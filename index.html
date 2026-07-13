@@ -132,6 +132,7 @@
   .confirm-actionrow{display:flex;gap:8px;padding:0 16px 16px;}
   .confirm-actionrow button{flex:1;border:none;border-radius:6px;padding:10px 0;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
   .confirm-okbtn{background:#c5221f;color:#fff;}
+  #update-apply.confirm-okbtn{background:var(--ledger-green);}
 
   .changelog-link{
     background:none;border:none;color:var(--stamp-red);font-size:inherit;text-decoration:underline;
@@ -153,15 +154,16 @@
   }
 
   /* ============ POPUP NOTIFIKASI VERSI BARU (auto-update) ============
-     Murni pemberitahuan — tidak ada tombol aksi apa pun, tidak mengubah
-     alur reload otomatis yang sudah berjalan. Popup ini otomatis lenyap
-     dengan sendirinya begitu halaman reload (bukan lewat JS khusus). */
-  .update-popup{width:280px;}
-  .update-popup-body{padding:26px 20px;text-align:center;}
-  .update-popup-icon{font-size:32px;margin-bottom:10px;animation:updateSpin 1.2s linear infinite;display:inline-block;}
-  @keyframes updateSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-  .update-popup-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px;}
-  .update-popup-text{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+     Popup ini murni pemberitahuan — TIDAK auto-reload sendiri. User yang
+     putuskan kapan reload lewat tombol "Perbarui Sekarang", atau tutup
+     dulu ("Nanti Saja" / ✕) dan reload nanti belakangan (lewat cek
+     berkala berikutnya, atau reload manual browser). */
+  .update-popup{width:320px;}
+  .update-popup-body{padding:14px 16px 6px;}
+  .update-popup-version{font-family:'Roboto Mono',monospace;font-weight:700;font-size:15px;color:var(--ledger-green);margin-bottom:6px;}
+  .update-popup-sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;}
+  .update-popup-list{margin:0;padding-left:18px;}
+  .update-popup-list li{font-size:12.5px;color:var(--ink);line-height:1.6;margin-bottom:3px;}
 
   @media (max-width:480px){
     /* Popup mobile: dikunci agar TIDAK PERNAH melebihi lebar layar
@@ -248,13 +250,13 @@
     border-top:2px solid var(--ink);border-bottom:none;margin-top:8px;padding-top:10px;
     font-family:'Roboto',sans-serif;font-weight:700;font-size:18px;
   }
-  .row .lbl{color:var(--ink-soft);}
+  .row .lbl{color:var(--ink);}
   .row .val{font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;}
   .row.total .val{color:var(--ledger-green);}
   .row input{max-width:150px;text-align:right;}
 
   .field{margin-bottom:10px;}
-  .field label{display:block;font-size:11px;color:var(--ink-soft);margin-bottom:3px;font-weight:500;}
+  .field label{display:block;font-size:11.5px;color:var(--ink);margin-bottom:4px;font-weight:600;}
 
   .breakdown{margin-top:12px;border-top:1px solid var(--line);padding-top:8px;}
   .breakdown .row{font-size:12px;border-bottom:none;}
@@ -415,8 +417,8 @@
 
   <header>
     <div>
-      <h1>Halawa Bintang Utama</h1>
-      <div class="sub">Kalkulator nota pesanan — versi HTML dari Format_Penjualan_2026_Offline.xlsx</div>
+      <h1>Rincian Pemesanan (Rp)</h1>
+      <div class="sub">Halawa Bintang Utama</div>
     </div>
     <div class="datebox">
       <div><b id="hariNow">–</b></div>
@@ -614,7 +616,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Nota Halawa &nbsp;·&nbsp; versi 1.5.1
+      Nota Halawa &nbsp;·&nbsp; versi 1.7.2
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -646,7 +648,45 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.5.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.7.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Balik posisi judul header: "Rincian Pemesanan (Rp)" jadi judul utama, "Halawa Bintang Utama" jadi subjudul.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.7.1</div>
+          <ul>
+            <li>Ganti teks subjudul header jadi "Rincian pemesanan (Rp)".</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.7.0</div>
+          <ul>
+            <li>Fitur baru: <b>auto-simpan draft</b> — isian pesanan otomatis tersimpan di HP dan dipulihkan lagi kalau tab/browser tidak sengaja tertutup atau HP mati baterai.</li>
+            <li>Fitur baru: <b>peringatan sebelum keluar</b> — browser akan menanyakan konfirmasi kalau mencoba menutup/refresh halaman padahal masih ada isian pesanan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.6.2</div>
+          <ul>
+            <li>Perbaikan kontras lanjutan: label "Total Qty", "Total Berat", "Subtotal Produk", "Ongkir", dan semua label baris ringkasan sejenis dipertegas jadi hitam — sebelumnya masih pudar.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.6.1</div>
+          <ul>
+            <li>Perbaikan kontras: label semua field (Ekspedisi, Rate Ongkir, Ongkir Manual, dll) dipertegas jadi hitam &amp; tebal — sebelumnya sempat kepencet balik jadi pudar saat penyederhanaan desain sebelumnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.6.0</div>
+          <ul>
+            <li>Popup "Versi Baru Tersedia" dirombak total: sekarang menampilkan <b>versi & daftar fitur baru sungguhan</b> (diambil langsung dari server, bukan generik), dan <b>tidak reload otomatis lagi</b> — user pilih sendiri lewat tombol "Perbarui Sekarang" atau "Nanti Saja".</li>
+            <li>Popup tidak muncul berulang untuk versi yang sama setelah ditutup — hanya muncul lagi kalau ada versi baru di atasnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.5.1</div>
           <ul>
             <li>Ubah arah navigasi <b>Enter</b>: sekarang turun ke baris berikutnya di kolom yang sama (seperti Excel), bukan geser ke samping lagi. Tombol <b>Tab</b> tetap perilaku bawaan browser (geser ke kanan lalu turun).</li>
           </ul>
@@ -723,11 +763,21 @@
 
   <!-- ================= POPUP NOTIFIKASI VERSI BARU (auto-update) ================= -->
   <div id="update-overlay" class="calc-overlay" hidden>
-    <div class="calc-popup update-popup" role="dialog" aria-label="Versi baru terdeteksi">
+    <div class="calc-popup update-popup" role="dialog" aria-label="Versi baru tersedia">
+      <div class="calc-head">
+        <span>Versi Baru Tersedia</span>
+        <button id="update-close" class="calc-close" aria-label="Tutup">✕</button>
+      </div>
       <div class="update-popup-body">
-        <div class="update-popup-icon">🔄</div>
-        <div class="update-popup-title">Versi Baru Terdeteksi</div>
-        <div class="update-popup-text">Sedang memperbarui otomatis, halaman akan dimuat ulang sebentar lagi…</div>
+        <div class="update-popup-version" id="update-version-label">Versi terbaru</div>
+        <div class="update-popup-sub">Ada pembaruan berikut:</div>
+        <ul class="update-popup-list" id="update-feature-list">
+          <li>Perbaikan &amp; peningkatan umum.</li>
+        </ul>
+      </div>
+      <div class="calc-actionrow">
+        <button id="update-later" class="calc-actbtn calc-clearbtn">Nanti Saja</button>
+        <button id="update-apply" class="calc-actbtn confirm-okbtn">Perbarui Sekarang</button>
       </div>
     </div>
   </div>
@@ -1314,6 +1364,125 @@ setupOngkirExclusive("cs-rate", "cs-ongkir-manual", "custom");
 
 calc("penjualan"); calc("custom");
 
+/* ============ Auto-simpan Draft + Peringatan Sebelum Keluar ============
+   Isian pesanan (kedua tab) otomatis tersimpan ke penyimpanan lokal HP
+   (localStorage) tiap kali ada perubahan, dan otomatis dipulihkan lagi
+   saat halaman dibuka ulang — jadi kalau HP mati baterai / tab
+   ke-tutup tidak sengaja / lupa nutup browser, isian tidak hilang. */
+(function(){
+  const DRAFT_KEY = "notaHalawaDraft_v1";
+
+  function serializeTab(tab){
+    const rows = [...document.querySelectorAll(`#rows-${tab} tr`)].map(tr => ({
+      prod: tr.querySelector("select.prod")?.value || "",
+      qty: tr.querySelector("input.qty")?.value || "",
+      diskon: tr.querySelector("input.diskon")?.value || ""
+    }));
+    const pfx = tab === "penjualan" ? "pj" : "cs";
+    const out = {
+      rows,
+      ekspedisi: document.getElementById(`${pfx}-ekspedisi`)?.value || "",
+      rate: document.getElementById(`${pfx}-rate`)?.value || "",
+      ongkirManual: document.getElementById(`${pfx}-ongkir-manual`)?.value || "",
+      kelebihan: document.getElementById(`${pfx}-kelebihan`)?.value || ""
+    };
+    if(tab === "custom") out.diskonOngkir = document.getElementById("cs-diskonongkir")?.value || "";
+    return out;
+  }
+
+  function saveDraft(){
+    try{
+      const data = { penjualan: serializeTab("penjualan"), custom: serializeTab("custom") };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+    }catch(e){ /* localStorage penuh/diblokir (mis. mode privasi) -> abaikan senyap */ }
+  }
+
+  function restoreTab(tab, data){
+    if(!data) return;
+    const pfx = tab === "penjualan" ? "pj" : "cs";
+    const trs = [...document.querySelectorAll(`#rows-${tab} tr`)];
+    (data.rows || []).forEach((rowData, i) => {
+      const tr = trs[i];
+      if(!tr) return;
+      const selEl = tr.querySelector("select.prod");
+      const qtyEl = tr.querySelector("input.qty");
+      const diskonEl = tr.querySelector("input.diskon");
+      if(selEl && rowData.prod) selEl.value = rowData.prod;
+      if(qtyEl && rowData.qty) qtyEl.value = rowData.qty;
+      if(diskonEl && rowData.diskon) diskonEl.value = rowData.diskon;
+    });
+    if(data.ekspedisi) document.getElementById(`${pfx}-ekspedisi`).value = data.ekspedisi;
+    if(data.rate) document.getElementById(`${pfx}-rate`).value = data.rate;
+    if(data.ongkirManual) document.getElementById(`${pfx}-ongkir-manual`).value = data.ongkirManual;
+    if(data.kelebihan) document.getElementById(`${pfx}-kelebihan`).value = data.kelebihan;
+    if(tab === "custom" && data.diskonOngkir) document.getElementById("cs-diskonongkir").value = data.diskonOngkir;
+  }
+
+  function hasAnyRowFilled(dataTab){
+    return !!(dataTab && dataTab.rows && dataTab.rows.some(r => r.prod || r.qty));
+  }
+
+  function loadDraft(){
+    try{
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      restoreTab("penjualan", data.penjualan);
+      restoreTab("custom", data.custom);
+      calc("penjualan"); calc("custom");
+      if(hasAnyRowFilled(data.penjualan) || hasAnyRowFilled(data.custom)){
+        showMsg("Draft pesanan sebelumnya berhasil dipulihkan.");
+      }
+    }catch(e){ /* draft rusak/tidak valid -> abaikan senyap, mulai kosong seperti biasa */ }
+  }
+
+  function hasUnsavedData(){
+    const rowsFilled = (tab) => [...document.querySelectorAll(`#rows-${tab} tr`)].some(tr => {
+      const sel = tr.querySelector("select.prod");
+      const qty = tr.querySelector("input.qty");
+      return (sel && sel.value) || (qty && qty.value);
+    });
+    return rowsFilled("penjualan") || rowsFilled("custom");
+  }
+
+  // simpan otomatis (debounced) tiap kali ada perubahan di field mana pun
+  let saveTimer = null;
+  document.addEventListener("input", (e)=>{
+    if(!e.target.matches("select.prod, input.qty, input.diskon, .rate-input, #pj-ekspedisi, #cs-ekspedisi, #pj-kelebihan, #cs-kelebihan, #cs-diskonongkir")) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveDraft, 400);
+  });
+  document.addEventListener("change", (e)=>{
+    if(!e.target.matches("select.prod, #pj-ekspedisi, #cs-ekspedisi")) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveDraft, 400);
+  });
+
+  // peringatan browser bawaan sebelum keluar/refresh kalau ada isian —
+  // KECUALI kalau reload-nya memang disengaja lewat aksi di app sendiri
+  // (misal tombol RESET yang sudah minta konfirmasi terpisah).
+  let allowNextUnload = false;
+  window.addEventListener("beforeunload", (e)=>{
+    if(allowNextUnload) return;
+    if(hasUnsavedData()){
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  });
+
+  // pulihkan draft begitu halaman dibuka
+  loadDraft();
+
+  // ekspos fungsi simpan & hapus draft supaya bisa dipakai fitur RESET
+  // (biar draft yang tersimpan ikut kosong saat user reset manual, dan
+  // supaya reload dari RESET tidak memicu peringatan keluar-halaman lagi).
+  window.__notaHalawaDraft = {
+    save: saveDraft,
+    clear: ()=>{ try{ localStorage.removeItem(DRAFT_KEY); }catch(e){} },
+    allowNextUnload: ()=>{ allowNextUnload = true; }
+  };
+})();
+
 /* ============ Tombol RESET ============
    Mengosongkan semua field yang terisi di TAB YANG SEDANG AKTIF saja
    (Penjualan atau Custom, sesuai tab yang lagi dibuka) — tidak menyentuh
@@ -1354,6 +1523,15 @@ calc("penjualan"); calc("custom");
 
     calc(activeTab);
     showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan — me-refresh halaman…`);
+
+    // Simpan ulang draft (sekarang sudah kosong untuk tab ini) supaya
+    // reload di bawah tidak "menghidupkan lagi" data yang baru dihapus,
+    // dan izinkan reload ini lewat tanpa memicu peringatan keluar-halaman
+    // (karena sudah dikonfirmasi lewat popup RESET-nya sendiri).
+    if(window.__notaHalawaDraft){
+      window.__notaHalawaDraft.save();
+      window.__notaHalawaDraft.allowNextUnload();
+    }
 
     // RESET juga berfungsi sebagai refresh sungguhan: reload penuh halaman
     // (bukan cuma reset tampilan), sekaligus jadi kesempatan tambahan untuk
@@ -1613,50 +1791,121 @@ document.addEventListener("keydown", (e)=>{
 })();
 
 
-/* ============ registrasi service worker (PWA) + AUTO-UPDATE ============ */
+/* ============ registrasi service worker (PWA) + UPDATE MANUAL ============
+   Popup "Versi Baru Tersedia" HANYA memberi tahu — tidak reload otomatis.
+   User yang putuskan lewat tombol "Perbarui Sekarang" (reload sekarang)
+   atau "Nanti Saja" (tutup, popup tidak muncul lagi untuk versi yang sama
+   sampai ada versi lebih baru lagi — dilacak lewat localStorage). */
 if ("serviceWorker" in navigator) {
   const updateOverlay = document.getElementById("update-overlay");
-  let refreshing = false;
+  const versionLabelEl = document.getElementById("update-version-label");
+  const featureListEl = document.getElementById("update-feature-list");
+  const btnClose = document.getElementById("update-close");
+  const btnLater = document.getElementById("update-later");
+  const btnApply = document.getElementById("update-apply");
+  const LS_KEY = "notaHalawaLastNotifiedVersion";
 
-  // Saat service worker baru resmi mengambil alih kontrol halaman,
-  // reload otomatis SEKALI saja (dijaga oleh flag `refreshing`
-  // supaya tidak terjadi loop reload tanpa henti).
+  let refreshing = false;
+  let pendingWorker = null;
+
+  // Reload cuma terjadi kalau USER yang minta (klik "Perbarui Sekarang"),
+  // lewat pengiriman pesan SKIP_WAITING di bawah — bukan otomatis lagi.
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (refreshing) return;
     refreshing = true;
     location.reload();
   });
 
+  function closeUpdatePopup(){ updateOverlay.hidden = true; }
+  btnClose.addEventListener("click", closeUpdatePopup);
+  btnLater.addEventListener("click", closeUpdatePopup);
+  updateOverlay.addEventListener("click", (e)=>{ if(e.target === updateOverlay) closeUpdatePopup(); });
+  document.addEventListener("keydown", (e)=>{ if(!updateOverlay.hidden && e.key === "Escape") closeUpdatePopup(); });
+
+  btnApply.addEventListener("click", ()=>{
+    closeUpdatePopup();
+    if(pendingWorker){
+      pendingWorker.postMessage({ type: "SKIP_WAITING" });
+    } else {
+      location.reload(); // jaring pengaman kalau referensi worker sudah hilang
+    }
+  });
+
+  // Ambil versi & daftar fitur baru LANGSUNG dari index.html yang baru di
+  // server (bukan dikarang) — parsing entri #1 di daftar Riwayat Update-nya.
+  async function getUpdateInfo(){
+    try{
+      const res = await fetch("index.html?_swbypass=1&_t=" + Date.now(), { cache: "no-store" });
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, "text/html");
+      const firstItem = doc.querySelector(".changelog-item");
+      if(!firstItem) return null;
+      const verEl = firstItem.querySelector(".changelog-ver");
+      let version = null;
+      if(verEl){
+        version = [...verEl.childNodes]
+          .filter(n => n.nodeType === Node.TEXT_NODE)
+          .map(n => n.textContent.trim()).join("").trim();
+      }
+      const items = [...firstItem.querySelectorAll("li")].map(li => li.textContent.trim());
+      return { version: version || null, items };
+    }catch(e){
+      return null;
+    }
+  }
+
+  async function showUpdatePopup(newWorker){
+    const info = await getUpdateInfo();
+    const versionKey = info && info.version ? info.version : null;
+
+    // Sudah pernah dikasih tahu untuk versi yang SAMA -> jangan ulangi.
+    // Popup hanya muncul lagi kalau versionKey berbeda (ada versi lebih baru lagi).
+    if(versionKey && localStorage.getItem(LS_KEY) === versionKey) return;
+    if(versionKey) localStorage.setItem(LS_KEY, versionKey);
+
+    pendingWorker = newWorker;
+    versionLabelEl.textContent = versionKey ? versionKey : "Versi terbaru";
+    if(info && info.items && info.items.length){
+      featureListEl.innerHTML = info.items.map(t => `<li>${t}</li>`).join("");
+    } else {
+      featureListEl.innerHTML = `<li>Perbaikan &amp; peningkatan umum.</li>`;
+    }
+    updateOverlay.hidden = false;
+  }
+
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").then((reg) => {
 
-      // Fungsi pengecek update: dipanggil berkala & saat tab aktif lagi
       const checkForUpdate = () => { reg.update().catch(()=>{}); };
 
       // 1) Cek update tiap 5 menit selama app terbuka
       setInterval(checkForUpdate, 5 * 60 * 1000);
 
       // 2) Cek update tiap kali user kembali ke tab ini
-      //    (mis. buka app lain lalu balik lagi ke Nota Halawa)
       document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") checkForUpdate();
       });
 
-      // 3) Kalau service worker menemukan file baru sedang di-install,
-      //    pantau sampai statusnya "installed" lalu suruh langsung aktif
-      //    (skipWaiting), dan tampilkan toast supaya user tahu kenapa
-      //    halaman tiba-tiba reload sendiri.
+      // 3) Kalau ada worker baru yang sudah "installed" dan menunggu giliran
+      //    aktif -> tampilkan popup (BUKAN langsung skipWaiting/reload).
+      //    sw.js sendiri TIDAK lagi auto-skipWaiting saat install, jadi
+      //    worker baru akan diam menunggu sampai user klik "Perbarui Sekarang".
       reg.addEventListener("updatefound", () => {
         const newWorker = reg.installing;
         if (!newWorker) return;
         newWorker.addEventListener("statechange", () => {
           if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-            if (updateOverlay) updateOverlay.hidden = false;
-            // beri jeda sebentar biar popup sempat terbaca sebelum reload
-            newWorker.postMessage({ type: "SKIP_WAITING" });
+            showUpdatePopup(newWorker);
           }
         });
       });
+
+      // 4) Kalau pas halaman ini dibuka TERNYATA sudah ada worker yang
+      //    lagi menunggu (mis. dari sesi sebelumnya yang belum di-apply)
+      //    -> langsung tawarkan juga, tidak perlu tunggu updatefound baru.
+      if(reg.waiting && navigator.serviceWorker.controller){
+        showUpdatePopup(reg.waiting);
+      }
 
     }).catch(err=>{
       console.log("Service worker gagal didaftarkan:", err);

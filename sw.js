@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v5";
+const CACHE_VERSION = "v11";
 const CACHE_NAME = "nota-halawa-" + CACHE_VERSION;
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
 const CORE_ASSETS = [
@@ -31,13 +31,15 @@ self.addEventListener("install", (event) => {
       );
     })
   );
-  self.skipWaiting();
+  // SENGAJA TIDAK panggil self.skipWaiting() di sini lagi — worker baru
+  // akan diam menunggu ("waiting") sampai halaman mengirim pesan
+  // SKIP_WAITING (dipicu saat user klik tombol "Perbarui Sekarang" di
+  // popup notifikasi). Ini yang bikin update tidak lagi otomatis
+  // langsung reload, tapi menunggu persetujuan user dulu.
 });
 /* ---------- MESSAGE: terima sinyal "SKIP_WAITING" dari halaman ----------
-   index.html mengirim ini begitu mendeteksi service worker baru sudah
-   ter-install. self.skipWaiting() di atas sebenarnya sudah membuat SW baru
-   langsung aktif tanpa nunggu — listener ini dijaga sebagai jaring pengaman
-   kalau suatu saat auto-skipWaiting di atas dihapus/diubah jadi manual. */
+   Ini SEKARANG SATU-SATUNYA jalur yang membuat worker baru aktif —
+   dikirim index.html begitu user klik "Perbarui Sekarang" di popup. */
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
@@ -68,6 +70,12 @@ self.addEventListener("fetch", (event) => {
   const isSameOrigin = url.origin === self.location.origin;
   if (!isSameOrigin) {
     // biarkan browser yang urus (font Google, cdnjs html2canvas, dst)
+    return;
+  }
+  // Request khusus pengecekan update (dari getUpdateInfo() di index.html)
+  // sengaja DILEWATKAN dari cache sama sekali, supaya selalu ambil versi
+  // TERBARU dari jaringan — bukan versi lama yang kebetulan sudah tercache.
+  if (url.searchParams.has("_swbypass")) {
     return;
   }
   event.respondWith(
