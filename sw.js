@@ -4,10 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-
 const CACHE_VERSION = "v2";
 const CACHE_NAME = "nota-halawa-" + CACHE_VERSION;
-
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
 const CORE_ASSETS = [
   "./",
@@ -17,7 +15,6 @@ const CORE_ASSETS = [
   "./icon-512.png",
   "./apple-touch-icon.png"
 ];
-
 /* ---------- INSTALL: simpan app-shell ke cache ---------- */
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -36,7 +33,16 @@ self.addEventListener("install", (event) => {
   );
   self.skipWaiting();
 });
-
+/* ---------- MESSAGE: terima sinyal "SKIP_WAITING" dari halaman ----------
+   index.html mengirim ini begitu mendeteksi service worker baru sudah
+   ter-install. self.skipWaiting() di atas sebenarnya sudah membuat SW baru
+   langsung aktif tanpa nunggu — listener ini dijaga sebagai jaring pengaman
+   kalau suatu saat auto-skipWaiting di atas dihapus/diubah jadi manual. */
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
 /* ---------- ACTIVATE: bersihkan cache versi lama ---------- */
 self.addEventListener("activate", (event) => {
   event.waitUntil(
@@ -50,25 +56,20 @@ self.addEventListener("activate", (event) => {
   );
   self.clients.claim();
 });
-
 /* ---------- FETCH: cache-first untuk same-origin, ---------- 
    fallback ke network. Untuk request lintas domain (font, cdnjs,
    dll) biarkan lewat langsung ke network — tidak dipaksa cache,
    supaya tidak ada masalah CORS/opaque response. */
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-
   // hanya tangani GET
   if (req.method !== "GET") return;
-
   const url = new URL(req.url);
   const isSameOrigin = url.origin === self.location.origin;
-
   if (!isSameOrigin) {
     // biarkan browser yang urus (font Google, cdnjs html2canvas, dst)
     return;
   }
-
   event.respondWith(
     caches.match(req).then((cached) => {
       const networkFetch = fetch(req)
@@ -81,7 +82,6 @@ self.addEventListener("fetch", (event) => {
           return res;
         })
         .catch(() => cached); // offline & tidak ada di cache -> gagal senyap
-
       // tampilkan versi cache dulu kalau ada (cepat), sambil update di belakang layar
       return cached || networkFetch;
     })
