@@ -65,6 +65,11 @@
     border-radius:4px 4px 0 0;position:relative;top:1px;
   }
   .tab-btn.active{background:var(--card);color:var(--ink);border-bottom:2px solid var(--stamp-red);font-weight:700;}
+  .reset-btn{
+    margin-left:auto;color:#c5221f;font-weight:700;border-color:var(--line);
+    background:var(--paper-dark);letter-spacing:.03em;
+  }
+  .reset-btn:hover{background:#fce8e6;border-color:#f3b4ae;}
   .panel{display:none;}
   .panel.active{display:block;animation:fade .2s ease;}
   @keyframes fade{from{opacity:0;}to{opacity:1;}}
@@ -118,6 +123,16 @@
   .calc-msg{font-size:11px;color:var(--ink-soft);text-align:center;padding:6px 10px 10px;min-height:26px;}
 
   /* ============ RIWAYAT UPDATE (CHANGELOG) ============ */
+  /* ============ Popup Konfirmasi (pengganti confirm() bawaan browser,
+     yang sering diblokir di iframe/preview) ============ */
+  .confirm-popup{width:300px;}
+  .confirm-body{padding:16px;}
+  .confirm-body p{margin:0 0 6px;font-size:13.5px;color:var(--ink);line-height:1.5;}
+  .confirm-body .confirm-warning{font-size:11.5px;color:#c5221f;margin-bottom:0;}
+  .confirm-actionrow{display:flex;gap:8px;padding:0 16px 16px;}
+  .confirm-actionrow button{flex:1;border:none;border-radius:6px;padding:10px 0;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
+  .confirm-okbtn{background:#c5221f;color:#fff;}
+
   .changelog-link{
     background:none;border:none;color:var(--stamp-red);font-size:inherit;text-decoration:underline;
     cursor:pointer;padding:0;font-family:'Roboto',sans-serif;
@@ -206,25 +221,6 @@
   }
   select:focus, input:focus{outline:2px solid var(--stamp-red);outline-offset:-1px;border-color:var(--stamp-red);}
   input[readonly]{background:transparent;border-color:transparent;color:var(--ink-soft);padding-left:2px;}
-  .rate-input:disabled{background:#eef0f2;color:#9aa0a6;cursor:not-allowed;border-style:dashed;}
-
-  /* ============ Badge status field Ongkir (Rate vs Manual, saling eksklusif) ============ */
-  .ongkir-field{
-    border:1px solid var(--line);border-radius:6px;padding:8px 10px 10px;transition:border-color .15s;
-  }
-  .ongkir-field.is-active{border-color:var(--ledger-green);border-width:1.5px;background:#f2f8f2;}
-  .ongkir-field.is-locked{background:var(--paper-dark);}
-  .ongkir-field .rate-input{border:none;background:transparent;padding:2px 0;font-size:14px;}
-  .ongkir-field.is-active .rate-input{font-weight:700;color:var(--ink);}
-  .ongkir-labelrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:2px;}
-  .ongkir-field .ongkir-labelrow label{font-size:12px;color:var(--ink);font-weight:600;margin:0;}
-  .ongkir-badge{
-    font-size:9px;font-weight:700;padding:2px 7px;border-radius:9px;text-transform:uppercase;
-    letter-spacing:.02em;white-space:nowrap;flex-shrink:0;
-  }
-  .ongkir-field.is-active .ongkir-badge{background:var(--ledger-green);color:#fff;}
-  .ongkir-field.is-locked .ongkir-badge{background:#e0e0e0;color:#888;}
-  .ongkir-field.is-neutral .ongkir-badge{display:none;}
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   input[type=number]{-moz-appearance:textfield;}
@@ -420,6 +416,7 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="penjualan">Penjualan (Grosir)</button>
     <button class="tab-btn" data-tab="custom">Custom</button>
+    <button class="tab-btn reset-btn" id="btn-reset" title="Kosongkan semua isian di tab yang aktif">RESET</button>
   </div>
 
   <div class="toolbar">
@@ -495,18 +492,12 @@
             <label>Ekspedisi</label>
             <select id="pj-ekspedisi"></select>
           </div>
-          <div class="field ongkir-field is-neutral" id="pj-rate-wrap">
-            <div class="ongkir-labelrow">
-              <label>Rate ongkir (Rp / kg)</label>
-              <span class="ongkir-badge" id="pj-rate-badge">● Aktif</span>
-            </div>
+          <div class="field">
+            <label>Rate ongkir (Rp / kg)</label>
             <input type="text" inputmode="numeric" id="pj-rate" class="rate-input" placeholder="0" value="">
           </div>
-          <div class="field ongkir-field is-neutral" id="pj-ongkir-manual-wrap">
-            <div class="ongkir-labelrow">
-              <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
-              <span class="ongkir-badge" id="pj-ongkir-manual-badge">🔒 Terkunci</span>
-            </div>
+          <div class="field">
+            <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
             <input type="text" inputmode="numeric" id="pj-ongkir-manual" class="rate-input" placeholder="0" value="">
           </div>
           <div class="note" id="pj-note">Aturan khusus: jika ekspedisi <b>IDTruck</b> dan berat &lt; 10 kg, ongkir tetap dihitung minimal 10 kg. Pembulatan berat memakai aturan longgar (≥1) untuk Sentral Cargo / Wahana / Laris Cargo, selain itu memakai aturan ketat (≥2).</div>
@@ -564,18 +555,12 @@
             <label>Ekspedisi</label>
             <select id="cs-ekspedisi"></select>
           </div>
-          <div class="field ongkir-field is-neutral" id="cs-rate-wrap">
-            <div class="ongkir-labelrow">
-              <label>Rate ongkir (Rp / kg)</label>
-              <span class="ongkir-badge" id="cs-rate-badge">● Aktif</span>
-            </div>
+          <div class="field">
+            <label>Rate ongkir (Rp / kg)</label>
             <input type="text" inputmode="numeric" id="cs-rate" class="rate-input" placeholder="0" value="">
           </div>
-          <div class="field ongkir-field is-neutral" id="cs-ongkir-manual-wrap">
-            <div class="ongkir-labelrow">
-              <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
-              <span class="ongkir-badge" id="cs-ongkir-manual-badge">🔒 Terkunci</span>
-            </div>
+          <div class="field">
+            <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
             <input type="text" inputmode="numeric" id="cs-ongkir-manual" class="rate-input" placeholder="0" value="">
           </div>
           <div class="note" id="cs-note">Di sheet Custom: kolom <b>Diskon</b> diisi manual per baris (bukan otomatis), tidak ada aturan minimum 10&nbsp;kg untuk IDTruck, dan subsidi ongkir tidak otomatis (isi manual). Ini sesuai struktur asli filenya.</div>
@@ -618,10 +603,28 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Nota Halawa &nbsp;·&nbsp; versi 1.2.2
+      Nota Halawa &nbsp;·&nbsp; versi 1.4.1
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
+
+  <!-- ================= POPUP KONFIRMASI RESET ================= -->
+  <div id="reset-confirm-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup confirm-popup" role="dialog" aria-label="Konfirmasi reset">
+      <div class="calc-head">
+        <span>Konfirmasi Reset</span>
+        <button id="reset-confirm-close" class="calc-close" aria-label="Batal">✕</button>
+      </div>
+      <div class="confirm-body">
+        <p id="reset-confirm-text">Kosongkan semua isian di tab ini?</p>
+        <p class="confirm-warning">Tindakan ini tidak bisa dibatalkan.</p>
+      </div>
+      <div class="confirm-actionrow">
+        <button id="reset-confirm-cancel" class="calc-actbtn calc-clearbtn">Batal</button>
+        <button id="reset-confirm-ok" class="calc-actbtn confirm-okbtn">Ya, Kosongkan</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= POPUP RIWAYAT UPDATE (CHANGELOG) ================= -->
   <div id="changelog-overlay" class="calc-overlay" hidden>
@@ -632,7 +635,32 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.2.2 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.4.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Perbaikan bug: konfirmasi tombol RESET diganti dari dialog bawaan browser (<code>confirm()</code>) ke popup buatan sendiri — dialog bawaan sering diblokir saat dibuka lewat iframe/preview, membuat tombolnya terlihat tidak berfungsi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.4.0</div>
+          <ul>
+            <li>Fitur baru: tombol <b>RESET</b> (teks merah) di sebelah tab Custom — mengosongkan semua isian di tab yang sedang aktif, lengkap dengan konfirmasi supaya tidak kepencet tidak sengaja.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.3.1</div>
+          <ul>
+            <li>Ubah logika Rate Ongkir vs Ongkir Manual: dari saling <b>mengunci</b> jadi saling <b>me-nol-kan</b> (sesuai logika Excel asli) — kedua field sekarang selalu bisa diklik/diedit kapan saja, tidak ada lagi yang terkunci.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.3.0</div>
+          <ul>
+            <li>Fitur baru: tekan <b>Enter</b> di kolom mana pun (dropdown produk, Qty, Diskon, Ekspedisi, Rate, dst) otomatis pindah ke kolom berikutnya, seperti Tab.</li>
+            <li>Perbaikan bug: hasil Kalkulator Manual kadang tertimpa angka lama saat tombol Enter fisik ditekan — sekarang selalu akurat.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.2.2</div>
           <ul>
             <li>Tambah <b>badge status</b> ("● Aktif" / "🔒 Terkunci") pada field Rate Ongkir &amp; Ongkir Manual, supaya jelas kelihatan mana yang sedang dipakai — mencegah salah isi.</li>
           </ul>
@@ -866,7 +894,7 @@ function calc(sheet){
     // Ongkir yang berlaku sekarang (otomatis ATAU manual — bukan cuma otomatis).
     const pjManualStr = document.getElementById("pj-ongkir-manual").value.trim();
     const pjManualVal = parseFloat(pjManualStr.replace(/\./g,"").replace(/,/g,"."));
-    const pjPakaiManual = pjManualStr !== "" && !isNaN(pjManualVal);
+    const pjPakaiManual = pjManualStr !== "" && !isNaN(pjManualVal) && pjManualVal !== 0;
     if(pjPakaiManual) ongkir = pjManualVal;
 
     diskonOngkir = isIdtruck
@@ -893,7 +921,7 @@ function calc(sheet){
     // Ongkir Manual (opsional) — sama seperti tab Penjualan, menimpa hasil otomatis.
     const csManualStr = document.getElementById("cs-ongkir-manual").value.trim();
     const csManualVal = parseFloat(csManualStr.replace(/\./g,"").replace(/,/g,"."));
-    const csPakaiManual = csManualStr !== "" && !isNaN(csManualVal);
+    const csPakaiManual = csManualStr !== "" && !isNaN(csManualVal) && csManualVal !== 0;
     if(csPakaiManual) ongkir = csManualVal;
 
     diskonOngkir = parseFloat(document.getElementById("cs-diskonongkir").value)||0;
@@ -935,9 +963,9 @@ function buildRegionTable(){
 }
 
 /* ============ tabs ============ */
-document.querySelectorAll(".tab-btn").forEach(btn=>{
+document.querySelectorAll(".tab-btn[data-tab]").forEach(btn=>{
   btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".tab-btn[data-tab]").forEach(b=>b.classList.remove("active"));
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
@@ -1217,49 +1245,31 @@ document.querySelectorAll(".rate-input").forEach(el=>{
    ongkir jadi ambigu (dua sumber ongkir aktif bersamaan). Badge status
    ("● Aktif" / "🔒 Terkunci") ditampilkan supaya jelas kelihatan mana yang
    lagi dipakai, biar pengguna tidak salah isi field. */
+/* Rate Ongkir vs Ongkir Manual saling me-nol-kan — TIDAK ADA PENGUNCIAN.
+   Kedua field selalu bisa diklik & diketik kapan saja. Begitu salah satu
+   diisi angka bukan-nol, field satunya otomatis di-set ke 0 (bukan
+   dikosongkan, bukan di-disable) — persis logika VBA Worksheet_Change
+   pada sel L5 (Rate) & L9 (Ongkir Manual) di file Excel aslinya. */
 function setupOngkirExclusive(rateId, manualId, sheetName){
   const rateEl = document.getElementById(rateId);
   const manualEl = document.getElementById(manualId);
-  const rateWrap = document.getElementById(rateId+"-wrap");
-  const manualWrap = document.getElementById(manualId+"-wrap");
-  const rateBadge = document.getElementById(rateId+"-badge");
-  const manualBadge = document.getElementById(manualId+"-badge");
 
-  function setState(activeWrap, activeBadge, lockedWrap, lockedBadge, isNeutral){
-    [activeWrap, lockedWrap].forEach(w=>w.classList.remove("is-active","is-locked","is-neutral"));
-    if(isNeutral){
-      activeWrap.classList.add("is-neutral");
-      lockedWrap.classList.add("is-neutral");
-    } else {
-      activeWrap.classList.add("is-active");
-      activeBadge.textContent = "● Aktif";
-      lockedWrap.classList.add("is-locked");
-      lockedBadge.textContent = "🔒 Terkunci";
-    }
+  function parseNum(str){
+    return parseFloat(String(str).replace(/\./g,"").replace(/,/g,"."));
   }
 
   rateEl.addEventListener("input", ()=>{
-    const rateFilled = rateEl.value.trim() !== "" && rateEl.value.trim() !== "0";
-    if(rateFilled){
-      manualEl.value = "";
-      manualEl.disabled = true;
-      setState(rateWrap, rateBadge, manualWrap, manualBadge, false);
-    } else {
-      manualEl.disabled = false;
-      setState(rateWrap, rateBadge, manualWrap, manualBadge, true);
+    const val = parseNum(rateEl.value);
+    if(rateEl.value.trim() !== "" && !isNaN(val) && val !== 0){
+      manualEl.value = "0";
     }
     calc(sheetName);
   });
 
   manualEl.addEventListener("input", ()=>{
-    const manualFilled = manualEl.value.trim() !== "";
-    if(manualFilled){
-      rateEl.value = "";
-      rateEl.disabled = true;
-      setState(manualWrap, manualBadge, rateWrap, rateBadge, false);
-    } else {
-      rateEl.disabled = false;
-      setState(manualWrap, manualBadge, rateWrap, rateBadge, true);
+    const val = parseNum(manualEl.value);
+    if(manualEl.value.trim() !== "" && !isNaN(val) && val !== 0){
+      rateEl.value = "0";
     }
     calc(sheetName);
   });
@@ -1268,6 +1278,92 @@ setupOngkirExclusive("pj-rate", "pj-ongkir-manual", "penjualan");
 setupOngkirExclusive("cs-rate", "cs-ongkir-manual", "custom");
 
 calc("penjualan"); calc("custom");
+
+/* ============ Tombol RESET ============
+   Mengosongkan semua field yang terisi di TAB YANG SEDANG AKTIF saja
+   (Penjualan atau Custom, sesuai tab yang lagi dibuka) — tidak menyentuh
+   tab satunya. Pakai popup konfirmasi buatan sendiri (bukan confirm()
+   bawaan browser), karena confirm()/alert() sering diblokir browser di
+   dalam iframe/preview sehingga tombolnya terlihat "tidak berfungsi". */
+(function(){
+  const overlay = document.getElementById("reset-confirm-overlay");
+  const textEl = document.getElementById("reset-confirm-text");
+  const btnCancel = document.getElementById("reset-confirm-cancel");
+  const btnClose = document.getElementById("reset-confirm-close");
+  const btnOk = document.getElementById("reset-confirm-ok");
+  let targetTab = null;
+
+  function openConfirm(tab){
+    targetTab = tab;
+    const namaTab = tab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
+    textEl.textContent = `Kosongkan semua isian di tab "${namaTab}"?`;
+    overlay.hidden = false;
+  }
+  function closeConfirm(){ overlay.hidden = true; targetTab = null; }
+
+  function doReset(activeTab){
+    const pfx = activeTab === "penjualan" ? "pj" : "cs";
+    const namaTab = activeTab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
+
+    document.querySelectorAll(`#rows-${activeTab} select.prod`).forEach(el => el.value = "");
+    document.querySelectorAll(`#rows-${activeTab} input.qty`).forEach(el => el.value = "");
+    document.querySelectorAll(`#rows-${activeTab} input.diskon`).forEach(el => el.value = "");
+
+    document.getElementById(`${pfx}-ekspedisi`).value = "";
+    document.getElementById(`${pfx}-rate`).value = "";
+    document.getElementById(`${pfx}-ongkir-manual`).value = "";
+    document.getElementById(`${pfx}-kelebihan`).value = "0";
+    if(activeTab === "custom"){
+      document.getElementById("cs-diskonongkir").value = "0";
+    }
+
+    calc(activeTab);
+    showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan.`);
+  }
+
+  document.getElementById("btn-reset").addEventListener("click", ()=>{
+    const activeTab = document.querySelector(".tab-btn.active[data-tab]").dataset.tab;
+    openConfirm(activeTab);
+  });
+  btnOk.addEventListener("click", ()=>{
+    if(targetTab) doReset(targetTab);
+    closeConfirm();
+  });
+  btnCancel.addEventListener("click", closeConfirm);
+  btnClose.addEventListener("click", closeConfirm);
+  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeConfirm(); });
+  document.addEventListener("keydown", (e)=>{ if(!overlay.hidden && e.key === "Escape") closeConfirm(); });
+})();
+
+/* ============ Navigasi via tombol Enter ============
+   Tekan Enter di dropdown produk, Qty, Diskon (Custom), Ekspedisi, Rate,
+   Ongkir Manual, atau Kelebihan bayar -> otomatis pindah fokus ke field
+   berikutnya (urut sesuai posisi di layar), seperti menekan Tab. Kalau
+   sudah di field terakhir, Enter tidak melakukan apa-apa (tidak wrap). */
+function getFocusableFieldsInPanel(panelEl){
+  return [...panelEl.querySelectorAll(
+    "select:not(:disabled), input:not(:disabled):not([type=hidden])"
+  )].filter(el => el.offsetParent !== null); // hanya yang benar-benar terlihat
+}
+document.addEventListener("keydown", (e)=>{
+  if(e.key !== "Enter") return;
+  const target = e.target;
+  if(!(target.matches("select, input"))) return;
+
+  const panel = target.closest(".panel");
+  if(!panel) return; // Enter di luar area form nota (mis. di dalam popup kalkulator) -> abaikan di sini
+
+  e.preventDefault();
+  const fields = getFocusableFieldsInPanel(panel);
+  const idx = fields.indexOf(target);
+  if(idx > -1 && idx < fields.length - 1){
+    const next = fields[idx + 1];
+    next.focus();
+    if(next.select) next.select(); // langsung blok isi field angka, siap ditimpa ketikan
+  } else if(idx === fields.length - 1){
+    target.blur(); // sudah field terakhir, cuma tutup keyboard/fokus
+  }
+});
 
 /* ============ Kalkulator Manual (popup) ============ */
 (function(){
@@ -1419,13 +1515,16 @@ calc("penjualan"); calc("custom");
   // dukungan keyboard fisik saat popup terbuka (opsional, memudahkan di desktop)
   document.addEventListener("keydown", (e)=>{
     if(overlay.hidden) return;
-    if(/^[0-9]$/.test(e.key)){ resetMsg(); inputDigit(e.key); }
-    else if(e.key === "."){ resetMsg(); inputDot(); }
-    else if(e.key === "Backspace"){ resetMsg(); backspace(); }
-    else if(e.key === "Enter" || e.key === "="){ resetMsg(); equals(); }
-    else if(e.key === "+"){ resetMsg(); chooseOp("+"); }
-    else if(e.key === "-"){ resetMsg(); chooseOp("−"); }
-    else if(e.key === "*"){ resetMsg(); chooseOp("×"); }
+    // preventDefault di semua kondisi supaya tombol <button> yang masih fokus
+    // (bekas diklik terakhir) tidak ikut "diklik ulang" otomatis oleh browser
+    // saat tombol fisik Enter/Spasi ditekan — itu akar bug hasil ketimpa.
+    if(/^[0-9]$/.test(e.key)){ e.preventDefault(); resetMsg(); inputDigit(e.key); }
+    else if(e.key === "."){ e.preventDefault(); resetMsg(); inputDot(); }
+    else if(e.key === "Backspace"){ e.preventDefault(); resetMsg(); backspace(); }
+    else if(e.key === "Enter" || e.key === "="){ e.preventDefault(); resetMsg(); equals(); }
+    else if(e.key === "+"){ e.preventDefault(); resetMsg(); chooseOp("+"); }
+    else if(e.key === "-"){ e.preventDefault(); resetMsg(); chooseOp("−"); }
+    else if(e.key === "*"){ e.preventDefault(); resetMsg(); chooseOp("×"); }
     else if(e.key === "/"){ e.preventDefault(); resetMsg(); chooseOp("÷"); }
   });
 })();
