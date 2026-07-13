@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#188038">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nota Halawa">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<title>Nota Pesanan — Halawa Bintang Utama (Spreadsheet Klasik)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --paper:#ffffff;
+    --paper-dark:#f8f9fa;
+    --ink:#1a1a1a;
+    --ink-soft:#5f6368;
+    --stamp-red:#1a73e8;
+    --ledger-green:#188038;
+    --line:#d3d6db;
+    --card:#ffffff;
+    --white-ish:#ffffff;
+  }
+  html{-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper-dark);
+    color:var(--ink);
+    font-family:'Roboto', sans-serif;
+    padding:28px clamp(16px, 3vw, 48px) 80px;
+    min-height:100vh;
+  }
+  .wrap{max-width:1100px;margin:0 auto;}
+
+  header{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:12px;margin-bottom:18px;flex-wrap:wrap;gap:10px;
+  }
+  header h1{
+    font-family:'Roboto',sans-serif;font-weight:700;font-size:clamp(20px,3vw,26px);
+    margin:0;letter-spacing:0;
+  }
+  header .sub{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
+  .datebox{
+    font-family:'Roboto Mono',monospace;text-align:right;font-size:12.5px;color:var(--ink-soft);
+    line-height:1.5;
+  }
+  .datebox b{color:var(--ink);font-size:13.5px;}
+
+  .tabs{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--line);}
+  .tab-btn{
+    font-family:'Roboto',sans-serif;font-weight:500;font-size:13.5px;
+    background:var(--paper-dark);border:1px solid var(--line);border-bottom:none;
+    padding:9px 20px;cursor:pointer;color:var(--ink-soft);
+    border-radius:4px 4px 0 0;position:relative;top:1px;
+  }
+  .tab-btn.active{background:var(--card);color:var(--ink);border-bottom:2px solid var(--stamp-red);font-weight:700;}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fade .2s ease;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+
+  .toolbar{display:flex;align-items:center;gap:8px;margin:14px 0;flex-wrap:wrap;}
+  .action-btn{
+    font-family:'Roboto',sans-serif;font-size:12.5px;font-weight:500;
+    background:var(--card);border:1px solid var(--line);color:var(--ink);
+    padding:7px 14px;border-radius:4px;cursor:pointer;
+  }
+  .action-btn:hover{background:var(--paper-dark);border-color:var(--stamp-red);}
+  .action-btn:disabled{opacity:.5;cursor:wait;}
+  .toolbar-msg{font-size:12px;color:var(--ink-soft);}
+
+  /* ============ POPUP KALKULATOR MANUAL ============ */
+  .calc-overlay{
+    position:fixed;inset:0;background:rgba(20,20,20,.35);
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:90px 16px 16px;z-index:1000;
+  }
+  .calc-overlay[hidden]{display:none;}
+  .calc-popup{
+    width:300px;max-width:100%;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.22);
+    animation:calcpop .15s ease;
+  }
+  @keyframes calcpop{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+  .calc-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 14px;border-bottom:1px solid var(--line);
+    font-size:12.5px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;
+  }
+  .calc-close{background:none;border:none;font-size:15px;color:var(--ink-soft);cursor:pointer;padding:2px 6px;line-height:1;}
+  .calc-display{background:#1a1a1a;color:#fff;padding:16px 14px;text-align:right;}
+  .calc-prev{font-size:12px;color:#9aa0a6;font-family:'Roboto Mono',monospace;min-height:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .calc-curr{font-size:26px;font-weight:700;font-family:'Roboto Mono',monospace;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .calc-actionrow{display:flex;gap:6px;padding:8px 10px;background:var(--paper-dark);border-bottom:1px solid var(--line);}
+  .calc-actbtn{flex:1;border:none;border-radius:6px;padding:8px 0;font-size:11.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
+  .calc-clearbtn{background:#fce8e6;color:#c5221f;}
+  .calc-copybtn{background:var(--ledger-green);color:#fff;}
+  .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);padding:1px;}
+  .calc-key{
+    border:none;background:#fff;padding:14px 0;font-size:15px;font-weight:600;color:var(--ink);
+    cursor:pointer;font-family:'Roboto Mono',monospace;
+  }
+  .calc-key:active{background:#eef0f2;}
+  .calc-fn{background:#f1f5fe;color:var(--ink-soft);font-family:'Roboto',sans-serif;font-size:13px;}
+  .calc-op{background:#f1f5fe;color:var(--stamp-red);}
+  .calc-eq{background:var(--ledger-green);color:#fff;}
+  .calc-zero{grid-column:span 1;}
+  .calc-msg{font-size:11px;color:var(--ink-soft);text-align:center;padding:6px 10px 10px;min-height:26px;}
+
+  @media (max-width:480px){
+    /* Popup mobile: dikunci agar TIDAK PERNAH melebihi lebar layar
+       (width:100% dari area yang sudah dikurangi padding overlay,
+       bukan lebar tetap 300px) — jadi tidak memicu scroll horizontal
+       apa pun ukuran HP-nya. */
+    .calc-overlay{padding:70px 12px 12px;align-items:flex-start;}
+    .calc-popup{width:100%;max-width:340px;}
+    .calc-curr{font-size:24px;}
+    .calc-key{padding:15px 0;font-size:15px;}
+  }
+
+
+  .sheet{
+    background:var(--card);border:1px solid var(--line);border-radius:0;
+    padding:0;position:relative;
+  }
+  .sheet::before{content:none;}
+
+  .grid{display:grid;grid-template-columns:1.6fr 1fr;gap:0;align-items:start;border:1px solid var(--line);border-top:none;}
+  .grid > div{padding:20px 24px;}
+  .grid > div:first-child{border-right:1px solid var(--line);}
+  @media (max-width:860px){.grid{grid-template-columns:1fr;}.grid > div:first-child{border-right:none;border-bottom:1px solid var(--line);}.grid > div{padding:18px 20px;}}
+
+  /* ===== layar besar: naikkan sedikit ukuran huruf & jarak baca tabel ===== */
+  @media (min-width:1400px){
+    table{font-size:13.5px;}
+    thead th{font-size:11.5px;padding:8px 9px;}
+    tbody td{padding:7px 9px;}
+    .row{font-size:13.5px;}
+    .field label{font-size:11.5px;}
+  }
+
+  h2.section-title{
+    font-family:'Roboto',sans-serif;font-size:13px;font-weight:700;margin:0 0 10px;
+    text-transform:uppercase;letter-spacing:.03em;color:var(--ink-soft);
+    padding-bottom:8px;border-bottom:1px solid var(--line);
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed;border:1px solid var(--line);}
+  .col-no{width:22px;}
+  .col-qty{width:60px;}
+  .col-harga{width:90px;}
+  .col-diskon{width:82px;}
+  .col-satuan{width:92px;}
+  .col-total{width:130px;}
+  .col-desk{width:160px;}
+  /* Kolom Deskripsi diberi lebar pasti 200px (bukan clamp/vw) supaya stabil dan
+     dapat diprediksi di semua lebar desktop — tidak bergantung pada sisa ruang
+     yang bisa berubah-ubah dan tidak stabil di lebar layar tertentu. */
+  .table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .table-scroll table{min-width:580px;}
+  thead th{
+    text-align:left;font-family:'Roboto',sans-serif;font-weight:700;
+    font-size:11px;letter-spacing:0;text-transform:none;color:var(--ink);
+    border:1px solid var(--line);background:var(--paper-dark);padding:6px 7px;white-space:nowrap;
+  }
+  tbody td{padding:5px 7px;border:1px solid var(--line);vertical-align:middle;}
+  tbody tr:nth-child(even) td{background:#fbfbfc;}
+  tbody tr:hover td{background:#e8f0fe;}
+  td.num, th.num{text-align:right;font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  td.center{text-align:center;color:var(--ink-soft);font-family:'Roboto Mono',monospace;}
+
+  select, input[type=number], input[type=text], input[type=date]{
+    font-family:'Roboto',sans-serif;font-size:12.5px;
+    background:#fff;border:1px solid var(--line);border-radius:3px;
+    padding:4px 6px;color:var(--ink);width:100%;min-width:0;
+  }
+  select:focus, input:focus{outline:2px solid var(--stamp-red);outline-offset:-1px;border-color:var(--stamp-red);}
+  input[readonly]{background:transparent;border-color:transparent;color:var(--ink-soft);padding-left:2px;}
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  input[type=number]{-moz-appearance:textfield;}
+  input.qty{min-width:0;text-align:center;font-weight:600;padding:4px 3px;}
+  select.prod{max-width:320px;}
+
+  .readout{font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;}
+
+  .receipt{
+    background:var(--card);border:1px solid var(--line);border-radius:0;padding:14px 16px;
+  }
+  .row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:12.5px;border-bottom:1px dotted var(--line);}
+  .row.total{
+    border-top:2px solid var(--ink);border-bottom:none;margin-top:8px;padding-top:10px;
+    font-family:'Roboto',sans-serif;font-weight:700;font-size:18px;
+  }
+  .row .lbl{color:var(--ink-soft);}
+  .row .val{font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;}
+  .row.total .val{color:var(--ledger-green);}
+  .row input{max-width:150px;text-align:right;}
+
+  .field{margin-bottom:10px;}
+  .field label{display:block;font-size:11px;color:var(--ink-soft);margin-bottom:3px;font-weight:500;}
+
+  .breakdown{margin-top:12px;border-top:1px solid var(--line);padding-top:8px;}
+  .breakdown .row{font-size:12px;border-bottom:none;}
+
+  .subtext{font-size:11px;color:var(--ink-soft);margin-top:4px;line-height:1.5;}
+
+  details.region{
+    margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:0;padding:14px 18px;
+  }
+  details.region summary{
+    font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;cursor:pointer;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-soft);
+  }
+  .region-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1px;margin-top:12px;background:var(--line);border:1px solid var(--line);
+  }
+  .region-item{
+    display:flex;justify-content:space-between;font-family:'Roboto Mono',monospace;font-size:12px;
+    border:none;border-radius:0;padding:6px 10px;cursor:pointer;background:#fff;
+  }
+  .region-item:hover{background:#e8f0fe;}
+  .region-item span:last-child{color:var(--ink-soft);}
+  .region-item.empty{opacity:.4;cursor:not-allowed;}
+
+  footer{margin-top:22px;font-size:11.5px;color:var(--ink-soft);text-align:center;line-height:1.7;}
+  footer b{color:var(--ink);}
+
+  .note{
+    font-size:11px;color:var(--ink-soft);background:var(--paper-dark);border-left:3px solid var(--stamp-red);
+    padding:8px 12px;border-radius:0;margin-top:12px;line-height:1.5;
+  }
+
+  /* ===== template nota untuk unduh/salin gambar ===== */
+  .pnota{
+    width:1080px;height:auto;background:#ffffff;color:#1a1a1a;font-family:'Roboto',sans-serif;
+    border:2px solid #cfd4da;
+  }
+  .pnota-head{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;
+    background:#eaf3ea;padding:26px 36px;border-bottom:3px solid #1a1a1a;
+  }
+  .pnota-brand{font-size:25px;font-weight:700;color:#1f6b3a;letter-spacing:.02em;}
+  .pnota-title{font-size:34px;font-weight:700;color:#1a1a1a;text-align:center;flex:1;}
+  .pnota-date{font-size:21px;text-align:right;color:#333;line-height:1.4;}
+  .pnota-date b{display:block;font-size:23px;}
+  .pnota table{width:100%;border-collapse:collapse;font-size:23px;}
+  .pnota thead th{
+    background:#f5f7f5;border-bottom:3px solid #1a1a1a;border-right:1px solid #d7dbdf;
+    padding:14px 14px;text-align:left;font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.02em;color:#333;
+  }
+  .pnota thead th:last-child{border-right:none;}
+  .pnota tbody td{padding:13px 14px;border-bottom:1px solid #d7dbdf;border-right:1px solid #d7dbdf;}
+  .pnota tbody td:last-child{border-right:none;}
+  .pnota tbody tr:last-child td{border-bottom:none;}
+  .pnota tbody tr:nth-child(even) td{background:#fafbfa;}
+  .pnota .pn-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .pnota .pn-center{text-align:center;color:#777;}
+  .pnota-summary{
+    display:flex;border-top:3px solid #1a1a1a;
+  }
+  .pnota-summary > div{flex:1;padding:22px 36px;}
+  .pnota-summary > div:first-child{border-right:1px solid #d7dbdf;}
+  .pnota-sline{display:flex;justify-content:space-between;font-size:23px;padding:7px 0;}
+  .pnota-sline .l{color:#555;}
+  .pnota-sline .v{font-weight:600;font-variant-numeric:tabular-nums;}
+  .pnota-grand{
+    grid-column:1/-1;background:#eaf3ea;border-top:3px solid #1a1a1a;
+    display:flex;justify-content:space-between;align-items:center;padding:26px 36px;
+  }
+  .pnota-grand .l{font-size:29px;font-weight:700;color:#1f6b3a;font-style:italic;}
+  .pnota-grand .v{font-size:40px;font-weight:800;color:#c1272d;}
+  .pnota-pay{border-top:3px solid #1a1a1a;}
+  .pnota-payline{
+    display:flex;justify-content:space-between;align-items:center;padding:16px 36px;
+    border-bottom:1px solid #d7dbdf;font-size:23px;
+  }
+  .pnota-payline:last-child{border-bottom:none;}
+  .pnota-payline .l{font-style:italic;font-weight:600;color:#333;}
+  .pnota-payline .v{font-variant-numeric:tabular-nums;}
+  .pnota-payline.pnota-status .l{font-weight:800;}
+  .pnota-payline.pnota-status .v{font-weight:800;font-size:27px;}
+
+  /* ===== responsive: HP / layar sempit ===== */
+  @media (max-width:600px){
+    body{padding:16px 10px 60px;}
+    header{align-items:flex-start;gap:8px;padding-bottom:10px;margin-bottom:14px;}
+    header .sub{font-size:11.5px;}
+    .datebox{text-align:left;font-size:12px;}
+
+    .tabs{width:100%;}
+    .tab-btn{flex:1;text-align:center;padding:10px 8px;font-size:13px;}
+
+    .toolbar{gap:6px;}
+    .action-btn{flex:1;min-width:130px;text-align:center;padding:9px 10px;font-size:12px;}
+    .toolbar-msg{width:100%;order:99;}
+
+    .grid > div{padding:14px 10px;}
+    h2.section-title{font-size:12px;}
+
+    /* Di HP, kolom Harga & Total disembunyikan dari tabel INPUT supaya
+       yang tersisa (No, Deskripsi, Qty, Diskon, Satuan) punya ruang lega
+       dan tidak perlu geser/kepotong. Harga & Total tetap ada normal di
+       gambar nota hasil unduhan dan di tampilan desktop. */
+    .table-scroll{overflow-x:visible;}
+    table{font-size:8.5px;table-layout:fixed;width:100%;}
+    .table-scroll table{min-width:0;width:100%;}
+    .col-harga, td[data-label="Harga"]{display:none;}
+    .col-total, td[data-label="Total"]{display:none;}
+
+    .col-no{width:6%;}
+    .col-desk{width:auto;}
+    .col-qty{width:14%;}
+    .col-diskon{width:22%;}
+    .col-satuan{width:25%;}
+    /* sisanya (Deskripsi) otomatis dapat sisa ruang (~33%) lewat table-layout:fixed.
+       Qty dilebarkan supaya muat sampai 3 digit (mis. "100"). Diskon & Satuan
+       dikasih margin lebih longgar (bukan pas-pasan) supaya tetap satu baris
+       dan tidak terpotong ellipsis walau angkanya besar. */
+
+    thead th{padding:4px 3px;font-size:7.5px;white-space:normal;line-height:1.2;word-break:break-word;}
+    tbody td{padding:4px 3px;min-width:0;overflow:hidden;}
+    td.num, th.num{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    select.prod{
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      font-size:9px;font-weight:500;padding:6px 4px;border-color:#9aa0a6;min-width:0;max-width:100%;
+    }
+    select, input[type=number], input[type=text], input[type=date]{font-size:16px;padding:7px 6px;}
+    input.qty{font-size:10px;padding:5px 3px;border-color:#9aa0a6;}
+
+    .row{font-size:12.5px;}
+    .row.total{font-size:16px;}
+    .field label{font-size:10.5px;}
+
+    details.region{padding:12px 14px;}
+    .region-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+    .region-item{font-size:11px;padding:6px 8px;}
+
+    .note{font-size:10.5px;}
+    footer{font-size:11px;}
+  }
+
+  @media (max-width:380px){
+    table{font-size:7.5px;}
+    .col-no{width:6%;}
+    .col-desk{width:auto;}
+    .col-qty{width:14%;}
+    .col-diskon{width:22%;}
+    .col-satuan{width:25%;}
+    thead th{padding:3px 2px;font-size:7px;}
+    tbody td{padding:3px 2px;}
+    select.prod{font-size:9px;padding:4px 2px;}
+    input.qty{font-size:10px;padding:4px 2px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Halawa Bintang Utama</h1>
+      <div class="sub">Kalkulator nota pesanan — versi HTML dari Format_Penjualan_2026_Offline.xlsx</div>
+    </div>
+    <div class="datebox">
+      <div><b id="hariNow">–</b></div>
+      <div id="tglNow">–</div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="penjualan">Penjualan (Grosir)</button>
+    <button class="tab-btn" data-tab="custom">Custom</button>
+  </div>
+
+  <div class="toolbar">
+    <button class="action-btn" id="btn-download">⬇ Unduh sebagai Gambar</button>
+    <button class="action-btn" id="btn-share">⇪ Bagikan</button>
+    <button class="action-btn" id="btn-copy">⧉ Salin ke Clipboard</button>
+    <button class="action-btn" id="btn-calc-toggle">🧮 Kalkulator</button>
+    <span class="toolbar-msg" id="toolbar-msg"></span>
+  </div>
+
+  <!-- ================= POPUP KALKULATOR MANUAL ================= -->
+  <div id="calc-overlay" class="calc-overlay" hidden>
+    <div id="calc-popup" class="calc-popup" role="dialog" aria-label="Kalkulator manual">
+      <div class="calc-head">
+        <span>Kalkulator Manual</span>
+        <button id="calc-close" class="calc-close" aria-label="Tutup kalkulator">✕</button>
+      </div>
+      <div class="calc-display">
+        <div class="calc-prev" id="calc-prev">&nbsp;</div>
+        <div class="calc-curr" id="calc-curr">0</div>
+      </div>
+      <div class="calc-actionrow">
+        <button id="calc-clear" class="calc-actbtn calc-clearbtn">Bersihkan</button>
+        <button id="calc-copy" class="calc-actbtn calc-copybtn">⧉ Salin Hasil</button>
+      </div>
+      <div class="calc-grid">
+        <button class="calc-key calc-fn" data-act="ce">C</button>
+        <button class="calc-key calc-fn" data-act="percent">%</button>
+        <button class="calc-key calc-fn" data-act="back">⌫</button>
+        <button class="calc-key calc-op" data-op="÷">÷</button>
+        <button class="calc-key" data-num="7">7</button>
+        <button class="calc-key" data-num="8">8</button>
+        <button class="calc-key" data-num="9">9</button>
+        <button class="calc-key calc-op" data-op="×">×</button>
+        <button class="calc-key" data-num="4">4</button>
+        <button class="calc-key" data-num="5">5</button>
+        <button class="calc-key" data-num="6">6</button>
+        <button class="calc-key calc-op" data-op="−">−</button>
+        <button class="calc-key" data-num="1">1</button>
+        <button class="calc-key" data-num="2">2</button>
+        <button class="calc-key" data-num="3">3</button>
+        <button class="calc-key calc-op" data-op="+">+</button>
+        <button class="calc-key calc-zero" data-num="0">0</button>
+        <button class="calc-key" data-act="dot">.</button>
+        <button class="calc-key calc-eq" data-act="eq">=</button>
+      </div>
+      <div class="calc-msg" id="calc-msg">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- ================= PENJUALAN ================= -->
+  <div class="panel active" id="panel-penjualan">
+    <div class="sheet" id="capture-penjualan">
+      <div class="grid">
+        <div>
+          <h2 class="section-title">Rincian Pemesanan</h2>
+          <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th class="col-no">No</th><th class="col-desk">Deskripsi</th><th class="num col-qty">Qty</th>
+              <th class="num col-harga">Harga</th><th class="num col-diskon">Diskon</th>
+              <th class="num col-satuan">Satuan</th><th class="num col-total">Total</th>
+            </tr></thead>
+            <tbody id="rows-penjualan"></tbody>
+          </table>
+          </div>
+          <div class="row" style="margin-top:6px;">
+            <span class="lbl">Total Qty</span><span class="val" id="pj-totalqty">–</span>
+          </div>
+          <div class="row" id="pj-beratrow"><span class="lbl">Total Berat</span><span class="val" id="pj-totalberat">–</span></div>
+
+          <div class="field" style="margin-top:14px;">
+            <label>Ekspedisi</label>
+            <select id="pj-ekspedisi"></select>
+          </div>
+          <div class="field">
+            <label>Rate ongkir (Rp / kg)</label>
+            <input type="text" inputmode="numeric" id="pj-rate" class="rate-input" placeholder="0" value="">
+          </div>
+          <div class="note" id="pj-note">Aturan khusus: jika ekspedisi <b>IDTruck</b> dan berat &lt; 10 kg, ongkir tetap dihitung minimal 10 kg. Pembulatan berat memakai aturan longgar (≥1) untuk Sentral Cargo / Wahana / Laris Cargo, selain itu memakai aturan ketat (≥2).</div>
+        </div>
+
+        <div>
+          <h2 class="section-title">Nota</h2>
+          <div class="receipt">
+            <div class="row"><span class="lbl">Subtotal Produk</span><span class="val" id="pj-subtotal">–</span></div>
+            <div class="row"><span class="lbl">Ongkir</span><span class="val" id="pj-ongkir">–</span></div>
+            <div class="row"><span class="lbl">Diskon Ongkir (subsidi)</span><span class="val" id="pj-diskonongkir">–</span></div>
+            <div class="row total"><span class="lbl">Grand Total</span><span class="val" id="pj-grandtotal">–</span></div>
+
+            <div class="field" style="margin-top:14px;">
+              <label>Kelebihan bayar sebelumnya</label>
+              <input type="number" id="pj-kelebihan" value="0">
+            </div>
+            <div class="row"><span class="lbl" id="pj-statuslabel">Kurang bayar</span><span class="val" id="pj-selisih">–</span></div>
+
+            <div class="breakdown" id="pj-breakdown">
+              <div class="row"><span class="lbl">Harga per Sachet</span><span class="val" id="pj-sachet">–</span></div>
+              <div class="row"><span class="lbl">Harga per Renteng</span><span class="val" id="pj-renteng">–</span></div>
+              <div class="row"><span class="lbl">Harga per Pack</span><span class="val" id="pj-pack">–</span></div>
+              <div class="row"><span class="lbl">Harga per Karton</span><span class="val" id="pj-karton">–</span></div>
+              <div class="row"><span class="lbl">Ongkir dibayar</span><span class="val" id="pj-ongkirdibayar">–</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CUSTOM ================= -->
+  <div class="panel" id="panel-custom">
+    <div class="sheet" id="capture-custom">
+      <div class="grid">
+        <div>
+          <h2 class="section-title">Rincian Pemesanan (Custom)</h2>
+          <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th class="col-no">No</th><th class="col-desk">Deskripsi</th><th class="num col-qty">Qty</th>
+              <th class="num col-harga">Harga</th><th class="num col-diskon">Diskon</th>
+              <th class="num col-satuan">Satuan</th><th class="num col-total">Total</th>
+            </tr></thead>
+            <tbody id="rows-custom"></tbody>
+          </table>
+          </div>
+          <div class="row" style="margin-top:6px;">
+            <span class="lbl">Total Qty</span><span class="val" id="cs-totalqty">–</span>
+          </div>
+          <div class="row" id="cs-beratrow"><span class="lbl">Total Berat</span><span class="val" id="cs-totalberat">–</span></div>
+
+          <div class="field" style="margin-top:14px;">
+            <label>Ekspedisi</label>
+            <select id="cs-ekspedisi"></select>
+          </div>
+          <div class="field">
+            <label>Rate ongkir (Rp / kg)</label>
+            <input type="text" inputmode="numeric" id="cs-rate" class="rate-input" placeholder="0" value="">
+          </div>
+          <div class="note" id="cs-note">Di sheet Custom: kolom <b>Diskon</b> diisi manual per baris (bukan otomatis), tidak ada aturan minimum 10&nbsp;kg untuk IDTruck, dan subsidi ongkir tidak otomatis (isi manual). Ini sesuai struktur asli filenya.</div>
+        </div>
+
+        <div>
+          <h2 class="section-title">Nota</h2>
+          <div class="receipt">
+            <div class="row"><span class="lbl">Subtotal Produk</span><span class="val" id="cs-subtotal">–</span></div>
+            <div class="row"><span class="lbl">Ongkir</span><span class="val" id="cs-ongkir">–</span></div>
+            <div class="row">
+              <span class="lbl">Diskon Ongkir (manual)</span>
+              <input type="number" id="cs-diskonongkir" value="0" style="max-width:130px;text-align:right;">
+            </div>
+            <div class="row total"><span class="lbl">Grand Total</span><span class="val" id="cs-grandtotal">–</span></div>
+
+            <div class="field" style="margin-top:14px;">
+              <label>Kelebihan bayar sebelumnya</label>
+              <input type="number" id="cs-kelebihan" value="0">
+            </div>
+            <div class="row"><span class="lbl" id="cs-statuslabel">Kurang bayar</span><span class="val" id="cs-selisih">–</span></div>
+
+            <div class="breakdown">
+              <div class="row"><span class="lbl">Diskon produk (total nilai)</span><span class="val" id="cs-diskonproduk">–</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <details class="region">
+    <summary>Referensi ongkir per wilayah (Rp / kg) — klik untuk isi otomatis rate ongkir</summary>
+    <div class="region-grid" id="region-grid"></div>
+    <div class="subtext">Tabel ini murni referensi manual di file asli (tidak terhubung ke formula apa pun) — sama seperti di Excel, hanya membantu isi kolom rate ongkir.</div>
+  </details>
+
+  <footer>
+    <div><b>PT. Halawa Bintang Utama</b></div>
+    <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
+    <div id="berlaku" style="margin-top:6px;"></div>
+    <div style="margin-top:8px;opacity:.6;">Nota Halawa &nbsp;·&nbsp; versi 1.1.0</div>
+  </footer>
+
+  <div id="print-holder" style="position:fixed;left:-99999px;top:0;"></div>
+</div>
+
+<script>
+/* ============ DATA (persis dari sheet Data) ============ */
+const PRODUCTS = [
+  {name:"Halawa rasa Ayam",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:5.6, satuan:"Karton"},
+  {name:"Halawa rasa Sapi",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:5.6, satuan:"Karton"},
+  {name:"Halawa rasa Jamur",  harga:384000, diskon:[0.16,0.21,0.24],     subsidi:[0,9000,9000], berat:4.1, satuan:"Karton"},
+  {name:"Halawa Ayam 500 g",  harga:400000, diskon:[55000,75000,85000],  subsidi:[0,9000,9000], berat:5.3, satuan:"Karton"},
+  {name:"Halawa Sapi 500 g",  harga:400000, diskon:[55000,75000,85000],  subsidi:[0,9000,9000], berat:5.3, satuan:"Karton"},
+  {name:"Halawa Ayam (Pack)", harga:24000,  diskon:[0,0,0],              subsidi:[0,0,0],       berat:0.35,satuan:"Pack"},
+  {name:"Halawa Sapi (Pack)", harga:24000,  diskon:[0,0,0],              subsidi:[0,0,0],       berat:0.35,satuan:"Pack"},
+  {name:"Halawa Jamur (Pack)",harga:24000,  diskon:[0,0,0],              subsidi:[0,0,0],       berat:0.27,satuan:"Pack"},
+];
+const PRODUCTS_PENJUALAN = PRODUCTS.slice(0,5); // dropdown Penjualan hanya A4:A8, sesuai file asli
+const EKSPEDISI = ["313 Express","APM Logistics","Baraka Express","Buton Express","Diambil Sendiri","Duta Express","IDTruck","Indah Logistik","JNE Express","JNE Trucking","JNT Cargo","JNT Express","KALOG","Laris Cargo","LSJ Cargo","Pangeran Express","Papandayan Cargo","Sajira Mahardika","Sentral Cargo","TAM Cargo","Toyyib Logistik","Tri Tunggal","Wahana","CalistaExpress","Lion Parcel"];
+const REGIONS = [
+  ["JAWA TIMUR",3500],["JAWA TENGAH",4250],["JAWA BARAT",5000],["JAKARTA",null],
+  ["BALI",5250],["SUMATERA BARAT",9000],["SUMATERA UTARA",null],["SUMATERA SELATAN",6500],
+  ["LAMPUNG",null],["RIAU",9000],["ACEH",11000],["JAMBI",7000],["BENGKULU",7500],
+];
+const ROWS = 7; // C5:C11
+
+const rupiah = n => "Rp " + Math.round(n||0).toLocaleString("id-ID");
+const fmtNum = n => (n||0).toLocaleString("id-ID", {maximumFractionDigits:2});
+
+/* ============ tanggal ============ */
+function initDate(){
+  const d = new Date();
+  const hari = d.toLocaleDateString("id-ID",{weekday:"long"});
+  const tgl = d.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"});
+  document.getElementById("hariNow").textContent = hari;
+  document.getElementById("tglNow").textContent = tgl;
+  const besok = new Date(d.getTime()+86400000);
+  const hariBesok = besok.toLocaleDateString("id-ID",{weekday:"long"});
+  const jam = d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("berlaku").textContent =
+    `Daftar rincian pemesanan ini berlaku sampai hari ${hariBesok}, ${besok.getDate().toString().padStart(2,"0")} ${d.toLocaleDateString("id-ID",{month:"short"})} ${d.getFullYear()} | ${jam} WIB`;
+}
+
+/* ============ tier ekspedisi pembulatan ============
+   Penjualan: Sentral Cargo, Wahana, Laris Cargo
+   Custom   : + JNE Express (sesuai file asli) */
+function roundWeight(totalBerat, ekspedisi, sheet){
+  const longgar = sheet==="penjualan"
+    ? ["Sentral Cargo","Wahana","Laris Cargo"]
+    : ["Sentral Cargo","Wahana","Laris Cargo","JNE Express"];
+  const desimal = (totalBerat % 1) * 10;
+  const threshold = longgar.includes(ekspedisi) ? 1 : 2;
+  return desimal >= threshold ? Math.ceil(totalBerat) : Math.floor(totalBerat);
+}
+
+function tierOf(totalKarton){
+  // NB: pada file asli, sel referensi tier (L13) selalu kosong/0,
+  // sehingga label tier selalu "Reseller" apa pun jumlah pesanannya.
+  // Direplikasi apa adanya (tidak diperbaiki), lihat catatan di bawah tabel.
+  return "Reseller";
+}
+
+/* ============ build rows ============ */
+function buildRows(sheet){
+  const tbody = document.getElementById(sheet==="penjualan"?"rows-penjualan":"rows-custom");
+  const list = sheet==="penjualan" ? PRODUCTS_PENJUALAN : PRODUCTS;
+  tbody.innerHTML = "";
+  for(let i=0;i<ROWS;i++){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="center" data-label="No">${i+1}</td>
+      <td data-label="Deskripsi"><select data-r="${i}" data-f="produk" class="prod">
+            <option value="">—</option>
+            ${list.map(p=>`<option value="${p.name}">${p.name}</option>`).join("")}
+          </select></td>
+      <td data-label="Qty"><input type="number" min="0" max="1000" inputmode="numeric" data-r="${i}" data-f="qty" class="qty num" style="text-align:right;" value=""></td>
+      <td class="num readout" data-r="${i}" data-f="harga" data-label="Harga">–</td>
+      <td class="num" data-f="diskoncell" data-label="Diskon">${sheet==="custom"
+            ? `<input type="text" data-r="${i}" data-f="diskon" class="diskon" placeholder="0.2 / 55000" style="text-align:right;">`
+            : `<span class="readout" data-r="${i}" data-f="diskon">–</span>`}</td>
+      <td class="num readout" data-r="${i}" data-f="satuan" data-label="Satuan">–</td>
+      <td class="num readout" data-r="${i}" data-f="total" data-label="Total">–</td>
+    `;
+    tbody.appendChild(tr);
+  }
+  tbody.querySelectorAll("select.prod, input.qty, input.diskon").forEach(el=>{
+    el.addEventListener("input", ()=>calc(sheet));
+    el.addEventListener("change", ()=>calc(sheet));
+  });
+  // Qty dibatasi maksimal 1000 (4 digit) — kalau diketik manual lebih dari itu,
+  // otomatis dipotong balik ke 1000 supaya tampilan tabel tetap aman & konsisten.
+  tbody.querySelectorAll("input.qty").forEach(el=>{
+    el.addEventListener("input", ()=>{
+      if(el.value !== "" && parseFloat(el.value) > 1000){
+        el.value = "1000";
+        calc(sheet);
+      }
+    });
+  });
+}
+
+function findProduct(name){ return PRODUCTS.find(p=>p.name===name); }
+
+function tierIndex(totalKarton){
+  if(totalKarton < 14) return 0;
+  if(totalKarton < 50) return 1;
+  return 2;
+}
+
+function formatQtyBreakdown(raw){
+  const groups = {};
+  raw.forEach(r=>{
+    if(r.name && r.qty>0 && r.prod){
+      groups[r.prod.satuan] = (groups[r.prod.satuan]||0) + r.qty;
+    }
+  });
+  const order = ["Karton","Pack"];
+  const parts = [];
+  order.forEach(k=>{ if(groups[k]) parts.push(`${groups[k]} ${k}`); });
+  Object.keys(groups).forEach(k=>{ if(!order.includes(k)) parts.push(`${groups[k]} ${k}`); });
+  return parts.length ? parts.join(", ") : "0 Karton";
+}
+
+function calc(sheet){
+  const pfx = sheet==="penjualan" ? "pj" : "cs";
+  const tbody = document.getElementById(sheet==="penjualan"?"rows-penjualan":"rows-custom");
+  const trs = [...tbody.querySelectorAll("tr")];
+
+  const raw = trs.map(tr=>{
+    const prodSel = tr.querySelector("select.prod");
+    const qtyInp = tr.querySelector("input.qty");
+    const name = prodSel.value;
+    const qty = parseFloat(qtyInp.value)||0;
+    return {name, qty, prod: findProduct(name)};
+  });
+
+  // total Karton (dipakai untuk tier diskon & subsidi Penjualan)
+  const totalKarton = raw.reduce((s,r)=> s + ((r.prod && r.prod.satuan==="Karton" && r.name && r.qty>0) ? r.qty : 0), 0);
+  const tIdx = tierIndex(totalKarton);
+
+  let subtotal = 0, totalBerat = 0, totalQty = 0, totalSubsidi = 0, totalDiskonProduk = 0;
+
+  raw.forEach((r,i)=>{
+    const tr = trs[i];
+    const hargaCell = tr.querySelector('[data-f="harga"]');
+    const satuanCell = tr.querySelector('[data-f="satuan"]');
+    const totalCell = tr.querySelector('[data-f="total"]');
+    const diskonReadout = tr.querySelector('span[data-f="diskon"]');
+    const diskonInput = tr.querySelector('input[data-f="diskon"]');
+
+    if(!r.name || !r.prod){
+      hargaCell.textContent = "–"; satuanCell.textContent = "–"; totalCell.textContent = "–";
+      if(diskonReadout) diskonReadout.textContent = "–";
+      return;
+    }
+    const harga = r.prod.harga;
+    hargaCell.textContent = rupiah(harga);
+
+    let diskonVal;
+    if(sheet==="penjualan"){
+      diskonVal = r.qty>0 ? r.prod.diskon[tIdx] : "";
+      if(diskonReadout) diskonReadout.textContent = diskonVal===""? "–" : (diskonVal<1 ? (diskonVal*100).toFixed(0)+"%" : rupiah(diskonVal));
+    } else {
+      const txt = diskonInput.value.trim();
+      diskonVal = txt===""? 0 : parseFloat(txt.replace(/[^\d.]/g,""))||0;
+    }
+
+    const hargaSatuan = diskonVal==="" ? 0 : (diskonVal<1 ? harga-(harga*diskonVal) : harga-diskonVal);
+    satuanCell.textContent = r.qty>0 ? rupiah(hargaSatuan) : "–";
+    const total = r.qty * hargaSatuan;
+    totalCell.textContent = r.qty>0 ? rupiah(total) : "–";
+
+    if(r.qty>0){
+      subtotal += total;
+      totalBerat += r.qty * r.prod.berat;
+      totalQty += r.qty;
+      totalDiskonProduk += r.qty * (harga - hargaSatuan);
+      if(sheet==="penjualan"){
+        totalSubsidi += r.qty * r.prod.subsidi[tIdx];
+      }
+    }
+  });
+
+  document.getElementById(pfx+"-totalqty").textContent = formatQtyBreakdown(raw);
+  document.getElementById(pfx+"-subtotal").textContent = rupiah(subtotal);
+
+  const ekspedisi = document.getElementById(pfx+"-ekspedisi").value;
+  const isIdtruck = (ekspedisi||"").trim().toLowerCase()==="idtruck";
+  const rateVal = parseInt((document.getElementById(pfx+"-rate").value||"").replace(/\./g,""), 10) || 0;
+
+  const roundedBerat = roundWeight(totalBerat, ekspedisi, sheet);
+  document.getElementById(pfx+"-totalberat").textContent = roundedBerat + " Kg";
+  let ongkir, diskonOngkir, grandTotal;
+
+  if(sheet==="penjualan"){
+    ongkir = (isIdtruck && roundedBerat<10) ? 10*rateVal : roundedBerat*rateVal;
+    diskonOngkir = isIdtruck
+      ? Math.min(ongkir*0.2, ongkir) + Math.min(totalSubsidi, ongkir*0.8)
+      : Math.min(totalSubsidi, ongkir);
+    grandTotal = (subtotal + ongkir) - diskonOngkir;
+
+    document.getElementById("pj-ongkir").textContent = rupiah(ongkir);
+    document.getElementById("pj-diskonongkir").textContent = rupiah(diskonOngkir);
+    document.getElementById("pj-grandtotal").textContent = rupiah(grandTotal);
+
+    const kelebihan = parseFloat(document.getElementById("pj-kelebihan").value)||0;
+    const selisih = kelebihan - grandTotal;
+    document.getElementById("pj-selisih").textContent = rupiah(Math.abs(selisih));
+    document.getElementById("pj-statuslabel").textContent = selisih>0 ? "Kembalian" : (selisih<0 ? "Kurang bayar" : "Lunas");
+
+    document.getElementById("pj-sachet").textContent = totalKarton>0 ? rupiah(grandTotal/(totalKarton*384)) : "–";
+    document.getElementById("pj-renteng").textContent = totalKarton>0 ? rupiah(grandTotal/(totalKarton*32)) : "–";
+    document.getElementById("pj-pack").textContent = totalKarton>0 ? rupiah(grandTotal/(totalKarton*16)) : "–";
+    document.getElementById("pj-karton").textContent = totalKarton>0 ? rupiah(grandTotal/totalKarton) : "–";
+    document.getElementById("pj-ongkirdibayar").textContent = rupiah(ongkir-diskonOngkir);
+  } else {
+    ongkir = rateVal * roundedBerat; // Custom: tidak ada aturan minimum IDTruck
+    diskonOngkir = parseFloat(document.getElementById("cs-diskonongkir").value)||0;
+    grandTotal = (subtotal + ongkir) - diskonOngkir;
+
+    document.getElementById("cs-ongkir").textContent = rupiah(ongkir);
+    document.getElementById("cs-grandtotal").textContent = rupiah(grandTotal);
+    document.getElementById("cs-diskonproduk").textContent = rupiah(totalDiskonProduk);
+
+    const kelebihan = parseFloat(document.getElementById("cs-kelebihan").value)||0;
+    const selisih = kelebihan - grandTotal;
+    document.getElementById("cs-selisih").textContent = rupiah(Math.abs(selisih));
+    document.getElementById("cs-statuslabel").textContent = selisih>0 ? "Kembalian" : (selisih<0 ? "Kurang bayar" : "Lunas");
+  }
+}
+
+/* ============ ekspedisi + region ============ */
+function buildEkspedisi(sheet){
+  const sel = document.getElementById((sheet==="penjualan"?"pj":"cs")+"-ekspedisi");
+  sel.innerHTML = `<option value="">— pilih ekspedisi —</option>` + EKSPEDISI.map(e=>`<option value="${e}">${e}</option>`).join("");
+  sel.addEventListener("change", ()=>calc(sheet));
+}
+
+function buildRegionTable(){
+  const grid = document.getElementById("region-grid");
+  grid.innerHTML = REGIONS.map(([name,rate])=>`
+    <div class="region-item ${rate===null?"empty":""}" data-rate="${rate||""}" data-name="${name}">
+      <span>${name}</span><span>${rate? "Rp "+rate.toLocaleString("id-ID"):"—"}</span>
+    </div>`).join("");
+  grid.querySelectorAll(".region-item:not(.empty)").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const rate = parseFloat(el.dataset.rate);
+      const activeTab = document.querySelector(".tab-btn.active").dataset.tab;
+      const pfx = activeTab==="penjualan" ? "pj" : "cs";
+      document.getElementById(pfx+"-rate").value = rate.toLocaleString("id-ID");
+      calc(activeTab);
+    });
+  });
+}
+
+/* ============ tabs ============ */
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
+  });
+});
+
+/* ============ export gambar (unduh / salin) ============ */
+function activeCaptureEl(){
+  const tab = document.querySelector(".tab-btn.active").dataset.tab;
+  return document.getElementById("capture-"+tab);
+}
+
+function showMsg(text, isError){
+  const el = document.getElementById("toolbar-msg");
+  el.textContent = text;
+  el.style.color = isError ? "var(--stamp-red)" : "var(--ink-soft)";
+  clearTimeout(showMsg._t);
+  showMsg._t = setTimeout(()=>{ el.textContent=""; }, 3500);
+}
+
+/* ============ export gambar (unduh / salin) — pakai template nota rapi ============ */
+function buildPrintNota(tab){
+  const pfx = tab==="penjualan" ? "pj" : "cs";
+  const tbody = document.getElementById(tab==="penjualan" ? "rows-penjualan" : "rows-custom");
+  const rows = [...tbody.querySelectorAll("tr")].filter(tr=>{
+    const sel = tr.querySelector("select.prod");
+    return sel && sel.value !== "";
+  });
+
+  const rowsHtml = rows.map(tr=>{
+    const no = tr.children[0].textContent;
+    const desk = tr.querySelector("select.prod").value;
+    const qty = tr.querySelector("input.qty").value || "0";
+    const harga = tr.querySelector('[data-f="harga"]').textContent;
+    const diskonEl = tr.querySelector('[data-f="diskon"]');
+    let diskon = "–";
+    if(diskonEl){
+      if(diskonEl.tagName === "INPUT"){
+        const raw = parseFloat((diskonEl.value||"").replace(/[^\d.]/g,""))||0;
+        diskon = diskonEl.value.trim()==="" ? "–" : (raw<1 ? (raw*100).toFixed(0)+"%" : rupiah(raw));
+      } else {
+        diskon = diskonEl.textContent;
+      }
+    }
+    const satuan = tr.querySelector('[data-f="satuan"]').textContent;
+    const total = tr.querySelector('[data-f="total"]').textContent;
+    return `<tr>
+      <td class="pn-center">${no}</td><td>${desk}</td><td class="pn-num">${qty}</td>
+      <td class="pn-num">${harga}</td><td class="pn-num">${diskon}</td>
+      <td class="pn-num">${satuan}</td><td class="pn-num">${total}</td>
+    </tr>`;
+  }).join("");
+
+  const hari = document.getElementById("hariNow").textContent;
+  const tgl = document.getElementById("tglNow").textContent;
+  const ekspedisi = document.getElementById(pfx+"-ekspedisi").value || "–";
+  const totalqty = document.getElementById(pfx+"-totalqty").textContent;
+  const totalberat = document.getElementById(pfx+"-totalberat").textContent;
+  const subtotal = document.getElementById(pfx+"-subtotal").textContent;
+  const ongkir = document.getElementById(pfx+"-ongkir").textContent;
+  const diskonongkir = tab==="penjualan"
+    ? document.getElementById("pj-diskonongkir").textContent
+    : (document.getElementById("cs-diskonongkir").value ? rupiah(parseFloat(document.getElementById("cs-diskonongkir").value)) : "Rp 0");
+  const grandtotal = document.getElementById(pfx+"-grandtotal").textContent;
+
+  const kelebihan = parseFloat(document.getElementById(pfx+"-kelebihan").value)||0;
+  const kelebihanFmt = rupiah(kelebihan);
+  const statusLabel = document.getElementById(pfx+"-statuslabel").textContent;
+  const selisihFmt = document.getElementById(pfx+"-selisih").textContent;
+  const isKurang = statusLabel === "Kurang bayar";
+  const isKembalian = statusLabel === "Kembalian";
+  const signPrefix = isKurang ? "-" : "";
+  const statusColor = isKurang ? "#c1272d" : (isKembalian ? "#1f6b3a" : "#333");
+
+  return `
+    <div class="pnota">
+      <div class="pnota-head">
+        <div></div>
+        <div class="pnota-title">Rincian Pemesanan</div>
+        <div class="pnota-date"><b>${hari}</b>${tgl}</div>
+      </div>
+      <table>
+        <thead><tr>
+          <th style="width:47px;">No</th><th>Deskripsi</th><th class="pn-num" style="width:72px;">Qty</th>
+          <th class="pn-num" style="width:162px;">Harga</th><th class="pn-num" style="width:168px;">Diskon</th>
+          <th class="pn-num" style="width:180px;">Harga Satuan</th><th class="pn-num" style="width:180px;">Total</th>
+        </tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+      <div class="pnota-summary">
+        <div>
+          <div class="pnota-sline"><span class="l">Total Qty</span><span class="v">${totalqty}</span></div>
+          <div class="pnota-sline"><span class="l">Total Berat</span><span class="v">${totalberat}</span></div>
+          <div class="pnota-sline"><span class="l">Ekspedisi</span><span class="v">${ekspedisi}</span></div>
+        </div>
+        <div>
+          <div class="pnota-sline"><span class="l">Subtotal Produk</span><span class="v">${subtotal}</span></div>
+          <div class="pnota-sline"><span class="l">Ongkir</span><span class="v">${ongkir}</span></div>
+          <div class="pnota-sline"><span class="l">Diskon Ongkir</span><span class="v">${diskonongkir}</span></div>
+        </div>
+      </div>
+      <div class="pnota-grand"><span class="l">Grand Total</span><span class="v">${grandtotal}</span></div>
+      <div class="pnota-pay">
+        <div class="pnota-payline"><span class="l">Kelebihan bayar sebelumnya</span><span class="v">${kelebihanFmt}</span></div>
+        <div class="pnota-payline pnota-status" style="color:${statusColor}"><span class="l">${statusLabel}</span><span class="v">${signPrefix}${selisihFmt}</span></div>
+      </div>
+    </div>
+  `;
+}
+
+async function renderCanvas(){
+  const tab = document.querySelector(".tab-btn.active").dataset.tab;
+  const holder = document.getElementById("print-holder");
+  holder.innerHTML = buildPrintNota(tab);
+  await new Promise(r=>setTimeout(r, 50)); // beri waktu render/layout
+  const target = holder.querySelector(".pnota");
+  const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:1, useCORS:true});
+  holder.innerHTML = "";
+  return canvas;
+}
+
+function downloadCanvas(canvas){
+  const tab = document.querySelector(".tab-btn.active").dataset.tab;
+  const link = document.createElement("a");
+  link.download = `nota-halawa-${tab}-${Date.now()}.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+document.getElementById("btn-download").addEventListener("click", async ()=>{
+  const btn = document.getElementById("btn-download");
+  btn.disabled = true; showMsg("Menyiapkan gambar…");
+  try{
+    const canvas = await renderCanvas();
+    downloadCanvas(canvas);
+    showMsg("Gambar berhasil diunduh.");
+  }catch(e){
+    showMsg("Gagal membuat gambar: "+e.message, true);
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+document.getElementById("btn-share").addEventListener("click", async ()=>{
+  const btn = document.getElementById("btn-share");
+  btn.disabled = true; showMsg("Menyiapkan gambar untuk dibagikan…");
+  try{
+    const canvas = await renderCanvas();
+    const tab = document.querySelector(".tab-btn.active").dataset.tab;
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    const file = new File([blob], `nota-halawa-${tab}-${Date.now()}.png`, {type:"image/png"});
+
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:"Nota Halawa"});
+      showMsg("Dialog share terbuka — pilih WhatsApp/chat tujuan.");
+    } else if(navigator.share){
+      // sebagian browser lama punya navigator.share tapi tidak dukung file
+      showMsg("Perangkat ini tidak mendukung share gambar langsung — gunakan tombol Unduh, lalu lampirkan manual di chat.", true);
+    } else {
+      showMsg("Fitur Bagikan tidak didukung browser ini — gunakan tombol Unduh sebagai alternatif.", true);
+    }
+  }catch(e){
+    if(e.name !== "AbortError"){ // AbortError = user membatalkan dialog share, bukan error
+      showMsg("Gagal membagikan: "+(e.name||e.message)+" — gunakan tombol Unduh sebagai alternatif.", true);
+    }
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+// Pesan yang lebih jelas per jenis error clipboard, plus fallback
+// otomatis: kalau salin gagal, gambar tetap diunduh supaya pengguna
+// tidak kehilangan hasilnya.
+function clipboardErrorMessage(err){
+  const name = err && err.name;
+  if(name === "NotAllowedError"){
+    return "Izin salin-gambar ditolak browser (NotAllowedError). Ini biasanya karena situs belum diakses lewat HTTPS, halaman dimuat di dalam iframe tanpa izin clipboard, atau izin clipboard diblokir di pengaturan browser. Gambar otomatis diunduh sebagai gantinya.";
+  }
+  if(name === "SecurityError"){
+    return "Salin gambar diblokir karena halaman tidak berjalan di konteks aman (butuh HTTPS). Gambar otomatis diunduh sebagai gantinya.";
+  }
+  return "Gagal menyalin (" + (name || err.message) + ") — perangkat/browser ini kemungkinan belum mendukung salin gambar. Gambar otomatis diunduh sebagai gantinya.";
+}
+
+document.getElementById("btn-copy").addEventListener("click", async ()=>{
+  const btn = document.getElementById("btn-copy");
+  btn.disabled = true; showMsg("Menyalin gambar…");
+
+  // Konteks tidak aman (HTTP biasa, bukan HTTPS/localhost) -> Clipboard API
+  // untuk gambar memang tidak akan pernah bisa jalan, jadi langsung fallback.
+  if(!window.isSecureContext){
+    try{
+      const canvas = await renderCanvas();
+      downloadCanvas(canvas);
+      showMsg("Halaman ini tidak berjalan di HTTPS sehingga salin-gambar tidak didukung browser. Gambar diunduh sebagai gantinya.", true);
+    }catch(e){
+      showMsg("Gagal membuat gambar: "+e.message, true);
+    }finally{
+      btn.disabled = false;
+    }
+    return;
+  }
+
+  if(!navigator.clipboard || !window.ClipboardItem){
+    try{
+      const canvas = await renderCanvas();
+      downloadCanvas(canvas);
+      showMsg("Browser/perangkat ini tidak mendukung salin gambar ke clipboard. Gambar diunduh sebagai gantinya.", true);
+    }catch(e){
+      showMsg("Gagal membuat gambar: "+e.message, true);
+    }finally{
+      btn.disabled = false;
+    }
+    return;
+  }
+
+  // Promise gambar disiapkan di sini, tapi clipboard.write() dipanggil
+  // SEGERA (synchronous, masih dalam gesture tap) di bawah — supaya
+  // browser HP (Chrome Android dkk) tidak menganggap izin "user activation"
+  // sudah kedaluwarsa saat proses render gambar berlangsung.
+  let canvasForFallback = null;
+  const blobPromise = renderCanvas().then(canvas =>{
+    canvasForFallback = canvas;
+    return new Promise((resolve, reject)=>{
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Gagal membuat blob gambar")), "image/png");
+    });
+  });
+
+  try{
+    await navigator.clipboard.write([ new ClipboardItem({ "image/png": blobPromise }) ]);
+    showMsg("Nota disalin — tinggal paste (Ctrl/Cmd+V) ke WhatsApp, chat, dll.");
+  }catch(err){
+    // fallback 1: sebagian browser (terutama mobile) belum mendukung
+    // ClipboardItem berbasis Promise — coba cara lama (tunggu gambar jadi dulu)
+    try{
+      const blob = await blobPromise;
+      await navigator.clipboard.write([ new ClipboardItem({ "image/png": blob }) ]);
+      showMsg("Nota disalin — tinggal paste (Ctrl/Cmd+V) ke WhatsApp, chat, dll.");
+    }catch(err2){
+      // fallback 2: benar-benar tidak bisa salin -> otomatis unduh saja
+      try{
+        const canvas = canvasForFallback || await renderCanvas();
+        downloadCanvas(canvas);
+      }catch(e3){ /* abaikan, pesan error di bawah tetap tampil */ }
+      showMsg(clipboardErrorMessage(err2), true);
+    }
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+/* ============ init ============ */
+buildRows("penjualan"); buildRows("custom");
+buildEkspedisi("penjualan"); buildEkspedisi("custom");
+buildRegionTable();
+initDate();
+
+["pj-kelebihan","cs-kelebihan","cs-diskonongkir"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", ()=>calc(id.startsWith("pj")?"penjualan":"custom"));
+});
+
+/* format titik ribuan otomatis untuk input Rate Ongkir */
+function formatRibuanInput(el){
+  const raw = el.value.replace(/\D/g, "");
+  el.value = raw ? parseInt(raw, 10).toLocaleString("id-ID") : "";
+}
+document.querySelectorAll(".rate-input").forEach(el=>{
+  el.addEventListener("input", ()=>{
+    formatRibuanInput(el);
+    calc(el.id.startsWith("pj") ? "penjualan" : "custom");
+  });
+});
+
+calc("penjualan"); calc("custom");
+
+/* ============ Kalkulator Manual (popup) ============ */
+(function(){
+  const overlay = document.getElementById("calc-overlay");
+  const popup = document.getElementById("calc-popup");
+  const elPrev = document.getElementById("calc-prev");
+  const elCurr = document.getElementById("calc-curr");
+  const elMsg = document.getElementById("calc-msg");
+  const btnToggle = document.getElementById("btn-calc-toggle");
+  const btnClose = document.getElementById("calc-close");
+
+  let curr = "0";       // angka yang sedang diketik
+  let prevExpr = "";    // teks riwayat "angka operator" di atas
+  let storedVal = null; // nilai tersimpan sebelum operator
+  let pendingOp = null; // operator yang menunggu (+ − × ÷)
+  let justEvaluated = false;
+
+  function fmtDisplay(numStr){
+    // format ribuan ringan untuk tampilan (tanpa ubah nilai asli)
+    if(numStr === "" || numStr === "-") return numStr;
+    const neg = numStr.startsWith("-");
+    let s = neg ? numStr.slice(1) : numStr;
+    let [intPart, decPart] = s.split(".");
+    intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    let out = intPart + (decPart !== undefined ? "," + decPart : "");
+    return (neg ? "-" : "") + out;
+  }
+
+  function render(){
+    elCurr.textContent = fmtDisplay(curr);
+    elPrev.textContent = prevExpr || "\u00A0";
+  }
+
+  function resetMsg(){ elMsg.textContent = "\u00A0"; }
+
+  function inputDigit(d){
+    if(justEvaluated){ curr = "0"; prevExpr = ""; justEvaluated = false; }
+    if(curr === "0") curr = d;
+    else if(curr.replace("-","").length < 15) curr += d;
+    render();
+  }
+  function inputDot(){
+    if(justEvaluated){ curr = "0"; prevExpr = ""; justEvaluated = false; }
+    if(!curr.includes(".")) curr += ".";
+    render();
+  }
+  function backspace(){
+    if(justEvaluated) return;
+    curr = curr.length > 1 ? curr.slice(0,-1) : "0";
+    render();
+  }
+  function clearAll(){
+    curr = "0"; prevExpr = ""; storedVal = null; pendingOp = null; justEvaluated = false;
+    resetMsg(); render();
+  }
+  function percent(){
+    curr = String(parseFloat(curr || "0") / 100);
+    render();
+  }
+  function applyPending(){
+    const val = parseFloat(curr);
+    if(storedVal === null){ storedVal = val; return; }
+    switch(pendingOp){
+      case "+": storedVal = storedVal + val; break;
+      case "−": storedVal = storedVal - val; break;
+      case "×": storedVal = storedVal * val; break;
+      case "÷": storedVal = val === 0 ? NaN : storedVal / val; break;
+      default: storedVal = val;
+    }
+  }
+  function chooseOp(op){
+    if(pendingOp && !justEvaluated){ applyPending(); }
+    else if(storedVal === null){ storedVal = parseFloat(curr); }
+    pendingOp = op;
+    prevExpr = fmtDisplay(String(storedVal)) + " " + op;
+    justEvaluated = false;
+    curr = "0";
+    render();
+  }
+  function equals(){
+    if(pendingOp === null) return;
+    const opSym = pendingOp;
+    const leftDisp = fmtDisplay(String(storedVal));
+    const rightDisp = fmtDisplay(curr);
+    applyPending();
+    if(isNaN(storedVal)){
+      prevExpr = "Tidak bisa dibagi 0";
+      curr = "0"; storedVal = null; pendingOp = null; justEvaluated = false;
+      render();
+      return;
+    }
+    prevExpr = leftDisp + " " + opSym + " " + rightDisp + " =";
+    curr = String(Math.round(storedVal * 1e8) / 1e8);
+    storedVal = null; pendingOp = null; justEvaluated = true;
+    render();
+  }
+
+  document.querySelectorAll(".calc-key[data-num]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{ resetMsg(); inputDigit(btn.dataset.num); });
+  });
+  document.querySelectorAll(".calc-key[data-op]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{ resetMsg(); chooseOp(btn.dataset.op); });
+  });
+  document.querySelector('[data-act="dot"]').addEventListener("click", ()=>{ resetMsg(); inputDot(); });
+  document.querySelector('[data-act="back"]').addEventListener("click", ()=>{ resetMsg(); backspace(); });
+  document.querySelector('[data-act="percent"]').addEventListener("click", ()=>{ resetMsg(); percent(); });
+  document.querySelector('[data-act="eq"]').addEventListener("click", ()=>{ resetMsg(); equals(); });
+  document.getElementById("calc-clear").addEventListener("click", clearAll);
+
+  document.getElementById("calc-copy").addEventListener("click", async ()=>{
+    // Salin ANGKA MURNI sebagai teks (bukan gambar) — pakai nilai asli
+    // curr (titik desimal, tanpa pemisah ribuan), bukan versi tampilan.
+    const rawValue = curr;
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(rawValue);
+        elMsg.textContent = "Hasil \"" + rawValue + "\" disalin sebagai teks.";
+      } else {
+        throw new Error("Clipboard API tidak tersedia");
+      }
+    }catch(err){
+      // fallback lawas: textarea sementara + execCommand
+      try{
+        const ta = document.createElement("textarea");
+        ta.value = rawValue;
+        ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        elMsg.textContent = "Hasil \"" + rawValue + "\" disalin sebagai teks.";
+      }catch(err2){
+        elMsg.textContent = "Gagal menyalin — salin manual dari layar hasil.";
+      }
+    }
+  });
+
+  function openCalc(){
+    overlay.hidden = false;
+    clearAll();
+  }
+  function closeCalc(){ overlay.hidden = true; }
+
+  btnToggle.addEventListener("click", openCalc);
+  btnClose.addEventListener("click", closeCalc);
+  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeCalc(); });
+  document.addEventListener("keydown", (e)=>{ if(!overlay.hidden && e.key === "Escape") closeCalc(); });
+
+  // dukungan keyboard fisik saat popup terbuka (opsional, memudahkan di desktop)
+  document.addEventListener("keydown", (e)=>{
+    if(overlay.hidden) return;
+    if(/^[0-9]$/.test(e.key)){ resetMsg(); inputDigit(e.key); }
+    else if(e.key === "."){ resetMsg(); inputDot(); }
+    else if(e.key === "Backspace"){ resetMsg(); backspace(); }
+    else if(e.key === "Enter" || e.key === "="){ resetMsg(); equals(); }
+    else if(e.key === "+"){ resetMsg(); chooseOp("+"); }
+    else if(e.key === "-"){ resetMsg(); chooseOp("−"); }
+    else if(e.key === "*"){ resetMsg(); chooseOp("×"); }
+    else if(e.key === "/"){ e.preventDefault(); resetMsg(); chooseOp("÷"); }
+  });
+})();
+
+
+/* ============ registrasi service worker (PWA) ============ */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(err=>{
+      console.log("Service worker gagal didaftarkan:", err);
+    });
+  });
+}
+</script>
+</body>
+</html>

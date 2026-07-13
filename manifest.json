@@ -1,0 +1,25 @@
+{
+  "name": "Nota Halawa — Halawa Bintang Utama",
+  "short_name": "Nota Halawa",
+  "description": "Kalkulator nota pesanan Halawa Bintang Utama (versi HTML dari spreadsheet).",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#188038",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
