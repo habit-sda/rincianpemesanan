@@ -258,6 +258,22 @@
   .field{margin-bottom:10px;}
   .field label{display:block;font-size:11.5px;color:var(--ink);margin-bottom:4px;font-weight:600;}
 
+  /* ============ Indikator visual field Ongkir yang sedang diisi ============
+     MURNI TAMPILAN — tidak menyentuh logika saling me-nol-kan yang sudah
+     ada. Cuma menandai field mana yang lagi ada isinya (border + badge),
+     supaya tidak salah pilih mau isi Rate atau Ongkir Manual. */
+  .ongkir-indicator{border:1px solid transparent;border-radius:6px;padding:6px 8px;margin:-6px -8px 10px;transition:border-color .15s,background-color .15s;}
+  .ongkir-indicator-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;}
+  .ongkir-indicator-row label{margin:0;}
+  .ongkir-indicator-badge{
+    display:none;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:9px;
+    text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;flex-shrink:0;
+    background:var(--ledger-green);color:#fff;
+  }
+  .ongkir-indicator.is-filled{border-color:var(--ledger-green);background:#f2f8f2;}
+  .ongkir-indicator.is-filled .ongkir-indicator-badge{display:inline-block;}
+  .ongkir-indicator.is-filled input{font-weight:700;}
+
   .breakdown{margin-top:12px;border-top:1px solid var(--line);padding-top:8px;}
   .breakdown .row{font-size:12px;border-bottom:none;}
 
@@ -505,12 +521,18 @@
             <label>Ekspedisi</label>
             <select id="pj-ekspedisi"></select>
           </div>
-          <div class="field">
-            <label>Rate ongkir (Rp / kg)</label>
+          <div class="field ongkir-indicator" id="pj-rate-wrap">
+            <div class="ongkir-indicator-row">
+              <label>Rate ongkir (Rp / kg)</label>
+              <span class="ongkir-indicator-badge" id="pj-rate-badge">SEDANG DIPAKAI</span>
+            </div>
             <input type="text" inputmode="numeric" id="pj-rate" class="rate-input" placeholder="0" value="">
           </div>
-          <div class="field">
-            <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
+          <div class="field ongkir-indicator" id="pj-ongkir-manual-wrap">
+            <div class="ongkir-indicator-row">
+              <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
+              <span class="ongkir-indicator-badge" id="pj-ongkir-manual-badge">SEDANG DIPAKAI</span>
+            </div>
             <input type="text" inputmode="numeric" id="pj-ongkir-manual" class="rate-input" placeholder="0" value="">
           </div>
           <div class="note" id="pj-note">Aturan khusus: jika ekspedisi <b>IDTruck</b> dan berat &lt; 10 kg, ongkir tetap dihitung minimal 10 kg. Pembulatan berat memakai aturan longgar (≥1) untuk Sentral Cargo / Wahana / Laris Cargo, selain itu memakai aturan ketat (≥2).</div>
@@ -568,12 +590,18 @@
             <label>Ekspedisi</label>
             <select id="cs-ekspedisi"></select>
           </div>
-          <div class="field">
-            <label>Rate ongkir (Rp / kg)</label>
+          <div class="field ongkir-indicator" id="cs-rate-wrap">
+            <div class="ongkir-indicator-row">
+              <label>Rate ongkir (Rp / kg)</label>
+              <span class="ongkir-indicator-badge" id="cs-rate-badge">SEDANG DIPAKAI</span>
+            </div>
             <input type="text" inputmode="numeric" id="cs-rate" class="rate-input" placeholder="0" value="">
           </div>
-          <div class="field">
-            <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
+          <div class="field ongkir-indicator" id="cs-ongkir-manual-wrap">
+            <div class="ongkir-indicator-row">
+              <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
+              <span class="ongkir-indicator-badge" id="cs-ongkir-manual-badge">SEDANG DIPAKAI</span>
+            </div>
             <input type="text" inputmode="numeric" id="cs-ongkir-manual" class="rate-input" placeholder="0" value="">
           </div>
           <div class="note" id="cs-note">Di sheet Custom: kolom <b>Diskon</b> diisi manual per baris (bukan otomatis), tidak ada aturan minimum 10&nbsp;kg untuk IDTruck, dan subsidi ongkir tidak otomatis (isi manual). Ini sesuai struktur asli filenya.</div>
@@ -616,7 +644,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Nota Halawa &nbsp;·&nbsp; versi <span id="app-current-version">1.9.0</span>
+      Nota Halawa &nbsp;·&nbsp; versi <span id="app-current-version">1.10.0</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -648,7 +676,13 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.9.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.10.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Tambah tanda visual "SEDANG DIPAKAI" (border hijau + badge) pada field Rate Ongkir / Ongkir Manual yang lagi ada isinya — membantu supaya tidak salah pilih field mana yang aktif, tanpa mengubah logika hitung sama sekali.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.9.0</div>
           <ul>
             <li>Popup "Versi Baru" sekarang cuma muncul untuk update yang berarti (versi mayor/minor, mis. 1.8.x → 1.9.0) — update patch kecil (mis. 1.9.0 → 1.9.1) diterapkan diam-diam tanpa mengganggu.</li>
             <li>Teks tombol popup menyesuaikan konteks: "Perbarui Sekarang" kalau memang ada aksi reload yang perlu dilakukan, atau "Oke, Mengerti" kalau ternyata sudah otomatis di versi terbaru (tidak ada yang perlu dilakukan lagi).</li>
@@ -1375,6 +1409,34 @@ function setupOngkirExclusive(rateId, manualId, sheetName){
 setupOngkirExclusive("pj-rate", "pj-ongkir-manual", "penjualan");
 setupOngkirExclusive("cs-rate", "cs-ongkir-manual", "custom");
 
+/* ============ Indikator visual field Ongkir (murni tampilan) ============
+   TIDAK menyentuh setupOngkirExclusive() di atas sama sekali — cuma
+   "menonton" nilai tiap field lalu kasih tanda visual (border + badge)
+   kalau field itu lagi ada isinya (bukan kosong, bukan "0"). Membantu
+   supaya tidak salah pilih mau isi Rate atau Ongkir Manual.
+   Setiap ada perubahan di SALAH SATU field, kita cek ULANG SEMUA field —
+   soalnya setupOngkirExclusive() men-nol-kan field pasangannya lewat JS
+   (bukan ketikan user), jadi field itu juga perlu ikut diperiksa ulang. */
+const ONGKIR_INDICATOR_IDS = ["pj-rate", "pj-ongkir-manual", "cs-rate", "cs-ongkir-manual"];
+function refreshAllOngkirIndicators(){
+  ONGKIR_INDICATOR_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    const wrap = document.getElementById(id + "-wrap");
+    if(!el || !wrap) return;
+    const val = el.value.trim().replace(/\./g, "");
+    const isFilled = val !== "" && val !== "0";
+    wrap.classList.toggle("is-filled", isFilled);
+  });
+}
+ONGKIR_INDICATOR_IDS.forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener("input", refreshAllOngkirIndicators);
+});
+refreshAllOngkirIndicators(); // set kondisi awal saat halaman dibuka
+// dipanggil ulang oleh fitur auto-restore draft (yang set .value lewat JS,
+// jadi tidak memicu event "input" secara alami) supaya badge tetap akurat.
+window.__refreshOngkirIndicators = refreshAllOngkirIndicators;
+
 calc("penjualan"); calc("custom");
 
 /* ============ Auto-simpan Draft + Peringatan Sebelum Keluar ============
@@ -1443,6 +1505,7 @@ calc("penjualan"); calc("custom");
       restoreTab("penjualan", data.penjualan);
       restoreTab("custom", data.custom);
       calc("penjualan"); calc("custom");
+      if(window.__refreshOngkirIndicators) window.__refreshOngkirIndicators();
       if(hasAnyRowFilled(data.penjualan) || hasAnyRowFilled(data.custom)){
         showMsg("Draft pesanan sebelumnya berhasil dipulihkan.");
       }
