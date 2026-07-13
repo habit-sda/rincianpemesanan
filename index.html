@@ -117,6 +117,26 @@
   .calc-zero{grid-column:span 1;}
   .calc-msg{font-size:11px;color:var(--ink-soft);text-align:center;padding:6px 10px 10px;min-height:26px;}
 
+  /* ============ RIWAYAT UPDATE (CHANGELOG) ============ */
+  .changelog-link{
+    background:none;border:none;color:var(--stamp-red);font-size:inherit;text-decoration:underline;
+    cursor:pointer;padding:0;font-family:'Roboto',sans-serif;
+  }
+  .changelog-popup{width:360px;max-height:80vh;display:flex;flex-direction:column;}
+  .changelog-body{overflow-y:auto;padding:6px 16px 16px;}
+  .changelog-item{padding:12px 0;border-bottom:1px solid var(--line);}
+  .changelog-item:last-child{border-bottom:none;}
+  .changelog-ver{font-family:'Roboto Mono',monospace;font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:6px;}
+  .changelog-tag{
+    display:inline-block;background:var(--ledger-green);color:#fff;font-size:9.5px;font-weight:700;
+    font-family:'Roboto',sans-serif;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle;
+  }
+  .changelog-item ul{margin:0;padding-left:18px;}
+  .changelog-item li{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:3px;}
+  @media (max-width:480px){
+    .changelog-popup{width:100%;max-width:340px;}
+  }
+
   @media (max-width:480px){
     /* Popup mobile: dikunci agar TIDAK PERNAH melebihi lebar layar
        (width:100% dari area yang sudah dikurangi padding overlay,
@@ -186,6 +206,25 @@
   }
   select:focus, input:focus{outline:2px solid var(--stamp-red);outline-offset:-1px;border-color:var(--stamp-red);}
   input[readonly]{background:transparent;border-color:transparent;color:var(--ink-soft);padding-left:2px;}
+  .rate-input:disabled{background:#eef0f2;color:#9aa0a6;cursor:not-allowed;border-style:dashed;}
+
+  /* ============ Badge status field Ongkir (Rate vs Manual, saling eksklusif) ============ */
+  .ongkir-field{
+    border:1px solid var(--line);border-radius:6px;padding:8px 10px 10px;transition:border-color .15s;
+  }
+  .ongkir-field.is-active{border-color:var(--ledger-green);border-width:1.5px;background:#f2f8f2;}
+  .ongkir-field.is-locked{background:var(--paper-dark);}
+  .ongkir-field .rate-input{border:none;background:transparent;padding:2px 0;font-size:14px;}
+  .ongkir-field.is-active .rate-input{font-weight:700;color:var(--ink);}
+  .ongkir-labelrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:2px;}
+  .ongkir-field .ongkir-labelrow label{font-size:12px;color:var(--ink);font-weight:600;margin:0;}
+  .ongkir-badge{
+    font-size:9px;font-weight:700;padding:2px 7px;border-radius:9px;text-transform:uppercase;
+    letter-spacing:.02em;white-space:nowrap;flex-shrink:0;
+  }
+  .ongkir-field.is-active .ongkir-badge{background:var(--ledger-green);color:#fff;}
+  .ongkir-field.is-locked .ongkir-badge{background:#e0e0e0;color:#888;}
+  .ongkir-field.is-neutral .ongkir-badge{display:none;}
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   input[type=number]{-moz-appearance:textfield;}
@@ -456,9 +495,19 @@
             <label>Ekspedisi</label>
             <select id="pj-ekspedisi"></select>
           </div>
-          <div class="field">
-            <label>Rate ongkir (Rp / kg)</label>
+          <div class="field ongkir-field is-neutral" id="pj-rate-wrap">
+            <div class="ongkir-labelrow">
+              <label>Rate ongkir (Rp / kg)</label>
+              <span class="ongkir-badge" id="pj-rate-badge">● Aktif</span>
+            </div>
             <input type="text" inputmode="numeric" id="pj-rate" class="rate-input" placeholder="0" value="">
+          </div>
+          <div class="field ongkir-field is-neutral" id="pj-ongkir-manual-wrap">
+            <div class="ongkir-labelrow">
+              <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
+              <span class="ongkir-badge" id="pj-ongkir-manual-badge">🔒 Terkunci</span>
+            </div>
+            <input type="text" inputmode="numeric" id="pj-ongkir-manual" class="rate-input" placeholder="0" value="">
           </div>
           <div class="note" id="pj-note">Aturan khusus: jika ekspedisi <b>IDTruck</b> dan berat &lt; 10 kg, ongkir tetap dihitung minimal 10 kg. Pembulatan berat memakai aturan longgar (≥1) untuk Sentral Cargo / Wahana / Laris Cargo, selain itu memakai aturan ketat (≥2).</div>
         </div>
@@ -515,9 +564,19 @@
             <label>Ekspedisi</label>
             <select id="cs-ekspedisi"></select>
           </div>
-          <div class="field">
-            <label>Rate ongkir (Rp / kg)</label>
+          <div class="field ongkir-field is-neutral" id="cs-rate-wrap">
+            <div class="ongkir-labelrow">
+              <label>Rate ongkir (Rp / kg)</label>
+              <span class="ongkir-badge" id="cs-rate-badge">● Aktif</span>
+            </div>
             <input type="text" inputmode="numeric" id="cs-rate" class="rate-input" placeholder="0" value="">
+          </div>
+          <div class="field ongkir-field is-neutral" id="cs-ongkir-manual-wrap">
+            <div class="ongkir-labelrow">
+              <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
+              <span class="ongkir-badge" id="cs-ongkir-manual-badge">🔒 Terkunci</span>
+            </div>
+            <input type="text" inputmode="numeric" id="cs-ongkir-manual" class="rate-input" placeholder="0" value="">
           </div>
           <div class="note" id="cs-note">Di sheet Custom: kolom <b>Diskon</b> diisi manual per baris (bukan otomatis), tidak ada aturan minimum 10&nbsp;kg untuk IDTruck, dan subsidi ongkir tidak otomatis (isi manual). Ini sesuai struktur asli filenya.</div>
         </div>
@@ -558,8 +617,55 @@
     <div><b>PT. Halawa Bintang Utama</b></div>
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
-    <div style="margin-top:8px;opacity:.6;">Nota Halawa &nbsp;·&nbsp; versi 1.1.0</div>
+    <div style="margin-top:8px;opacity:.6;">
+      Nota Halawa &nbsp;·&nbsp; versi 1.2.2
+      &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
+    </div>
   </footer>
+
+  <!-- ================= POPUP RIWAYAT UPDATE (CHANGELOG) ================= -->
+  <div id="changelog-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup changelog-popup" role="dialog" aria-label="Riwayat update">
+      <div class="calc-head">
+        <span>Riwayat Update</span>
+        <button id="changelog-close" class="calc-close" aria-label="Tutup riwayat update">✕</button>
+      </div>
+      <div class="changelog-body">
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.2.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Tambah <b>badge status</b> ("● Aktif" / "🔒 Terkunci") pada field Rate Ongkir &amp; Ongkir Manual, supaya jelas kelihatan mana yang sedang dipakai — mencegah salah isi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.2.1</div>
+          <ul>
+            <li>Rate Ongkir &amp; Ongkir Manual saling mengunci — cuma boleh isi salah satu, biar tidak ambigu.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.2.0</div>
+          <ul>
+            <li>Fitur baru: <b>Ongkir Manual</b> (opsional) di tab Penjualan &amp; Custom — bisa menimpa hasil hitungan ongkir otomatis.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.1.0</div>
+          <ul>
+            <li>Fitur baru: <b>Kalkulator Manual</b> (popup) — hitung bebas tambah/kurang/kali/bagi, hasil bisa disalin sebagai teks angka murni.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.0.6</div>
+          <ul>
+            <li>Versi dasar: nota otomatis dari data produk, unduh/bagikan/salin nota sebagai gambar.</li>
+            <li>Dukungan PWA — bisa diinstal ke layar utama HP seperti aplikasi.</li>
+            <li>Berbagai perbaikan tampilan mobile &amp; desktop (kolom tabel, lebar layar, ukuran font, ikon).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div id="print-holder" style="position:fixed;left:-99999px;top:0;"></div>
 </div>
@@ -755,12 +861,20 @@ function calc(sheet){
 
   if(sheet==="penjualan"){
     ongkir = (isIdtruck && roundedBerat<10) ? 10*rateVal : roundedBerat*rateVal;
+    // Ongkir Manual (opsional): kalau diisi, menimpa hasil hitungan otomatis di atas.
+    // Diskon Ongkir (subsidi) tetap dihitung seperti biasa, tapi berbasis nilai
+    // Ongkir yang berlaku sekarang (otomatis ATAU manual — bukan cuma otomatis).
+    const pjManualStr = document.getElementById("pj-ongkir-manual").value.trim();
+    const pjManualVal = parseFloat(pjManualStr.replace(/\./g,"").replace(/,/g,"."));
+    const pjPakaiManual = pjManualStr !== "" && !isNaN(pjManualVal);
+    if(pjPakaiManual) ongkir = pjManualVal;
+
     diskonOngkir = isIdtruck
       ? Math.min(ongkir*0.2, ongkir) + Math.min(totalSubsidi, ongkir*0.8)
       : Math.min(totalSubsidi, ongkir);
     grandTotal = (subtotal + ongkir) - diskonOngkir;
 
-    document.getElementById("pj-ongkir").textContent = rupiah(ongkir);
+    document.getElementById("pj-ongkir").textContent = rupiah(ongkir) + (pjPakaiManual ? " (manual)" : "");
     document.getElementById("pj-diskonongkir").textContent = rupiah(diskonOngkir);
     document.getElementById("pj-grandtotal").textContent = rupiah(grandTotal);
 
@@ -776,10 +890,16 @@ function calc(sheet){
     document.getElementById("pj-ongkirdibayar").textContent = rupiah(ongkir-diskonOngkir);
   } else {
     ongkir = rateVal * roundedBerat; // Custom: tidak ada aturan minimum IDTruck
+    // Ongkir Manual (opsional) — sama seperti tab Penjualan, menimpa hasil otomatis.
+    const csManualStr = document.getElementById("cs-ongkir-manual").value.trim();
+    const csManualVal = parseFloat(csManualStr.replace(/\./g,"").replace(/,/g,"."));
+    const csPakaiManual = csManualStr !== "" && !isNaN(csManualVal);
+    if(csPakaiManual) ongkir = csManualVal;
+
     diskonOngkir = parseFloat(document.getElementById("cs-diskonongkir").value)||0;
     grandTotal = (subtotal + ongkir) - diskonOngkir;
 
-    document.getElementById("cs-ongkir").textContent = rupiah(ongkir);
+    document.getElementById("cs-ongkir").textContent = rupiah(ongkir) + (csPakaiManual ? " (manual)" : "");
     document.getElementById("cs-grandtotal").textContent = rupiah(grandTotal);
     document.getElementById("cs-diskonproduk").textContent = rupiah(totalDiskonProduk);
 
@@ -1091,6 +1211,62 @@ document.querySelectorAll(".rate-input").forEach(el=>{
   });
 });
 
+/* Rate Ongkir vs Ongkir Manual saling mengunci — cuma boleh isi salah satu.
+   Begitu satu field diisi, field pasangannya otomatis DIKOSONGKAN & dikunci
+   (disabled), supaya tidak ada nilai lama yang nyangkut dan bikin hitungan
+   ongkir jadi ambigu (dua sumber ongkir aktif bersamaan). Badge status
+   ("● Aktif" / "🔒 Terkunci") ditampilkan supaya jelas kelihatan mana yang
+   lagi dipakai, biar pengguna tidak salah isi field. */
+function setupOngkirExclusive(rateId, manualId, sheetName){
+  const rateEl = document.getElementById(rateId);
+  const manualEl = document.getElementById(manualId);
+  const rateWrap = document.getElementById(rateId+"-wrap");
+  const manualWrap = document.getElementById(manualId+"-wrap");
+  const rateBadge = document.getElementById(rateId+"-badge");
+  const manualBadge = document.getElementById(manualId+"-badge");
+
+  function setState(activeWrap, activeBadge, lockedWrap, lockedBadge, isNeutral){
+    [activeWrap, lockedWrap].forEach(w=>w.classList.remove("is-active","is-locked","is-neutral"));
+    if(isNeutral){
+      activeWrap.classList.add("is-neutral");
+      lockedWrap.classList.add("is-neutral");
+    } else {
+      activeWrap.classList.add("is-active");
+      activeBadge.textContent = "● Aktif";
+      lockedWrap.classList.add("is-locked");
+      lockedBadge.textContent = "🔒 Terkunci";
+    }
+  }
+
+  rateEl.addEventListener("input", ()=>{
+    const rateFilled = rateEl.value.trim() !== "" && rateEl.value.trim() !== "0";
+    if(rateFilled){
+      manualEl.value = "";
+      manualEl.disabled = true;
+      setState(rateWrap, rateBadge, manualWrap, manualBadge, false);
+    } else {
+      manualEl.disabled = false;
+      setState(rateWrap, rateBadge, manualWrap, manualBadge, true);
+    }
+    calc(sheetName);
+  });
+
+  manualEl.addEventListener("input", ()=>{
+    const manualFilled = manualEl.value.trim() !== "";
+    if(manualFilled){
+      rateEl.value = "";
+      rateEl.disabled = true;
+      setState(manualWrap, manualBadge, rateWrap, rateBadge, false);
+    } else {
+      rateEl.disabled = false;
+      setState(manualWrap, manualBadge, rateWrap, rateBadge, true);
+    }
+    calc(sheetName);
+  });
+}
+setupOngkirExclusive("pj-rate", "pj-ongkir-manual", "penjualan");
+setupOngkirExclusive("cs-rate", "cs-ongkir-manual", "custom");
+
 calc("penjualan"); calc("custom");
 
 /* ============ Kalkulator Manual (popup) ============ */
@@ -1252,6 +1428,19 @@ calc("penjualan"); calc("custom");
     else if(e.key === "*"){ resetMsg(); chooseOp("×"); }
     else if(e.key === "/"){ e.preventDefault(); resetMsg(); chooseOp("÷"); }
   });
+})();
+
+/* ============ Popup Riwayat Update (Changelog) ============ */
+(function(){
+  const overlay = document.getElementById("changelog-overlay");
+  const btnOpen = document.getElementById("btn-changelog");
+  const btnClose = document.getElementById("changelog-close");
+  function open(){ overlay.hidden = false; }
+  function close(){ overlay.hidden = true; }
+  btnOpen.addEventListener("click", open);
+  btnClose.addEventListener("click", close);
+  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) close(); });
+  document.addEventListener("keydown", (e)=>{ if(!overlay.hidden && e.key === "Escape") close(); });
 })();
 
 

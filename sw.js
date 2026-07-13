@@ -5,11 +5,10 @@
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
 
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_NAME = "nota-halawa-" + CACHE_VERSION;
 
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
-// Sesuaikan "./index.html" jika nama file HTML utamamu berbeda.
 const CORE_ASSETS = [
   "./",
   "./index.html",
