@@ -152,20 +152,16 @@
     .changelog-popup{width:100%;max-width:340px;}
   }
 
-  /* ============ TOAST AUTO-UPDATE ============ */
-  .update-toast{
-    position:fixed;left:50%;bottom:22px;transform:translateX(-50%);
-    background:#1a1a1a;color:#fff;font-family:'Roboto',sans-serif;
-    font-size:12.5px;font-weight:500;padding:10px 18px;border-radius:20px;
-    box-shadow:0 6px 20px rgba(0,0,0,.28);z-index:1200;
-    display:flex;align-items:center;gap:8px;
-    animation:toastIn .25s ease;
-  }
-  .update-toast[hidden]{display:none;}
-  @keyframes toastIn{from{opacity:0;transform:translate(-50%,10px);}to{opacity:1;transform:translate(-50%,0);}}
-  @media (max-width:480px){
-    .update-toast{bottom:16px;font-size:12px;padding:9px 14px;width:calc(100% - 32px);justify-content:center;text-align:center;}
-  }
+  /* ============ POPUP NOTIFIKASI VERSI BARU (auto-update) ============
+     Murni pemberitahuan — tidak ada tombol aksi apa pun, tidak mengubah
+     alur reload otomatis yang sudah berjalan. Popup ini otomatis lenyap
+     dengan sendirinya begitu halaman reload (bukan lewat JS khusus). */
+  .update-popup{width:280px;}
+  .update-popup-body{padding:26px 20px;text-align:center;}
+  .update-popup-icon{font-size:32px;margin-bottom:10px;animation:updateSpin 1.2s linear infinite;display:inline-block;}
+  @keyframes updateSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  .update-popup-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .update-popup-text{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
 
   @media (max-width:480px){
     /* Popup mobile: dikunci agar TIDAK PERNAH melebihi lebar layar
@@ -618,7 +614,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Nota Halawa &nbsp;·&nbsp; versi 1.4.1
+      Nota Halawa &nbsp;·&nbsp; versi 1.5.0
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -650,7 +646,14 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.4.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.5.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Popup notifikasi "Versi Baru Terdeteksi" — tampil sebentar sebagai pemberitahuan sebelum reload otomatis berjalan (tidak mengubah alur update, murni informasi).</li>
+            <li>Tombol RESET sekarang juga berfungsi sebagai refresh — setelah field dikosongkan, halaman langsung reload penuh.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.4.1</div>
           <ul>
             <li>Perbaikan bug: konfirmasi tombol RESET diganti dari dialog bawaan browser (<code>confirm()</code>) ke popup buatan sendiri — dialog bawaan sering diblokir saat dibuka lewat iframe/preview, membuat tombolnya terlihat tidak berfungsi.</li>
           </ul>
@@ -712,9 +715,15 @@
 
   <div id="print-holder" style="position:fixed;left:-99999px;top:0;"></div>
 
-  <!-- ================= TOAST AUTO-UPDATE ================= -->
-  <div id="update-toast" class="update-toast" hidden>
-    <span>🔄 Versi baru tersedia — memperbarui otomatis…</span>
+  <!-- ================= POPUP NOTIFIKASI VERSI BARU (auto-update) ================= -->
+  <div id="update-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup update-popup" role="dialog" aria-label="Versi baru terdeteksi">
+      <div class="update-popup-body">
+        <div class="update-popup-icon">🔄</div>
+        <div class="update-popup-title">Versi Baru Terdeteksi</div>
+        <div class="update-popup-text">Sedang memperbarui otomatis, halaman akan dimuat ulang sebentar lagi…</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1316,7 +1325,7 @@ calc("penjualan"); calc("custom");
   function openConfirm(tab){
     targetTab = tab;
     const namaTab = tab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
-    textEl.textContent = `Kosongkan semua isian di tab "${namaTab}"?`;
+    textEl.textContent = `Kosongkan semua isian di tab "${namaTab}" dan refresh halaman?`;
     overlay.hidden = false;
   }
   function closeConfirm(){ overlay.hidden = true; targetTab = null; }
@@ -1338,7 +1347,13 @@ calc("penjualan"); calc("custom");
     }
 
     calc(activeTab);
-    showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan.`);
+    showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan — me-refresh halaman…`);
+
+    // RESET juga berfungsi sebagai refresh sungguhan: reload penuh halaman
+    // (bukan cuma reset tampilan), sekaligus jadi kesempatan tambahan untuk
+    // langsung ambil versi terbaru dari server kalau ada update pending.
+    // Jeda singkat supaya pesan di atas sempat kelihatan sebelum reload.
+    setTimeout(()=>{ location.reload(); }, 400);
   }
 
   document.getElementById("btn-reset").addEventListener("click", ()=>{
@@ -1565,7 +1580,7 @@ document.addEventListener("keydown", (e)=>{
 
 /* ============ registrasi service worker (PWA) + AUTO-UPDATE ============ */
 if ("serviceWorker" in navigator) {
-  const updateToast = document.getElementById("update-toast");
+  const updateOverlay = document.getElementById("update-overlay");
   let refreshing = false;
 
   // Saat service worker baru resmi mengambil alih kontrol halaman,
@@ -1601,8 +1616,8 @@ if ("serviceWorker" in navigator) {
         if (!newWorker) return;
         newWorker.addEventListener("statechange", () => {
           if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-            if (updateToast) updateToast.hidden = false;
-            // beri jeda sebentar biar toast sempat terbaca sebelum reload
+            if (updateOverlay) updateOverlay.hidden = false;
+            // beri jeda sebentar biar popup sempat terbaca sebelum reload
             newWorker.postMessage({ type: "SKIP_WAITING" });
           }
         });
