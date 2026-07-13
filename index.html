@@ -616,7 +616,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Nota Halawa &nbsp;·&nbsp; versi 1.7.2
+      Nota Halawa &nbsp;·&nbsp; versi <span id="app-current-version">1.9.0</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -648,7 +648,20 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.7.2 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.9.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Popup "Versi Baru" sekarang cuma muncul untuk update yang berarti (versi mayor/minor, mis. 1.8.x → 1.9.0) — update patch kecil (mis. 1.9.0 → 1.9.1) diterapkan diam-diam tanpa mengganggu.</li>
+            <li>Teks tombol popup menyesuaikan konteks: "Perbarui Sekarang" kalau memang ada aksi reload yang perlu dilakukan, atau "Oke, Mengerti" kalau ternyata sudah otomatis di versi terbaru (tidak ada yang perlu dilakukan lagi).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.8.0</div>
+          <ul>
+            <li>Perbaikan: popup "Versi Baru" sekarang juga muncul saat halaman baru dibuka, meskipun update-nya sempat terjadi diam-diam (tab/app tertutup total saat versi baru di-deploy) — sebelumnya popup bisa terlewat di kondisi ini.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.7.2</div>
           <ul>
             <li>Balik posisi judul header: "Rincian Pemesanan (Rp)" jadi judul utama, "Halawa Bintang Utama" jadi subjudul.</li>
           </ul>
@@ -1792,10 +1805,13 @@ document.addEventListener("keydown", (e)=>{
 
 
 /* ============ registrasi service worker (PWA) + UPDATE MANUAL ============
-   Popup "Versi Baru Tersedia" HANYA memberi tahu — tidak reload otomatis.
-   User yang putuskan lewat tombol "Perbarui Sekarang" (reload sekarang)
-   atau "Nanti Saja" (tutup, popup tidak muncul lagi untuk versi yang sama
-   sampai ada versi lebih baru lagi — dilacak lewat localStorage). */
+   Popup "Versi Baru Tersedia" HANYA muncul untuk update yang BERARTI (versi
+   mayor/minor berubah, mis. 1.8.x -> 1.9.0) — tidak reload otomatis, user
+   yang putuskan lewat tombol di popup.
+   Update PATCH kecil (mis. 1.8.0 -> 1.8.1, perbaikan kecil/bug fix) DITERAPKAN
+   DIAM-DIAM di belakang layar tanpa popup dan TANPA reload paksa, supaya
+   user tidak dibanjiri notifikasi untuk hal-hal yang tidak perlu mereka tahu
+   — baru kelihatan efeknya di kunjungan berikutnya secara alami. */
 if ("serviceWorker" in navigator) {
   const updateOverlay = document.getElementById("update-overlay");
   const versionLabelEl = document.getElementById("update-version-label");
@@ -1807,11 +1823,13 @@ if ("serviceWorker" in navigator) {
 
   let refreshing = false;
   let pendingWorker = null;
+  let suppressNextReload = false; // dipakai saat update patch diterapkan diam-diam
 
   // Reload cuma terjadi kalau USER yang minta (klik "Perbarui Sekarang"),
-  // lewat pengiriman pesan SKIP_WAITING di bawah — bukan otomatis lagi.
+  // KECUALI ini update patch yang memang sengaja diterapkan diam-diam.
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (refreshing) return;
+    if (suppressNextReload){ suppressNextReload = false; return; }
     refreshing = true;
     location.reload();
   });
@@ -1826,10 +1844,52 @@ if ("serviceWorker" in navigator) {
     closeUpdatePopup();
     if(pendingWorker){
       pendingWorker.postMessage({ type: "SKIP_WAITING" });
-    } else {
-      location.reload(); // jaring pengaman kalau referensi worker sudah hilang
     }
+    // kalau pendingWorker null (kasus "sudah di versi terbaru", lihat
+    // checkStartupVersionChange) -> tidak perlu apa-apa lagi, cukup tutup.
   });
+
+  // ---- Bantuan baca & bandingkan nomor versi (format X.Y.Z) ----
+  function parseVersion(v){
+    const m = String(v || "").match(/(\d+)\.(\d+)\.(\d+)/);
+    return m ? { major:+m[1], minor:+m[2], patch:+m[3] } : null;
+  }
+  // true kalau HANYA angka patch (terakhir) yang beda -> dianggap "kecil"
+  function isPatchOnlyChange(oldV, newV){
+    const a = parseVersion(oldV), b = parseVersion(newV);
+    if(!a || !b) return false; // format tak dikenal -> aman-nya anggap BUKAN patch, tetap tampilkan popup
+    return a.major === b.major && a.minor === b.minor && a.patch !== b.patch;
+  }
+  function getCurrentAppVersion(){
+    const el = document.getElementById("app-current-version");
+    return el ? el.textContent.trim() : null;
+  }
+
+  // Tampilkan popup dengan tombol "Perbarui Sekarang" (ada aksi nyata:
+  // kirim SKIP_WAITING lalu reload begitu diklik).
+  function openPopupPending(newWorker, versionKey, items){
+    pendingWorker = newWorker;
+    btnApply.textContent = "Perbarui Sekarang";
+    versionLabelEl.textContent = versionKey || "Versi terbaru";
+    featureListEl.innerHTML = (items && items.length)
+      ? items.map(t => `<li>${t}</li>`).join("")
+      : `<li>Perbaikan &amp; peningkatan umum.</li>`;
+    updateOverlay.hidden = false;
+  }
+
+  // Tampilkan popup dengan tombol "Oke, Mengerti" (TIDAK ada aksi reload —
+  // dipakai saat user TERNYATA sudah otomatis berada di versi terbaru,
+  // mis. lewat jalur checkStartupVersionChange, jadi tidak ada yang perlu
+  // "diperbarui" lagi, cuma pemberitahuan/pengakuan saja).
+  function openPopupInformational(versionKey, items){
+    pendingWorker = null;
+    btnApply.textContent = "Oke, Mengerti";
+    versionLabelEl.textContent = versionKey || "Versi terbaru";
+    featureListEl.innerHTML = (items && items.length)
+      ? items.map(t => `<li>${t}</li>`).join("")
+      : `<li>Perbaikan &amp; peningkatan umum.</li>`;
+    updateOverlay.hidden = false;
+  }
 
   // Ambil versi & daftar fitur baru LANGSUNG dari index.html yang baru di
   // server (bukan dikarang) — parsing entri #1 di daftar Riwayat Update-nya.
@@ -1854,24 +1914,70 @@ if ("serviceWorker" in navigator) {
     }
   }
 
-  async function showUpdatePopup(newWorker){
+  async function handleNewWorkerInstalled(newWorker){
     const info = await getUpdateInfo();
     const versionKey = info && info.version ? info.version : null;
+    const currentVersion = getCurrentAppVersion();
 
-    // Sudah pernah dikasih tahu untuk versi yang SAMA -> jangan ulangi.
-    // Popup hanya muncul lagi kalau versionKey berbeda (ada versi lebih baru lagi).
+    // Sudah pernah dikasih tahu/diterapkan untuk versi yang SAMA -> jangan ulangi.
     if(versionKey && localStorage.getItem(LS_KEY) === versionKey) return;
-    if(versionKey) localStorage.setItem(LS_KEY, versionKey);
 
-    pendingWorker = newWorker;
-    versionLabelEl.textContent = versionKey ? versionKey : "Versi terbaru";
-    if(info && info.items && info.items.length){
-      featureListEl.innerHTML = info.items.map(t => `<li>${t}</li>`).join("");
-    } else {
-      featureListEl.innerHTML = `<li>Perbaikan &amp; peningkatan umum.</li>`;
+    if(versionKey && currentVersion && isPatchOnlyChange(currentVersion, versionKey)){
+      // Update PATCH kecil -> terapkan diam-diam, TANPA popup & TANPA reload paksa.
+      suppressNextReload = true;
+      localStorage.setItem(LS_KEY, versionKey);
+      newWorker.postMessage({ type: "SKIP_WAITING" });
+      return;
     }
-    updateOverlay.hidden = false;
+
+    if(versionKey) localStorage.setItem(LS_KEY, versionKey);
+    openPopupPending(newWorker, versionKey, info && info.items);
   }
+
+  // ============ Cek update yang terjadi "diam-diam" (tab sempat tertutup) ============
+  // Kalau tab/app benar-benar tertutup pas versi baru di-deploy, browser bisa
+  // otomatis aktifkan service worker baru begitu tab dibuka lagi TANPA sempat
+  // memicu jalur updatefound/popup di atas (perilaku bawaan browser, di luar
+  // kendali kode ini). Untuk menutup celah itu: begitu halaman ini dimuat, cek
+  // versi yang SEDANG terbuka sekarang (dari isi halaman itu sendiri, tidak
+  // perlu fetch) dibandingkan versi terakhir yang pernah dilihat user. Kalau
+  // beda DAN bukan cuma patch kecil, tetap tampilkan popup "Versi Baru" —
+  // tapi mode INFORMATIONAL saja (sudah kepasang otomatis, tidak perlu aksi).
+  function getCurrentPageChangelogInfo(){
+    const firstItem = document.querySelector(".changelog-item");
+    if(!firstItem) return null;
+    const verEl = firstItem.querySelector(".changelog-ver");
+    let version = null;
+    if(verEl){
+      version = [...verEl.childNodes]
+        .filter(n => n.nodeType === Node.TEXT_NODE)
+        .map(n => n.textContent.trim()).join("").trim();
+    }
+    const items = [...firstItem.querySelectorAll("li")].map(li => li.textContent.trim());
+    return { version: version || null, items };
+  }
+
+  function checkStartupVersionChange(){
+    const info = getCurrentPageChangelogInfo();
+    if(!info || !info.version) return;
+    const seen = localStorage.getItem(LS_KEY);
+    if(seen === null){
+      // kunjungan pertama di HP ini -> jangan tampilkan popup, cukup catat baseline
+      localStorage.setItem(LS_KEY, info.version);
+      return;
+    }
+    if(seen === info.version) return;
+
+    if(isPatchOnlyChange(seen, info.version)){
+      // patch kecil yang sempat kepasang diam-diam -> cukup update catatan, tanpa popup
+      localStorage.setItem(LS_KEY, info.version);
+      return;
+    }
+
+    localStorage.setItem(LS_KEY, info.version);
+    openPopupInformational(info.version, info.items);
+  }
+  checkStartupVersionChange();
 
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").then((reg) => {
@@ -1887,24 +1993,22 @@ if ("serviceWorker" in navigator) {
       });
 
       // 3) Kalau ada worker baru yang sudah "installed" dan menunggu giliran
-      //    aktif -> tampilkan popup (BUKAN langsung skipWaiting/reload).
-      //    sw.js sendiri TIDAK lagi auto-skipWaiting saat install, jadi
-      //    worker baru akan diam menunggu sampai user klik "Perbarui Sekarang".
+      //    aktif -> putuskan diam-diam (patch) atau tampilkan popup (mayor/minor).
       reg.addEventListener("updatefound", () => {
         const newWorker = reg.installing;
         if (!newWorker) return;
         newWorker.addEventListener("statechange", () => {
           if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-            showUpdatePopup(newWorker);
+            handleNewWorkerInstalled(newWorker);
           }
         });
       });
 
       // 4) Kalau pas halaman ini dibuka TERNYATA sudah ada worker yang
       //    lagi menunggu (mis. dari sesi sebelumnya yang belum di-apply)
-      //    -> langsung tawarkan juga, tidak perlu tunggu updatefound baru.
+      //    -> putuskan juga lewat aturan yang sama, tidak perlu tunggu updatefound baru.
       if(reg.waiting && navigator.serviceWorker.controller){
-        showUpdatePopup(reg.waiting);
+        handleNewWorkerInstalled(reg.waiting);
       }
 
     }).catch(err=>{
