@@ -614,7 +614,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Nota Halawa &nbsp;·&nbsp; versi 1.5.0
+      Nota Halawa &nbsp;·&nbsp; versi 1.5.1
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -646,7 +646,13 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.5.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.5.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Ubah arah navigasi <b>Enter</b>: sekarang turun ke baris berikutnya di kolom yang sama (seperti Excel), bukan geser ke samping lagi. Tombol <b>Tab</b> tetap perilaku bawaan browser (geser ke kanan lalu turun).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.5.0</div>
           <ul>
             <li>Popup notifikasi "Versi Baru Terdeteksi" — tampil sebentar sebagai pemberitahuan sebelum reload otomatis berjalan (tidak mengubah alur update, murni informasi).</li>
             <li>Tombol RESET sekarang juga berfungsi sebagai refresh — setelah field dikosongkan, halaman langsung reload penuh.</li>
@@ -1371,15 +1377,14 @@ calc("penjualan"); calc("custom");
 })();
 
 /* ============ Navigasi via tombol Enter ============
-   Tekan Enter di dropdown produk, Qty, Diskon (Custom), Ekspedisi, Rate,
-   Ongkir Manual, atau Kelebihan bayar -> otomatis pindah fokus ke field
-   berikutnya (urut sesuai posisi di layar), seperti menekan Tab. Kalau
-   sudah di field terakhir, Enter tidak melakukan apa-apa (tidak wrap). */
-function getFocusableFieldsInPanel(panelEl){
-  return [...panelEl.querySelectorAll(
-    "select:not(:disabled), input:not(:disabled):not([type=hidden])"
-  )].filter(el => el.offsetParent !== null); // hanya yang benar-benar terlihat
-}
+   Tekan Enter -> fokus TURUN ke baris berikutnya, di KOLOM YANG SAMA
+   (mis. dari Qty baris 1 -> Qty baris 2), seperti Excel. Kalau sudah di
+   baris terakhir tabel, Enter loncat ke field pertama di bawah tabel
+   (Ekspedisi), lalu seterusnya turun satu-satu (Rate, Ongkir Manual,
+   Kelebihan bayar). Kalau sudah field paling bawah, Enter tidak
+   melakukan apa-apa.
+   Tombol TAB sengaja TIDAK disentuh — biarkan perilaku bawaan browser
+   (geser ke kanan lalu turun ke baris berikutnya). */
 document.addEventListener("keydown", (e)=>{
   if(e.key !== "Enter") return;
   const target = e.target;
@@ -1388,15 +1393,45 @@ document.addEventListener("keydown", (e)=>{
   const panel = target.closest(".panel");
   if(!panel) return; // Enter di luar area form nota (mis. di dalam popup kalkulator) -> abaikan di sini
 
+  const activeTab = panel.id === "panel-penjualan" ? "penjualan" : "custom";
+  const pfx = activeTab === "penjualan" ? "pj" : "cs";
+
+  // field standalone di bawah tabel, urut sesuai posisi di layar
+  const standaloneIds = [`${pfx}-ekspedisi`, `${pfx}-rate`, `${pfx}-ongkir-manual`, `${pfx}-kelebihan`];
+
   e.preventDefault();
-  const fields = getFocusableFieldsInPanel(panel);
-  const idx = fields.indexOf(target);
-  if(idx > -1 && idx < fields.length - 1){
-    const next = fields[idx + 1];
-    next.focus();
-    if(next.select) next.select(); // langsung blok isi field angka, siap ditimpa ketikan
-  } else if(idx === fields.length - 1){
-    target.blur(); // sudah field terakhir, cuma tutup keyboard/fokus
+
+  const tr = target.closest("tr");
+  if(tr){
+    // === di dalam tabel produk: turun ke kolom yang sama, baris berikutnya ===
+    let colSelector = null;
+    if(target.matches("select.prod")) colSelector = "select.prod";
+    else if(target.matches("input.qty")) colSelector = "input.qty";
+    else if(target.matches("input.diskon")) colSelector = "input.diskon";
+    if(!colSelector) return;
+
+    const nextTr = tr.nextElementSibling;
+    if(nextTr){
+      const nextField = nextTr.querySelector(colSelector);
+      if(nextField){
+        nextField.focus();
+        if(nextField.select) nextField.select();
+        return;
+      }
+    }
+    // sudah baris terakhir tabel -> loncat ke field standalone pertama (Ekspedisi)
+    const first = document.getElementById(standaloneIds[0]);
+    if(first){ first.focus(); if(first.select) first.select(); }
+    return;
+  }
+
+  // === field standalone (Ekspedisi, Rate, Ongkir Manual, Kelebihan bayar) ===
+  const idx = standaloneIds.indexOf(target.id);
+  if(idx > -1 && idx < standaloneIds.length - 1){
+    const next = document.getElementById(standaloneIds[idx + 1]);
+    if(next){ next.focus(); if(next.select) next.select(); }
+  } else if(idx === standaloneIds.length - 1){
+    target.blur(); // sudah field paling bawah
   }
 });
 
