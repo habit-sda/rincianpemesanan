@@ -11,8 +11,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Nota Halawa">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
 <title>Nota Pesanan — Halawa Bintang Utama (Spreadsheet Klasik)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -273,6 +275,8 @@
   .ongkir-indicator.is-filled{border-color:var(--ledger-green);background:#f2f8f2;}
   .ongkir-indicator.is-filled .ongkir-indicator-badge{display:inline-block;}
   .ongkir-indicator.is-filled input{font-weight:700;}
+  .ongkir-indicator-red.is-filled{border-color:#c5221f;background:#fdecea;}
+  .ongkir-indicator-red.is-filled .ongkir-indicator-badge{background:#c5221f;}
 
   .breakdown{margin-top:12px;border-top:1px solid var(--line);padding-top:8px;}
   .breakdown .row{font-size:12px;border-bottom:none;}
@@ -535,7 +539,13 @@
             </div>
             <input type="text" inputmode="numeric" id="pj-ongkir-manual" class="rate-input" placeholder="0" value="">
           </div>
-          <div class="note" id="pj-note">Aturan khusus: jika ekspedisi <b>IDTruck</b> dan berat &lt; 10 kg, ongkir tetap dihitung minimal 10 kg. Pembulatan berat memakai aturan longgar (≥1) untuk Sentral Cargo / Wahana / Laris Cargo, selain itu memakai aturan ketat (≥2).</div>
+          <div class="field ongkir-indicator ongkir-indicator-red" id="pj-kelebihan-wrap">
+            <div class="ongkir-indicator-row">
+              <label>Kelebihan bayar sebelumnya</label>
+              <span class="ongkir-indicator-badge" id="pj-kelebihan-badge">ADA ISINYA</span>
+            </div>
+            <input type="number" id="pj-kelebihan" value="0">
+          </div>
         </div>
 
         <div>
@@ -546,10 +556,6 @@
             <div class="row"><span class="lbl">Diskon Ongkir (subsidi)</span><span class="val" id="pj-diskonongkir">–</span></div>
             <div class="row total"><span class="lbl">Grand Total</span><span class="val" id="pj-grandtotal">–</span></div>
 
-            <div class="field" style="margin-top:14px;">
-              <label>Kelebihan bayar sebelumnya</label>
-              <input type="number" id="pj-kelebihan" value="0">
-            </div>
             <div class="row"><span class="lbl" id="pj-statuslabel">Kurang bayar</span><span class="val" id="pj-selisih">–</span></div>
 
             <div class="breakdown" id="pj-breakdown">
@@ -604,6 +610,13 @@
             </div>
             <input type="text" inputmode="numeric" id="cs-ongkir-manual" class="rate-input" placeholder="0" value="">
           </div>
+          <div class="field ongkir-indicator ongkir-indicator-red" id="cs-kelebihan-wrap">
+            <div class="ongkir-indicator-row">
+              <label>Kelebihan bayar sebelumnya</label>
+              <span class="ongkir-indicator-badge" id="cs-kelebihan-badge">ADA ISINYA</span>
+            </div>
+            <input type="number" id="cs-kelebihan" value="0">
+          </div>
           <div class="note" id="cs-note">Di sheet Custom: kolom <b>Diskon</b> diisi manual per baris (bukan otomatis), tidak ada aturan minimum 10&nbsp;kg untuk IDTruck, dan subsidi ongkir tidak otomatis (isi manual). Ini sesuai struktur asli filenya.</div>
         </div>
 
@@ -618,10 +631,6 @@
             </div>
             <div class="row total"><span class="lbl">Grand Total</span><span class="val" id="cs-grandtotal">–</span></div>
 
-            <div class="field" style="margin-top:14px;">
-              <label>Kelebihan bayar sebelumnya</label>
-              <input type="number" id="cs-kelebihan" value="0">
-            </div>
             <div class="row"><span class="lbl" id="cs-statuslabel">Kurang bayar</span><span class="val" id="cs-selisih">–</span></div>
 
             <div class="breakdown">
@@ -644,7 +653,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Nota Halawa &nbsp;·&nbsp; versi <span id="app-current-version">1.10.0</span>
+      Nota Halawa &nbsp;·&nbsp; versi <span id="app-current-version">1.11.0</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -676,7 +685,21 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.10.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.11.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Field "Kelebihan bayar sebelumnya" dipindah dari panel Nota ke panel Rincian Pemesanan (tepat di bawah Ongkir Manual), dengan tanda visual merah saat ada isinya — panel Nota sekarang bersih dari input, murni ringkasan.</li>
+            <li>Nama ikon di homescreen HP diganti jadi "Rp".</li>
+            <li>Hapus catatan "Aturan khusus IDTruck" yang sudah tidak relevan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.10.1</div>
+          <ul>
+            <li>Perbaikan ikon PWA: susunan ikon di <code>manifest.json</code> dilengkapi jadi 14 resolusi (16px–512px) termasuk varian "maskable" untuk Android, supaya ikon di homescreen tidak lagi buram. Perbaikan link ikon di halaman &amp; sinkronisasi <code>start_url</code>.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.10.0</div>
           <ul>
             <li>Tambah tanda visual "SEDANG DIPAKAI" (border hijau + badge) pada field Rate Ongkir / Ongkir Manual yang lagi ada isinya — membantu supaya tidak salah pilih field mana yang aktif, tanpa mengubah logika hitung sama sekali.</li>
           </ul>
@@ -1417,7 +1440,7 @@ setupOngkirExclusive("cs-rate", "cs-ongkir-manual", "custom");
    Setiap ada perubahan di SALAH SATU field, kita cek ULANG SEMUA field —
    soalnya setupOngkirExclusive() men-nol-kan field pasangannya lewat JS
    (bukan ketikan user), jadi field itu juga perlu ikut diperiksa ulang. */
-const ONGKIR_INDICATOR_IDS = ["pj-rate", "pj-ongkir-manual", "cs-rate", "cs-ongkir-manual"];
+const ONGKIR_INDICATOR_IDS = ["pj-rate", "pj-ongkir-manual", "pj-kelebihan", "cs-rate", "cs-ongkir-manual", "cs-kelebihan"];
 function refreshAllOngkirIndicators(){
   ONGKIR_INDICATOR_IDS.forEach(id => {
     const el = document.getElementById(id);

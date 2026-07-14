@@ -4,16 +4,19 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v14";
+const CACHE_VERSION = "v16";
 const CACHE_NAME = "nota-halawa-" + CACHE_VERSION;
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./icon-192.png",
-  "./icon-512.png",
-  "./apple-touch-icon.png"
+  "./icon-192x192.png",
+  "./icon-512x512.png",
+  "./icon-192x192-maskable.png",
+  "./icon-512x512-maskable.png",
+  "./icon-180x180.png",
+  "./icon-32x32.png"
 ];
 /* ---------- INSTALL: simpan app-shell ke cache ---------- */
 self.addEventListener("install", (event) => {
