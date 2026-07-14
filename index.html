@@ -10,12 +10,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Nota Halawa">
+<meta name="apple-mobile-web-app-title" content="Rp">
 <link rel="apple-touch-icon" href="icon-180x180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
-<title>Nota Pesanan — Halawa Bintang Utama (Spreadsheet Klasik)</title>
+<title>Rincian Pemesanan (Rp) — Halawa Bintang Utama</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -653,7 +653,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Nota Halawa &nbsp;·&nbsp; versi <span id="app-current-version">1.11.0</span>
+      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.11.1</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -685,7 +685,13 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.11.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.11.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Samakan semua penamaan jadi "Rp" — judul tab browser, nama share, nama homescreen iOS, dan teks footer (sebelumnya masih tercampur "Nota Halawa"/"Nota Pesanan" di beberapa tempat).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.11.0</div>
           <ul>
             <li>Field "Kelebihan bayar sebelumnya" dipindah dari panel Nota ke panel Rincian Pemesanan (tepat di bawah Ongkir Manual), dengan tanda visual merah saat ada isinya — panel Nota sekarang bersih dari input, murni ringkasan.</li>
             <li>Nama ikon di homescreen HP diganti jadi "Rp".</li>
@@ -1274,7 +1280,7 @@ document.getElementById("btn-share").addEventListener("click", async ()=>{
     const file = new File([blob], `nota-halawa-${tab}-${Date.now()}.png`, {type:"image/png"});
 
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file], title:"Nota Halawa"});
+      await navigator.share({files:[file], title:"Rincian Pemesanan (Rp)"});
       showMsg("Dialog share terbuka — pilih WhatsApp/chat tujuan.");
     } else if(navigator.share){
       // sebagian browser lama punya navigator.share tapi tidak dukung file
