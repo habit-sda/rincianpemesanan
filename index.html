@@ -67,11 +67,10 @@
     border-radius:4px 4px 0 0;position:relative;top:1px;
   }
   .tab-btn.active{background:var(--card);color:var(--ink);border-bottom:2px solid var(--stamp-red);font-weight:700;}
-  .reset-btn{
-    margin-left:auto;color:#c5221f;font-weight:700;border-color:var(--line);
-    background:var(--paper-dark);letter-spacing:.03em;
+  .action-btn.reset-btn{
+    color:#ffffff;font-weight:700;border-color:#c5221f;background:#c5221f;letter-spacing:.03em;
   }
-  .reset-btn:hover{background:#fce8e6;border-color:#f3b4ae;}
+  .action-btn.reset-btn:hover{background:#a11b18;border-color:#a11b18;}
   .panel{display:none;}
   .panel.active{display:block;animation:fade .2s ease;}
   @keyframes fade{from{opacity:0;}to{opacity:1;}}
@@ -457,7 +456,6 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="penjualan">Penjualan (Grosir)</button>
     <button class="tab-btn" data-tab="custom">Custom</button>
-    <button class="tab-btn reset-btn" id="btn-reset" title="Kosongkan semua isian di tab yang aktif">RESET</button>
   </div>
 
   <div class="toolbar">
@@ -465,6 +463,7 @@
     <button class="action-btn" id="btn-share">⇪ Bagikan</button>
     <button class="action-btn" id="btn-copy">⧉ Salin ke Clipboard</button>
     <button class="action-btn" id="btn-calc-toggle">🧮 Kalkulator</button>
+    <button class="action-btn reset-btn" id="btn-reset" title="Kosongkan semua isian di tab yang aktif">🗑 RESET</button>
     <span class="toolbar-msg" id="toolbar-msg"></span>
   </div>
 
@@ -552,7 +551,7 @@
               <label>Kelebihan bayar sebelumnya</label>
               <span class="ongkir-indicator-badge" id="pj-kelebihan-badge">ADA ISINYA</span>
             </div>
-            <input type="number" id="pj-kelebihan" value="0">
+            <input type="text" inputmode="numeric" id="pj-kelebihan" class="rate-input" value="0">
           </div>
         </div>
 
@@ -623,7 +622,7 @@
               <label>Kelebihan bayar sebelumnya</label>
               <span class="ongkir-indicator-badge" id="cs-kelebihan-badge">ADA ISINYA</span>
             </div>
-            <input type="number" id="cs-kelebihan" value="0">
+            <input type="text" inputmode="numeric" id="cs-kelebihan" class="rate-input" value="0">
           </div>
           <div class="note" id="cs-note">Catatan khusus tab Custom (mengikuti struktur asli file Excel): kolom <b>Diskon</b> di tabel harus diisi <b>manual per baris</b> oleh Anda sendiri, tidak dihitung otomatis oleh sistem. Ekspedisi IDTruck di tab ini <b>tidak</b> dikenakan aturan berat minimum 10&nbsp;kg (beda dengan tab Penjualan). <b>Diskon Ongkir</b> juga wajib diisi manual di kolom Nota — <b>tidak ada</b> perhitungan subsidi ongkir otomatis seperti di tab Penjualan.</div>
         </div>
@@ -636,7 +635,7 @@
             <div class="row ongkir-indicator ongkir-indicator-blue" id="cs-diskonongkir-wrap" style="margin:-6px -8px 4px;">
               <span class="lbl">Diskon Ongkir (manual)</span>
               <span class="ongkir-indicator-badge" id="cs-diskonongkir-badge" style="margin-right:6px;">ADA ISINYA</span>
-              <input type="number" id="cs-diskonongkir" value="0" style="max-width:130px;text-align:right;">
+              <input type="text" inputmode="numeric" id="cs-diskonongkir" class="rate-input" value="0" style="max-width:130px;text-align:right;">
             </div>
             <div class="row total"><span class="lbl">Grand Total</span><span class="val" id="cs-grandtotal">–</span></div>
 
@@ -662,7 +661,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.12.1</span>
+      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.13.1</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -694,7 +693,20 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.12.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.13.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Tombol RESET dibuat lebih mencolok: sekarang solid merah penuh (sebelumnya cuma teks merah dengan latar terang) dan ditambah ikon 🗑, supaya lebih jelas terlihat sebagai aksi yang perlu hati-hati.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.13.0</div>
+          <ul>
+            <li>Field "Kelebihan bayar sebelumnya" (Penjualan & Custom) dan "Diskon Ongkir (manual)" (Custom) sekarang otomatis diformat titik ribuan saat mengetik, mis. 2000 → 2.000 — sama seperti field Rate Ongkir/Ongkir Manual.</li>
+            <li>Tombol RESET dipindah dari baris tab ke toolbar, tepat di sebelah kanan tombol Kalkulator, supaya lebih mudah dijangkau (terutama di HP).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.12.1</div>
           <ul>
             <li>Perjelas isi catatan khusus tab Custom (soal kolom Diskon manual, tidak ada aturan minimum 10 kg IDTruck, dan Diskon Ongkir manual) supaya lebih mudah dipahami.</li>
             <li>Warna catatan tersebut diubah jadi merah (sebelumnya biru) — dibuat terpisah dari variabel warna aksen global supaya tidak ikut mengubah warna tab/tombol/link lain di halaman.</li>
@@ -1000,6 +1012,14 @@ function formatQtyBreakdown(raw){
   return parts.length ? parts.join(", ") : "0 Karton";
 }
 
+/* Helper global: baca angka dari input yang formatnya pakai titik ribuan
+   (mis. "2.000" -> 2000). Dipakai untuk field yang sekarang auto-format
+   ribuan: Kelebihan bayar sebelumnya & Diskon Ongkir (manual). */
+function parseRibuan(str){
+  const v = parseFloat(String(str).trim().replace(/\./g,"").replace(/,/g,"."));
+  return isNaN(v) ? 0 : v;
+}
+
 function calc(sheet){
   const pfx = sheet==="penjualan" ? "pj" : "cs";
   const tbody = document.getElementById(sheet==="penjualan"?"rows-penjualan":"rows-custom");
@@ -1090,7 +1110,7 @@ function calc(sheet){
     document.getElementById("pj-diskonongkir").textContent = rupiah(diskonOngkir);
     document.getElementById("pj-grandtotal").textContent = rupiah(grandTotal);
 
-    const kelebihan = parseFloat(document.getElementById("pj-kelebihan").value)||0;
+    const kelebihan = parseRibuan(document.getElementById("pj-kelebihan").value);
     const selisih = kelebihan - grandTotal;
     document.getElementById("pj-selisih").textContent = rupiah(Math.abs(selisih));
     document.getElementById("pj-statuslabel").textContent = selisih>0 ? "Kembalian" : (selisih<0 ? "Kurang bayar" : "Lunas");
@@ -1108,14 +1128,14 @@ function calc(sheet){
     const csPakaiManual = csManualStr !== "" && !isNaN(csManualVal) && csManualVal !== 0;
     if(csPakaiManual) ongkir = csManualVal;
 
-    diskonOngkir = parseFloat(document.getElementById("cs-diskonongkir").value)||0;
+    diskonOngkir = parseRibuan(document.getElementById("cs-diskonongkir").value);
     grandTotal = (subtotal + ongkir) - diskonOngkir;
 
     document.getElementById("cs-ongkir").textContent = rupiah(ongkir) + (csPakaiManual ? " (manual)" : "");
     document.getElementById("cs-grandtotal").textContent = rupiah(grandTotal);
     document.getElementById("cs-diskonproduk").textContent = rupiah(totalDiskonProduk);
 
-    const kelebihan = parseFloat(document.getElementById("cs-kelebihan").value)||0;
+    const kelebihan = parseRibuan(document.getElementById("cs-kelebihan").value);
     const selisih = kelebihan - grandTotal;
     document.getElementById("cs-selisih").textContent = rupiah(Math.abs(selisih));
     document.getElementById("cs-statuslabel").textContent = selisih>0 ? "Kembalian" : (selisih<0 ? "Kurang bayar" : "Lunas");
@@ -1212,10 +1232,10 @@ function buildPrintNota(tab){
   const ongkir = document.getElementById(pfx+"-ongkir").textContent;
   const diskonongkir = tab==="penjualan"
     ? document.getElementById("pj-diskonongkir").textContent
-    : (document.getElementById("cs-diskonongkir").value ? rupiah(parseFloat(document.getElementById("cs-diskonongkir").value)) : "Rp 0");
+    : (document.getElementById("cs-diskonongkir").value ? rupiah(parseRibuan(document.getElementById("cs-diskonongkir").value)) : "Rp 0");
   const grandtotal = document.getElementById(pfx+"-grandtotal").textContent;
 
-  const kelebihan = parseFloat(document.getElementById(pfx+"-kelebihan").value)||0;
+  const kelebihan = parseRibuan(document.getElementById(pfx+"-kelebihan").value);
   const kelebihanFmt = rupiah(kelebihan);
   const statusLabel = document.getElementById(pfx+"-statuslabel").textContent;
   const selisihFmt = document.getElementById(pfx+"-selisih").textContent;
@@ -1407,9 +1427,10 @@ buildEkspedisi("penjualan"); buildEkspedisi("custom");
 buildRegionTable();
 initDate();
 
-["pj-kelebihan","cs-kelebihan","cs-diskonongkir"].forEach(id=>{
-  document.getElementById(id).addEventListener("input", ()=>calc(id.startsWith("pj")?"penjualan":"custom"));
-});
+/* Catatan: listener "input" untuk pj-kelebihan/cs-kelebihan/cs-diskonongkir
+   sekarang ditangani lewat loop .rate-input di bawah (field-field ini sudah
+   dikasih class "rate-input" supaya auto-format titik ribuan), jadi tidak
+   perlu listener input terpisah lagi di sini. */
 
 /* ============ Auto-hilang angka "0" saat field diisi ============
    Berlaku untuk "Kelebihan bayar sebelumnya" (Penjualan & Custom) dan
