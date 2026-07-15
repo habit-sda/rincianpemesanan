@@ -309,6 +309,12 @@
     font-size:11px;color:var(--ink-soft);background:var(--paper-dark);border-left:3px solid var(--stamp-red);
     padding:8px 12px;border-radius:0;margin-top:12px;line-height:1.5;
   }
+  /* Catatan khusus tab Custom (#cs-note) sengaja dibuat MERAH, terpisah dari
+     variabel --stamp-red (yang sebenarnya biru & dipakai di banyak elemen
+     lain seperti tab aktif/tombol/link) — supaya catatan penting ini
+     langsung menonjol tanpa mengubah warna aksen di seluruh halaman. */
+  #cs-note{border-left-color:#c5221f;background:#fdecea;color:#8a1c17;}
+  #cs-note b{color:#8a1c17;}
 
   /* ===== template nota untuk unduh/salin gambar ===== */
   .pnota{
@@ -619,7 +625,7 @@
             </div>
             <input type="number" id="cs-kelebihan" value="0">
           </div>
-          <div class="note" id="cs-note">Di sheet Custom: kolom <b>Diskon</b> diisi manual per baris (bukan otomatis), tidak ada aturan minimum 10&nbsp;kg untuk IDTruck, dan subsidi ongkir tidak otomatis (isi manual). Ini sesuai struktur asli filenya.</div>
+          <div class="note" id="cs-note">Catatan khusus tab Custom (mengikuti struktur asli file Excel): kolom <b>Diskon</b> di tabel harus diisi <b>manual per baris</b> oleh Anda sendiri, tidak dihitung otomatis oleh sistem. Ekspedisi IDTruck di tab ini <b>tidak</b> dikenakan aturan berat minimum 10&nbsp;kg (beda dengan tab Penjualan). <b>Diskon Ongkir</b> juga wajib diisi manual di kolom Nota — <b>tidak ada</b> perhitungan subsidi ongkir otomatis seperti di tab Penjualan.</div>
         </div>
 
         <div>
@@ -656,7 +662,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.12.0</span>
+      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.12.1</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -688,7 +694,14 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.12.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.12.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Perjelas isi catatan khusus tab Custom (soal kolom Diskon manual, tidak ada aturan minimum 10 kg IDTruck, dan Diskon Ongkir manual) supaya lebih mudah dipahami.</li>
+            <li>Warna catatan tersebut diubah jadi merah (sebelumnya biru) — dibuat terpisah dari variabel warna aksen global supaya tidak ikut mengubah warna tab/tombol/link lain di halaman.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.12.0</div>
           <ul>
             <li>Field "Kelebihan bayar sebelumnya" (Penjualan & Custom) dan "Diskon Ongkir (manual)" (Custom): angka "0" bawaan sekarang otomatis ter-select begitu field diklik/fokus, jadi langsung tertimpa saat mulai mengetik — tidak perlu hapus manual dulu. Kalau field dikosongkan lalu ditinggal, otomatis kembali jadi "0" supaya perhitungan tetap aman.</li>
             <li>Field "Diskon Ongkir (manual)" di tab Custom sekarang punya tanda visual biru (border + badge "ADA ISINYA") saat diisi, konsisten dengan pola indikator Rate Ongkir/Ongkir Manual (hijau) dan Kelebihan Bayar (merah) — mempermudah melihat sekilas field mana saja yang sedang aktif.</li>
