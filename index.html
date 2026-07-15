@@ -354,6 +354,14 @@
   }
   .pnota-grand .l{font-size:29px;font-weight:700;color:#1f6b3a;font-style:italic;}
   .pnota-grand .v{font-size:40px;font-weight:800;color:#c1272d;}
+  /* Warna band nota (header & Grand Total) mengikuti tingkat Total Qty:
+     < 14 = kuning, 14–49 = hijau (default di atas), > 49 = biru.
+     Hanya berlaku di gambar Nota hasil unduhan/salin, bukan di tampilan layar. */
+  .pnota-head.qty-yellow, .pnota-grand.qty-yellow{background:#fdf3d0;}
+  .pnota-grand.qty-yellow .l{color:#8a6d1f;}
+  .pnota-head.qty-blue, .pnota-grand.qty-blue{background:#e3edf9;}
+  .pnota-grand.qty-blue .l{color:#1a56a8;}
+  .pnota-grand.qty-blue .v{color:#0b2f57;}
   .pnota-pay{border-top:3px solid #1a1a1a;}
   .pnota-payline{
     display:flex;justify-content:space-between;align-items:center;padding:16px 36px;
@@ -661,7 +669,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.13.1</span>
+      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.15.0</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -693,7 +701,19 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.13.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.15.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Gambar Nota hasil unduhan/salin: baris "Kelebihan bayar sebelumnya" dan status pembayaran (Kurang bayar/Kembalian/Lunas) sekarang otomatis disembunyikan kalau Kelebihan bayar sebelumnya bernilai Rp 0 — nota langsung berhenti di Grand Total. Kalau ada isinya, kedua baris tetap tampil seperti biasa. Berlaku di tab Penjualan & Custom.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.14.0</div>
+          <ul>
+            <li>Warna band header & Grand Total pada gambar Nota hasil unduhan/salin sekarang otomatis menyesuaikan Total Qty: kuning kalau di bawah 14, hijau muda kalau 14–49 (seperti sebelumnya), dan biru kalau di atas 49 — berlaku di tab Penjualan maupun Custom. Tampilan di layar aplikasi (sebelum diunduh) tidak berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.13.1</div>
           <ul>
             <li>Tombol RESET dibuat lebih mencolok: sekarang solid merah penuh (sebelumnya cuma teks merah dengan latar terang) dan ditambah ikon 🗑, supaya lebih jelas terlihat sebagai aksi yang perlu hati-hati.</li>
           </ul>
@@ -1081,6 +1101,7 @@ function calc(sheet){
   });
 
   document.getElementById(pfx+"-totalqty").textContent = formatQtyBreakdown(raw);
+  document.getElementById(pfx+"-totalqty").dataset.raw = totalQty;
   document.getElementById(pfx+"-subtotal").textContent = rupiah(subtotal);
 
   const ekspedisi = document.getElementById(pfx+"-ekspedisi").value;
@@ -1244,9 +1265,14 @@ function buildPrintNota(tab){
   const signPrefix = isKurang ? "-" : "";
   const statusColor = isKurang ? "#c1272d" : (isKembalian ? "#1f6b3a" : "#333");
 
+  /* Tingkat warna band nota berdasarkan Total Qty mentah (bukan teks
+     breakdown-nya): < 14 = kuning, 14–49 = hijau (default), > 49 = biru. */
+  const totalQtyRaw = parseFloat(document.getElementById(pfx+"-totalqty").dataset.raw) || 0;
+  const qtyTierClass = totalQtyRaw < 14 ? "qty-yellow" : (totalQtyRaw > 49 ? "qty-blue" : "");
+
   return `
     <div class="pnota">
-      <div class="pnota-head">
+      <div class="pnota-head ${qtyTierClass}">
         <div></div>
         <div class="pnota-title">Rincian Pemesanan</div>
         <div class="pnota-date"><b>${hari}</b>${tgl}</div>
@@ -1271,11 +1297,12 @@ function buildPrintNota(tab){
           <div class="pnota-sline"><span class="l">Diskon Ongkir</span><span class="v">${diskonongkir}</span></div>
         </div>
       </div>
-      <div class="pnota-grand"><span class="l">Grand Total</span><span class="v">${grandtotal}</span></div>
+      <div class="pnota-grand ${qtyTierClass}"><span class="l">Grand Total</span><span class="v">${grandtotal}</span></div>
+      ${kelebihan !== 0 ? `
       <div class="pnota-pay">
         <div class="pnota-payline"><span class="l">Kelebihan bayar sebelumnya</span><span class="v">${kelebihanFmt}</span></div>
         <div class="pnota-payline pnota-status" style="color:${statusColor}"><span class="l">${statusLabel}</span><span class="v">${signPrefix}${selisihFmt}</span></div>
-      </div>
+      </div>` : ""}
     </div>
   `;
 }
