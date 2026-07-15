@@ -277,6 +277,8 @@
   .ongkir-indicator.is-filled input{font-weight:700;}
   .ongkir-indicator-red.is-filled{border-color:#c5221f;background:#fdecea;}
   .ongkir-indicator-red.is-filled .ongkir-indicator-badge{background:#c5221f;}
+  .ongkir-indicator-blue.is-filled{border-color:#1a56db;background:#eaf1fd;}
+  .ongkir-indicator-blue.is-filled .ongkir-indicator-badge{background:#1a56db;}
 
   .breakdown{margin-top:12px;border-top:1px solid var(--line);padding-top:8px;}
   .breakdown .row{font-size:12px;border-bottom:none;}
@@ -625,8 +627,9 @@
           <div class="receipt">
             <div class="row"><span class="lbl">Subtotal Produk</span><span class="val" id="cs-subtotal">–</span></div>
             <div class="row"><span class="lbl">Ongkir</span><span class="val" id="cs-ongkir">–</span></div>
-            <div class="row">
+            <div class="row ongkir-indicator ongkir-indicator-blue" id="cs-diskonongkir-wrap" style="margin:-6px -8px 4px;">
               <span class="lbl">Diskon Ongkir (manual)</span>
+              <span class="ongkir-indicator-badge" id="cs-diskonongkir-badge" style="margin-right:6px;">ADA ISINYA</span>
               <input type="number" id="cs-diskonongkir" value="0" style="max-width:130px;text-align:right;">
             </div>
             <div class="row total"><span class="lbl">Grand Total</span><span class="val" id="cs-grandtotal">–</span></div>
@@ -653,7 +656,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.11.1</span>
+      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.12.0</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -685,7 +688,14 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.11.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.12.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Field "Kelebihan bayar sebelumnya" (Penjualan & Custom) dan "Diskon Ongkir (manual)" (Custom): angka "0" bawaan sekarang otomatis ter-select begitu field diklik/fokus, jadi langsung tertimpa saat mulai mengetik — tidak perlu hapus manual dulu. Kalau field dikosongkan lalu ditinggal, otomatis kembali jadi "0" supaya perhitungan tetap aman.</li>
+            <li>Field "Diskon Ongkir (manual)" di tab Custom sekarang punya tanda visual biru (border + badge "ADA ISINYA") saat diisi, konsisten dengan pola indikator Rate Ongkir/Ongkir Manual (hijau) dan Kelebihan Bayar (merah) — mempermudah melihat sekilas field mana saja yang sedang aktif.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.11.1</div>
           <ul>
             <li>Samakan semua penamaan jadi "Rp" — judul tab browser, nama share, nama homescreen iOS, dan teks footer (sebelumnya masih tercampur "Nota Halawa"/"Nota Pesanan" di beberapa tempat).</li>
           </ul>
@@ -1388,6 +1398,28 @@ initDate();
   document.getElementById(id).addEventListener("input", ()=>calc(id.startsWith("pj")?"penjualan":"custom"));
 });
 
+/* ============ Auto-hilang angka "0" saat field diisi ============
+   Berlaku untuk "Kelebihan bayar sebelumnya" (Penjualan & Custom) dan
+   "Diskon Ongkir (manual)" (Custom). Saat field ini di-klik/fokus dan
+   nilainya masih "0", teks "0" langsung ter-select semua — jadi begitu
+   user mulai mengetik, angka 0 otomatis tertimpa/hilang (tidak perlu
+   hapus manual dulu). Kalau field dikosongkan total lalu ditinggal
+   (blur) tanpa diisi apa-apa, otomatis diisi ulang jadi "0" supaya
+   perhitungan tidak error. */
+["pj-kelebihan","cs-kelebihan","cs-diskonongkir"].forEach(id=>{
+  const el = document.getElementById(id);
+  el.addEventListener("focus", ()=>{
+    if(el.value.trim() === "0") el.select();
+  });
+  el.addEventListener("blur", ()=>{
+    if(el.value.trim() === ""){
+      el.value = "0";
+      calc(id.startsWith("pj")?"penjualan":"custom");
+      if(window.__refreshOngkirIndicators) window.__refreshOngkirIndicators();
+    }
+  });
+});
+
 /* format titik ribuan otomatis untuk input Rate Ongkir */
 function formatRibuanInput(el){
   const raw = el.value.replace(/\D/g, "");
@@ -1446,7 +1478,7 @@ setupOngkirExclusive("cs-rate", "cs-ongkir-manual", "custom");
    Setiap ada perubahan di SALAH SATU field, kita cek ULANG SEMUA field —
    soalnya setupOngkirExclusive() men-nol-kan field pasangannya lewat JS
    (bukan ketikan user), jadi field itu juga perlu ikut diperiksa ulang. */
-const ONGKIR_INDICATOR_IDS = ["pj-rate", "pj-ongkir-manual", "pj-kelebihan", "cs-rate", "cs-ongkir-manual", "cs-kelebihan"];
+const ONGKIR_INDICATOR_IDS = ["pj-rate", "pj-ongkir-manual", "pj-kelebihan", "cs-rate", "cs-ongkir-manual", "cs-kelebihan", "cs-diskonongkir"];
 function refreshAllOngkirIndicators(){
   ONGKIR_INDICATOR_IDS.forEach(id => {
     const el = document.getElementById(id);
