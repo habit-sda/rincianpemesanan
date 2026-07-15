@@ -362,6 +362,8 @@
   .pnota-head.qty-blue, .pnota-grand.qty-blue{background:#e3edf9;}
   .pnota-grand.qty-blue .l{color:#1a56a8;}
   .pnota-grand.qty-blue .v{color:#0b2f57;}
+  .pnota.qty-yellow thead th{background:#fdf3d0;}
+  .pnota.qty-blue thead th{background:#e3edf9;}
   .pnota-pay{border-top:3px solid #1a1a1a;}
   .pnota-payline{
     display:flex;justify-content:space-between;align-items:center;padding:16px 36px;
@@ -669,7 +671,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.15.0</span>
+      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.15.1</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -701,7 +703,13 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.15.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.15.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Header tabel (NO/DESKRIPSI/QTY/dst) pada gambar Nota sekarang ikut berubah warna mengikuti tingkat Total Qty (kuning/hijau/biru) — sebelumnya cuma band judul atas & Grand Total yang berubah, header tabel tetap abu-abu.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.15.0</div>
           <ul>
             <li>Gambar Nota hasil unduhan/salin: baris "Kelebihan bayar sebelumnya" dan status pembayaran (Kurang bayar/Kembalian/Lunas) sekarang otomatis disembunyikan kalau Kelebihan bayar sebelumnya bernilai Rp 0 — nota langsung berhenti di Grand Total. Kalau ada isinya, kedua baris tetap tampil seperti biasa. Berlaku di tab Penjualan & Custom.</li>
           </ul>
@@ -1271,7 +1279,7 @@ function buildPrintNota(tab){
   const qtyTierClass = totalQtyRaw < 14 ? "qty-yellow" : (totalQtyRaw > 49 ? "qty-blue" : "");
 
   return `
-    <div class="pnota">
+    <div class="pnota ${qtyTierClass}">
       <div class="pnota-head ${qtyTierClass}">
         <div></div>
         <div class="pnota-title">Rincian Pemesanan</div>
