@@ -671,7 +671,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.15.1</span>
+      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.16.0</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -703,7 +703,13 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.15.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.16.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Field "Diskon (manual)" di tabel Custom sekarang otomatis dirapikan jadi format persen saat field ditinggalkan (blur) — ketik <b>0.25</b> atau <b>25%</b>, keduanya otomatis jadi tampilan <b>25%</b>. Nominal Rupiah (mis. 55000) tidak ikut berubah. Perhitungan Harga Satuan, Total, dan tampilan di gambar Nota tetap akurat mengikuti format baru ini.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.15.1</div>
           <ul>
             <li>Header tabel (NO/DESKRIPSI/QTY/dst) pada gambar Nota sekarang ikut berubah warna mengikuti tingkat Total Qty (kuning/hijau/biru) — sebelumnya cuma band judul atas & Grand Total yang berubah, header tabel tetap abu-abu.</li>
           </ul>
@@ -1048,6 +1054,29 @@ function parseRibuan(str){
   return isNaN(v) ? 0 : v;
 }
 
+/* Helper global untuk field "Diskon (manual)" di tabel Custom.
+   Field ini serbaguna: ketik desimal (mis. 0.25) atau nominal Rupiah
+   (mis. 55000). parseDiskonInput membaca nilai apa adanya (mendukung
+   juga tanda "%" kalau sudah diketik/diformat), formatDiskonInput
+   merapikan tampilan jadi "25%" begitu field ditinggalkan (blur). */
+function parseDiskonInput(raw){
+  const txt = String(raw).trim();
+  if(txt === "") return 0;
+  const num = parseFloat(txt.replace(/[^\d.]/g,"")) || 0;
+  return txt.includes("%") ? num/100 : num;
+}
+function formatDiskonInput(el){
+  const raw = el.value.trim();
+  if(raw === "") return;
+  const num = parseFloat(raw.replace(/[^\d.]/g,""));
+  if(isNaN(num)) return;
+  const isPercent = raw.includes("%") || (num > 0 && num < 1);
+  if(isPercent){
+    const pct = raw.includes("%") ? num : num*100;
+    el.value = (Math.round(pct*100)/100) + "%";
+  }
+}
+
 function calc(sheet){
   const pfx = sheet==="penjualan" ? "pj" : "cs";
   const tbody = document.getElementById(sheet==="penjualan"?"rows-penjualan":"rows-custom");
@@ -1089,7 +1118,7 @@ function calc(sheet){
       if(diskonReadout) diskonReadout.textContent = diskonVal===""? "–" : (diskonVal<1 ? (diskonVal*100).toFixed(0)+"%" : rupiah(diskonVal));
     } else {
       const txt = diskonInput.value.trim();
-      diskonVal = txt===""? 0 : parseFloat(txt.replace(/[^\d.]/g,""))||0;
+      diskonVal = parseDiskonInput(txt);
     }
 
     const hargaSatuan = diskonVal==="" ? 0 : (diskonVal<1 ? harga-(harga*diskonVal) : harga-diskonVal);
@@ -1237,7 +1266,7 @@ function buildPrintNota(tab){
     let diskon = "–";
     if(diskonEl){
       if(diskonEl.tagName === "INPUT"){
-        const raw = parseFloat((diskonEl.value||"").replace(/[^\d.]/g,""))||0;
+        const raw = parseDiskonInput(diskonEl.value);
         diskon = diskonEl.value.trim()==="" ? "–" : (raw<1 ? (raw*100).toFixed(0)+"%" : rupiah(raw));
       } else {
         diskon = diskonEl.textContent;
@@ -1614,7 +1643,7 @@ calc("penjualan"); calc("custom");
       const diskonEl = tr.querySelector("input.diskon");
       if(selEl && rowData.prod) selEl.value = rowData.prod;
       if(qtyEl && rowData.qty) qtyEl.value = rowData.qty;
-      if(diskonEl && rowData.diskon) diskonEl.value = rowData.diskon;
+      if(diskonEl && rowData.diskon) { diskonEl.value = rowData.diskon; formatDiskonInput(diskonEl); }
     });
     if(data.ekspedisi) document.getElementById(`${pfx}-ekspedisi`).value = data.ekspedisi;
     if(data.rate) document.getElementById(`${pfx}-rate`).value = data.rate;
@@ -1662,6 +1691,13 @@ calc("penjualan"); calc("custom");
     if(!e.target.matches("select.prod, #pj-ekspedisi, #cs-ekspedisi")) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveDraft, 400);
+  });
+
+  // Rapikan tampilan "Diskon (manual)" di tabel Custom jadi format persen
+  // (mis. 0.25 -> 25%) begitu field ditinggalkan (blur/focusout).
+  document.addEventListener("focusout", (e)=>{
+    if(!e.target.matches("input.diskon")) return;
+    formatDiskonInput(e.target);
   });
 
   // peringatan browser bawaan sebelum keluar/refresh kalau ada isian —
