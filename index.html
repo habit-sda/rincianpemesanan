@@ -671,7 +671,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.16.0</span>
+      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.16.1</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -703,7 +703,13 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.16.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.16.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Kata "(manual)" di sebelah nilai Ongkir sekarang tidak ikut muncul di gambar Nota hasil unduhan/salin — tetap tampil seperti biasa di layar aplikasi supaya Anda tetap tahu ongkir itu diisi manual.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.16.0</div>
           <ul>
             <li>Field "Diskon (manual)" di tabel Custom sekarang otomatis dirapikan jadi format persen saat field ditinggalkan (blur) — ketik <b>0.25</b> atau <b>25%</b>, keduanya otomatis jadi tampilan <b>25%</b>. Nominal Rupiah (mis. 55000) tidak ikut berubah. Perhitungan Harga Satuan, Total, dan tampilan di gambar Nota tetap akurat mengikuti format baru ini.</li>
           </ul>
@@ -1287,7 +1293,7 @@ function buildPrintNota(tab){
   const totalqty = document.getElementById(pfx+"-totalqty").textContent;
   const totalberat = document.getElementById(pfx+"-totalberat").textContent;
   const subtotal = document.getElementById(pfx+"-subtotal").textContent;
-  const ongkir = document.getElementById(pfx+"-ongkir").textContent;
+  const ongkir = document.getElementById(pfx+"-ongkir").textContent.replace(" (manual)", "");
   const diskonongkir = tab==="penjualan"
     ? document.getElementById("pj-diskonongkir").textContent
     : (document.getElementById("cs-diskonongkir").value ? rupiah(parseRibuan(document.getElementById("cs-diskonongkir").value)) : "Rp 0");
