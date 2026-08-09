@@ -578,7 +578,7 @@
       text-align:left;cursor:pointer;overflow:hidden;
       box-shadow:0 1px 3px rgba(0,0,0,.05);
     }
-    .home-tile-top{padding:18px 14px 16px;}
+    .home-tile-top{padding:18px 14px 16px;flex:1;}
     .home-tile-icon{
       width:48px;height:48px;border-radius:50%;margin-bottom:12px;
       display:flex;align-items:center;justify-content:center;
@@ -594,7 +594,7 @@
       background:#e9f6ef;color:var(--primary-green);
     }
     .home-tile.tile-custom .home-tile-cta{background:#e8f2fc;color:#1976d2;}
-    .home-tile-cta svg{width:16px;height:16px;}
+    .home-tile-cta svg{width:16px;height:16px;flex-shrink:0;}
 
     /* --- Aksi cepat --- */
     .home-section-label{font-size:14px;font-weight:700;color:var(--ink);}
@@ -611,8 +611,9 @@
       display:flex;align-items:center;justify-content:center;
     }
     .home-actionrow-icon svg{width:19px;height:19px;}
-    .home-actionrow-label{flex:1;min-width:0;font-weight:700;font-size:14px;}
-    .home-actionrow-sub{font-size:11.5px;color:var(--ink-soft);font-weight:500;flex-shrink:0;margin-right:6px;}
+    .home-actionrow-textwrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+    .home-actionrow-label{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .home-actionrow-sub{font-size:11.5px;color:var(--ink-soft);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .home-actionrow-arrow{flex-shrink:0;font-size:19px;color:var(--ink-soft);}
     .home-actionrow.tg .home-actionrow-icon{background:#1e96e8;}
     .home-actionrow.tg .home-actionrow-label{color:#1976d2;}
@@ -644,16 +645,24 @@
     .nota-col.wiz-show{display:block;}
 
     /* --- wizard: 1 langkah = 1 layar --- */
-    .wiz{display:flex;flex-direction:column;}
+    .wiz{display:flex;flex-direction:column;padding-bottom:70px;}
     .wiz-step{display:none;}
     .wiz-step.active{display:block;}
-    .wiz-dots{display:flex;gap:10px;justify-content:center;margin-bottom:16px;}
-    .wiz-dots button{
-      flex:1;background:var(--card);border:1px solid var(--line);border-radius:9px;
-      padding:9px 4px;font-size:10.5px;color:var(--ink-soft);cursor:pointer;font-weight:700;
+    .wiz-dots{
+      position:fixed;left:0;right:0;bottom:0;z-index:45;
+      display:flex;justify-content:space-around;gap:2px;
+      background:#fff;border-top:1px solid var(--line);
+      padding:8px 6px calc(6px + env(safe-area-inset-bottom));
+      box-shadow:0 -6px 16px rgba(0,0,0,.06);
     }
-    .wiz-dots button.on{border-color:var(--primary-green);color:var(--primary-green);background:#e3f0fa;}
-    .wiz-dots button.done{color:var(--ink);border-color:#c8ccd1;}
+    .wiz-dots button{
+      flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+      background:none;border:none;border-radius:12px;padding:7px 2px;
+      font-size:10.5px;color:var(--ink-soft);cursor:pointer;font-weight:600;
+    }
+    .wiz-dots button svg{width:21px;height:21px;}
+    .wiz-dots button.on{background:#e6f4ea;color:var(--primary-green);}
+    body.showing-wizdots-nav{padding-bottom:72px;}
     .wiz-title{font-weight:700;font-size:15px;margin-bottom:16px;}
     .wiz-field label{display:block;font-size:12.5px;color:var(--ink-soft);margin:16px 0 6px;}
     .wiz-section{padding:16px 0;border-bottom:1px solid var(--line);}
@@ -684,7 +693,9 @@
     .wiz-btn-primary{
       width:100%;height:52px;border:none;border-radius:10px;background:var(--primary-green);color:#fff;
       font-weight:700;font-size:15px;margin-top:22px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:8px;
     }
+    .wiz-btn-primary svg{width:18px;height:18px;flex-shrink:0;}
     .wiz-btn-dash{
       width:100%;height:52px;border-radius:10px;border:1.5px dashed var(--accent-green);
       background:#e6f4ea;color:var(--accent-green);font-weight:700;font-size:14px;margin-top:8px;cursor:pointer;
@@ -692,13 +703,16 @@
     .wiz-btn-ghost{
       width:100%;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
       color:var(--ink-soft);font-weight:700;font-size:13.5px;margin-top:10px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:6px;
     }
+    .wiz-btn-ghost svg{width:15px;height:15px;flex-shrink:0;}
+    .wiz-btn-ghost.accent{color:var(--primary-green);border-color:#bfe0c7;}
     /* --- CTA sticky di bawah layar: bungkus tombol aksi utama tiap langkah
        wizard supaya selalu terjangkau ibu jari, tidak perlu scroll ke bawah
        dulu (penting di langkah "Tersimpan" yang bisa berisi banyak kartu). --- */
     .wiz-cta-bar{
-      position:sticky;bottom:0;left:0;right:0;background:#ffffff;
-      padding:12px 0 calc(10px + env(safe-area-inset-bottom));
+      position:sticky;bottom:64px;left:0;right:0;background:#ffffff;
+      padding:12px 0 10px;
       margin-top:18px;box-shadow:0 -8px 14px -10px rgba(0,0,0,.2);z-index:5;
       display:flex;flex-direction:column;gap:14px;
     }
@@ -713,7 +727,7 @@
     /* --- Form tambah/edit produk, sekarang tampil INLINE di bawah daftar
        produk tersimpan (bukan pindah ke layar terpisah) --- */
     .wiz-inline-form{
-      background:#f8f9fa;border:1px solid var(--line);border-radius:12px;
+      background:#eef7f1;border:1px solid #cfe8d8;border-radius:12px;
       padding:14px 14px 4px;margin:14px 0 4px;
     }
     .wiz-inline-form .wiz-title{font-size:13.5px;margin-bottom:12px;}
@@ -754,26 +768,79 @@
       background:none;border:none;font-size:15px;cursor:pointer;padding:2px 4px;line-height:1;
       opacity:.7;
     }
-    .wiz-disclose{
-      display:flex;align-items:center;gap:6px;margin-top:18px;color:var(--primary-green);
-      font-size:13.5px;font-weight:700;cursor:pointer;
+    /* --- Header ikon + judul + subjudul, dipakai di step Kirim & Review --- */
+    .wiz-stephead{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+    .wiz-stephead-icon{
+      flex-shrink:0;width:48px;height:48px;border-radius:50%;background:#e6f4ea;
+      display:flex;align-items:center;justify-content:center;
     }
-    .wiz-disclose .arrow{transition:.15s;display:inline-block;}
+    .wiz-stephead-icon svg{width:24px;height:24px;}
+    .wiz-stephead-title{font-weight:700;font-size:18px;color:var(--ink);margin-bottom:2px;}
+    .wiz-stephead-sub{font-size:12.5px;color:var(--ink-soft);line-height:1.4;}
+
+    /* --- Kartu putih pembungkus field (Ekspedisi, Rate ongkir) --- */
+    .wiz-fieldcard{
+      background:var(--card);border:1px solid var(--line);border-radius:14px;
+      padding:6px 16px;margin-bottom:14px;
+    }
+    .wiz-fieldcard .wiz-section{padding:14px 0;}
+    .wiz-fieldcard .wiz-section-label{color:var(--ink);font-weight:600;}
+    .wiz-fieldcard .wiz-section-ic-badge{
+      width:22px;height:22px;border-radius:6px;background:#e6f4ea;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .wiz-fieldcard .wiz-section-ic-badge svg{width:13px;height:13px;}
+
+    /* --- Baris toggle (dulu teks link biasa) sekarang jadi list-row hijau samar --- */
+    .wiz-disclose{
+      display:flex;align-items:center;gap:12px;margin-top:10px;padding:12px 14px;
+      background:#e6f4ea;border-radius:14px;cursor:pointer;
+    }
+    .wiz-disclose-icon{
+      flex-shrink:0;width:36px;height:36px;border-radius:10px;background:var(--primary-green);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .wiz-disclose-icon svg{width:18px;height:18px;}
+    .wiz-disclose-text{flex:1;min-width:0;}
+    .wiz-disclose-label{font-weight:700;font-size:13.5px;color:var(--primary-green);}
+    .wiz-disclose-sub{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+    .wiz-disclose .arrow{transition:.15s;display:inline-block;color:var(--primary-green);font-size:18px;flex-shrink:0;}
     .wiz-disclose.open .arrow{transform:rotate(90deg);}
-    .wiz-disclose-body{display:none;margin-top:6px;}
+    .wiz-disclose-body{display:none;margin-top:8px;padding:0 2px;}
     .wiz-disclose-body.open{display:block;}
     .wiz-revrow{display:flex;justify-content:space-between;font-size:14px;padding:5px 0;}
     .wiz-revrow.sub span:first-child{padding-left:10px;color:var(--ink-soft);font-size:12.5px;}
     .wiz-revrow.total{font-weight:700;font-size:16px;padding-top:10px;}
     .wiz-hr{border-top:1px solid var(--line);margin:10px 0;}
     /* --- Review: kartu per produk + kartu ringkasan + kartu grand total --- */
-    .wiz-pcard-rev{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:9px;}
-    .wiz-pcard-rev-top{display:flex;justify-content:space-between;font-weight:700;font-size:14.5px;}
-    .wiz-pcard-rev-disc{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
-    .wiz-sumcard{background:#f1f3f4;border-radius:12px;padding:13px 15px;margin:12px 0;}
-    .wiz-sumcard .wiz-revrow{font-size:13px;color:var(--ink-soft);padding:3px 0;}
+    .wiz-pcard-rev{
+      display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+      border-radius:14px;padding:12px 14px;margin-bottom:10px;
+    }
+    .wiz-pcard-rev-img{width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f5ede1;}
+    .wiz-pcard-rev-body{flex:1;min-width:0;}
+    .wiz-pcard-rev-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:700;font-size:14.5px;}
+    .wiz-pcard-rev-top span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .wiz-pcard-rev-top span:last-child{flex-shrink:0;}
+    .wiz-pcard-rev-disc{
+      display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--primary-green);
+      background:#e6f4ea;padding:4px 11px;border-radius:20px;margin-top:7px;
+    }
+    .wiz-pcard-rev-disc svg{width:12px;height:12px;}
+    .wiz-sumcard{background:#f1f3f4;border-radius:14px;padding:6px 16px;margin:12px 0;}
+    .wiz-sumcard .wiz-revrow{
+      display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--ink-soft);
+      padding:12px 0;border-bottom:1px solid #e3e5e6;
+    }
+    .wiz-sumcard .wiz-revrow:last-child{border-bottom:none;}
+    .wiz-sumcard .wiz-revrow-icon{
+      width:28px;height:28px;border-radius:8px;background:#e6f4ea;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .wiz-sumcard .wiz-revrow-icon svg{width:15px;height:15px;}
+    .wiz-sumcard .wiz-revrow span:last-child{margin-left:auto;font-weight:700;color:var(--ink);font-family:'Roboto Mono',monospace;}
     .wiz-totalcard{
-      background:#e3f0fa;border-radius:12px;padding:15px;
+      background:#e6f4ea;border-radius:14px;padding:16px;
       display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;
     }
     .wiz-totalcard .l{font-weight:700;font-size:14.5px;color:var(--ink);}
@@ -804,6 +871,7 @@
     .wiz-confirmed-actions .wiz-actionbtns{margin-top:0;}
     .wiz-confirmed-actions .wiz-btn-ghost{margin-top:0;}
     body.nota-confirmed{padding-bottom:190px;}
+    body.nota-confirmed .wiz-dots{display:none;}
   }
 
   /* ================================================================
@@ -975,29 +1043,31 @@
         <span class="home-actionrow-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none"><path d="M17.7 7.3l-2.1 10.1c-.16.7-.58.87-1.17.54l-3.24-2.39-1.56 1.5c-.17.17-.32.32-.65.32l.23-3.3 5.98-5.4c.26-.23-.06-.36-.4-.13l-7.4 4.66-3.18-1c-.69-.21-.7-.69.14-1.02l12.44-4.8c.58-.21 1.08.14.9 1.02z" fill="#fff"/></svg>
         </span>
-        <span class="home-actionrow-label">Buka Payment Telegram</span>
+        <span class="home-actionrow-textwrap"><span class="home-actionrow-label">Buka Payment Telegram</span></span>
         <span class="home-actionrow-arrow">›</span>
       </a>
       <a href="https://bayarpesanan.com/cs" target="_blank" rel="noopener" class="home-actionrow bp">
         <span class="home-actionrow-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M3 10h18" stroke="#fff" stroke-width="1.5"/><path d="M6 14.5h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
         </span>
-        <span class="home-actionrow-label">Bayar Pesanan</span>
+        <span class="home-actionrow-textwrap"><span class="home-actionrow-label">Bayar Pesanan</span></span>
         <span class="home-actionrow-arrow">›</span>
       </a>
       <button type="button" class="home-actionrow calc" id="home-link-calc">
         <span class="home-actionrow-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M8 7h8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="8.3" cy="12" r="1" fill="#fff"/><circle cx="12" cy="12" r="1" fill="#fff"/><circle cx="15.7" cy="12" r="1" fill="#fff"/><circle cx="8.3" cy="15.6" r="1" fill="#fff"/><circle cx="12" cy="15.6" r="1" fill="#fff"/><circle cx="15.7" cy="15.6" r="1" fill="#fff"/></svg>
         </span>
-        <span class="home-actionrow-label">Kalkulator</span>
+        <span class="home-actionrow-textwrap"><span class="home-actionrow-label">Kalkulator</span></span>
         <span class="home-actionrow-arrow">›</span>
       </button>
       <button type="button" class="home-actionrow reset" id="home-link-reset">
         <span class="home-actionrow-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
-        <span class="home-actionrow-label">Reset</span>
-        <span class="home-actionrow-sub">Hapus semua data input dan mulai baru</span>
+        <span class="home-actionrow-textwrap">
+          <span class="home-actionrow-label">Reset</span>
+          <span class="home-actionrow-sub">Hapus semua data input dan mulai baru</span>
+        </span>
         <span class="home-actionrow-arrow">›</span>
       </button>
     </div>
@@ -1069,9 +1139,18 @@
     </div>
     <div class="wiz mobile-only" id="wiz-penjualan" data-sheet="penjualan">
       <div class="wiz-dots" data-wizdots="penjualan">
-        <button type="button" data-step="list">Input Penjualan</button>
-        <button type="button" data-step="ship">Kirim</button>
-        <button type="button" data-step="review">Review</button>
+        <button type="button" data-step="list">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 3.5h6a1 1 0 0 1 1 1V6H8V4.5a1 1 0 0 1 1-1z" fill="currentColor"/><path d="M8.5 11h7M8.5 14h7M8.5 17h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Input Penjualan
+        </button>
+        <button type="button" data-step="ship">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 16V7a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 11h3.5L21 14.5V16h-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 16h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.5" cy="16" r="1.8" fill="#fff" stroke="currentColor" stroke-width="1.4"/><circle cx="17.5" cy="16" r="1.8" fill="#fff" stroke="currentColor" stroke-width="1.4"/></svg>
+          Kirim
+        </button>
+        <button type="button" data-step="review">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 3.5h6a1 1 0 0 1 1 1V6H8V4.5a1 1 0 0 1 1-1z" fill="currentColor"/><path d="M8.5 13.5l1.8 1.8L15 11.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Review
+        </button>
       </div>
       <div class="wiz-step active" data-wstep="list"></div>
       <div class="wiz-step" data-wstep="ship"></div>
@@ -1154,9 +1233,18 @@
     </div>
     <div class="wiz mobile-only" id="wiz-custom" data-sheet="custom">
       <div class="wiz-dots" data-wizdots="custom">
-        <button type="button" data-step="list">Input Penjualan</button>
-        <button type="button" data-step="ship">Kirim</button>
-        <button type="button" data-step="review">Review</button>
+        <button type="button" data-step="list">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 3.5h6a1 1 0 0 1 1 1V6H8V4.5a1 1 0 0 1 1-1z" fill="currentColor"/><path d="M8.5 11h7M8.5 14h7M8.5 17h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Input Penjualan
+        </button>
+        <button type="button" data-step="ship">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 16V7a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 11h3.5L21 14.5V16h-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 16h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.5" cy="16" r="1.8" fill="#fff" stroke="currentColor" stroke-width="1.4"/><circle cx="17.5" cy="16" r="1.8" fill="#fff" stroke="currentColor" stroke-width="1.4"/></svg>
+          Kirim
+        </button>
+        <button type="button" data-step="review">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 3.5h6a1 1 0 0 1 1 1V6H8V4.5a1 1 0 0 1 1-1z" fill="currentColor"/><path d="M8.5 13.5l1.8 1.8L15 11.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Review
+        </button>
       </div>
       <div class="wiz-step active" data-wstep="list"></div>
       <div class="wiz-step" data-wstep="ship"></div>
@@ -1348,7 +1436,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.1.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.3.0</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
     </div>
   </footer>
@@ -1380,7 +1468,24 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.1.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.3.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Ikon truk diganti dengan gaya minimalis baru (garis tanah + roda putih), dipakai di bar navigasi bawah dan header "Pengiriman".</li>
+            <li>Tombol "Pesanan sudah benar" dihapus — tombol <b>Unduh, Bagikan, Salin</b> sekarang langsung muncul di layar Review, tidak perlu konfirmasi dulu.</li>
+            <li>Pratinjau nota panjang yang sebelumnya muncul di bawah Grand Total (setelah konfirmasi) sudah dihilangkan dari tampilan mobile — fungsi unduh/bagikan/salin tetap menghasilkan nota yang sama seperti biasa.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.2.0</div>
+          <ul>
+            <li>Perbaikan bug: tombol "Mulai" di kartu Grosir/Custom sekarang selalu sejajar rapi di bagian bawah kartu, tidak lagi tidak-konsisten tingginya. Teks "Reset" yang sebelumnya bertabrakan dengan keterangannya sekarang disusun rapi bertumpuk.</li>
+            <li>Navigasi wizard (Input Penjualan / Kirim / Review) dipindah dari atas ke <b>bar bawah tetap</b>, lengkap dengan ikon — sesuai contoh referensi.</li>
+            <li>Tampilan langkah <b>Kirim</b> &amp; <b>Review</b> dirombak total mengikuti referensi: header ikon+judul, kartu field dengan ikon per baris, toggle "Gunakan ongkir manual" &amp; "Ada kelebihan bayar" jadi list-row hijau, kartu produk di Review pakai foto produk + badge diskon hijau, kartu ringkasan dengan ikon per baris, dan tombol-tombol dengan ikon.</li>
+            <li>Latar form "Tambah produk" diganti dari abu-abu jadi hijau samar, konsisten dengan tema.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.1.0</div>
           <ul>
             <li>Fitur baru: <b>gambar produk</b>. Kartu produk tersimpan di "Input Penjualan" sekarang menampilkan foto produk (kalau belum diatur, tampil gambar kardus polos bawaan — tidak makan penyimpanan sama sekali).</li>
             <li>Master Data → Produk → Detail (klik dua kali nama produk) sekarang punya field baru <b>"Link gambar produk (URL)"</b>. Cukup tempel link gambar dari internet — bukan unggah file — supaya tidak menghabiskan penyimpanan. Begitu link diisi & disimpan, gambar di kartu produk otomatis berubah.</li>
@@ -3799,23 +3904,47 @@ if ("serviceWorker" in navigator) {
     const diskonOngkirInp = sheet==="custom" ? document.getElementById("cs-diskonongkir") : null;
 
     host.innerHTML = `
-      <div class="wiz-title">Pengiriman</div>
-      <div class="wiz-field">
-        <label>Ekspedisi</label>
-        <select id="ws-eksp-${sheet}"><option value="">— pilih ekspedisi —</option>${EKSPEDISI.map(e=>`<option value="${e}">${e}</option>`).join("")}</select>
+      <div class="wiz-stephead">
+        <div class="wiz-stephead-icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 16V7a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v9" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/><path d="M14 11h3.5L21 14.5V16h-7z" stroke="var(--primary-green)" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 16h18" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.5" cy="16" r="1.8" fill="#fff" stroke="var(--primary-green)" stroke-width="1.4"/><circle cx="17.5" cy="16" r="1.8" fill="#fff" stroke="var(--primary-green)" stroke-width="1.4"/></svg>
+        </div>
+        <div>
+          <div class="wiz-stephead-title">Pengiriman</div>
+          <div class="wiz-stephead-sub">Atur ekspedisi dan ongkir untuk pesanan ini.</div>
+        </div>
       </div>
-      <div class="wiz-field">
-        <label>Rate ongkir (Rp / kg)</label>
-        <input type="text" inputmode="numeric" id="ws-rate-${sheet}" placeholder="0">
+      <div class="wiz-fieldcard">
+        <div class="wiz-section">
+          <div class="wiz-section-label"><span class="wiz-section-ic-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 7v10l8 4 8-4V7l-8-4z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><path d="M4 7l8 4 8-4M12 11v10" stroke="var(--primary-green)" stroke-width="1.4"/></svg></span> Ekspedisi</div>
+          <select id="ws-eksp-${sheet}"><option value="">— pilih ekspedisi —</option>${EKSPEDISI.map(e=>`<option value="${e}">${e}</option>`).join("")}</select>
+        </div>
+        <div class="wiz-section">
+          <div class="wiz-section-label"><span class="wiz-section-ic-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12.5 3.5H20v7.5L11 20l-8-8 9.5-8.5z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><circle cx="15.5" cy="7.5" r="1.3" fill="var(--primary-green)"/></svg></span> Rate ongkir (Rp / kg)</div>
+          <input type="text" inputmode="numeric" id="ws-rate-${sheet}" placeholder="0">
+        </div>
       </div>
-      <div class="wiz-disclose" id="ws-manual-toggle-${sheet}"><span class="arrow">›</span> Gunakan ongkir manual</div>
+      <div class="wiz-disclose" id="ws-manual-toggle-${sheet}">
+        <span class="wiz-disclose-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M8 7h8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="8.3" cy="12" r="1" fill="#fff"/><circle cx="12" cy="12" r="1" fill="#fff"/><circle cx="15.7" cy="12" r="1" fill="#fff"/></svg></span>
+        <span class="wiz-disclose-text">
+          <div class="wiz-disclose-label">Gunakan ongkir manual</div>
+          <div class="wiz-disclose-sub">Masukkan ongkir total secara manual.</div>
+        </span>
+        <span class="arrow">›</span>
+      </div>
       <div class="wiz-disclose-body" id="ws-manual-body-${sheet}">
         <div class="wiz-field" style="margin-top:0;">
           <label>Ongkir manual (override hasil hitungan)</label>
           <input type="text" inputmode="numeric" id="ws-manualval-${sheet}" placeholder="0">
         </div>
       </div>
-      <div class="wiz-disclose" id="ws-kelebihan-toggle-${sheet}"><span class="arrow">›</span> Ada kelebihan bayar sebelumnya</div>
+      <div class="wiz-disclose" id="ws-kelebihan-toggle-${sheet}">
+        <span class="wiz-disclose-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M3 10h18" stroke="#fff" stroke-width="1.5"/><path d="M6 14.5h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        <span class="wiz-disclose-text">
+          <div class="wiz-disclose-label">Ada kelebihan bayar sebelumnya</div>
+          <div class="wiz-disclose-sub">Gunakan saldo kelebihan untuk pesanan ini.</div>
+        </span>
+        <span class="arrow">›</span>
+      </div>
       <div class="wiz-disclose-body" id="ws-kelebihan-body-${sheet}">
         <div class="wiz-field" style="margin-top:0;">
           <label>Nominal kelebihan bayar (Rp)</label>
@@ -3823,7 +3952,14 @@ if ("serviceWorker" in navigator) {
         </div>
       </div>
       ${sheet==="custom" ? `
-      <div class="wiz-disclose" id="ws-diskonongkir-toggle-${sheet}"><span class="arrow">›</span> Ada diskon ongkir manual</div>
+      <div class="wiz-disclose" id="ws-diskonongkir-toggle-${sheet}">
+        <span class="wiz-disclose-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 12l-8 8-9-9V3h8l9 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1.2" fill="#fff"/></svg></span>
+        <span class="wiz-disclose-text">
+          <div class="wiz-disclose-label">Ada diskon ongkir manual</div>
+          <div class="wiz-disclose-sub">Kurangi ongkir dengan nominal tertentu.</div>
+        </span>
+        <span class="arrow">›</span>
+      </div>
       <div class="wiz-disclose-body" id="ws-diskonongkir-body-${sheet}">
         <div class="wiz-field" style="margin-top:0;">
           <label>Nominal diskon ongkir (Rp)</label>
@@ -3831,9 +3967,15 @@ if ("serviceWorker" in navigator) {
         </div>
       </div>` : ``}
       <div class="wiz-cta-bar">
-        <button class="wiz-btn-primary" id="ws-next-${sheet}">Lihat review</button>
+        <button class="wiz-btn-primary" id="ws-next-${sheet}">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="#fff" stroke-width="1.8"/><path d="M15.5 15.5L21 21" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Lihat review & ringkasan pesanan
+        </button>
       </div>
-      <button class="wiz-btn-ghost" id="ws-back-${sheet}">‹ Kembali ke daftar produk</button>
+      <button class="wiz-btn-ghost accent" id="ws-back-${sheet}">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7" stroke="var(--primary-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Kembali ke daftar produk
+      </button>
     `;
 
     const wEksp = document.getElementById("ws-eksp-"+sheet);
@@ -3899,26 +4041,45 @@ if ("serviceWorker" in navigator) {
           }
         }
       }
+      const p = findProduct(prod);
+      const imgSrc = (p && p.gambar) ? p.gambar : PRODUCT_IMG_PLACEHOLDER;
       return `<div class="wiz-pcard-rev">
-        <div class="wiz-pcard-rev-top"><span>${prod}</span><span>${qty} ${satuan}</span></div>
-        <div class="wiz-pcard-rev-disc">↳ Diskon ${diskonTxt}</div>
+        <img class="wiz-pcard-rev-img" src="${imgSrc}" alt="" onerror="this.onerror=null;this.src='${PRODUCT_IMG_PLACEHOLDER}';">
+        <div class="wiz-pcard-rev-body">
+          <div class="wiz-pcard-rev-top"><span>${prod}</span><span>${qty} ${satuan}</span></div>
+          <div class="wiz-pcard-rev-disc"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 12l-8 8-9-9V3h8l9 9z" stroke="var(--primary-green)" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1.2" fill="var(--primary-green)"/></svg>Diskon ${diskonTxt}</div>
+        </div>
       </div>`;
     }).join("");
     host.innerHTML = `
-      <div class="wiz-title">Review pesanan</div>
+      <div class="wiz-stephead">
+        <div class="wiz-stephead-icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M9 3.5h6a1 1 0 0 1 1 1V6H8V4.5a1 1 0 0 1 1-1z" fill="var(--primary-green)"/><path d="M8.5 13.5l1.8 1.8L15 11.5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="wiz-stephead-title">Review pesanan</div>
+          <div class="wiz-stephead-sub">Periksa kembali detail pesanan, lalu unduh atau bagikan notanya.</div>
+        </div>
+      </div>
       ${rowsHtml}
       <div class="wiz-sumcard">
-        <div class="wiz-revrow"><span>Total qty</span><span>${document.getElementById(pfx+"-totalqty").textContent}</span></div>
-        <div class="wiz-revrow"><span>Total berat</span><span>${document.getElementById(pfx+"-totalberat").textContent}</span></div>
-        <div class="wiz-revrow"><span>Subtotal</span><span>${document.getElementById(pfx+"-subtotal").textContent}</span></div>
-        <div class="wiz-revrow"><span>Ongkir</span><span>${document.getElementById(pfx+"-ongkir").textContent}</span></div>
+        <div class="wiz-revrow"><span class="wiz-revrow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 7v10l8 4 8-4V7l-8-4z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/></svg></span><span>Total qty</span><span>${document.getElementById(pfx+"-totalqty").textContent}</span></div>
+        <div class="wiz-revrow"><span class="wiz-revrow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 8V6a4 4 0 1 1 8 0v2M5.5 8h13l1 12h-15z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/></svg></span><span>Total berat</span><span>${document.getElementById(pfx+"-totalberat").textContent}</span></div>
+        <div class="wiz-revrow"><span class="wiz-revrow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" stroke="var(--primary-green)" stroke-width="1.4"/><path d="M8 7h8" stroke="var(--primary-green)" stroke-width="1.4" stroke-linecap="round"/><circle cx="8.3" cy="12" r=".9" fill="var(--primary-green)"/><circle cx="12" cy="12" r=".9" fill="var(--primary-green)"/><circle cx="15.7" cy="12" r=".9" fill="var(--primary-green)"/></svg></span><span>Subtotal</span><span>${document.getElementById(pfx+"-subtotal").textContent}</span></div>
+        <div class="wiz-revrow"><span class="wiz-revrow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="var(--primary-green)" stroke-width="1.4" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><path d="M3 15h16" stroke="var(--primary-green)" stroke-width="1.4" stroke-linecap="round"/><circle cx="7" cy="15" r="1.5" fill="#fff" stroke="var(--primary-green)" stroke-width="1.2"/><circle cx="15.5" cy="15" r="1.5" fill="#fff" stroke="var(--primary-green)" stroke-width="1.2"/></svg></span><span>Ongkir</span><span>${document.getElementById(pfx+"-ongkir").textContent}</span></div>
       </div>
       <div class="wiz-totalcard"><span class="l">Grand total</span><span class="v wiz-copyable" id="wr-grandtotal-${sheet}" title="Ketuk untuk salin angka">${document.getElementById(pfx+"-grandtotal").textContent}</span></div>
       <div class="wiz-cta-bar">
-        <button class="wiz-btn-primary" id="wr-confirm-${sheet}">Pesanan sudah benar</button>
+        <div class="wiz-actionbtns">
+          <button class="primary" id="wr-download-${sheet}">⬇ Unduh</button>
+          <button id="wr-share-${sheet}">↗ Bagikan</button>
+          <button id="wr-copy-${sheet}">⧉ Salin</button>
+        </div>
       </div>
-      <button class="wiz-btn-ghost" id="wr-back-${sheet}">‹ Kembali ke pengiriman</button>
-      <div id="wr-confirmed-${sheet}"></div>
+      <button class="wiz-btn-ghost accent" id="wr-back-${sheet}">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7" stroke="var(--primary-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Kembali ke pengiriman
+      </button>
     `;
     document.getElementById("wr-grandtotal-"+sheet).addEventListener("click", (e)=>{
       // Salin ANGKA MURNI (tanpa "Rp" & tanpa titik pemisah ribuan) —
@@ -3927,31 +4088,9 @@ if ("serviceWorker" in navigator) {
       copyPlainNumber(rawDigits, "Grand total");
     });
     document.getElementById("wr-back-"+sheet).addEventListener("click", ()=> wizGo(sheet, "ship"));
-    document.getElementById("wr-confirm-"+sheet).addEventListener("click", ()=>{
-      document.getElementById(pfx+"-nota-col").classList.add("wiz-show");
-      document.getElementById("wr-confirm-"+sheet).style.display = "none";
-      document.getElementById("wr-back-"+sheet).style.display = "none";
-      document.body.classList.add("nota-confirmed");
-      document.getElementById("wr-confirmed-"+sheet).innerHTML = `
-        <div class="wiz-stamp">✓ Pesanan dikonfirmasi — nota siap dibagikan</div>
-        <div class="wiz-confirmed-actions">
-          <div class="wiz-actionbtns">
-            <button class="primary" id="wr-download-${sheet}">⬇ Unduh</button>
-            <button id="wr-share-${sheet}">↗ Bagikan</button>
-            <button id="wr-copy-${sheet}">⧉ Salin</button>
-          </div>
-          <button class="wiz-btn-ghost" id="wr-editagain-${sheet}">‹ Edit pesanan lagi</button>
-        </div>
-      `;
-      document.getElementById("wr-download-"+sheet).addEventListener("click", ()=> document.getElementById("btn-download").click());
-      document.getElementById("wr-share-"+sheet).addEventListener("click", ()=> document.getElementById("btn-share").click());
-      document.getElementById("wr-copy-"+sheet).addEventListener("click", ()=> document.getElementById("btn-copy").click());
-      document.getElementById("wr-editagain-"+sheet).addEventListener("click", ()=>{
-        document.body.classList.remove("nota-confirmed");
-        wizGo(sheet, "list");
-      });
-      window.scrollTo(0,0);
-    });
+    document.getElementById("wr-download-"+sheet).addEventListener("click", ()=> document.getElementById("btn-download").click());
+    document.getElementById("wr-share-"+sheet).addEventListener("click", ()=> document.getElementById("btn-share").click());
+    document.getElementById("wr-copy-"+sheet).addEventListener("click", ()=> document.getElementById("btn-copy").click());
   }
 
   /* ---------- hook dipanggil dari akhir calc() di atas: refresh step aktif kalau perlu ---------- */
