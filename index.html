@@ -998,11 +998,6 @@
   .md-hapus-preview{margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--paper-dark);}
   .md-hapus-preview-tipe{font-size:11.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
   .md-hapus-preview-nama{font-size:15px;font-weight:700;margin:4px 0 12px;}
-  .md-hapus-refrow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);cursor:pointer;}
-  .md-hapus-refrow:last-child{border-bottom:none;}
-  .md-hapus-refrow:hover{background:var(--paper-dark);}
-  .md-hapus-refname{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .md-hapus-reftipe{font-size:11px;color:var(--ink-soft);flex-shrink:0;}
   .md-pinform label{display:block;font-size:12.5px;color:var(--ink-soft);margin:14px 0 6px;}
   .md-pinform input{width:100%;max-width:220px;height:44px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:16px;background:var(--card);}
   .md-btn{
@@ -1447,8 +1442,8 @@
         <h3>Hapus data via kode</h3>
         <div class="md-note" style="margin-bottom:12px;">
           Produk &amp; ekspedisi HANYA bisa dihapus dari sini. Klik badge kode di tab
-          Produk/Ekspedisi (atau di daftar bawah) untuk menyalinnya, tempel di kolom ini,
-          lalu cari. Data yang sudah terpakai di pesanan berjalan tidak otomatis ikut terhapus dari situ.
+          Produk/Ekspedisi untuk menyalinnya, tempel di kolom ini, lalu cari. Data yang
+          sudah terpakai di pesanan berjalan tidak otomatis ikut terhapus dari situ.
         </div>
         <label>Kode data</label>
         <input type="text" id="md-hapus-kode" placeholder="mis. P01 atau E01" style="text-transform:uppercase;max-width:220px;">
@@ -1461,12 +1456,6 @@
           <button class="md-btn danger" id="md-hapus-confirm">Hapus data ini</button>
           <button class="md-btn" id="md-hapus-cancel">Batal</button>
         </div>
-      </div>
-
-      <div class="md-card">
-        <h3>Semua kode terdaftar</h3>
-        <div class="md-note" style="margin-bottom:10px;">Klik kode untuk menyalin, atau klik baris untuk mengisi otomatis kolom pencarian di atas.</div>
-        <div id="md-hapus-reflist"></div>
       </div>
     </div>
 
@@ -4512,7 +4501,6 @@ if ("serviceWorker" in navigator) {
     buildEkspedisi("penjualan"); buildEkspedisi("custom");
     calc("penjualan"); calc("custom");
     pushMasterDataToServer();
-    if(typeof renderHapusReflist === "function") renderHapusReflist();
   }
   loadMasterData();
   if(migrateMasterData()) saveMasterData();
@@ -4543,7 +4531,6 @@ if ("serviceWorker" in navigator) {
     buildEkspedisi("penjualan"); buildEkspedisi("custom");
     calc("penjualan"); calc("custom");
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
-    if(typeof renderHapusReflist === "function") renderHapusReflist();
     if(migratedAfterPull) pushMasterDataToServer();
   })();
 
@@ -4666,7 +4653,6 @@ if ("serviceWorker" in navigator) {
     panel.hidden = false;
     renderProdukList();
     renderEkspedisiList();
-    renderHapusReflist();
     resetHapusForm();
   }
 
@@ -4836,30 +4822,6 @@ if ("serviceWorker" in navigator) {
     if(!k) return null;
     return allKodeEntries().find(en=> (en.kode||"").toUpperCase() === k) || null;
   }
-  function renderHapusReflist(){
-    const list = document.getElementById("md-hapus-reflist");
-    if(!list) return;
-    const entries = allKodeEntries().sort((a,b)=> (a.kode||"").localeCompare(b.kode||"", "id", {numeric:true}));
-    if(!entries.length){
-      list.innerHTML = `<div class="md-note">Belum ada produk/ekspedisi.</div>`;
-      return;
-    }
-    list.innerHTML = entries.map(en=>`
-      <div class="md-hapus-refrow" data-kode="${en.kode}">
-        <span class="md-kode-badge" data-copy-kode="${en.kode}" title="Klik untuk salin kode">${en.kode}</span>
-        <span class="md-hapus-refname">${en.nama}</span>
-        <span class="md-hapus-reftipe">${en.tipe}</span>
-      </div>
-    `).join("");
-    list.querySelectorAll(".md-hapus-refrow").forEach(row=>{
-      row.addEventListener("click", (ev)=>{
-        if(ev.target.closest("[data-copy-kode]")) return; // badge tetap fungsi salin, bukan isi form
-        document.getElementById("md-hapus-kode").value = row.dataset.kode;
-        cariKodeHapus();
-      });
-    });
-    bindKodeBadgeCopy(list);
-  }
   function resetHapusForm(){
     __hapusFound = null;
     const preview = document.getElementById("md-hapus-preview");
@@ -4920,7 +4882,6 @@ if ("serviceWorker" in navigator) {
       renderEkspedisiList();
     }
     refreshAfterDataChange();
-    renderHapusReflist();
     resetHapusForm();
     showToast(`${fresh.tipe} "${fresh.nama}" dihapus.`);
   });
