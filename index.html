@@ -680,6 +680,8 @@
       padding:11px 13px;margin-bottom:14px;line-height:1.4;
     }
     .wiz-preview-strip.filled{background:#fafbfa;border:1px solid var(--line);}
+    .wiz-preview-top{display:flex;align-items:center;gap:11px;}
+    .wiz-preview-img{width:44px;height:44px;border-radius:9px;object-fit:cover;flex-shrink:0;background:#f5ede1;}
     .wiz-preview-name{font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:7px;}
     .wiz-preview-badges{display:flex;gap:6px;flex-wrap:wrap;}
     .wiz-preview-badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:16px;font-family:'Roboto Mono',monospace;}
@@ -689,6 +691,16 @@
       width:100%;height:52px;border-radius:10px;border:1px solid var(--line);font-size:16px;padding:0 14px;
     }
     .wiz-field input.wiz-qty-big, .wiz-section input.wiz-qty-big{height:56px;font-size:24px;font-weight:700;text-align:center;}
+    /* --- Stepper +/- untuk field Jumlah --- */
+    .wiz-stepper{display:flex;align-items:center;gap:10px;}
+    .wiz-stepper input.wiz-qty-big{flex:1;min-width:0;}
+    .wiz-stepper-btn{
+      width:44px;height:44px;border-radius:50%;border:1.5px solid var(--primary-green);
+      background:#fff;color:var(--primary-green);font-size:21px;font-weight:700;cursor:pointer;
+      flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;
+      -webkit-tap-highlight-color:transparent;user-select:none;
+    }
+    .wiz-stepper-btn:active{background:#e6f4ea;}
     .wiz-hint{font-size:12.5px;color:var(--ink-soft);margin:6px 2px 0;}
     .wiz-btn-primary{
       width:100%;height:52px;border:none;border-radius:10px;background:var(--primary-green);color:#fff;
@@ -922,9 +934,33 @@
   .md-section{display:none;}
   .md-section.active{display:block;}
   .md-card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+  /* --- Baris toggle pengaturan (mis. Autocomplete) --- */
+  .md-togglerow{
+    display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:14px;margin-bottom:12px;
+  }
+  .md-togglerow-icon{
+    width:38px;height:38px;border-radius:11px;background:#e6f4ea;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .md-togglerow-icon svg{width:19px;height:19px;}
+  .md-togglerow-text{flex:1;min-width:0;}
+  .md-togglerow-label{font-weight:700;font-size:13.5px;color:var(--ink);}
+  .md-togglerow-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .md-switch{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0;cursor:pointer;}
+  .md-switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;}
+  .md-switch-track{
+    position:absolute;inset:0;background:#d3d6db;border-radius:20px;transition:.15s;
+  }
+  .md-switch-knob{
+    position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.15s;
+  }
+  .md-switch input:checked + .md-switch-track{background:var(--primary-green);}
+  .md-switch input:checked + .md-switch-track .md-switch-knob{left:20px;}
   .md-card h3{margin:0 0 14px;font-size:14.5px;}
   .md-row{
-    display:grid;grid-template-columns:1fr 95px 75px 85px 34px;gap:8px;align-items:center;
+    display:grid;grid-template-columns:1fr 95px 75px 85px 34px 34px;gap:8px;align-items:center;
     padding:8px 0;border-bottom:1px solid var(--line);
   }
   .md-row:last-child{border-bottom:none;}
@@ -933,6 +969,11 @@
     background:var(--card);
   }
   .md-row-del{background:none;border:none;color:var(--danger-red);font-size:16px;cursor:pointer;}
+  .md-row-detail{
+    background:#e6f4ea;border:none;border-radius:7px;color:var(--primary-green);cursor:pointer;
+    height:38px;display:flex;align-items:center;justify-content:center;
+  }
+  .md-row-detail svg{width:16px;height:16px;}
   .md-addrow{
     margin-top:12px;width:100%;height:44px;border-radius:9px;border:1.5px dashed var(--primary-green);
     background:#e3f0fa;color:var(--primary-green);font-weight:700;font-size:13px;cursor:pointer;
@@ -955,7 +996,7 @@
     .md-row-header{display:none;}
     .md-row{
       grid-template-columns:1fr 1fr 1fr 30px;
-      grid-template-areas:"name name name del" "harga berat satuan satuan";
+      grid-template-areas:"name name name del" "harga berat satuan detail";
       gap:6px 8px;padding:10px 0;
     }
     .md-p-name{grid-area:name;}
@@ -963,6 +1004,7 @@
     .md-p-harga{grid-area:harga;}
     .md-p-berat.md-col-berat{grid-area:berat;display:block;}
     .md-p-satuan.md-col-satuan{grid-area:satuan;display:block;}
+    .md-row-detail{grid-area:detail;}
   }
 
   /* Catatan: aturan tabel darurat untuk layar <380px yang dulu ada di sini
@@ -993,7 +1035,7 @@
         <img src="habit-logo.png" alt="">
         <span class="home-logo-text">Habit</span>
       </div>
-      <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-help-btn">
+      <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-help-btn" id="home-help-btn">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/></svg>
         Bantuan
       </a>
@@ -1346,6 +1388,7 @@
     <div class="md-tabs">
       <button class="md-tab active" data-md-tab="produk">📦 Produk</button>
       <button class="md-tab" data-md-tab="ekspedisi">🚚 Ekspedisi</button>
+      <button class="md-tab" data-md-tab="tampilan">⚙️ Tampilan</button>
       <button class="md-tab" data-md-tab="keamanan">🔒 Keamanan PIN</button>
     </div>
 
@@ -1358,7 +1401,7 @@
         </div>
         <div id="md-produk-list"></div>
         <button class="md-addrow" id="md-produk-add">+ Tambah produk</button>
-        <div class="md-note">Ubah diskon tier & subsidi ongkir per produk lewat tombol "Detail" (klik dua kali nama produk).</div>
+        <div class="md-note">Ubah diskon tier, subsidi ongkir & link gambar per produk lewat ikon 🖼️ "Detail" di setiap baris.</div>
       </div>
     </div>
 
@@ -1367,6 +1410,43 @@
         <h3>Daftar ekspedisi</h3>
         <div id="md-ekspedisi-list"></div>
         <button class="md-addrow" id="md-ekspedisi-add">+ Tambah ekspedisi</button>
+      </div>
+    </div>
+
+    <div class="md-section" id="md-sec-tampilan">
+      <div class="md-card">
+        <h3>Autocomplete (cari-ketik)</h3>
+        <div class="md-note" style="margin-bottom:12px;">Aktif = field bisa diketik untuk mencari. Nonaktif = kembali jadi pilihan dropdown biasa.</div>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M15 15l5 5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Autocomplete Produk</div>
+            <div class="md-togglerow-sub">Field pilih produk di langkah Input Penjualan</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-autoprod">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M15 15l5 5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Autocomplete Ekspedisi</div>
+            <div class="md-togglerow-sub">Field pilih ekspedisi di langkah Pengiriman</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-autoeksp">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card md-pinform">
+        <h3>Tombol Bantuan</h3>
+        <div class="md-note" style="margin-bottom:10px;">Link tujuan tombol "Bantuan" di pojok kanan atas Beranda (mis. link WhatsApp, Telegram, atau halaman FAQ).</div>
+        <label>Link Bantuan (URL)</label>
+        <input type="text" inputmode="url" id="md-bantuan-link" placeholder="https://...">
+        <div class="md-pin-err" id="md-bantuan-err"></div>
+        <button class="md-btn primary" id="md-bantuan-save">Simpan link Bantuan</button>
       </div>
     </div>
 
@@ -1436,7 +1516,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.3.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.5.0</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
     </div>
   </footer>
@@ -1468,7 +1548,22 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.3.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.5.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Master Data → Tampilan → <b>"Tombol Bantuan"</b>: sekarang bisa atur sendiri link tujuan tombol "Bantuan" di pojok kanan atas Beranda (bebas, tidak harus Telegram).</li>
+            <li>Perbaikan: tombol "Detail" produk (buat atur diskon tier, subsidi ongkir, & link gambar) sebelumnya cuma bisa dibuka lewat klik-dua-kali nama produk — gestur itu tidak jalan baik di HP. Sekarang ada <b>ikon 🖼️ Detail tersendiri</b> di tiap baris produk yang bisa langsung diketuk.</li>
+            <li>Gambar produk sekarang juga tampil di preview form Tambah/Edit produk (sebelumnya cuma di kartu tersimpan & Review), semuanya konsisten dipotong otomatis jadi kotak rapi berapa pun ukuran/rasio gambar aslinya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.4.0</div>
+          <ul>
+            <li>Master Data → tab baru <b>"Tampilan"</b>: bisa aktif/nonaktifkan autocomplete (cari-ketik) untuk field Produk (Input Penjualan) dan Ekspedisi (Pengiriman) secara terpisah. Kalau dinonaktifkan, field kembali jadi dropdown biasa.</li>
+            <li>Field Jumlah di form Tambah/Edit produk sekarang punya tombol <b>+ / −</b> bulat untuk menambah/mengurangi angka otomatis, tidak perlu ketik manual.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.3.0</div>
           <ul>
             <li>Ikon truk diganti dengan gaya minimalis baru (garis tanah + roda putih), dipakai di bar navigasi bawah dan header "Pengiriman".</li>
             <li>Tombol "Pesanan sudah benar" dihapus — tombol <b>Unduh, Bagikan, Salin</b> sekarang langsung muncul di layar Review, tidak perlu konfirmasi dulu.</li>
@@ -1938,6 +2033,30 @@ const PRODUCT_IMG_PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(
   </svg>`
 );
 const EKSPEDISI = ["313 Express","APM Logistics","Baraka Express","Buton Express","Diambil Sendiri","Duta Express","IDTruck","Indah Logistik","JNE Express","JNE Trucking","JNT Cargo","JNT Express","KALOG","Laris Cargo","LSJ Cargo","Pangeran Express","Papandayan Cargo","Sajira Mahardika","Sentral Cargo","TAM Cargo","Toyyib Logistik","Tri Tunggal","Wahana","CalistaExpress","Lion Parcel"];
+/* Pengaturan aktif/nonaktifkan autocomplete (combobox cari-ketik) per
+   field — kalau nonaktif, field kembali jadi <select> biasa. Diatur dari
+   Master Data, dipakai di step Input Penjualan & Pengiriman (mobile). */
+const SETTINGS_KEY = "notaHalawa_settings";
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm"};
+function loadSettings(){
+  try{
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(typeof s.autocompleteProduk === "boolean") SETTINGS.autocompleteProduk = s.autocompleteProduk;
+    if(typeof s.autocompleteEkspedisi === "boolean") SETTINGS.autocompleteEkspedisi = s.autocompleteEkspedisi;
+    if(typeof s.bantuanLink === "string" && s.bantuanLink.trim()) SETTINGS.bantuanLink = s.bantuanLink.trim();
+  }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
+}
+function saveSettings(){
+  try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(SETTINGS)); }catch(e){ console.log("Pengaturan gagal disimpan:", e); }
+}
+function applySettingsToDom(){
+  const helpBtn = document.getElementById("home-help-btn");
+  if(helpBtn) helpBtn.href = SETTINGS.bantuanLink;
+}
+loadSettings();
+applySettingsToDom();
 const REGIONS = [
   ["JAWA TIMUR",3500],["JAWA TENGAH",4250],["JAWA BARAT",5000],["JAKARTA",null],
   ["BALI",5250],["SUMATERA BARAT",9000],["SUMATERA UTARA",null],["SUMATERA SELATAN",6500],
@@ -3723,7 +3842,11 @@ if ("serviceWorker" in navigator) {
         <div class="wiz-section-row">
           <div class="wiz-section">
             <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
-            <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
+            <div class="wiz-stepper">
+              <button type="button" class="wiz-stepper-btn" id="wa-qtyminus-${sheet}" aria-label="Kurangi jumlah">−</button>
+              <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
+              <button type="button" class="wiz-stepper-btn" id="wa-qtyplus-${sheet}" aria-label="Tambah jumlah">+</button>
+            </div>
             <div class="wiz-hint" id="wa-hint-${sheet}"></div>
           </div>
           <div class="wiz-section">
@@ -3737,7 +3860,11 @@ if ("serviceWorker" in navigator) {
         </div>` : `
         <div class="wiz-section">
           <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
-          <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
+          <div class="wiz-stepper">
+            <button type="button" class="wiz-stepper-btn" id="wa-qtyminus-${sheet}" aria-label="Kurangi jumlah">−</button>
+            <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
+            <button type="button" class="wiz-stepper-btn" id="wa-qtyplus-${sheet}" aria-label="Tambah jumlah">+</button>
+          </div>
           <div class="wiz-hint" id="wa-hint-${sheet}"></div>
         </div>`}
         <div class="wiz-field" id="wa-err-${sheet}" style="color:var(--danger-red);font-size:12.5px;min-height:16px;"></div>
@@ -3811,7 +3938,7 @@ if ("serviceWorker" in navigator) {
     const hintEl = document.getElementById("wa-hint-"+sheet);
     const previewEl = document.getElementById("wa-preview-"+sheet);
     const prodEl = document.getElementById("wa-prod-"+sheet);
-    comboboxify(prodEl, "Pilih produk...");
+    if(SETTINGS.autocompleteProduk) comboboxify(prodEl, "Pilih produk...");
     function updHint(){
       const p = findProduct(prodEl.value);
       const q = parseFloat(qtyEl.value)||0;
@@ -3825,11 +3952,17 @@ if ("serviceWorker" in navigator) {
         } else {
           badge2 = `<span class="wiz-preview-badge badge-est">≈ ${rupiah(p.harga*q)}</span>`;
         }
+        const previewImgSrc = p.gambar || PRODUCT_IMG_PLACEHOLDER;
         previewEl.innerHTML = `
-          <div class="wiz-preview-name">${p.name}</div>
-          <div class="wiz-preview-badges">
-            <span class="wiz-preview-badge badge-qty">${q} ${p.satuan}</span>
-            ${badge2}
+          <div class="wiz-preview-top">
+            <img class="wiz-preview-img" src="${previewImgSrc}" alt="" onerror="this.onerror=null;this.src='${PRODUCT_IMG_PLACEHOLDER}';">
+            <div>
+              <div class="wiz-preview-name">${p.name}</div>
+              <div class="wiz-preview-badges">
+                <span class="wiz-preview-badge badge-qty">${q} ${p.satuan}</span>
+                ${badge2}
+              </div>
+            </div>
           </div>`;
         previewEl.classList.add("filled");
       } else {
@@ -3841,6 +3974,17 @@ if ("serviceWorker" in navigator) {
     qtyEl.addEventListener("input", updHint);
     prodEl.addEventListener("change", updHint);
     updHint();
+
+    const qtyMinusBtn = document.getElementById("wa-qtyminus-"+sheet);
+    const qtyPlusBtn = document.getElementById("wa-qtyplus-"+sheet);
+    function stepQty(delta){
+      const cur = parseFloat(qtyEl.value) || 0;
+      const next = Math.min(1000, Math.max(0, cur + delta));
+      qtyEl.value = next;
+      qtyEl.dispatchEvent(new Event("input", {bubbles:true}));
+    }
+    qtyMinusBtn.addEventListener("click", ()=> stepQty(-1));
+    qtyPlusBtn.addEventListener("click", ()=> stepQty(1));
 
     if(sheet==="custom") wireDiskonModeInput("wa-diskonmode-"+sheet, "wa-diskon-"+sheet, diskonVal);
 
@@ -3985,7 +4129,7 @@ if ("serviceWorker" in navigator) {
     formatRibuan(wRate); formatRibuan(wManualVal); formatRibuan(wKelebihanVal);
     wEksp.value = ekspSel.value; wRate.value = rateInp.value;
     wManualVal.value = manualInp.value; wKelebihanVal.value = kelebihanInp.value==="0" ? "" : kelebihanInp.value;
-    comboboxify(wEksp, "Pilih ekspedisi...");
+    if(SETTINGS.autocompleteEkspedisi) comboboxify(wEksp, "Pilih ekspedisi...");
     if(manualInp.value) openDisclose(sheet, "manual");
     if(kelebihanInp.value && kelebihanInp.value!=="0") openDisclose(sheet, "kelebihan");
 
@@ -4155,6 +4299,35 @@ if ("serviceWorker" in navigator) {
   loadMasterData();
   syncPenjualanSlice();
 
+  /* ---------- toggle Autocomplete (Tampilan) ---------- */
+  const toggleAutoProd = document.getElementById("md-toggle-autoprod");
+  const toggleAutoEksp = document.getElementById("md-toggle-autoeksp");
+  toggleAutoProd.checked = SETTINGS.autocompleteProduk;
+  toggleAutoEksp.checked = SETTINGS.autocompleteEkspedisi;
+  toggleAutoProd.addEventListener("change", ()=>{
+    SETTINGS.autocompleteProduk = toggleAutoProd.checked;
+    saveSettings();
+  });
+  toggleAutoEksp.addEventListener("change", ()=>{
+    SETTINGS.autocompleteEkspedisi = toggleAutoEksp.checked;
+    saveSettings();
+  });
+
+  /* ---------- link Bantuan (Tampilan) ---------- */
+  const bantuanLinkInput = document.getElementById("md-bantuan-link");
+  const bantuanErr = document.getElementById("md-bantuan-err");
+  bantuanLinkInput.value = SETTINGS.bantuanLink;
+  document.getElementById("md-bantuan-save").addEventListener("click", ()=>{
+    const val = bantuanLinkInput.value.trim();
+    bantuanErr.textContent = "";
+    if(!val){ bantuanErr.textContent = "Link tidak boleh kosong."; return; }
+    if(!/^https?:\/\/.+/i.test(val)){ bantuanErr.textContent = "Link harus diawali http:// atau https://"; return; }
+    SETTINGS.bantuanLink = val;
+    saveSettings();
+    applySettingsToDom();
+    showToast("Link Bantuan disimpan.");
+  });
+
   /* ---------- buka/tutup ---------- */
   const trigger = document.getElementById("md-secret-tap");
   const pinOverlay = document.getElementById("md-pin-overlay");
@@ -4220,10 +4393,13 @@ if ("serviceWorker" in navigator) {
     const list = document.getElementById("md-produk-list");
     list.innerHTML = PRODUCTS.map((p,i)=>`
       <div class="md-row" data-idx="${i}">
-        <input type="text" class="md-p-name" value="${p.name}" placeholder="Nama produk" title="Klik dua kali untuk atur diskon tier & subsidi">
+        <input type="text" class="md-p-name" value="${p.name}" placeholder="Nama produk">
         <input type="text" inputmode="numeric" class="md-p-harga" value="${(p.harga||0).toLocaleString('id-ID')}" placeholder="Harga">
         <input type="number" step="0.01" class="md-p-berat md-col-berat" value="${p.berat}" placeholder="Berat">
         <input type="text" class="md-p-satuan md-col-satuan" value="${p.satuan}" placeholder="Satuan">
+        <button class="md-row-detail" data-detail="${i}" title="Detail: diskon tier, subsidi ongkir & link gambar" aria-label="Detail produk">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 15.5l4.5-4 3 2.5L16.5 9 20 13" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </button>
         <button class="md-row-del" title="Hapus produk" data-del="${i}">✕</button>
       </div>
     `).join("");
@@ -4233,12 +4409,13 @@ if ("serviceWorker" in navigator) {
       bindAutoSelect(row.querySelector(".md-p-name"));
       bindAutoSelect(row.querySelector(".md-p-berat"));
       bindAutoSelect(row.querySelector(".md-p-satuan"));
-      row.querySelector(".md-p-name").addEventListener("click", (e)=>{ e.stopPropagation(); });
-      row.querySelector(".md-p-name").addEventListener("dblclick", ()=> openProdukDetail(idx));
       row.querySelector(".md-p-name").addEventListener("change", ()=>{ PRODUCTS[idx].name = row.querySelector(".md-p-name").value.trim() || PRODUCTS[idx].name; refreshAfterDataChange(); renderProdukList(); });
       row.querySelector(".md-p-harga").addEventListener("change", ()=>{ PRODUCTS[idx].harga = parseRp(row.querySelector(".md-p-harga").value); refreshAfterDataChange(); });
       row.querySelector(".md-p-berat").addEventListener("change", ()=>{ PRODUCTS[idx].berat = parseFloat(row.querySelector(".md-p-berat").value)||0; refreshAfterDataChange(); });
       row.querySelector(".md-p-satuan").addEventListener("change", ()=>{ PRODUCTS[idx].satuan = row.querySelector(".md-p-satuan").value.trim() || PRODUCTS[idx].satuan; refreshAfterDataChange(); });
+    });
+    list.querySelectorAll("[data-detail]").forEach(btn=>{
+      btn.addEventListener("click", ()=> openProdukDetail(+btn.dataset.detail));
     });
     list.querySelectorAll("[data-del]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
@@ -4249,9 +4426,6 @@ if ("serviceWorker" in navigator) {
           renderProdukList();
         }
       });
-    });
-    list.querySelectorAll(".md-p-name").forEach(inp=>{
-      inp.title = "Klik dua kali untuk atur diskon tier & subsidi";
     });
   }
   document.getElementById("md-produk-add").addEventListener("click", ()=>{
