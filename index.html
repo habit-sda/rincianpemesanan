@@ -1389,6 +1389,7 @@
       <button class="md-tab active" data-md-tab="produk">📦 Produk</button>
       <button class="md-tab" data-md-tab="ekspedisi">🚚 Ekspedisi</button>
       <button class="md-tab" data-md-tab="tampilan">⚙️ Tampilan</button>
+      <button class="md-tab" data-md-tab="rumus">🧮 Rumus</button>
       <button class="md-tab" data-md-tab="keamanan">🔒 Keamanan PIN</button>
     </div>
 
@@ -1447,6 +1448,25 @@
         <input type="text" inputmode="url" id="md-bantuan-link" placeholder="https://...">
         <div class="md-pin-err" id="md-bantuan-err"></div>
         <button class="md-btn primary" id="md-bantuan-save">Simpan link Bantuan</button>
+      </div>
+    </div>
+
+    <div class="md-section" id="md-sec-rumus">
+      <div class="md-card md-pinform">
+        <h3>Batas tier diskon Grosir</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Tab <b>Penjualan (Grosir)</b> otomatis memilih tier diskon berdasarkan
+          <b>total jumlah karton</b> dalam satu pesanan (dijumlah dari semua produk).
+          Angka diskon &amp; subsidi ongkir tiap tier tetap diatur per produk lewat
+          ikon 🖼️ "Detail" di tab Produk — di sini cuma atur BATAS jumlahnya.
+        </div>
+        <label>Tier 1 berlaku untuk jumlah di bawah</label>
+        <input type="number" inputmode="numeric" id="md-tier-batas1" min="1" style="max-width:140px;">
+        <label>Tier 2 berlaku untuk jumlah di bawah</label>
+        <input type="number" inputmode="numeric" id="md-tier-batas2" min="2" style="max-width:140px;">
+        <div class="md-note" id="md-tier-preview" style="margin-top:12px;font-weight:700;color:var(--ink);"></div>
+        <div class="md-pin-err" id="md-tier-err"></div>
+        <button class="md-btn primary" id="md-tier-save">Simpan batas tier</button>
       </div>
     </div>
 
@@ -1516,7 +1536,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.7.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.8.1</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
     </div>
   </footer>
@@ -1548,7 +1568,20 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.7.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.8.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Perbaikan bug: mematikan/menyalakan toggle Autocomplete (Produk/Ekspedisi) sekarang <b>langsung berlaku seketika</b> ke layar Input Penjualan/Pengiriman yang sedang terbuka — sebelumnya baru berlaku setelah pindah layar dulu.</li>
+            <li>Link Bantuan: validasi diperketat (menolak link yang ada spasinya, yang bisa bikin link jadi rusak tanpa disadari) dan sekarang ada konfirmasi tertulis jelas di layar setelah tersimpan, bukan cuma notifikasi kecil.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.8.0</div>
+          <ul>
+            <li>Master Data → tab baru <b>"🧮 Rumus"</b>: batas jumlah tier diskon Grosir (sebelumnya tertanam di kode: &lt;14 Karton = Tier 1, 14–49 = Tier 2, 50+ = Tier 3) sekarang bisa diatur sendiri, lengkap dengan pratinjau langsung yang menunjukkan rentang tiap tier saat diketik. Nilai diskon &amp; subsidi tiap tier tetap diatur per produk seperti biasa (lewat ikon 🖼️ Detail) — di sini cuma atur BATAS jumlahnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.7.0</div>
           <ul>
             <li>Perbaikan tata letak stepper Jumlah (Custom): sebelumnya berbagi ruang 2-kolom dengan Diskon jadi kelihatan sangat kecil. Sekarang Jumlah dilebarkan jadi 1 baris penuh (tombol +/− lebih besar, kotak angka lega menampung sampai ribuan), Diskon pindah ke baris di bawahnya.</li>
           </ul>
@@ -2049,7 +2082,7 @@ const EKSPEDISI = ["313 Express","APM Logistics","Baraka Express","Buton Express
    field — kalau nonaktif, field kembali jadi <select> biasa. Diatur dari
    Master Data, dipakai di step Input Penjualan & Pengiriman (mobile). */
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm"};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -2058,6 +2091,8 @@ function loadSettings(){
     if(typeof s.autocompleteProduk === "boolean") SETTINGS.autocompleteProduk = s.autocompleteProduk;
     if(typeof s.autocompleteEkspedisi === "boolean") SETTINGS.autocompleteEkspedisi = s.autocompleteEkspedisi;
     if(typeof s.bantuanLink === "string" && s.bantuanLink.trim()) SETTINGS.bantuanLink = s.bantuanLink.trim();
+    if(typeof s.tierBatas1 === "number" && s.tierBatas1 > 0) SETTINGS.tierBatas1 = s.tierBatas1;
+    if(typeof s.tierBatas2 === "number" && s.tierBatas2 > SETTINGS.tierBatas1) SETTINGS.tierBatas2 = s.tierBatas2;
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
 function saveSettings(){
@@ -2363,8 +2398,8 @@ function syncAllDiskonFmt(sheet){
 }
 
 function tierIndex(totalKarton){
-  if(totalKarton < 14) return 0;
-  if(totalKarton < 50) return 1;
+  if(totalKarton < SETTINGS.tierBatas1) return 0;
+  if(totalKarton < SETTINGS.tierBatas2) return 1;
   return 2;
 }
 
@@ -4252,6 +4287,15 @@ if ("serviceWorker" in navigator) {
     const st = wizState[sheet];
     if(st.step==="list" || st.step==="review") renderStep(sheet, st.step);
   };
+  /* ---------- hook dipanggil dari Master Data saat toggle Autocomplete diubah:
+     paksa segarkan layar Input Penjualan/Pengiriman yang lagi aktif SEKARANG JUGA,
+     supaya tidak perlu pindah layar dulu baru berubah. ---------- */
+  window.__refreshAutocompleteFields = function(){
+    ["penjualan","custom"].forEach(sheet=>{
+      const st = wizState[sheet];
+      if(st.step==="list" || st.step==="ship") renderStep(sheet, st.step);
+    });
+  };
 
   document.querySelectorAll(".wiz-dots button").forEach(btn=>{
     btn.addEventListener("click", ()=> wizGo(btn.closest(".wiz-dots").dataset.wizdots, btn.dataset.step));
@@ -4324,10 +4368,14 @@ if ("serviceWorker" in navigator) {
   toggleAutoProd.addEventListener("change", ()=>{
     SETTINGS.autocompleteProduk = toggleAutoProd.checked;
     saveSettings();
+    if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
+    showToast(SETTINGS.autocompleteProduk ? "Autocomplete Produk diaktifkan." : "Autocomplete Produk dinonaktifkan.");
   });
   toggleAutoEksp.addEventListener("change", ()=>{
     SETTINGS.autocompleteEkspedisi = toggleAutoEksp.checked;
     saveSettings();
+    if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
+    showToast(SETTINGS.autocompleteEkspedisi ? "Autocomplete Ekspedisi diaktifkan." : "Autocomplete Ekspedisi dinonaktifkan.");
   });
 
   /* ---------- link Bantuan (Tampilan) ---------- */
@@ -4337,12 +4385,44 @@ if ("serviceWorker" in navigator) {
   document.getElementById("md-bantuan-save").addEventListener("click", ()=>{
     const val = bantuanLinkInput.value.trim();
     bantuanErr.textContent = "";
+    bantuanErr.style.color = "";
     if(!val){ bantuanErr.textContent = "Link tidak boleh kosong."; return; }
-    if(!/^https?:\/\/.+/i.test(val)){ bantuanErr.textContent = "Link harus diawali http:// atau https://"; return; }
+    if(!/^https?:\/\/\S+/i.test(val)){ bantuanErr.textContent = "Link harus diawali http:// atau https:// dan tanpa spasi."; return; }
     SETTINGS.bantuanLink = val;
     saveSettings();
     applySettingsToDom();
+    bantuanLinkInput.value = SETTINGS.bantuanLink;
+    bantuanErr.style.color = "var(--primary-green)";
+    bantuanErr.textContent = "✓ Tersimpan — tombol Bantuan sudah diarahkan ke link ini.";
     showToast("Link Bantuan disimpan.");
+  });
+
+  /* ---------- batas tier diskon Grosir (Rumus) ---------- */
+  const tierBatas1Input = document.getElementById("md-tier-batas1");
+  const tierBatas2Input = document.getElementById("md-tier-batas2");
+  const tierErr = document.getElementById("md-tier-err");
+  const tierPreview = document.getElementById("md-tier-preview");
+  tierBatas1Input.value = SETTINGS.tierBatas1;
+  tierBatas2Input.value = SETTINGS.tierBatas2;
+  function updateTierPreview(){
+    const b1 = parseInt(tierBatas1Input.value, 10) || 0;
+    const b2 = parseInt(tierBatas2Input.value, 10) || 0;
+    tierPreview.textContent = `Tier 1: 0–${Math.max(0,b1-1)} Karton  ·  Tier 2: ${b1}–${Math.max(b1,b2-1)} Karton  ·  Tier 3: ${b2}+ Karton`;
+  }
+  updateTierPreview();
+  tierBatas1Input.addEventListener("input", updateTierPreview);
+  tierBatas2Input.addEventListener("input", updateTierPreview);
+  document.getElementById("md-tier-save").addEventListener("click", ()=>{
+    const b1 = parseInt(tierBatas1Input.value, 10);
+    const b2 = parseInt(tierBatas2Input.value, 10);
+    tierErr.textContent = "";
+    if(!b1 || b1 < 1){ tierErr.textContent = "Batas Tier 1 harus angka lebih dari 0."; return; }
+    if(!b2 || b2 <= b1){ tierErr.textContent = "Batas Tier 2 harus lebih besar dari batas Tier 1."; return; }
+    SETTINGS.tierBatas1 = b1;
+    SETTINGS.tierBatas2 = b2;
+    saveSettings();
+    calc("penjualan"); calc("custom");
+    showToast("Batas tier disimpan — perhitungan sudah diperbarui.");
   });
 
   /* ---------- buka/tutup ---------- */
