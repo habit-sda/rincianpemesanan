@@ -1432,6 +1432,7 @@
     <div class="md-section" id="md-sec-ekspedisi">
       <div class="md-card">
         <h3>Daftar ekspedisi</h3>
+        <div class="md-note" style="margin-bottom:10px;">Ketuk ikon 🧮 di tiap baris untuk atur rumus pembulatan berat, minimum charge &amp; skema subsidi ongkir khusus ekspedisi itu.</div>
         <div id="md-ekspedisi-list"></div>
         <button class="md-addrow" id="md-ekspedisi-add">+ Tambah ekspedisi</button>
       </div>
@@ -1513,6 +1514,21 @@
         <div class="md-pin-err" id="md-tier-err"></div>
         <button class="md-btn primary" id="md-tier-save">Simpan batas tier</button>
       </div>
+      <div class="md-card md-pinform">
+        <h3>Rumus lain yang bisa diatur</h3>
+        <div class="md-note">
+          Aturan <b>pembulatan berat</b>, <b>minimum charge (kg)</b>, dan <b>skema subsidi ongkir khusus</b>
+          diatur per ekspedisi — buka tab 🚚 Ekspedisi, lalu ketuk ikon 🧮 di baris ekspedisi yang mau diubah.
+        </div>
+        <div class="md-note" style="margin-top:8px;">
+          Isi per Karton (dipakai untuk pecahan harga per Sachet/Renteng/Pack di ringkasan Penjualan)
+          diatur per produk — buka tab 📦 Produk, lalu ketuk ikon 🖼️ Detail di baris produk yang mau diubah.
+        </div>
+        <div class="md-note" style="margin-top:8px;opacity:.75;">
+          Catatan: label tier "Reseller/Grosir" di rujukan lama file ini sudah tidak aktif sejak filenya dibuat
+          (selalu "Reseller" apa pun jumlah pesanannya) — bukan bug baru, sengaja direplikasi apa adanya.
+        </div>
+      </div>
     </div>
 
     <div class="md-section" id="md-sec-keamanan">
@@ -1564,9 +1580,77 @@
         <label>Link gambar produk (URL)</label>
         <input type="text" inputmode="url" id="md-pd-gambar" placeholder="https://... (kosongkan untuk gambar bawaan)" style="max-width:none;">
         <div class="md-note" style="margin-top:4px;">Tempel link gambar dari internet (bukan unggah file) supaya tidak menghabiskan penyimpanan. Kalau dikosongkan, tampil gambar kardus polos.</div>
+
+        <label style="margin-top:14px;">Isi per Karton (buat pecah harga per satuan kecil di Penjualan)</label>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;">
+            <div class="md-note" style="margin:0 0 2px;">Sachet</div>
+            <input type="number" inputmode="numeric" id="md-pd-isisachet" style="max-width:none;">
+          </div>
+          <div style="flex:1;">
+            <div class="md-note" style="margin:0 0 2px;">Renteng</div>
+            <input type="number" inputmode="numeric" id="md-pd-isirenteng" style="max-width:none;">
+          </div>
+          <div style="flex:1;">
+            <div class="md-note" style="margin:0 0 2px;">Pack</div>
+            <input type="number" inputmode="numeric" id="md-pd-isipack" style="max-width:none;">
+          </div>
+        </div>
+        <div class="md-note" style="margin-top:4px;">Dipakai untuk baris "Harga per Sachet/Renteng/Pack" di ringkasan Penjualan. Isi 0 kalau produk ini tidak punya satuan tersebut (mis. produk Pack biasanya tidak punya sachet/renteng).</div>
       </div>
       <button class="wiz-btn-primary" id="md-pd-save">Simpan detail</button>
       <button class="md-pin-reset" id="md-pd-cancel">Batal</button>
+    </div>
+  </div>
+
+  <!-- ================= MASTER DATA: form detail ekspedisi (rumus) ================= -->
+  <div class="md-overlay" id="md-ekspedisi-detail-overlay" hidden>
+    <div class="md-pinbox" style="max-width:380px;text-align:left;">
+      <h3 id="md-ed-title">Rumus ekspedisi</h3>
+      <div class="md-pinform">
+        <div class="md-togglerow">
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Pembulatan berat longgar</div>
+            <div class="md-togglerow-sub">Aktif: desimal ≥ 0,1 dibulatkan ke atas. Nonaktif: baru dibulatkan ke atas mulai ≥ 0,2.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-ed-longgar">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+
+        <label style="margin-top:12px;">Berat minimum charge (kg)</label>
+        <input type="number" inputmode="numeric" id="md-ed-minberat" min="0" style="max-width:140px;">
+        <div class="md-note" style="margin:4px 0 10px;">Kosongkan/isi 0 kalau ekspedisi ini tidak punya aturan minimum. Kalau diisi, ongkir dihitung dari berat minimum ini kalau berat pesanan lebih kecil.</div>
+        <div class="md-togglerow">
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Minimum berlaku juga di tab Custom</div>
+            <div class="md-togglerow-sub">Kalau nonaktif, aturan minimum di atas hanya berlaku di tab Penjualan (Grosir).</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-ed-minbertacustom">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+
+        <div class="md-togglerow" style="margin-top:12px;">
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Skema subsidi ongkir khusus</div>
+            <div class="md-togglerow-sub">Aktif: Diskon Ongkir = % dari ongkir + subsidi produk (dibatasi % ongkir). Nonaktif: Diskon Ongkir = subsidi produk (dibatasi maksimal sebesar ongkir).</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-ed-subsidikhusus">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+        <label>Subsidi otomatis dari ongkir (%)</label>
+        <input type="number" inputmode="numeric" id="md-ed-subsidipersen" min="0" max="100" style="max-width:140px;">
+        <label>Batas subsidi produk, maks % dari ongkir</label>
+        <input type="number" inputmode="numeric" id="md-ed-subsidibatas" min="0" max="100" style="max-width:140px;">
+        <div class="md-note" id="md-ed-preview" style="margin-top:10px;font-weight:700;color:var(--ink);"></div>
+      </div>
+      <button class="wiz-btn-primary" id="md-ed-save">Simpan rumus</button>
+      <button class="md-pin-reset" id="md-ed-cancel">Batal</button>
     </div>
   </div>
 
@@ -1613,7 +1697,15 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.8.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.9.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Master Data → tab 🚚 Ekspedisi: baris ekspedisi sekarang punya ikon <b>🧮 Rumus</b> untuk atur <b>pembulatan berat</b> (longgar/ketat), <b>berat minimum charge (kg)</b>, dan <b>skema subsidi ongkir khusus</b> — aturan yang sebelumnya tertanam tetap di kode berdasarkan nama ekspedisi (mis. "IDTruck", "Sentral Cargo") sekarang bisa diatur sendiri per ekspedisi, termasuk untuk ekspedisi baru.</li>
+            <li>Master Data → tab 📦 Produk → Detail: field baru <b>"Isi per Karton"</b> (Sachet/Renteng/Pack) per produk — dipakai untuk baris "Harga per Sachet/Renteng/Pack" di ringkasan Penjualan, menggantikan angka tetap (384/32/16) yang sebelumnya dipakai sama untuk semua produk apa pun isinya.</li>
+            <li>Data lama otomatis dimigrasi supaya hasil hitung tidak berubah: ekspedisi & produk yang sudah ada diberi nilai rumus sesuai perilaku versi sebelumnya (bisa diubah kapan saja lewat ikon 🧮/🖼️).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.8.1</div>
           <ul>
             <li>Perbaikan bug: mematikan/menyalakan toggle Autocomplete (Produk/Ekspedisi) sekarang <b>langsung berlaku seketika</b> ke layar Input Penjualan/Pengiriman yang sedang terbuka — sebelumnya baru berlaku setelah pindah layar dulu.</li>
             <li>Link Bantuan: validasi diperketat (menolak link yang ada spasinya, yang bisa bikin link jadi rusak tanpa disadari) dan sekarang ada konfirmasi tertulis jelas di layar setelah tersimpan, bukan cuma notifikasi kecil.</li>
@@ -2407,14 +2499,21 @@ function initDate(){
 }
 
 /* ============ tier ekspedisi pembulatan ============
-   Penjualan: Sentral Cargo, Wahana, Laris Cargo
-   Custom   : + JNE Express (sesuai file asli) */
-function roundWeight(totalBerat, ekspedisi, sheet){
-  const longgar = sheet==="penjualan"
-    ? ["Sentral Cargo","Wahana","Laris Cargo"]
-    : ["Sentral Cargo","Wahana","Laris Cargo","JNE Express"];
+   Dulu: daftar ekspedisi "longgar" (ambang pembulatan 0,1) ditulis
+   sebagai nama-nama tetap di kode, beda-beda pula antara sheet
+   Penjualan & Custom — kalau nama ekspedisi diubah lewat Master Data,
+   aturan ini diam-diam berhenti berlaku.
+   Sekarang: dibaca dari properti "pembulatanLonggar" milik ekspedisi
+   itu sendiri (diatur lewat ikon 🧮 di tab Ekspedisi), sama untuk
+   kedua sheet. */
+function findEkspedisi(name){
+  return EKSPEDISI.find(e => e && e.name === name);
+}
+function roundWeight(totalBerat, ekspedisiName){
+  const eksp = findEkspedisi(ekspedisiName);
+  const longgar = !!(eksp && eksp.pembulatanLonggar);
   const desimal = (totalBerat % 1) * 10;
-  const threshold = longgar.includes(ekspedisi) ? 1 : 2;
+  const threshold = longgar ? 1 : 2;
   return desimal >= threshold ? Math.ceil(totalBerat) : Math.floor(totalBerat);
 }
 
@@ -2533,6 +2632,11 @@ function calc(sheet){
   const tIdx = tierIndex(totalKarton);
 
   let subtotal = 0, totalBerat = 0, totalQty = 0, totalSubsidi = 0, totalDiskonProduk = 0;
+  // Dulu: harga per sachet/renteng/pack dihitung pakai konstanta tetap
+  // (384/32/16) untuk SEMUA produk, padahal tiap produk bisa beda isi
+  // per kartonnya. Sekarang dijumlah dari field "Isi per Karton" milik
+  // masing-masing produk (diatur lewat Detail produk).
+  let totalSachetUnit = 0, totalRentengUnit = 0, totalPackUnit = 0;
 
   raw.forEach((r,i)=>{
     const tr = trs[i];
@@ -2571,6 +2675,11 @@ function calc(sheet){
       totalDiskonProduk += r.qty * (harga - hargaSatuan);
       if(sheet==="penjualan"){
         totalSubsidi += r.qty * r.prod.subsidi[tIdx];
+        if(r.prod.satuan === "Karton"){
+          totalSachetUnit += r.qty * (r.prod.isiSachet||0);
+          totalRentengUnit += r.qty * (r.prod.isiRenteng||0);
+          totalPackUnit += r.qty * (r.prod.isiPack||0);
+        }
       }
     }
   });
@@ -2579,15 +2688,22 @@ function calc(sheet){
   document.getElementById(pfx+"-subtotal").textContent = rupiah(subtotal);
 
   const ekspedisi = document.getElementById(pfx+"-ekspedisi").value;
-  const isIdtruck = (ekspedisi||"").trim().toLowerCase()==="idtruck";
+  const ekspObj = findEkspedisi(ekspedisi);
   const rateVal = parseInt((document.getElementById(pfx+"-rate").value||"").replace(/\./g,""), 10) || 0;
 
-  const roundedBerat = roundWeight(totalBerat, ekspedisi, sheet);
+  const roundedBerat = roundWeight(totalBerat, ekspedisi);
   document.getElementById(pfx+"-totalberat").textContent = roundedBerat + " Kg";
   let ongkir, diskonOngkir, grandTotal;
 
+  // Aturan berat minimum charge (dulu: hanya "IDTruck", angka 10 kg
+  // tertanam di kode, dan hanya berlaku di sheet Penjualan). Sekarang
+  // dibaca dari field "Berat minimum charge" milik ekspedisi terkait —
+  // berlaku di sheet mana pun sesuai toggle "Minimum berlaku juga di Custom".
+  const minBerat = ekspObj ? (ekspObj.minBeratKg||0) : 0;
+  const minBeratBerlaku = sheet==="penjualan" ? minBerat>0 : (minBerat>0 && !!(ekspObj && ekspObj.minBeratCustom));
+
   if(sheet==="penjualan"){
-    ongkir = (isIdtruck && roundedBerat<10) ? 10*rateVal : roundedBerat*rateVal;
+    ongkir = minBeratBerlaku && roundedBerat<minBerat ? minBerat*rateVal : roundedBerat*rateVal;
     // Ongkir Manual (opsional): kalau diisi, menimpa hasil hitungan otomatis di atas.
     // Diskon Ongkir (subsidi) tetap dihitung seperti biasa, tapi berbasis nilai
     // Ongkir yang berlaku sekarang (otomatis ATAU manual — bukan cuma otomatis).
@@ -2596,8 +2712,13 @@ function calc(sheet){
     const pjPakaiManual = pjManualStr !== "" && !isNaN(pjManualVal) && pjManualVal !== 0;
     if(pjPakaiManual) ongkir = pjManualVal;
 
-    diskonOngkir = isIdtruck
-      ? Math.min(ongkir*0.2, ongkir) + Math.min(totalSubsidi, ongkir*0.8)
+    // Skema subsidi ongkir (dulu: hanya "IDTruck", persentase 20%/80%
+    // tertanam di kode). Sekarang dibaca dari properti ekspedisi.
+    const subsidiKhusus = !!(ekspObj && ekspObj.subsidiKhusus);
+    const persenOngkir = ekspObj ? (ekspObj.subsidiPersenOngkir||0)/100 : 0;
+    const persenBatas = ekspObj ? (ekspObj.subsidiPersenBatas||0)/100 : 0;
+    diskonOngkir = subsidiKhusus
+      ? Math.min(ongkir*persenOngkir, ongkir) + Math.min(totalSubsidi, ongkir*persenBatas)
       : Math.min(totalSubsidi, ongkir);
     grandTotal = (subtotal + ongkir) - diskonOngkir;
 
@@ -2611,13 +2732,17 @@ function calc(sheet){
     document.getElementById("pj-statuslabel").textContent = selisih>0 ? "Kembalian" : (selisih<0 ? "Kurang bayar" : "Lunas");
     document.getElementById("pj-statusrow").className = "row status-row " + (selisih>0 ? "status-kembalian" : (selisih<0 ? "status-kurang" : "status-lunas"));
 
-    document.getElementById("pj-sachet").textContent = totalKarton>0 ? rupiah(grandTotal/(totalKarton*384)) : "–";
-    document.getElementById("pj-renteng").textContent = totalKarton>0 ? rupiah(grandTotal/(totalKarton*32)) : "–";
-    document.getElementById("pj-pack").textContent = totalKarton>0 ? rupiah(grandTotal/(totalKarton*16)) : "–";
+    document.getElementById("pj-sachet").textContent = totalSachetUnit>0 ? rupiah(grandTotal/totalSachetUnit) : "–";
+    document.getElementById("pj-renteng").textContent = totalRentengUnit>0 ? rupiah(grandTotal/totalRentengUnit) : "–";
+    document.getElementById("pj-pack").textContent = totalPackUnit>0 ? rupiah(grandTotal/totalPackUnit) : "–";
     document.getElementById("pj-karton").textContent = totalKarton>0 ? rupiah(grandTotal/totalKarton) : "–";
     document.getElementById("pj-ongkirdibayar").textContent = rupiah(ongkir-diskonOngkir);
   } else {
-    ongkir = rateVal * roundedBerat; // Custom: tidak ada aturan minimum IDTruck
+    // Dulu: tidak ada aturan minimum sama sekali di Custom (disengaja).
+    // Sekarang: mengikuti toggle "Minimum berlaku juga di Custom" milik
+    // ekspedisi terkait (default nonaktif untuk data lama, jadi perilaku
+    // tetap sama persis kecuali diaktifkan manual).
+    ongkir = minBeratBerlaku && roundedBerat<minBerat ? minBerat*rateVal : rateVal*roundedBerat;
     // Ongkir Manual (opsional) — sama seperti tab Penjualan, menimpa hasil otomatis.
     const csManualStr = document.getElementById("cs-ongkir-manual").value.trim();
     const csManualVal = parseFloat(csManualStr.replace(/\./g,"").replace(/,/g,"."));
@@ -4470,6 +4595,34 @@ if ("serviceWorker" in navigator) {
   // string polos) supaya semua data dijamin punya kode unik & permanen.
   // Aman dipanggil berulang kali — kalau semua sudah punya kode, tidak
   // melakukan apa-apa dan return false.
+  //
+  // Sejak versi ini, migrasi JUGA mengisi field rumus yang dulu tertanam
+  // di kode (pembulatan berat, minimum charge, skema subsidi ongkir per
+  // ekspedisi; isi-per-karton per produk). Nilai default untuk nama-nama
+  // yang SUDAH ada sebelum versi ini dibuat SAMA PERSIS dengan aturan lama
+  // supaya angka di nota tidak tiba-tiba berubah — kecuali untuk
+  // pembulatan "JNE Express" di tab Penjualan (dulu beda aturan dari tab
+  // Custom untuk ekspedisi itu; sekarang disatukan jadi longgar di kedua
+  // tab — silakan cek/ubah lewat ikon 🧮 kalau perlu).
+  const LEGACY_LONGGAR_NAMES = ["Sentral Cargo","Wahana","Laris Cargo","JNE Express"];
+  function applyEkspedisiDefaults(e){
+    let ch = false;
+    const isIdtruckLegacy = (e.name||"").trim().toLowerCase() === "idtruck";
+    if(typeof e.pembulatanLonggar !== "boolean"){ e.pembulatanLonggar = LEGACY_LONGGAR_NAMES.includes(e.name); ch = true; }
+    if(typeof e.minBeratKg !== "number"){ e.minBeratKg = isIdtruckLegacy ? 10 : 0; ch = true; }
+    if(typeof e.minBeratCustom !== "boolean"){ e.minBeratCustom = false; ch = true; }
+    if(typeof e.subsidiKhusus !== "boolean"){ e.subsidiKhusus = isIdtruckLegacy; ch = true; }
+    if(typeof e.subsidiPersenOngkir !== "number"){ e.subsidiPersenOngkir = 20; ch = true; }
+    if(typeof e.subsidiPersenBatas !== "number"){ e.subsidiPersenBatas = 80; ch = true; }
+    return ch;
+  }
+  function applyProdukDefaults(p){
+    let ch = false;
+    if(typeof p.isiSachet !== "number"){ p.isiSachet = p.satuan==="Karton" ? 384 : 0; ch = true; }
+    if(typeof p.isiRenteng !== "number"){ p.isiRenteng = p.satuan==="Karton" ? 32 : 0; ch = true; }
+    if(typeof p.isiPack !== "number"){ p.isiPack = p.satuan==="Karton" ? 16 : 0; ch = true; }
+    return ch;
+  }
   function migrateMasterData(){
     let changed = false;
     PRODUCTS.forEach(p=>{
@@ -4477,6 +4630,7 @@ if ("serviceWorker" in navigator) {
         p.kode = nextKode("P");
         changed = true;
       }
+      if(applyProdukDefaults(p)) changed = true;
     });
     for(let i = 0; i < EKSPEDISI.length; i++){
       if(typeof EKSPEDISI[i] === "string"){
@@ -4489,6 +4643,7 @@ if ("serviceWorker" in navigator) {
         e.kode = nextKode("E");
         changed = true;
       }
+      if(applyEkspedisiDefaults(e)) changed = true;
     });
     return changed;
   }
@@ -4747,7 +4902,7 @@ if ("serviceWorker" in navigator) {
     bindKodeBadgeCopy(list);
   }
   document.getElementById("md-produk-add").addEventListener("click", ()=>{
-    PRODUCTS.push({kode: nextKode("P"), name:"Produk baru", harga:0, diskon:[0,0,0], subsidi:[0,0,0], berat:1, satuan:"Pack", gambar:""});
+    PRODUCTS.push({kode: nextKode("P"), name:"Produk baru", harga:0, diskon:[0,0,0], subsidi:[0,0,0], berat:1, satuan:"Pack", gambar:"", isiSachet:0, isiRenteng:0, isiPack:0});
     refreshAfterDataChange();
     renderProdukList();
   });
@@ -4766,6 +4921,9 @@ if ("serviceWorker" in navigator) {
       el.value = (p.subsidi[n-1]||0).toLocaleString("id-ID");
     });
     document.getElementById("md-pd-gambar").value = p.gambar || "";
+    document.getElementById("md-pd-isisachet").value = p.isiSachet || 0;
+    document.getElementById("md-pd-isirenteng").value = p.isiRenteng || 0;
+    document.getElementById("md-pd-isipack").value = p.isiPack || 0;
     pdOverlay.hidden = false;
   }
   document.getElementById("md-pd-cancel").addEventListener("click", ()=> pdOverlay.hidden = true);
@@ -4774,8 +4932,62 @@ if ("serviceWorker" in navigator) {
     p.diskon = [1,2,3].map(n=> parseFloat(readDiskonModeValue("md-pd-diskonmode"+n, "md-pd-diskon"+n))||0);
     p.subsidi = [0,1,2].map(i=> parseRp(document.getElementById("md-pd-subsidi"+(i+1)).value));
     p.gambar = document.getElementById("md-pd-gambar").value.trim();
+    p.isiSachet = parseFloat(document.getElementById("md-pd-isisachet").value)||0;
+    p.isiRenteng = parseFloat(document.getElementById("md-pd-isirenteng").value)||0;
+    p.isiPack = parseFloat(document.getElementById("md-pd-isipack").value)||0;
     refreshAfterDataChange();
     pdOverlay.hidden = true;
+  });
+
+  /* ---------- detail ekspedisi (rumus: pembulatan, minimum, subsidi) ---------- */
+  const edOverlay = document.getElementById("md-ekspedisi-detail-overlay");
+  let edEditIdx = null;
+  function updateEkspedisiDetailPreview(){
+    const longgar = document.getElementById("md-ed-longgar").checked;
+    const minBerat = parseFloat(document.getElementById("md-ed-minberat").value)||0;
+    const minCustom = document.getElementById("md-ed-minbertacustom").checked;
+    const khusus = document.getElementById("md-ed-subsidikhusus").checked;
+    const pOngkir = parseFloat(document.getElementById("md-ed-subsidipersen").value)||0;
+    const pBatas = parseFloat(document.getElementById("md-ed-subsidibatas").value)||0;
+    let lines = [];
+    lines.push("Pembulatan: desimal ≥ " + (longgar ? "0,1" : "0,2") + " dibulatkan ke atas.");
+    lines.push(minBerat>0
+      ? ("Minimum charge: " + minBerat + " kg (Penjualan" + (minCustom ? " & Custom" : ", tidak di Custom") + ").")
+      : "Tanpa minimum charge.");
+    lines.push(khusus
+      ? ("Diskon Ongkir = " + pOngkir + "% ongkir + subsidi produk (maks " + pBatas + "% ongkir).")
+      : "Diskon Ongkir = subsidi produk (maks sebesar ongkir).");
+    document.getElementById("md-ed-preview").textContent = lines.join(" ");
+  }
+  ["md-ed-longgar","md-ed-minberat","md-ed-minbertacustom","md-ed-subsidikhusus","md-ed-subsidipersen","md-ed-subsidibatas"].forEach(id=>{
+    document.getElementById(id).addEventListener("input", updateEkspedisiDetailPreview);
+    document.getElementById(id).addEventListener("change", updateEkspedisiDetailPreview);
+  });
+  function openEkspedisiDetail(idx){
+    edEditIdx = idx;
+    const e = EKSPEDISI[idx];
+    document.getElementById("md-ed-title").textContent = "Rumus — " + e.name;
+    document.getElementById("md-ed-longgar").checked = !!e.pembulatanLonggar;
+    document.getElementById("md-ed-minberat").value = e.minBeratKg || 0;
+    document.getElementById("md-ed-minbertacustom").checked = !!e.minBeratCustom;
+    document.getElementById("md-ed-subsidikhusus").checked = !!e.subsidiKhusus;
+    document.getElementById("md-ed-subsidipersen").value = e.subsidiPersenOngkir ?? 20;
+    document.getElementById("md-ed-subsidibatas").value = e.subsidiPersenBatas ?? 80;
+    updateEkspedisiDetailPreview();
+    edOverlay.hidden = false;
+  }
+  document.getElementById("md-ed-cancel").addEventListener("click", ()=> edOverlay.hidden = true);
+  document.getElementById("md-ed-save").addEventListener("click", ()=>{
+    const e = EKSPEDISI[edEditIdx];
+    e.pembulatanLonggar = document.getElementById("md-ed-longgar").checked;
+    e.minBeratKg = parseFloat(document.getElementById("md-ed-minberat").value)||0;
+    e.minBeratCustom = document.getElementById("md-ed-minbertacustom").checked;
+    e.subsidiKhusus = document.getElementById("md-ed-subsidikhusus").checked;
+    e.subsidiPersenOngkir = parseFloat(document.getElementById("md-ed-subsidipersen").value)||0;
+    e.subsidiPersenBatas = parseFloat(document.getElementById("md-ed-subsidibatas").value)||0;
+    refreshAfterDataChange();
+    edOverlay.hidden = true;
+    showToast("Rumus ekspedisi \"" + e.name + "\" disimpan.");
   });
 
   /* ---------- Kelola Ekspedisi ---------- */
@@ -4788,6 +5000,9 @@ if ("serviceWorker" in navigator) {
         <div class="md-e-namewrap">
           <span class="md-kode-badge" data-copy-kode="${e.kode}" title="Klik untuk salin kode">${e.kode}</span>
           <input type="text" class="md-e-name" value="${e.name}">
+          <button class="md-row-detail" data-eksp-detail="${i}" title="Atur rumus: pembulatan berat, minimum charge & subsidi ongkir" aria-label="Rumus ekspedisi">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h5M8 17h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
         </div>
       </div>
     `).join("");
@@ -4799,10 +5014,13 @@ if ("serviceWorker" in navigator) {
         renderEkspedisiList();
       });
     });
+    list.querySelectorAll("[data-eksp-detail]").forEach(btn=>{
+      btn.addEventListener("click", ()=> openEkspedisiDetail(+btn.dataset.ekspDetail));
+    });
     bindKodeBadgeCopy(list);
   }
   document.getElementById("md-ekspedisi-add").addEventListener("click", ()=>{
-    EKSPEDISI.push({kode: nextKode("E"), name:"Ekspedisi baru"});
+    EKSPEDISI.push({kode: nextKode("E"), name:"Ekspedisi baru", pembulatanLonggar:false, minBeratKg:0, minBeratCustom:false, subsidiKhusus:false, subsidiPersenOngkir:20, subsidiPersenBatas:80});
     refreshAfterDataChange();
     renderEkspedisiList();
   });
