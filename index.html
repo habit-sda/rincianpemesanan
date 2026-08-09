@@ -6,7 +6,7 @@
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#188038">
+<meta name="theme-color" content="#0c4a78">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -516,7 +516,7 @@
     /* Beranda dapat latar gradasi biru "Deep Ocean" tersendiri — kartu &
        tombol di atasnya tetap putih supaya kontras terjaga. */
     body.showing-home{background:linear-gradient(160deg,#0c4a78 0%,#1a6fa8 100%);}
-    body.showing-home .wrap{background:transparent;}
+    body.showing-home .wrap{background:transparent;display:flex;flex-direction:column;min-height:calc(100vh - 108px);justify-content:space-between;}
     body.showing-home .home-hero h1{color:#ffffff;}
     body.showing-home .home-hero .sub{color:#cfe4f2;}
     body.showing-home footer{color:#cfe4f2;}
@@ -646,9 +646,9 @@
       position:sticky;bottom:0;left:0;right:0;background:#ffffff;
       padding:12px 0 calc(10px + env(safe-area-inset-bottom));
       margin-top:18px;box-shadow:0 -8px 14px -10px rgba(0,0,0,.2);z-index:5;
+      display:flex;flex-direction:column;gap:14px;
     }
     .wiz-cta-bar .wiz-btn-primary, .wiz-cta-bar .wiz-btn-dash{margin-top:0;}
-    .wiz-cta-bar > * + *{margin-top:14px;}
     .wiz-cta-bar .wiz-actionbtns{margin-top:0;}
     .wiz-empty{
       text-align:center;padding:30px 16px;color:var(--ink-soft);font-size:12.5px;
@@ -727,6 +727,20 @@
       font-weight:700;font-size:12px;cursor:pointer;
     }
     .wiz-actionbtns button.primary{background:var(--primary-blue);color:#fff;border:none;}
+
+    /* --- Bar aksi setelah pesanan dikonfirmasi (Unduh/Bagikan/Salin) DIPAKU
+       ke bawah LAYAR (bukan cuma sticky di dalam wizard), karena preview
+       nota di bawahnya panjang — supaya tombolnya tetap terjangkau selagi
+       men-scroll lihat nota, bukan malah ikut ke-scroll lewat. --- */
+    .wiz-confirmed-actions{
+      position:fixed;left:0;right:0;bottom:0;background:#ffffff;
+      padding:12px clamp(16px,3vw,48px) calc(10px + env(safe-area-inset-bottom));
+      box-shadow:0 -8px 14px -10px rgba(0,0,0,.2);z-index:50;
+      display:flex;flex-direction:column;gap:12px;
+    }
+    .wiz-confirmed-actions .wiz-actionbtns{margin-top:0;}
+    .wiz-confirmed-actions .wiz-btn-ghost{margin-top:0;}
+    body.nota-confirmed{padding-bottom:190px;}
 
     /* --- tombol Kalkulator & Reset di beranda --- */
     .home-links{display:flex;gap:10px;margin-top:0;}
@@ -878,7 +892,7 @@
         </span>
         Buka Payment Telegram
       </a>
-      <a href="https://bayarpesanan.com/" target="_blank" rel="noopener" class="home-actionlink atm">
+      <a href="https://bayarpesanan.com/cs" target="_blank" rel="noopener" class="home-actionlink atm">
         <span class="home-actionlink-icon" aria-hidden="true">🏧</span>
         Bayar Pesanan
       </a>
@@ -1230,7 +1244,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Rp</span> &nbsp;·&nbsp; versi <span id="app-current-version">1.28.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Rp</span> &nbsp;·&nbsp; versi <span id="app-current-version">1.30.0</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
     </div>
   </footer>
@@ -1262,7 +1276,25 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.28.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.30.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Tombol Unduh/Bagikan/Salin & "Edit pesanan lagi" setelah pesanan dikonfirmasi sekarang <b>dipaku ke bawah layar</b> — sebelumnya bisa ikut ke-scroll lewat kalau nota-nya panjang, sekarang tetap terjangkau sambil scroll lihat nota.</li>
+            <li>Baris "Kelebihan bayar sebelumnya" di nota otomatis disembunyikan kalau nilainya Rp 0 (tidak ada kelebihan bayar sebelumnya) — mengurangi baris yang tidak relevan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.29.0</div>
+          <ul>
+            <li>Link "Bayar Pesanan" diarahkan ke bayarpesanan.com/cs.</li>
+            <li>Warna status bar HP (strip paling atas) dulu masih hijau lama — sekarang ikut biru sesuai tema baru.</li>
+            <li>Kartu produk di langkah "Input Penjualan" sekarang menampilkan <b>diskon per satuan</b> DAN <b>harga per satuan</b> (bukan lagi total harga dikali qty), baik di Grosir maupun Custom.</li>
+            <li>Field Ekspedisi &amp; Produk: ketuk sekali langsung otomatis pilih semua teksnya (termasuk teks "— pilih ekspedisi —") — jadi tinggal ketik tanpa perlu hapus manual dulu.</li>
+            <li>Perbaikan bug: jarak antara tombol "+ Tambah produk" dan "Lanjut ke pengiriman" ternyata masih 0 di balik layar walau sudah "diperbaiki" sebelumnya — penyebabnya aturan CSS yang saling tumpang tindih. Sekarang beneran berjarak.</li>
+            <li>Beranda: ruang kosong besar di bawah footer (gara-gara latar gradasi memenuhi seluruh layar walau kontennya pendek) dirapikan — footer sekarang menempel rapi di bagian bawah layar.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.28.0</div>
           <ul>
             <li>Semua tampilan diskon berbentuk persen sekarang konsisten ditulis sebagai <b>"23 %"</b>, bukan lagi angka koma mentah seperti <b>"0.23"</b> — mencakup kolom Diskon tabel Custom (desktop), dan kartu diskon di langkah Review wizard HP yang sebelumnya masih menampilkan angka mentah. Nilai yang tersimpan di balik layar tidak berubah, cuma cara menampilkannya.</li>
           </ul>
@@ -1812,6 +1844,7 @@ function comboboxify(select, placeholder){
 
   input.addEventListener("focus", ()=>{
     renderList(input.value === labelFor(select.value) ? "" : input.value);
+    setTimeout(()=>{ try{ input.select(); }catch(e){} }, 0);
   });
   input.addEventListener("input", ()=> renderList(input.value));
   input.addEventListener("keydown", (e)=>{
@@ -2297,7 +2330,7 @@ function buildPrintNota(tab){
       </div>
       <div class="pnota-grand"><span class="l">Grand Total</span><span class="v">${grandtotal}</span></div>
       <div class="pnota-pay">
-        <div class="pnota-payline"><span class="l">Kelebihan bayar sebelumnya</span><span class="v">${kelebihanFmt}</span></div>
+        ${kelebihan!==0 ? `<div class="pnota-payline"><span class="l">Kelebihan bayar sebelumnya</span><span class="v">${kelebihanFmt}</span></div>` : ``}
         <div class="pnota-payline pnota-status" style="color:${statusColor}"><span class="l">${statusLabel}</span><span class="v">${signPrefix}${selisihFmt}</span></div>
       </div>
     </div>
@@ -3206,7 +3239,7 @@ if ("serviceWorker" in navigator) {
   const body = document.body;
 
   /* ---------- navigasi Beranda <-> panel ---------- */
-  function goHome(){ body.classList.add("showing-home"); window.scrollTo(0,0); }
+  function goHome(){ body.classList.add("showing-home"); body.classList.remove("nota-confirmed"); window.scrollTo(0,0); }
   function openTab(tab){
     body.classList.remove("showing-home");
     const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
@@ -3333,6 +3366,7 @@ if ("serviceWorker" in navigator) {
     });
     renderStep(sheet, step);
     document.getElementById(pfxOf(sheet)+"-nota-col").classList.remove("wiz-show");
+    document.body.classList.remove("nota-confirmed");
     window.scrollTo(0,0);
   }
 
@@ -3370,16 +3404,18 @@ if ("serviceWorker" in navigator) {
       const qty = tr.querySelector("input.qty").value || 0;
       const p = findProduct(prod);
       const satuan = p ? p.satuan : "";
+      const hargaSatuanTxt = tr.querySelector('[data-f="satuan"]').textContent;
       let detailTxt;
       if(sheet==="penjualan"){
         const dv = estimateGrosirDiskon(sheet, prod, parseFloat(qty)||0, i);
         const dtxt = dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv);
-        detailTxt = `Diskon ${dtxt}/${satuan}`;
+        detailTxt = `Diskon ${dtxt}/${satuan} · Harga ${hargaSatuanTxt}/${satuan}`;
       } else {
         const dEl = tr.querySelector("input.diskon");
         const raw = dEl ? dEl.value.trim() : "";
         const dv = parseFloat(raw)||0;
-        detailTxt = raw==="" ? "Tidak ada diskon" : `Diskon ${dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv)}/${satuan} · Estimasi ${rupiah((p?p.harga:0)*(parseFloat(qty)||0))}`;
+        const diskonPart = raw==="" ? "Tidak ada diskon" : `Diskon ${dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv)}/${satuan}`;
+        detailTxt = `${diskonPart} · Harga ${hargaSatuanTxt}/${satuan}`;
       }
       return `<div class="wiz-pcard-wrap">
         <div class="wiz-pcard-delbg" data-delrow="${i}">Hapus</div>
@@ -3727,21 +3763,25 @@ if ("serviceWorker" in navigator) {
       document.getElementById(pfx+"-nota-col").classList.add("wiz-show");
       document.getElementById("wr-confirm-"+sheet).style.display = "none";
       document.getElementById("wr-back-"+sheet).style.display = "none";
+      document.body.classList.add("nota-confirmed");
       document.getElementById("wr-confirmed-"+sheet).innerHTML = `
         <div class="wiz-stamp">✓ Pesanan dikonfirmasi — nota siap dibagikan</div>
-        <div class="wiz-cta-bar">
+        <div class="wiz-confirmed-actions">
           <div class="wiz-actionbtns">
             <button class="primary" id="wr-download-${sheet}">⬇ Unduh</button>
             <button id="wr-share-${sheet}">↗ Bagikan</button>
             <button id="wr-copy-${sheet}">⧉ Salin</button>
           </div>
+          <button class="wiz-btn-ghost" id="wr-editagain-${sheet}">‹ Edit pesanan lagi</button>
         </div>
-        <button class="wiz-btn-ghost" id="wr-editagain-${sheet}">‹ Edit pesanan lagi</button>
       `;
       document.getElementById("wr-download-"+sheet).addEventListener("click", ()=> document.getElementById("btn-download").click());
       document.getElementById("wr-share-"+sheet).addEventListener("click", ()=> document.getElementById("btn-share").click());
       document.getElementById("wr-copy-"+sheet).addEventListener("click", ()=> document.getElementById("btn-copy").click());
-      document.getElementById("wr-editagain-"+sheet).addEventListener("click", ()=> wizGo(sheet, "list"));
+      document.getElementById("wr-editagain-"+sheet).addEventListener("click", ()=>{
+        document.body.classList.remove("nota-confirmed");
+        wizGo(sheet, "list");
+      });
       window.scrollTo(0,0);
     });
   }
