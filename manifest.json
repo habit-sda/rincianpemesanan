@@ -1,12 +1,12 @@
 {
-  "name": "Nota Halawa — Halawa Bintang Utama",
-  "short_name": "Rp",
-  "description": "Kalkulator nota pesanan Halawa Bintang Utama (versi HTML dari spreadsheet).",
+  "name": "Habit — Halawa Bintang Utama",
+  "short_name": "Habit",
+  "description": "Habit — kalkulator nota pesanan Halawa Bintang Utama.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f8f9fa",
-  "theme_color": "#0c4a78",
+  "background_color": "#f7f9f8",
+  "theme_color": "#00845f",
   "orientation": "portrait-primary",
   "icons": [
     {

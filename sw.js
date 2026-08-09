@@ -1,11 +1,11 @@
 /* ============================================================
-   Service Worker — Nota Halawa
+   Service Worker — Habit
    Cache app-shell dasar supaya bisa dibuka offline / lebih cepat.
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v51";
-const CACHE_NAME = "nota-halawa-" + CACHE_VERSION;
+const CACHE_VERSION = "v53";
+const CACHE_NAME = "habit-" + CACHE_VERSION;
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
 const CORE_ASSETS = [
   "./",
@@ -16,7 +16,9 @@ const CORE_ASSETS = [
   "./icon-192x192-maskable.png",
   "./icon-512x512-maskable.png",
   "./icon-180x180.png",
-  "./icon-32x32.png"
+  "./icon-32x32.png",
+  "./habit-logo.png",
+  "./habit-hero.png"
 ];
 /* ---------- INSTALL: simpan app-shell ke cache ---------- */
 self.addEventListener("install", (event) => {
@@ -54,7 +56,7 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys
-          .filter((key) => key.startsWith("nota-halawa-") && key !== CACHE_NAME)
+          .filter((key) => (key.startsWith("nota-halawa-") || key.startsWith("habit-")) && key !== CACHE_NAME)
           .map((key) => caches.delete(key))
       )
     )

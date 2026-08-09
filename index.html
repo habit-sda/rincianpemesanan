@@ -6,16 +6,16 @@
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0c4a78">
+<meta name="theme-color" content="#00845f">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Rp">
+<meta name="apple-mobile-web-app-title" content="Habit">
 <link rel="apple-touch-icon" href="icon-180x180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
-<title>Rincian Pemesanan (Rp) — Halawa Bintang Utama</title>
+<title>Habit — Rincian Pemesanan (Halawa Bintang Utama)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -27,7 +27,7 @@
     --ink-soft:#5f6368;
     --accent-green:#188038;
     --danger-red:#c5221f;
-    --primary-blue:#0c4a78;
+    --primary-green:#00845f;
     --status-green:#188038;
     --status-blue:#1a73e8;
     --line:#d3d6db;
@@ -143,7 +143,7 @@
   .calc-actionrow{display:flex;gap:6px;padding:8px 10px;background:var(--paper-dark);border-bottom:1px solid var(--line);}
   .calc-actbtn{flex:1;border:none;border-radius:6px;padding:8px 0;font-size:11.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
   .calc-clearbtn{background:#fce8e6;color:var(--danger-red);}
-  .calc-copybtn{background:var(--primary-blue);color:#fff;}
+  .calc-copybtn{background:var(--primary-green);color:#fff;}
   .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);padding:1px;}
   .calc-key{
     border:none;background:#fff;padding:14px 0;font-size:15px;font-weight:600;color:var(--ink);
@@ -152,7 +152,7 @@
   .calc-key:active{background:#eef0f2;}
   .calc-fn{background:#e6f4ea;color:var(--ink-soft);font-family:'Roboto',sans-serif;font-size:13px;}
   .calc-op{background:#e6f4ea;color:var(--accent-green);}
-  .calc-eq{background:var(--primary-blue);color:#fff;}
+  .calc-eq{background:var(--primary-green);color:#fff;}
   .calc-zero{grid-column:span 1;}
   .calc-msg{font-size:11px;color:var(--ink-soft);text-align:center;padding:6px 10px 10px;min-height:26px;}
 
@@ -166,7 +166,7 @@
   .confirm-actionrow{display:flex;gap:8px;padding:0 16px 16px;}
   .confirm-actionrow button{flex:1;border:none;border-radius:6px;padding:10px 0;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
   .confirm-okbtn{background:var(--danger-red);color:#fff;}
-  #update-apply.confirm-okbtn{background:var(--primary-blue);}
+  #update-apply.confirm-okbtn{background:var(--primary-green);}
 
   .changelog-link{
     background:none;border:none;color:var(--accent-green);font-size:inherit;text-decoration:underline;
@@ -178,7 +178,7 @@
   .changelog-item:last-child{border-bottom:none;}
   .changelog-ver{font-family:'Roboto Mono',monospace;font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:6px;}
   .changelog-tag{
-    display:inline-block;background:var(--primary-blue);color:#fff;font-size:9.5px;font-weight:700;
+    display:inline-block;background:var(--primary-green);color:#fff;font-size:9.5px;font-weight:700;
     font-family:'Roboto',sans-serif;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle;
   }
   .changelog-item ul{margin:0;padding-left:18px;}
@@ -194,7 +194,7 @@
      berkala berikutnya, atau reload manual browser). */
   .update-popup{width:320px;}
   .update-popup-body{padding:14px 16px 6px;}
-  .update-popup-version{font-family:'Roboto Mono',monospace;font-weight:700;font-size:15px;color:var(--primary-blue);margin-bottom:6px;}
+  .update-popup-version{font-family:'Roboto Mono',monospace;font-weight:700;font-size:15px;color:var(--primary-green);margin-bottom:6px;}
   .update-popup-sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;}
   .update-popup-list{margin:0;padding-left:18px;}
   .update-popup-list li{font-size:12.5px;color:var(--ink);line-height:1.6;margin-bottom:3px;}
@@ -308,7 +308,7 @@
   .combo-item{padding:10px 12px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line);}
   .combo-item:last-child{border-bottom:none;}
   .combo-item:hover, .combo-item.active{background:#e3f0fa;}
-  .combo-item b{color:var(--primary-blue);}
+  .combo-item b{color:var(--primary-green);}
   .combo-empty{padding:12px;font-size:12px;color:var(--ink-soft);text-align:center;}
 
   .receipt{
@@ -321,7 +321,7 @@
   }
   .row .lbl{color:var(--ink);}
   .row .val{font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;}
-  .row.total .val{color:var(--primary-blue);}
+  .row.total .val{color:var(--primary-green);}
   .row input{max-width:150px;text-align:right;}
 
   /* ============ Status bayar berwarna ============
@@ -345,9 +345,9 @@
   .ongkir-indicator-badge{
     display:none;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:9px;
     text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;flex-shrink:0;
-    background:var(--primary-blue);color:#fff;
+    background:var(--primary-green);color:#fff;
   }
-  .ongkir-indicator.is-filled{border-color:var(--primary-blue);background:#eaf4fb;}
+  .ongkir-indicator.is-filled{border-color:var(--primary-green);background:#eaf4fb;}
   .ongkir-indicator.is-filled .ongkir-indicator-badge{display:inline-block;}
   .ongkir-indicator.is-filled input{font-weight:700;}
   .ongkir-indicator-red.is-filled{border-color:var(--danger-red);background:#fdecea;}
@@ -513,15 +513,9 @@
     /* Latar putih bersih khusus mobile (desktop tetap abu muda seperti semula) */
     body{background:#ffffff;}
     .wrap{background:#ffffff;}
-    /* Beranda dapat latar gradasi biru "Deep Ocean" tersendiri — kartu &
-       tombol di atasnya tetap putih supaya kontras terjaga. */
-    body.showing-home{background:linear-gradient(160deg,#0c4a78 0%,#1a6fa8 100%);}
-    body.showing-home .wrap{background:transparent;display:flex;flex-direction:column;min-height:calc(100vh - 108px);justify-content:center;gap:28px;}
-    body.showing-home .home-hero h1{color:#ffffff;}
-    body.showing-home .home-hero .sub{color:#cfe4f2;}
-    body.showing-home footer{color:#cfe4f2;}
-    body.showing-home footer b{color:#ffffff;}
-    body.showing-home footer #md-secret-tap{color:#cfe4f2;}
+    /* Beranda "Habit" — latar abu sangat muda, kartu/list putih di atasnya. */
+    body.showing-home{background:#f7f9f8;}
+    body.showing-home .wrap{background:transparent;display:flex;flex-direction:column;min-height:calc(100vh - 108px);}
 
     /* Header, tab atas, toolbar aksi, dan referensi ongkir wilayah adalah
        "chrome" desktop — di mobile digantikan sepenuhnya oleh Beranda +
@@ -531,7 +525,15 @@
     footer{display:none;}
     body.showing-home footer{display:block;}
     .footer-changelog-wrap{display:none;}
-    footer{margin-top:12px;line-height:1.55;}
+    footer{
+      margin:0 0 4px;padding:18px 18px 14px;line-height:1.6;text-align:left;
+      background:#fff;border:1px solid #e7eaed;border-radius:18px;
+      box-shadow:0 3px 14px rgba(0,0,0,.035);
+    }
+    footer b{display:block;margin-bottom:5px;font-size:14px;color:var(--ink);}
+    footer .footer-datebox{display:flex;align-items:flex-start;gap:6px;margin-top:8px;}
+    footer .footer-datebox svg{flex-shrink:0;margin-top:2px;}
+    footer .footer-dateval{color:var(--primary-green);font-weight:700;}
     body.showing-home .tabs,
     body.showing-home .toolbar,
     body.showing-home .panel,
@@ -539,39 +541,89 @@
     body.showing-home .home-screen{display:flex;}
 
     .home-screen{
-      flex-direction:column;gap:10px;padding:calc(18px + env(safe-area-inset-top)) 2px 6px;
+      flex-direction:column;gap:22px;padding:calc(18px + env(safe-area-inset-top)) 16px 10px;
     }
-    .home-hero{margin-bottom:4px;}
-    .home-hero h1{font-size:21px;margin:0 0 3px;font-weight:700;}
-    .home-hero .sub{font-size:12.5px;color:var(--ink-soft);}
+
+    /* --- topbar: logo Habit + tombol Bantuan --- */
+    .home-topbar{display:flex;justify-content:space-between;align-items:flex-start;}
+    .home-logo{display:flex;align-items:center;gap:8px;}
+    .home-logo img{width:34px;height:34px;display:block;}
+    .home-logo-text{font-size:23px;font-weight:700;color:var(--primary-green);font-style:italic;letter-spacing:-.01em;}
+    .home-help-btn{
+      display:flex;flex-direction:column;align-items:center;gap:2px;
+      background:#fff;border:none;border-radius:16px;padding:10px 14px;
+      box-shadow:0 3px 10px rgba(0,0,0,.06);color:var(--ink);font-size:11px;font-weight:600;cursor:pointer;
+    }
+    .home-help-btn svg{width:20px;height:20px;}
+
+    /* --- hero: sapaan + judul + ilustrasi --- */
+    .home-hero{display:flex;align-items:center;gap:14px;}
+    .home-hero-text{flex:1;min-width:0;}
+    .home-hero-greet{font-size:14px;color:var(--ink-soft);margin-bottom:6px;}
+    .home-hero h1{font-size:25px;line-height:1.2;margin:0 0 8px;font-weight:700;letter-spacing:-.01em;color:var(--ink);}
+    .home-hero h1 .accent{color:var(--primary-green);}
+    .home-hero .sub{font-size:13px;color:var(--ink-soft);}
+    .home-hero-art{flex-shrink:0;width:34%;max-width:150px;position:relative;}
+    .home-hero-art::before{
+      content:"";position:absolute;inset:8%;border-radius:50%;
+      background:var(--primary-green);opacity:.09;
+    }
+    .home-hero-art img{position:relative;width:100%;display:block;}
+
+    /* --- kartu Grosir / Custom --- */
+    .home-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     .home-tile{
-      display:flex;align-items:center;gap:14px;width:100%;
-      background:var(--card);border:1px solid var(--line);border-radius:14px;
-      padding:18px 16px;text-align:left;cursor:pointer;
+      display:flex;flex-direction:column;width:100%;
+      background:var(--card);border:1px solid var(--line);border-radius:16px;
+      text-align:left;cursor:pointer;overflow:hidden;
       box-shadow:0 1px 3px rgba(0,0,0,.05);
     }
-    .home-tile:active{background:#fafafa;border-color:var(--line);}
+    .home-tile-top{padding:18px 14px 16px;}
     .home-tile-icon{
-      flex-shrink:0;width:52px;height:52px;border-radius:16px;
-      display:flex;align-items:center;justify-content:center;font-size:24px;
-      background:#ffe0b2;color:#e65100;
+      width:48px;height:48px;border-radius:50%;margin-bottom:12px;
+      display:flex;align-items:center;justify-content:center;
+      background:#dff2e7;
     }
-    .home-tile.tile-custom .home-tile-icon{background:#b2f2e5;color:#00695c;}
-    .home-tile-body{flex:1;min-width:0;}
-    .home-tile-title{font-weight:700;font-size:15.5px;color:var(--ink);margin-bottom:2px;}
+    .home-tile.tile-custom .home-tile-icon{background:#dceefb;}
+    .home-tile-icon svg{width:24px;height:24px;}
+    .home-tile-title{font-weight:700;font-size:15px;color:var(--ink);margin-bottom:6px;line-height:1.25;}
     .home-tile-desc{font-size:12px;color:var(--ink-soft);line-height:1.4;}
-    .home-tile-arrow{font-size:18px;color:var(--ink-soft);flex-shrink:0;}
-    /* --- tombol ringkas Telegram & Bayar Pesanan, di bawah kartu Custom --- */
-    .home-actionlinks{display:flex;flex-direction:column;gap:8px;}
-    .home-actionlink{
-      display:flex;align-items:center;justify-content:center;gap:8px;
-      height:46px;border-radius:10px;border:1px solid var(--line);background:var(--card);
-      font-weight:700;font-size:13px;color:var(--ink);text-decoration:none;cursor:pointer;
+    .home-tile-cta{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:11px 14px;font-weight:700;font-size:13px;
+      background:#e9f6ef;color:var(--primary-green);
     }
-    .home-actionlink:active{background:#fafafa;}
-    .home-actionlink-icon{display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;}
-    .home-actionlink.telegram{border-color:#a9d9f1;color:#0c6198;}
-    .home-actionlink.atm{border-color:#bfe0c7;color:#188038;}
+    .home-tile.tile-custom .home-tile-cta{background:#e8f2fc;color:#1976d2;}
+    .home-tile-cta svg{width:16px;height:16px;}
+
+    /* --- Aksi cepat --- */
+    .home-section-label{font-size:14px;font-weight:700;color:var(--ink);}
+    .home-actionlist{display:flex;flex-direction:column;gap:10px;margin-top:-10px;}
+    .home-actionrow{
+      display:flex;align-items:center;gap:12px;width:100%;min-height:60px;
+      background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px 14px;
+      text-align:left;cursor:pointer;text-decoration:none;
+      box-shadow:0 2px 8px rgba(0,0,0,.035);
+    }
+    .home-actionrow:active{background:#fafafa;}
+    .home-actionrow-icon{
+      flex-shrink:0;width:38px;height:38px;border-radius:11px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .home-actionrow-icon svg{width:19px;height:19px;}
+    .home-actionrow-label{flex:1;min-width:0;font-weight:700;font-size:14px;}
+    .home-actionrow-sub{font-size:11.5px;color:var(--ink-soft);font-weight:500;flex-shrink:0;margin-right:6px;}
+    .home-actionrow-arrow{flex-shrink:0;font-size:19px;color:var(--ink-soft);}
+    .home-actionrow.tg .home-actionrow-icon{background:#1e96e8;}
+    .home-actionrow.tg .home-actionrow-label{color:#1976d2;}
+    .home-actionrow.bp .home-actionrow-icon{background:#00845f;}
+    .home-actionrow.bp .home-actionrow-label{color:var(--primary-green);}
+    .home-actionrow.calc .home-actionrow-icon{background:#7c4fd1;}
+    .home-actionrow.calc .home-actionrow-label{color:var(--ink);}
+    .home-actionrow.reset{border:1.5px solid #f2b3ab;}
+    .home-actionrow.reset .home-actionrow-icon{background:var(--danger-red);}
+    .home-actionrow.reset .home-actionrow-label{color:var(--danger-red);}
+    .home-actionrow.reset .home-actionrow-arrow{color:var(--danger-red);}
 
     /* --- back bar di dalam panel (mobile) --- */
     .mobile-only{display:flex;}
@@ -600,7 +652,7 @@
       flex:1;background:var(--card);border:1px solid var(--line);border-radius:9px;
       padding:9px 4px;font-size:10.5px;color:var(--ink-soft);cursor:pointer;font-weight:700;
     }
-    .wiz-dots button.on{border-color:var(--primary-blue);color:var(--primary-blue);background:#e3f0fa;}
+    .wiz-dots button.on{border-color:var(--primary-green);color:var(--primary-green);background:#e3f0fa;}
     .wiz-dots button.done{color:var(--ink);border-color:#c8ccd1;}
     .wiz-title{font-weight:700;font-size:15px;margin-bottom:16px;}
     .wiz-field label{display:block;font-size:12.5px;color:var(--ink-soft);margin:16px 0 6px;}
@@ -621,14 +673,14 @@
     .wiz-preview-badges{display:flex;gap:6px;flex-wrap:wrap;}
     .wiz-preview-badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:16px;font-family:'Roboto Mono',monospace;}
     .wiz-preview-badge.badge-qty{background:#e6f4ea;color:var(--accent-green);}
-    .wiz-preview-badge.badge-est{background:#e3f0fa;color:var(--primary-blue);}
+    .wiz-preview-badge.badge-est{background:#e3f0fa;color:var(--primary-green);}
     .wiz-field select, .wiz-field input, .wiz-section select, .wiz-section input{
       width:100%;height:52px;border-radius:10px;border:1px solid var(--line);font-size:16px;padding:0 14px;
     }
     .wiz-field input.wiz-qty-big, .wiz-section input.wiz-qty-big{height:56px;font-size:24px;font-weight:700;text-align:center;}
     .wiz-hint{font-size:12.5px;color:var(--ink-soft);margin:6px 2px 0;}
     .wiz-btn-primary{
-      width:100%;height:52px;border:none;border-radius:10px;background:var(--primary-blue);color:#fff;
+      width:100%;height:52px;border:none;border-radius:10px;background:var(--primary-green);color:#fff;
       font-weight:700;font-size:15px;margin-top:22px;cursor:pointer;
     }
     .wiz-btn-dash{
@@ -671,12 +723,12 @@
     }
     .wiz-pcard{
       position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;
-      padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-start;
+      padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
       touch-action:pan-y;user-select:none;
     }
     .wiz-pcard-body{flex:1;min-width:0;cursor:pointer;}
-    .wiz-pcard-nameline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-    .wiz-pcard-name{font-weight:700;font-size:14.5px;}
+    .wiz-pcard-nameline{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;}
+    .wiz-pcard-name{font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
     .wiz-qty-badge{
       display:inline-block;font-weight:700;font-size:13px;color:var(--accent-green);
       background:#e6f4ea;padding:4px 12px;border-radius:20px;white-space:nowrap;
@@ -697,7 +749,7 @@
       opacity:.7;
     }
     .wiz-disclose{
-      display:flex;align-items:center;gap:6px;margin-top:18px;color:var(--primary-blue);
+      display:flex;align-items:center;gap:6px;margin-top:18px;color:var(--primary-green);
       font-size:13.5px;font-weight:700;cursor:pointer;
     }
     .wiz-disclose .arrow{transition:.15s;display:inline-block;}
@@ -719,8 +771,8 @@
       display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;
     }
     .wiz-totalcard .l{font-weight:700;font-size:14.5px;color:var(--ink);}
-    .wiz-totalcard .v{font-weight:800;font-size:19px;color:var(--primary-blue);font-family:'Roboto Mono',monospace;}
-    .wiz-copyable{cursor:pointer;border-bottom:1.5px dotted var(--primary-blue);padding-bottom:1px;}
+    .wiz-totalcard .v{font-weight:800;font-size:19px;color:var(--primary-green);font-family:'Roboto Mono',monospace;}
+    .wiz-copyable{cursor:pointer;border-bottom:1.5px dotted var(--primary-green);padding-bottom:1px;}
     .wiz-copyable:active{opacity:.6;}
     .wiz-stamp{
       background:#fdece9;border:1px solid #f3b7ac;color:var(--danger-red);border-radius:10px;
@@ -731,7 +783,7 @@
       flex:1;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
       font-weight:700;font-size:12px;cursor:pointer;
     }
-    .wiz-actionbtns button.primary{background:var(--primary-blue);color:#fff;border:none;}
+    .wiz-actionbtns button.primary{background:var(--primary-green);color:#fff;border:none;}
 
     /* --- Bar aksi setelah pesanan dikonfirmasi (Unduh/Bagikan/Salin) DIPAKU
        ke bawah LAYAR (bukan cuma sticky di dalam wizard), karena preview
@@ -746,14 +798,6 @@
     .wiz-confirmed-actions .wiz-actionbtns{margin-top:0;}
     .wiz-confirmed-actions .wiz-btn-ghost{margin-top:0;}
     body.nota-confirmed{padding-bottom:190px;}
-
-    /* --- tombol Kalkulator & Reset di beranda --- */
-    .home-links{display:flex;gap:10px;margin-top:0;}
-    .home-links button{
-      flex:1;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
-      font-weight:700;font-size:13.5px;color:var(--ink-soft);cursor:pointer;text-decoration:none;
-    }
-    .home-links button.danger{color:var(--danger-red);border-color:#f3b7ac;}
   }
 
   /* ================================================================
@@ -800,7 +844,7 @@
     padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:var(--bg);
     font-size:13px;font-weight:700;color:var(--ink-soft);cursor:pointer;
   }
-  .md-tab.active{border-color:var(--primary-blue);color:var(--primary-blue);background:#e3f0fa;}
+  .md-tab.active{border-color:var(--primary-green);color:var(--primary-green);background:#e3f0fa;}
   .md-section{display:none;}
   .md-section.active{display:block;}
   .md-card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
@@ -816,8 +860,8 @@
   }
   .md-row-del{background:none;border:none;color:var(--danger-red);font-size:16px;cursor:pointer;}
   .md-addrow{
-    margin-top:12px;width:100%;height:44px;border-radius:9px;border:1.5px dashed var(--primary-blue);
-    background:#e3f0fa;color:var(--primary-blue);font-weight:700;font-size:13px;cursor:pointer;
+    margin-top:12px;width:100%;height:44px;border-radius:9px;border:1.5px dashed var(--primary-green);
+    background:#e3f0fa;color:var(--primary-green);font-weight:700;font-size:13px;cursor:pointer;
   }
   .md-eksrow{display:grid;grid-template-columns:1fr 40px;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);}
   .md-eksrow:last-child{border-bottom:none;}
@@ -828,7 +872,7 @@
     height:42px;padding:0 18px;border-radius:9px;border:1px solid var(--line);background:var(--card);
     font-weight:700;font-size:12.5px;cursor:pointer;margin-top:14px;margin-right:8px;
   }
-  .md-btn.primary{background:var(--primary-blue);color:#fff;border:none;}
+  .md-btn.primary{background:var(--primary-green);color:#fff;border:none;}
   .md-btn.danger{color:var(--danger-red);border-color:#f3b7ac;}
   .md-note{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
   @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
@@ -870,42 +914,88 @@
 
   <!-- ================= HOME SCREEN (khusus mobile) ================= -->
   <div class="home-screen" id="home-screen">
+    <div class="home-topbar">
+      <div class="home-logo">
+        <img src="habit-logo.png" alt="">
+        <span class="home-logo-text">Habit</span>
+      </div>
+      <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-help-btn">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/></svg>
+        Bantuan
+      </a>
+    </div>
+
     <div class="home-hero">
-      <h1>Mau buat nota apa?</h1>
-      <div class="sub">Pilih salah satu di bawah untuk mulai isi pesanan.</div>
+      <div class="home-hero-text">
+        <div class="home-hero-greet">Selamat datang 👋</div>
+        <h1>Mau buat nota <span class="accent">apa hari ini?</span></h1>
+        <div class="sub">Pilih jenis pesanan untuk mulai mengisi.</div>
+      </div>
+      <div class="home-hero-art">
+        <img src="habit-hero.png" alt="">
+      </div>
     </div>
-    <button class="home-tile tile-grosir" data-open-tab="penjualan">
-      <div class="home-tile-icon">📦</div>
-      <div class="home-tile-body">
-        <div class="home-tile-title">Penjualan (Grosir)</div>
-        <div class="home-tile-desc">Harga & diskon otomatis mengikuti jumlah pesanan.</div>
-      </div>
-      <div class="home-tile-arrow">›</div>
-    </button>
-    <button class="home-tile tile-custom" data-open-tab="custom">
-      <div class="home-tile-icon">🧾</div>
-      <div class="home-tile-body">
-        <div class="home-tile-title">Custom</div>
-        <div class="home-tile-desc">Isi item bebas satu per satu, diskon diatur manual.</div>
-      </div>
-      <div class="home-tile-arrow">›</div>
-    </button>
-    <div class="home-actionlinks">
-      <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-actionlink telegram">
-        <span class="home-actionlink-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><circle cx="12" cy="12" r="12" fill="#229ED9"/><path d="M17.7 7.3l-2.1 10.1c-.16.7-.58.87-1.17.54l-3.24-2.39-1.56 1.5c-.17.17-.32.32-.65.32l.23-3.3 5.98-5.4c.26-.23-.06-.36-.4-.13l-7.4 4.66-3.18-1c-.69-.21-.7-.69.14-1.02l12.44-4.8c.58-.21 1.08.14.9 1.02z" fill="#fff"/></svg>
+
+    <div class="home-cards">
+      <button class="home-tile tile-grosir" data-open-tab="penjualan">
+        <div class="home-tile-top">
+          <div class="home-tile-icon">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 7v10l8 4 8-4V7l-8-4z" fill="#00845f"/><path d="M4 7l8 4 8-4M12 11v10" stroke="#fff" stroke-width="1.3"/></svg>
+          </div>
+          <div class="home-tile-title">Penjualan (Grosir)</div>
+          <div class="home-tile-desc">Harga & diskon otomatis mengikuti jumlah pesanan.</div>
+        </div>
+        <div class="home-tile-cta">Mulai
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </button>
+      <button class="home-tile tile-custom" data-open-tab="custom">
+        <div class="home-tile-top">
+          <div class="home-tile-icon">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 2h12v20l-2.5-1.6L13 22l-2.5-1.6L8 22l-2-1.6V2z" fill="#eef6ff" stroke="#1976d2" stroke-width="1.3"/><path d="M9 8h6M9 12h6M9 16h3" stroke="#1976d2" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="home-tile-title">Custom</div>
+          <div class="home-tile-desc">Isi item bebas satu per satu, diskon diatur manual.</div>
+        </div>
+        <div class="home-tile-cta">Mulai
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </button>
+    </div>
+
+    <div class="home-section-label">Aksi cepat</div>
+    <div class="home-actionlist">
+      <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-actionrow tg">
+        <span class="home-actionrow-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M17.7 7.3l-2.1 10.1c-.16.7-.58.87-1.17.54l-3.24-2.39-1.56 1.5c-.17.17-.32.32-.65.32l.23-3.3 5.98-5.4c.26-.23-.06-.36-.4-.13l-7.4 4.66-3.18-1c-.69-.21-.7-.69.14-1.02l12.44-4.8c.58-.21 1.08.14.9 1.02z" fill="#fff"/></svg>
         </span>
-        Buka Payment Telegram
+        <span class="home-actionrow-label">Buka Payment Telegram</span>
+        <span class="home-actionrow-arrow">›</span>
       </a>
-      <a href="https://bayarpesanan.com/cs" target="_blank" rel="noopener" class="home-actionlink atm">
-        <span class="home-actionlink-icon" aria-hidden="true">🏧</span>
-        Bayar Pesanan
+      <a href="https://bayarpesanan.com/cs" target="_blank" rel="noopener" class="home-actionrow bp">
+        <span class="home-actionrow-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M3 10h18" stroke="#fff" stroke-width="1.5"/><path d="M6 14.5h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </span>
+        <span class="home-actionrow-label">Bayar Pesanan</span>
+        <span class="home-actionrow-arrow">›</span>
       </a>
+      <button type="button" class="home-actionrow calc" id="home-link-calc">
+        <span class="home-actionrow-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M8 7h8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="8.3" cy="12" r="1" fill="#fff"/><circle cx="12" cy="12" r="1" fill="#fff"/><circle cx="15.7" cy="12" r="1" fill="#fff"/><circle cx="8.3" cy="15.6" r="1" fill="#fff"/><circle cx="12" cy="15.6" r="1" fill="#fff"/><circle cx="15.7" cy="15.6" r="1" fill="#fff"/></svg>
+        </span>
+        <span class="home-actionrow-label">Kalkulator</span>
+        <span class="home-actionrow-arrow">›</span>
+      </button>
+      <button type="button" class="home-actionrow reset" id="home-link-reset">
+        <span class="home-actionrow-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="home-actionrow-label">Reset</span>
+        <span class="home-actionrow-sub">Hapus semua data input dan mulai baru</span>
+        <span class="home-actionrow-arrow">›</span>
+      </button>
     </div>
-    <div class="home-links">
-      <button type="button" id="home-link-calc">🧮 Kalkulator</button>
-      <button type="button" id="home-link-reset" class="danger">↺ Reset</button>
-    </div>
+
     <div style="text-align:center;">
       <button type="button" id="home-link-changelog" style="background:none;border:none;color:var(--ink-soft);font-size:11.5px;text-decoration:underline;">Riwayat Update</button>
     </div>
@@ -1249,7 +1339,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Rp</span> &nbsp;·&nbsp; versi <span id="app-current-version">1.32.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.0.0</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
     </div>
   </footer>
@@ -1281,7 +1371,22 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.32.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.0.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Rebranding penuh ke "Habit"</b> — nama aplikasi, logo, ikon PWA, dan judul halaman semuanya diganti. Data bisnis (PT. Halawa Bintang Utama, rekening bank, daftar produk) tidak berubah — cuma identitas aplikasinya yang di-rebrand.</li>
+            <li>Beranda (HP) dirombak total mengikuti desain baru: header logo + tombol Bantuan, ilustrasi hero, kartu Grosir/Custom dengan tombol "Mulai →" berwarna di footer kartu, daftar "Aksi cepat" dengan ikon berwarna per-item (Telegram biru, Bayar Pesanan hijau, Kalkulator ungu), dan <b>Reset kini diisolasi</b> dari navigasi utama (border merah tersendiri + keterangan "Hapus semua data input dan mulai baru") supaya tidak tersenggol tidak sengaja.</li>
+            <li>Warna utama aplikasi (tombol, Grand Total, badge, dll) diganti dari biru ke <b>hijau Habit</b>.</li>
+            <li>Footer info perusahaan direstyle jadi kartu dengan ikon kalender.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.33.0</div>
+          <ul>
+            <li>Perbaikan bug: nama produk yang panjang bisa membuat badge jumlah turun ke baris ke-2, jadi kelihatan tidak center dibanding ikon Edit di sampingnya. Sekarang nama produk yang kepanjangan dipotong dengan "..." supaya badge selalu tetap di baris yang sama.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.32.0</div>
           <ul>
             <li>Badge jumlah ("12 Karton") di kartu produk langkah "Input Penjualan" diperbesar &amp; dipindah nempel di sebelah nama produk (bukan lagi di bawahnya).</li>
             <li>Tombol "Edit" (teks) diganti jadi tombol ikon pensil 40×40px — target ketuknya lebih besar, lebih gampang kena jari.</li>
@@ -1899,8 +2004,8 @@ function initDate(){
   const besok = new Date(d.getTime()+86400000);
   const hariBesok = besok.toLocaleDateString("id-ID",{weekday:"long"});
   const jam = d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-  document.getElementById("berlaku").textContent =
-    `Daftar rincian pemesanan ini berlaku sampai hari ${hariBesok}, ${besok.getDate().toString().padStart(2,"0")} ${d.toLocaleDateString("id-ID",{month:"short"})} ${d.getFullYear()} | ${jam} WIB`;
+  document.getElementById("berlaku").innerHTML =
+    `Daftar rincian pemesanan ini berlaku sampai<div class="footer-datebox"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#66717d" stroke-width="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="#66717d" stroke-width="1.5" stroke-linecap="round"/></svg><span class="footer-dateval">hari ${hariBesok}, ${besok.getDate().toString().padStart(2,"0")} ${d.toLocaleDateString("id-ID",{month:"short"})} ${d.getFullYear()} | ${jam} WIB</span></div>`;
 }
 
 /* ============ tier ekspedisi pembulatan ============
@@ -2369,7 +2474,7 @@ async function renderCanvas(){
 function downloadCanvas(canvas){
   const tab = document.querySelector(".tab-btn.active").dataset.tab;
   const link = document.createElement("a");
-  link.download = `nota-halawa-${tab}-${Date.now()}.png`;
+  link.download = `habit-nota-${tab}-${Date.now()}.png`;
   link.href = canvas.toDataURL("image/png");
   link.click();
 }
@@ -2398,7 +2503,7 @@ document.getElementById("btn-share").addEventListener("click", async ()=>{
     const file = new File([blob], `nota-halawa-${tab}-${Date.now()}.png`, {type:"image/png"});
 
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file], title:"Rincian Pemesanan (Rp)"});
+      await navigator.share({files:[file], title:"Rincian Pemesanan (Habit)"});
       showMsg("Dialog share terbuka — pilih WhatsApp/chat tujuan.");
     } else if(navigator.share){
       // sebagian browser lama punya navigator.share tapi tidak dukung file
@@ -3448,8 +3553,8 @@ if ("serviceWorker" in navigator) {
           <div class="wiz-pcard-actions">
             <button type="button" class="wiz-pcard-edit" data-editrow="${i}" aria-label="Edit produk ${prod}">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="var(--primary-blue)"/>
-                <path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="var(--primary-blue)"/>
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="var(--primary-green)"/>
+                <path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="var(--primary-green)"/>
               </svg>
             </button>
           </div>
@@ -3902,7 +4007,7 @@ if ("serviceWorker" in navigator) {
     if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
       setPin(DEFAULT_PIN);
       pinErr.textContent = "PIN sudah direset ke PIN bawaan.";
-      pinErr.style.color = "var(--primary-blue)";
+      pinErr.style.color = "var(--primary-green)";
     }
   });
   document.getElementById("md-pin-submit").addEventListener("click", submitPin);
@@ -4043,7 +4148,7 @@ if ("serviceWorker" in navigator) {
     if(!/^\d{6}$/.test(newV)){ errEl.textContent = "PIN baru harus 6 digit angka."; return; }
     if(newV !== new2){ errEl.textContent = "Konfirmasi PIN baru tidak cocok."; return; }
     setPin(newV);
-    errEl.style.color = "var(--primary-blue)";
+    errEl.style.color = "var(--primary-green)";
     errEl.textContent = "PIN berhasil diganti.";
     document.getElementById("md-pin-old").value = "";
     document.getElementById("md-pin-new").value = "";
@@ -4053,7 +4158,7 @@ if ("serviceWorker" in navigator) {
     if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
       setPin(DEFAULT_PIN);
       const errEl = document.getElementById("md-pin-change-err");
-      errEl.style.color = "var(--primary-blue)";
+      errEl.style.color = "var(--primary-green)";
       errEl.textContent = "PIN sudah direset ke PIN bawaan.";
     }
   });
