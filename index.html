@@ -2113,6 +2113,59 @@ function applySettingsToDom(){
 }
 loadSettings();
 applySettingsToDom();
+
+/* ============================================================
+   MASTER DATA ONLINE — sinkron Produk/Ekspedisi/Tampilan/PIN
+   lewat Cloudflare Worker (bukan cuma localStorage per-HP lagi).
+   ISI URL worker di bawah ini setelah kamu deploy worker.js.
+   Selama kosong, app tetap jalan pakai localStorage biasa
+   (offline fallback) — tidak akan error.
+   ============================================================ */
+const MASTER_DATA_WORKER_URL = "https://raspy-limit-ba21.rincian-pemesanan.workers.dev";
+
+async function fetchMasterDataFromServer(){
+  if(!MASTER_DATA_WORKER_URL) return null;
+  try{
+    const res = await fetch(MASTER_DATA_WORKER_URL + "/master-data");
+    if(!res.ok) return null;
+    return await res.json();
+  }catch(e){
+    console.log("Master data online gagal diambil (offline?):", e);
+    return null;
+  }
+}
+
+// Dipanggil setelah SETIAP perubahan Master Data tersimpan lokal —
+// mengirim seluruh dokumen (produk, ekspedisi, settings, pin) supaya
+// semua HP lain ambil versi terbaru ini juga. Gagal kirim (offline)
+// tidak membatalkan perubahan lokal, cuma ditandai lewat toast.
+window.__pushingMasterData = false;
+async function pushMasterDataToServer(){
+  if(!MASTER_DATA_WORKER_URL) return;
+  if(window.__pushingMasterData) return; // hindari kirim dobel bertumpuk
+  window.__pushingMasterData = true;
+  try{
+    const body = {
+      products: PRODUCTS,
+      ekspedisi: EKSPEDISI,
+      settings: SETTINGS,
+      pin: (window.__getCurrentPin ? window.__getCurrentPin() : undefined),
+    };
+    const res = await fetch(MASTER_DATA_WORKER_URL + "/master-data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if(!res.ok){
+      showToast("Gagal sinkron ke server (perubahan tetap tersimpan di HP ini).");
+    }
+  }catch(e){
+    console.log("Master data online gagal dikirim:", e);
+    showToast("Gagal sinkron ke server (offline? perubahan tetap tersimpan di HP ini).");
+  }finally{
+    window.__pushingMasterData = false;
+  }
+}
 const REGIONS = [
   ["JAWA TIMUR",3500],["JAWA TENGAH",4250],["JAWA BARAT",5000],["JAKARTA",null],
   ["BALI",5250],["SUMATERA BARAT",9000],["SUMATERA UTARA",null],["SUMATERA SELATAN",6500],
@@ -4364,10 +4417,33 @@ if ("serviceWorker" in navigator) {
     buildRows("penjualan"); buildRows("custom");
     buildEkspedisi("penjualan"); buildEkspedisi("custom");
     calc("penjualan"); calc("custom");
+    pushMasterDataToServer();
   }
   loadMasterData();
   sortEkspedisi();
   syncPenjualanSlice();
+
+  // Tarik versi terbaru dari server (GitHub lewat worker) begitu app dibuka.
+  // Kalau berhasil, timpa data lokal & render ulang. Kalau gagal (offline/
+  // belum diisi URL worker), app tetap jalan pakai data lokal yang sudah ada.
+  window.__getCurrentPin = getPin;
+  (async function pullMasterDataOnStart(){
+    const remote = await fetchMasterDataFromServer();
+    if(!remote) return;
+    if(Array.isArray(remote.products) && remote.products.length) PRODUCTS.splice(0, PRODUCTS.length, ...remote.products);
+    if(Array.isArray(remote.ekspedisi) && remote.ekspedisi.length) EKSPEDISI.splice(0, EKSPEDISI.length, ...remote.ekspedisi);
+    if(remote.settings && typeof remote.settings === "object") Object.assign(SETTINGS, remote.settings);
+    if(typeof remote.pin === "string" && /^\d{6}$/.test(remote.pin)) setPin(remote.pin);
+    sortEkspedisi();
+    syncPenjualanSlice();
+    saveMasterData();
+    saveSettings();
+    applySettingsToDom();
+    buildRows("penjualan"); buildRows("custom");
+    buildEkspedisi("penjualan"); buildEkspedisi("custom");
+    calc("penjualan"); calc("custom");
+    if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
+  })();
 
   /* ---------- toggle Autocomplete (Tampilan) ---------- */
   const toggleAutoProd = document.getElementById("md-toggle-autoprod");
@@ -4379,12 +4455,14 @@ if ("serviceWorker" in navigator) {
     saveSettings();
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
     showToast(SETTINGS.autocompleteProduk ? "Autocomplete Produk diaktifkan." : "Autocomplete Produk dinonaktifkan.");
+    pushMasterDataToServer();
   });
   toggleAutoEksp.addEventListener("change", ()=>{
     SETTINGS.autocompleteEkspedisi = toggleAutoEksp.checked;
     saveSettings();
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
     showToast(SETTINGS.autocompleteEkspedisi ? "Autocomplete Ekspedisi diaktifkan." : "Autocomplete Ekspedisi dinonaktifkan.");
+    pushMasterDataToServer();
   });
 
   /* ---------- link Bantuan (Tampilan) ---------- */
@@ -4404,6 +4482,7 @@ if ("serviceWorker" in navigator) {
     bantuanErr.style.color = "var(--primary-green)";
     bantuanErr.textContent = "✓ Tersimpan — tombol Bantuan sudah diarahkan ke link ini.";
     showToast("Link Bantuan disimpan.");
+    pushMasterDataToServer();
   });
 
   /* ---------- batas tier diskon Grosir (Rumus) ---------- */
@@ -4432,6 +4511,7 @@ if ("serviceWorker" in navigator) {
     saveSettings();
     calc("penjualan"); calc("custom");
     showToast("Batas tier disimpan — perhitungan sudah diperbarui.");
+    pushMasterDataToServer();
   });
 
   /* ---------- buka/tutup ---------- */
@@ -4464,6 +4544,7 @@ if ("serviceWorker" in navigator) {
       setPin(DEFAULT_PIN);
       pinErr.textContent = "PIN sudah direset ke PIN bawaan.";
       pinErr.style.color = "var(--primary-green)";
+      pushMasterDataToServer();
     }
   });
   document.getElementById("md-pin-submit").addEventListener("click", submitPin);
@@ -4616,6 +4697,7 @@ if ("serviceWorker" in navigator) {
     document.getElementById("md-pin-old").value = "";
     document.getElementById("md-pin-new").value = "";
     document.getElementById("md-pin-new2").value = "";
+    pushMasterDataToServer();
   });
   document.getElementById("md-pin-reset-btn").addEventListener("click", ()=>{
     if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
@@ -4623,6 +4705,7 @@ if ("serviceWorker" in navigator) {
       const errEl = document.getElementById("md-pin-change-err");
       errEl.style.color = "var(--primary-green)";
       errEl.textContent = "PIN sudah direset ke PIN bawaan.";
+      pushMasterDataToServer();
     }
   });
 })();
