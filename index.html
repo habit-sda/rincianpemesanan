@@ -25,9 +25,11 @@
     --paper-dark:#f8f9fa;
     --ink:#1a1a1a;
     --ink-soft:#5f6368;
-    --accent-blue:#1a73e8;
+    --accent-green:#188038;
     --danger-red:#c5221f;
-    --ledger-green:#188038;
+    --primary-blue:#0c4a78;
+    --status-green:#188038;
+    --status-blue:#1a73e8;
     --line:#d3d6db;
     --card:#ffffff;
     --white-ish:#ffffff;
@@ -67,7 +69,7 @@
     padding:9px 20px;cursor:pointer;color:var(--ink-soft);
     border-radius:4px 4px 0 0;position:relative;top:1px;
   }
-  .tab-btn.active{background:var(--card);color:var(--ink);border-bottom:2px solid var(--accent-blue);font-weight:700;}
+  .tab-btn.active{background:var(--card);color:var(--ink);border-bottom:2px solid var(--accent-green);font-weight:700;}
   .reset-btn{
     margin-left:auto;color:var(--danger-red);font-weight:700;border-color:var(--line);
     background:var(--paper-dark);letter-spacing:.03em;
@@ -83,7 +85,7 @@
     background:var(--card);border:1px solid var(--line);color:var(--ink);
     padding:7px 14px;border-radius:4px;cursor:pointer;
   }
-  .action-btn:hover{background:var(--paper-dark);border-color:var(--accent-blue);}
+  .action-btn:hover{background:var(--paper-dark);border-color:var(--accent-green);}
   .action-btn:disabled{opacity:.5;cursor:wait;}
   .toolbar-msg{font-size:12px;color:var(--ink-soft);}
 
@@ -141,16 +143,16 @@
   .calc-actionrow{display:flex;gap:6px;padding:8px 10px;background:var(--paper-dark);border-bottom:1px solid var(--line);}
   .calc-actbtn{flex:1;border:none;border-radius:6px;padding:8px 0;font-size:11.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
   .calc-clearbtn{background:#fce8e6;color:var(--danger-red);}
-  .calc-copybtn{background:var(--ledger-green);color:#fff;}
+  .calc-copybtn{background:var(--primary-blue);color:#fff;}
   .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);padding:1px;}
   .calc-key{
     border:none;background:#fff;padding:14px 0;font-size:15px;font-weight:600;color:var(--ink);
     cursor:pointer;font-family:'Roboto Mono',monospace;
   }
   .calc-key:active{background:#eef0f2;}
-  .calc-fn{background:#f1f5fe;color:var(--ink-soft);font-family:'Roboto',sans-serif;font-size:13px;}
-  .calc-op{background:#f1f5fe;color:var(--accent-blue);}
-  .calc-eq{background:var(--ledger-green);color:#fff;}
+  .calc-fn{background:#e6f4ea;color:var(--ink-soft);font-family:'Roboto',sans-serif;font-size:13px;}
+  .calc-op{background:#e6f4ea;color:var(--accent-green);}
+  .calc-eq{background:var(--primary-blue);color:#fff;}
   .calc-zero{grid-column:span 1;}
   .calc-msg{font-size:11px;color:var(--ink-soft);text-align:center;padding:6px 10px 10px;min-height:26px;}
 
@@ -164,10 +166,10 @@
   .confirm-actionrow{display:flex;gap:8px;padding:0 16px 16px;}
   .confirm-actionrow button{flex:1;border:none;border-radius:6px;padding:10px 0;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
   .confirm-okbtn{background:var(--danger-red);color:#fff;}
-  #update-apply.confirm-okbtn{background:var(--ledger-green);}
+  #update-apply.confirm-okbtn{background:var(--primary-blue);}
 
   .changelog-link{
-    background:none;border:none;color:var(--accent-blue);font-size:inherit;text-decoration:underline;
+    background:none;border:none;color:var(--accent-green);font-size:inherit;text-decoration:underline;
     cursor:pointer;padding:0;font-family:'Roboto',sans-serif;
   }
   .changelog-popup{width:360px;max-height:80vh;display:flex;flex-direction:column;}
@@ -176,7 +178,7 @@
   .changelog-item:last-child{border-bottom:none;}
   .changelog-ver{font-family:'Roboto Mono',monospace;font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:6px;}
   .changelog-tag{
-    display:inline-block;background:var(--ledger-green);color:#fff;font-size:9.5px;font-weight:700;
+    display:inline-block;background:var(--primary-blue);color:#fff;font-size:9.5px;font-weight:700;
     font-family:'Roboto',sans-serif;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle;
   }
   .changelog-item ul{margin:0;padding-left:18px;}
@@ -192,7 +194,7 @@
      berkala berikutnya, atau reload manual browser). */
   .update-popup{width:320px;}
   .update-popup-body{padding:14px 16px 6px;}
-  .update-popup-version{font-family:'Roboto Mono',monospace;font-weight:700;font-size:15px;color:var(--ledger-green);margin-bottom:6px;}
+  .update-popup-version{font-family:'Roboto Mono',monospace;font-weight:700;font-size:15px;color:var(--primary-blue);margin-bottom:6px;}
   .update-popup-sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;}
   .update-popup-list{margin:0;padding-left:18px;}
   .update-popup-list li{font-size:12.5px;color:var(--ink);line-height:1.6;margin-bottom:3px;}
@@ -259,12 +261,26 @@
   td.num, th.num{text-align:right;font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;white-space:nowrap;}
   td.center{text-align:center;color:var(--ink-soft);font-family:'Roboto Mono',monospace;}
 
+  /* --- Kolom Diskon (Custom): field asli tetap simpan nilai mentah
+     (mis. "0.23" / "55000") supaya semua kode lain (hitung, simpan draft,
+     dst) tidak perlu diubah — cuma TAMPILANNYA yang ditimpa jadi "23 %"
+     lewat overlay ini saat field sedang tidak difokus. --- */
+  .diskon-wrap{position:relative;display:block;}
+  .diskon-wrap input.diskon{width:100%;}
+  .diskon-fmt{
+    position:absolute;inset:0;display:none;align-items:center;justify-content:flex-end;
+    background:#fff;pointer-events:none;font-family:'Roboto Mono',monospace;
+    font-size:12.5px;padding:0 7px;color:var(--ink);
+  }
+  .diskon-wrap.show-fmt .diskon-fmt{display:flex;}
+  .diskon-wrap.show-fmt input.diskon{color:transparent;}
+
   select, input[type=number], input[type=text], input[type=date]{
     font-family:'Roboto',sans-serif;font-size:12.5px;
     background:#fff;border:1px solid var(--line);border-radius:3px;
     padding:4px 6px;color:var(--ink);width:100%;min-width:0;
   }
-  select:focus, input:focus{outline:2px solid var(--accent-blue);outline-offset:-1px;border-color:var(--accent-blue);}
+  select:focus, input:focus{outline:2px solid var(--accent-green);outline-offset:-1px;border-color:var(--accent-green);}
   input[readonly]{background:transparent;border-color:transparent;color:var(--ink-soft);padding-left:2px;}
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
@@ -291,8 +307,8 @@
   .combo-list.show{display:block;}
   .combo-item{padding:10px 12px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line);}
   .combo-item:last-child{border-bottom:none;}
-  .combo-item:hover, .combo-item.active{background:#e6f4ea;}
-  .combo-item b{color:var(--ledger-green);}
+  .combo-item:hover, .combo-item.active{background:#e3f0fa;}
+  .combo-item b{color:var(--primary-blue);}
   .combo-empty{padding:12px;font-size:12px;color:var(--ink-soft);text-align:center;}
 
   .receipt{
@@ -305,7 +321,7 @@
   }
   .row .lbl{color:var(--ink);}
   .row .val{font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;}
-  .row.total .val{color:var(--ledger-green);}
+  .row.total .val{color:var(--primary-blue);}
   .row input{max-width:150px;text-align:right;}
 
   /* ============ Status bayar berwarna ============
@@ -313,8 +329,8 @@
      Supaya status langsung tertangkap mata tanpa perlu baca teksnya. */
   .status-row .lbl, .status-row .val{font-weight:700;transition:color .15s;}
   .status-row.status-kurang .lbl, .status-row.status-kurang .val{color:var(--danger-red);}
-  .status-row.status-lunas .lbl, .status-row.status-lunas .val{color:var(--ledger-green);}
-  .status-row.status-kembalian .lbl, .status-row.status-kembalian .val{color:var(--accent-blue);}
+  .status-row.status-lunas .lbl, .status-row.status-lunas .val{color:var(--status-green);}
+  .status-row.status-kembalian .lbl, .status-row.status-kembalian .val{color:var(--status-blue);}
 
   .field{margin-bottom:10px;}
   .field label{display:block;font-size:11.5px;color:var(--ink);margin-bottom:4px;font-weight:600;}
@@ -329,9 +345,9 @@
   .ongkir-indicator-badge{
     display:none;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:9px;
     text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;flex-shrink:0;
-    background:var(--ledger-green);color:#fff;
+    background:var(--primary-blue);color:#fff;
   }
-  .ongkir-indicator.is-filled{border-color:var(--ledger-green);background:#f2f8f2;}
+  .ongkir-indicator.is-filled{border-color:var(--primary-blue);background:#eaf4fb;}
   .ongkir-indicator.is-filled .ongkir-indicator-badge{display:inline-block;}
   .ongkir-indicator.is-filled input{font-weight:700;}
   .ongkir-indicator-red.is-filled{border-color:var(--danger-red);background:#fdecea;}
@@ -363,7 +379,7 @@
   footer b{color:var(--ink);}
 
   .note{
-    font-size:11px;color:var(--ink-soft);background:var(--paper-dark);border-left:3px solid var(--accent-blue);
+    font-size:11px;color:var(--ink-soft);background:var(--paper-dark);border-left:3px solid var(--accent-green);
     padding:8px 12px;border-radius:0;margin-top:12px;line-height:1.5;
   }
 
@@ -497,6 +513,15 @@
     /* Latar putih bersih khusus mobile (desktop tetap abu muda seperti semula) */
     body{background:#ffffff;}
     .wrap{background:#ffffff;}
+    /* Beranda dapat latar gradasi biru "Deep Ocean" tersendiri — kartu &
+       tombol di atasnya tetap putih supaya kontras terjaga. */
+    body.showing-home{background:linear-gradient(160deg,#0c4a78 0%,#1a6fa8 100%);}
+    body.showing-home .wrap{background:transparent;}
+    body.showing-home .home-hero h1{color:#ffffff;}
+    body.showing-home .home-hero .sub{color:#cfe4f2;}
+    body.showing-home footer{color:#cfe4f2;}
+    body.showing-home footer b{color:#ffffff;}
+    body.showing-home footer #md-secret-tap{color:#cfe4f2;}
 
     /* Header, tab atas, toolbar aksi, dan referensi ongkir wilayah adalah
        "chrome" desktop — di mobile digantikan sepenuhnya oleh Beranda +
@@ -505,6 +530,8 @@
     header, .tabs, .toolbar, details.region{display:none;}
     footer{display:none;}
     body.showing-home footer{display:block;}
+    .footer-changelog-wrap{display:none;}
+    footer{margin-top:12px;line-height:1.55;}
     body.showing-home .tabs,
     body.showing-home .toolbar,
     body.showing-home .panel,
@@ -512,7 +539,7 @@
     body.showing-home .home-screen{display:flex;}
 
     .home-screen{
-      flex-direction:column;gap:14px;padding:calc(18px + env(safe-area-inset-top)) 2px 10px;
+      flex-direction:column;gap:10px;padding:calc(18px + env(safe-area-inset-top)) 2px 6px;
     }
     .home-hero{margin-bottom:4px;}
     .home-hero h1{font-size:21px;margin:0 0 3px;font-weight:700;}
@@ -534,8 +561,17 @@
     .home-tile-title{font-weight:700;font-size:15.5px;color:var(--ink);margin-bottom:2px;}
     .home-tile-desc{font-size:12px;color:var(--ink-soft);line-height:1.4;}
     .home-tile-arrow{font-size:18px;color:var(--ink-soft);flex-shrink:0;}
-    .home-links{display:flex;justify-content:center;gap:14px;margin-top:6px;font-size:11.5px;color:var(--ink-soft);}
-    .home-links button{background:none;border:none;color:var(--ink-soft);text-decoration:underline;font-size:inherit;padding:4px;}
+    /* --- tombol ringkas Telegram & Bayar Pesanan, di bawah kartu Custom --- */
+    .home-actionlinks{display:flex;flex-direction:column;gap:8px;}
+    .home-actionlink{
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      height:46px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+      font-weight:700;font-size:13px;color:var(--ink);text-decoration:none;cursor:pointer;
+    }
+    .home-actionlink:active{background:#fafafa;}
+    .home-actionlink-icon{display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;}
+    .home-actionlink.telegram{border-color:#a9d9f1;color:#0c6198;}
+    .home-actionlink.atm{border-color:#bfe0c7;color:#188038;}
 
     /* --- back bar di dalam panel (mobile) --- */
     .mobile-only{display:flex;}
@@ -559,12 +595,12 @@
     .wiz{display:flex;flex-direction:column;}
     .wiz-step{display:none;}
     .wiz-step.active{display:block;}
-    .wiz-dots{display:flex;gap:6px;justify-content:center;margin-bottom:16px;}
+    .wiz-dots{display:flex;gap:10px;justify-content:center;margin-bottom:16px;}
     .wiz-dots button{
       flex:1;background:var(--card);border:1px solid var(--line);border-radius:9px;
-      padding:8px 2px;font-size:10.5px;color:var(--ink-soft);cursor:pointer;font-weight:700;
+      padding:9px 4px;font-size:10.5px;color:var(--ink-soft);cursor:pointer;font-weight:700;
     }
-    .wiz-dots button.on{border-color:var(--ledger-green);color:var(--ledger-green);background:#e6f4ea;}
+    .wiz-dots button.on{border-color:var(--primary-blue);color:var(--primary-blue);background:#e3f0fa;}
     .wiz-dots button.done{color:var(--ink);border-color:#c8ccd1;}
     .wiz-title{font-weight:700;font-size:15px;margin-bottom:16px;}
     .wiz-field label{display:block;font-size:12.5px;color:var(--ink-soft);margin:16px 0 6px;}
@@ -584,20 +620,20 @@
     .wiz-preview-name{font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:7px;}
     .wiz-preview-badges{display:flex;gap:6px;flex-wrap:wrap;}
     .wiz-preview-badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:16px;font-family:'Roboto Mono',monospace;}
-    .wiz-preview-badge.blue{background:#d6ecfa;color:#0b5fa5;}
-    .wiz-preview-badge.green{background:#e6f4ea;color:var(--ledger-green);}
+    .wiz-preview-badge.badge-qty{background:#e6f4ea;color:var(--accent-green);}
+    .wiz-preview-badge.badge-est{background:#e3f0fa;color:var(--primary-blue);}
     .wiz-field select, .wiz-field input, .wiz-section select, .wiz-section input{
       width:100%;height:52px;border-radius:10px;border:1px solid var(--line);font-size:16px;padding:0 14px;
     }
     .wiz-field input.wiz-qty-big, .wiz-section input.wiz-qty-big{height:56px;font-size:24px;font-weight:700;text-align:center;}
     .wiz-hint{font-size:12.5px;color:var(--ink-soft);margin:6px 2px 0;}
     .wiz-btn-primary{
-      width:100%;height:52px;border:none;border-radius:10px;background:var(--ledger-green);color:#fff;
+      width:100%;height:52px;border:none;border-radius:10px;background:var(--primary-blue);color:#fff;
       font-weight:700;font-size:15px;margin-top:22px;cursor:pointer;
     }
     .wiz-btn-dash{
-      width:100%;height:52px;border-radius:10px;border:1.5px dashed var(--accent-blue);
-      background:#f1f5fe;color:var(--accent-blue);font-weight:700;font-size:14px;margin-top:8px;cursor:pointer;
+      width:100%;height:52px;border-radius:10px;border:1.5px dashed var(--accent-green);
+      background:#e6f4ea;color:var(--accent-green);font-weight:700;font-size:14px;margin-top:8px;cursor:pointer;
     }
     .wiz-btn-ghost{
       width:100%;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
@@ -612,15 +648,25 @@
       margin-top:18px;box-shadow:0 -8px 14px -10px rgba(0,0,0,.2);z-index:5;
     }
     .wiz-cta-bar .wiz-btn-primary, .wiz-cta-bar .wiz-btn-dash{margin-top:0;}
-    .wiz-cta-bar > * + *{margin-top:8px;}
+    .wiz-cta-bar > * + *{margin-top:14px;}
     .wiz-cta-bar .wiz-actionbtns{margin-top:0;}
     .wiz-empty{
       text-align:center;padding:30px 16px;color:var(--ink-soft);font-size:12.5px;
       border:1.5px dashed var(--line);border-radius:12px;
     }
     .wiz-pcard-wrap{position:relative;overflow:hidden;border-radius:12px;margin-bottom:10px;}
+    .wiz-subtle{font-size:12px;color:var(--ink-soft);margin:-10px 0 12px;}
+    /* --- Form tambah/edit produk, sekarang tampil INLINE di bawah daftar
+       produk tersimpan (bukan pindah ke layar terpisah) --- */
+    .wiz-inline-form{
+      background:#f8f9fa;border:1px solid var(--line);border-radius:12px;
+      padding:14px 14px 4px;margin:14px 0 4px;
+    }
+    .wiz-inline-form .wiz-title{font-size:13.5px;margin-bottom:12px;}
+    .wiz-inline-form-btns .wiz-btn-primary{margin-top:0;}
+    .wiz-inline-form-btns > * + *{margin-top:12px;}
     .wiz-pcard-delbg{
-      position:absolute;right:0;top:0;bottom:0;width:70px;background:var(--accent-blue);color:#fff;
+      position:absolute;right:0;top:0;bottom:0;width:70px;background:var(--danger-red);color:#fff;
       display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;cursor:pointer;
     }
     .wiz-pcard{
@@ -631,8 +677,8 @@
     .wiz-pcard-body{flex:1;min-width:0;cursor:pointer;}
     .wiz-pcard-name{font-weight:700;font-size:14.5px;}
     .wiz-qty-badge{
-      display:inline-block;font-weight:700;font-size:12px;color:#0b5fa5;
-      background:#d6ecfa;padding:3px 10px;border-radius:20px;margin-top:6px;
+      display:inline-block;font-weight:700;font-size:12px;color:var(--accent-green);
+      background:#e6f4ea;padding:3px 10px;border-radius:20px;margin-top:6px;
     }
     .wiz-pcard-detail{
       max-height:0;overflow:hidden;opacity:0;transition:all .18s ease;
@@ -640,13 +686,13 @@
     }
     .wiz-pcard-detail.open{max-height:60px;opacity:1;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);}
     .wiz-pcard-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:10px;}
-    .wiz-pcard-edit{font-size:13px;color:var(--ledger-green);font-weight:700;cursor:pointer;}
+    .wiz-pcard-edit{font-size:13px;color:var(--primary-blue);font-weight:700;cursor:pointer;}
     .wiz-pcard-delbtn{
       background:none;border:none;font-size:15px;cursor:pointer;padding:2px 4px;line-height:1;
       opacity:.7;
     }
     .wiz-disclose{
-      display:flex;align-items:center;gap:6px;margin-top:18px;color:var(--ledger-green);
+      display:flex;align-items:center;gap:6px;margin-top:18px;color:var(--primary-blue);
       font-size:13.5px;font-weight:700;cursor:pointer;
     }
     .wiz-disclose .arrow{transition:.15s;display:inline-block;}
@@ -664,11 +710,13 @@
     .wiz-sumcard{background:#f1f3f4;border-radius:12px;padding:13px 15px;margin:12px 0;}
     .wiz-sumcard .wiz-revrow{font-size:13px;color:var(--ink-soft);padding:3px 0;}
     .wiz-totalcard{
-      background:#e6f4ea;border-radius:12px;padding:15px;
+      background:#e3f0fa;border-radius:12px;padding:15px;
       display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;
     }
     .wiz-totalcard .l{font-weight:700;font-size:14.5px;color:var(--ink);}
-    .wiz-totalcard .v{font-weight:800;font-size:19px;color:var(--ledger-green);font-family:'Roboto Mono',monospace;}
+    .wiz-totalcard .v{font-weight:800;font-size:19px;color:var(--primary-blue);font-family:'Roboto Mono',monospace;}
+    .wiz-copyable{cursor:pointer;border-bottom:1.5px dotted var(--primary-blue);padding-bottom:1px;}
+    .wiz-copyable:active{opacity:.6;}
     .wiz-stamp{
       background:#fdece9;border:1px solid #f3b7ac;color:var(--danger-red);border-radius:10px;
       padding:10px 12px;font-size:12.5px;font-weight:700;text-align:center;margin-bottom:16px;
@@ -678,10 +726,10 @@
       flex:1;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
       font-weight:700;font-size:12px;cursor:pointer;
     }
-    .wiz-actionbtns button.primary{background:var(--ledger-green);color:#fff;border:none;}
+    .wiz-actionbtns button.primary{background:var(--primary-blue);color:#fff;border:none;}
 
     /* --- tombol Kalkulator & Reset di beranda --- */
-    .home-links{display:flex;gap:10px;margin-top:16px;}
+    .home-links{display:flex;gap:10px;margin-top:0;}
     .home-links button{
       flex:1;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
       font-weight:700;font-size:13.5px;color:var(--ink-soft);cursor:pointer;text-decoration:none;
@@ -733,7 +781,7 @@
     padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:var(--bg);
     font-size:13px;font-weight:700;color:var(--ink-soft);cursor:pointer;
   }
-  .md-tab.active{border-color:var(--ledger-green);color:var(--ledger-green);background:#e6f4ea;}
+  .md-tab.active{border-color:var(--primary-blue);color:var(--primary-blue);background:#e3f0fa;}
   .md-section{display:none;}
   .md-section.active{display:block;}
   .md-card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
@@ -749,8 +797,8 @@
   }
   .md-row-del{background:none;border:none;color:var(--danger-red);font-size:16px;cursor:pointer;}
   .md-addrow{
-    margin-top:12px;width:100%;height:44px;border-radius:9px;border:1.5px dashed var(--ledger-green);
-    background:#e6f4ea;color:var(--ledger-green);font-weight:700;font-size:13px;cursor:pointer;
+    margin-top:12px;width:100%;height:44px;border-radius:9px;border:1.5px dashed var(--primary-blue);
+    background:#e3f0fa;color:var(--primary-blue);font-weight:700;font-size:13px;cursor:pointer;
   }
   .md-eksrow{display:grid;grid-template-columns:1fr 40px;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);}
   .md-eksrow:last-child{border-bottom:none;}
@@ -761,7 +809,7 @@
     height:42px;padding:0 18px;border-radius:9px;border:1px solid var(--line);background:var(--card);
     font-weight:700;font-size:12.5px;cursor:pointer;margin-top:14px;margin-right:8px;
   }
-  .md-btn.primary{background:var(--ledger-green);color:#fff;border:none;}
+  .md-btn.primary{background:var(--primary-blue);color:#fff;border:none;}
   .md-btn.danger{color:var(--danger-red);border-color:#f3b7ac;}
   .md-note{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
   @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
@@ -823,11 +871,23 @@
       </div>
       <div class="home-tile-arrow">›</div>
     </button>
+    <div class="home-actionlinks">
+      <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-actionlink telegram">
+        <span class="home-actionlink-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><circle cx="12" cy="12" r="12" fill="#229ED9"/><path d="M17.7 7.3l-2.1 10.1c-.16.7-.58.87-1.17.54l-3.24-2.39-1.56 1.5c-.17.17-.32.32-.65.32l.23-3.3 5.98-5.4c.26-.23-.06-.36-.4-.13l-7.4 4.66-3.18-1c-.69-.21-.7-.69.14-1.02l12.44-4.8c.58-.21 1.08.14.9 1.02z" fill="#fff"/></svg>
+        </span>
+        Buka Payment Telegram
+      </a>
+      <a href="https://bayarpesanan.com/" target="_blank" rel="noopener" class="home-actionlink atm">
+        <span class="home-actionlink-icon" aria-hidden="true">🏧</span>
+        Bayar Pesanan
+      </a>
+    </div>
     <div class="home-links">
       <button type="button" id="home-link-calc">🧮 Kalkulator</button>
       <button type="button" id="home-link-reset" class="danger">↺ Reset</button>
     </div>
-    <div style="text-align:center;margin-top:10px;">
+    <div style="text-align:center;">
       <button type="button" id="home-link-changelog" style="background:none;border:none;color:var(--ink-soft);font-size:11.5px;text-decoration:underline;">Riwayat Update</button>
     </div>
   </div>
@@ -894,13 +954,11 @@
     </div>
     <div class="wiz mobile-only" id="wiz-penjualan" data-sheet="penjualan">
       <div class="wiz-dots" data-wizdots="penjualan">
-        <button type="button" data-step="add">Tambah</button>
-        <button type="button" data-step="list">Tersimpan</button>
+        <button type="button" data-step="list">Input Penjualan</button>
         <button type="button" data-step="ship">Kirim</button>
         <button type="button" data-step="review">Review</button>
       </div>
-      <div class="wiz-step active" data-wstep="add"></div>
-      <div class="wiz-step" data-wstep="list"></div>
+      <div class="wiz-step active" data-wstep="list"></div>
       <div class="wiz-step" data-wstep="ship"></div>
       <div class="wiz-step" data-wstep="review"></div>
     </div>
@@ -981,13 +1039,11 @@
     </div>
     <div class="wiz mobile-only" id="wiz-custom" data-sheet="custom">
       <div class="wiz-dots" data-wizdots="custom">
-        <button type="button" data-step="add">Tambah</button>
-        <button type="button" data-step="list">Tersimpan</button>
+        <button type="button" data-step="list">Input Penjualan</button>
         <button type="button" data-step="ship">Kirim</button>
         <button type="button" data-step="review">Review</button>
       </div>
-      <div class="wiz-step active" data-wstep="add"></div>
-      <div class="wiz-step" data-wstep="list"></div>
+      <div class="wiz-step active" data-wstep="list"></div>
       <div class="wiz-step" data-wstep="ship"></div>
       <div class="wiz-step" data-wstep="review"></div>
     </div>
@@ -1174,8 +1230,8 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Rp</span> &nbsp;·&nbsp; versi <span id="app-current-version">1.23.0</span>
-      &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
+      <span id="md-secret-tap" style="cursor:default;">Rp</span> &nbsp;·&nbsp; versi <span id="app-current-version">1.28.0</span>
+      <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
     </div>
   </footer>
 
@@ -1206,10 +1262,43 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.23.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.28.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Semua tampilan diskon berbentuk persen sekarang konsisten ditulis sebagai <b>"23 %"</b>, bukan lagi angka koma mentah seperti <b>"0.23"</b> — mencakup kolom Diskon tabel Custom (desktop), dan kartu diskon di langkah Review wizard HP yang sebelumnya masih menampilkan angka mentah. Nilai yang tersimpan di balik layar tidak berubah, cuma cara menampilkannya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.27.0</div>
+          <ul>
+            <li>Beranda (HP) sekarang pakai latar gradasi biru "Deep Ocean" sesuai referensi desain yang dipilih.</li>
+            <li>Warna utama aplikasi ditukar: warna hijau yang sebelumnya jadi warna utama (tombol Simpan, Grand Total, badge "SEDANG DIPAKAI", tab aktif, dsb) sekarang jadi <b>biru</b>, dan warna biru yang sebelumnya dipakai untuk badge/aksen (border tab, fokus input, badge jumlah produk) sekarang jadi <b>hijau</b>. Warna status pembayaran (Kurang bayar = merah, Lunas = hijau, Kembalian = biru) sengaja TIDAK ikut tertukar supaya artinya tetap jelas. Sekalian dibetulkan 2 warna yang dari dulu salah pasang (pesan error &amp; latar tombol "Hapus" saat geser kartu, keduanya seharusnya merah).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.26.0</div>
+          <ul>
+            <li>Angka <b>Grand Total di layar Review</b> (wizard HP) sekarang bisa diketuk untuk disalin — hasil salinannya angka polos tanpa "Rp" dan tanpa titik pemisah ribuan (mis. "Rp 1.234.000" tersalin jadi "1234000"), supaya gampang ditempel ke aplikasi bank/transfer.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.25.0</div>
+          <ul>
+            <li>Ditambahkan 2 tombol baru di Beranda, di bawah kartu Custom: <b>"Buka Payment Telegram"</b> (buka grup pembayaran Telegram) dan <b>"Bayar Pesanan"</b> (buka bayarpesanan.com), masing-masing dengan ikonnya sendiri.</li>
+            <li>Jarak kosong yang terlalu lebar antara tombol Kalkulator/Reset dan blok info di bagian bawah Beranda dipangkas, dan link "Riwayat Update" yang sebelumnya tampil dobel di Beranda mobile sekarang cuma satu.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.24.0</div>
+          <ul>
+            <li>Langkah "Tambah" di wizard HP dihapus sebagai layar terpisah — sekarang <b>digabung ke langkah "Input Penjualan"</b> (dulu namanya "Tersimpan"). Tombol "+ Tambah produk" &amp; "Edit" pada tiap kartu produk memunculkan form langsung <b>di bawah daftar produk tersimpan</b> di layar yang sama, supaya lebih mudah mengoreksi sambil tetap melihat produk lain yang sudah ada. Form ini juga punya tombol "Batal" untuk menutup tanpa menyimpan.</li>
+            <li>Jarak antar tombol aksi (mis. "+ Tambah produk" &amp; "Lanjut ke pengiriman", juga tab wizard di atas) diperlebar sedikit — sebelumnya terasa terlalu berdempetan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.23.0</div>
           <ul>
             <li>Status pembayaran (<b>Kurang bayar</b> / <b>Lunas</b> / <b>Kembalian</b>) di ringkasan sekarang tampil dengan warna berbeda — merah, hijau, biru — supaya statusnya langsung tertangkap mata tanpa perlu baca teksnya dulu. Warna yang sama juga dipakai di nota hasil unduhan/gambar.</li>
-            <li>Rapi-rapi sistem warna internal: variabel warna biru yang sebelumnya bernama <code>--stamp-red</code> (padahal warnanya biru, cuma penamaan lama yang salah kaprah) diganti jadi <code>--accent-blue</code>, dan warna merah untuk error/hapus yang tadinya diulang-ulang jadi kode warna terpisah sekarang dirapikan jadi satu variabel <code>--danger-red</code>. Termasuk memperbaiki dua tempat (label peringatan di ringkasan wizard &amp; tombol "Reset" di Beranda) yang sebelumnya kepasang warna biru padahal seharusnya merah.</li>
+            <li>Rapi-rapi sistem warna internal: variabel warna biru yang sebelumnya bernama <code>--stamp-red</code> (padahal warnanya biru, cuma penamaan lama yang salah kaprah) diganti jadi <code>--accent-green</code>, dan warna merah untuk error/hapus yang tadinya diulang-ulang jadi kode warna terpisah sekarang dirapikan jadi satu variabel <code>--danger-red</code>. Termasuk memperbaiki dua tempat (label peringatan di ringkasan wizard &amp; tombol "Reset" di Beranda) yang sebelumnya kepasang warna biru padahal seharusnya merah.</li>
           </ul>
         </div>
         <div class="changelog-item">
@@ -1798,7 +1887,7 @@ function buildRows(sheet){
       <td data-label="Qty"><input type="number" min="0" max="1000" inputmode="numeric" data-r="${i}" data-f="qty" class="qty num" style="text-align:right;" value=""></td>
       <td class="num readout" data-r="${i}" data-f="harga" data-label="Harga">–</td>
       <td class="num" data-f="diskoncell" data-label="Diskon">${sheet==="custom"
-            ? `<input type="text" data-r="${i}" data-f="diskon" class="diskon" placeholder="0.2 / 55000" style="text-align:right;">`
+            ? `<span class="diskon-wrap"><input type="text" data-r="${i}" data-f="diskon" class="diskon" placeholder="0.2 / 55000" style="text-align:right;"><span class="diskon-fmt" aria-hidden="true"></span></span>`
             : `<span class="readout" data-r="${i}" data-f="diskon">–</span>`}</td>
       <td class="num readout" data-r="${i}" data-f="satuan" data-label="Satuan">–</td>
       <td class="num readout" data-r="${i}" data-f="total" data-label="Total">–</td>
@@ -1810,6 +1899,12 @@ function buildRows(sheet){
     el.addEventListener("input", ()=>calc(sheet));
     el.addEventListener("change", ()=>calc(sheet));
   });
+  if(sheet==="custom"){
+    tbody.querySelectorAll("input.diskon").forEach(el=>{
+      el.addEventListener("focus", ()=> el.closest(".diskon-wrap").classList.remove("show-fmt"));
+      el.addEventListener("blur", ()=> syncDiskonFmt(el));
+    });
+  }
   // Qty dibatasi maksimal 1000 (4 digit) — kalau diketik manual lebih dari itu,
   // otomatis dipotong balik ke 1000 supaya tampilan tabel tetap aman & konsisten.
   tbody.querySelectorAll("input.qty").forEach(el=>{
@@ -1823,6 +1918,28 @@ function buildRows(sheet){
 }
 
 function findProduct(name){ return PRODUCTS.find(p=>p.name===name); }
+
+/* Tampilkan field Diskon (Custom) sebagai "23 %" / "Rp 55.000" saat tidak
+   difokus — .value input aslinya TIDAK berubah, tetap raw ("0.23"/"55000"),
+   supaya semua kode lain yang membaca .value tidak perlu diubah sama sekali. */
+function syncDiskonFmt(input){
+  const wrap = input.closest(".diskon-wrap");
+  if(!wrap) return;
+  const fmtEl = wrap.querySelector(".diskon-fmt");
+  const raw = input.value.trim();
+  const v = parseFloat(raw.replace(/[^\d.]/g,""));
+  if(raw==="" || isNaN(v)){
+    wrap.classList.remove("show-fmt");
+    return;
+  }
+  fmtEl.textContent = v<1 ? Math.round(v*100)+" %" : rupiah(v);
+  wrap.classList.add("show-fmt");
+}
+function syncAllDiskonFmt(sheet){
+  document.querySelectorAll(`#rows-${sheet} input.diskon`).forEach(el=>{
+    if(document.activeElement !== el) syncDiskonFmt(el);
+  });
+}
 
 function tierIndex(totalKarton){
   if(totalKarton < 14) return 0;
@@ -1967,6 +2084,7 @@ function calc(sheet){
     document.getElementById("cs-statusrow").className = "row status-row " + (selisih>0 ? "status-kembalian" : (selisih<0 ? "status-kurang" : "status-lunas"));
   }
 
+  if(sheet==="custom") syncAllDiskonFmt("custom");
   if(window.__renderMobileCards) window.__renderMobileCards(sheet);
 }
 
@@ -2021,7 +2139,7 @@ function activeCaptureEl(){
 function showMsg(text, isError){
   const el = document.getElementById("toolbar-msg");
   el.textContent = text;
-  el.style.color = isError ? "var(--accent-blue)" : "var(--ink-soft)";
+  el.style.color = isError ? "var(--danger-red)" : "var(--ink-soft)";
   clearTimeout(showMsg._t);
   showMsg._t = setTimeout(()=>{ el.textContent=""; }, 3500);
   showToast(text, isError);
@@ -2042,6 +2160,34 @@ function showToast(text, isError){
   if(navigator.vibrate) navigator.vibrate(isError ? [30,40,30] : 30);
   clearTimeout(__toastTimer);
   __toastTimer = setTimeout(()=> __toastEl.classList.remove("show"), 3200);
+}
+
+/* ============ Salin angka polos (tanpa "Rp" & tanpa titik ribuan) ============
+   Dipakai oleh field yang perlu disalin sebagai angka murni, mis. Grand Total
+   di layar Review wizard HP — supaya gampang ditempel ke aplikasi lain. */
+async function copyPlainNumber(rawDigits, label){
+  const namaField = label || "Angka";
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(rawDigits);
+    } else {
+      throw new Error("Clipboard API tidak tersedia");
+    }
+  }catch(err){
+    try{
+      const ta = document.createElement("textarea");
+      ta.value = rawDigits;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }catch(err2){
+      showToast("Gagal menyalin " + namaField + " — coba lagi.", true);
+      return;
+    }
+  }
+  showToast(namaField + " \"" + rawDigits + "\" disalin.");
 }
 
 /* ============ Undo-snackbar mobile (dipakai saat hapus kartu produk) ============ */
@@ -3065,7 +3211,7 @@ if ("serviceWorker" in navigator) {
     body.classList.remove("showing-home");
     const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
     if(btn) btn.click();
-    wizGo(tab, "add");
+    wizGo(tab, "list");
     window.scrollTo(0,0);
   }
   body.classList.add("showing-home");
@@ -3087,10 +3233,10 @@ if ("serviceWorker" in navigator) {
   });
 
   /* ---------- helper umum ---------- */
-  const STEP_ORDER = ["add","list","ship","review"];
+  const STEP_ORDER = ["list","ship","review"];
   const wizState = {
-    penjualan: {step:"add", editingRow:null},
-    custom:    {step:"add", editingRow:null},
+    penjualan: {step:"list", editingRow:null, formOpen:true},
+    custom:    {step:"list", editingRow:null, formOpen:true},
   };
 
   function trsOf(sheet){ return [...document.querySelectorAll("#rows-"+sheet+" tr")]; }
@@ -3191,146 +3337,32 @@ if ("serviceWorker" in navigator) {
   }
 
   function renderStep(sheet, step){
-    if(step==="add") renderAddStep(sheet);
-    else if(step==="list") renderListStep(sheet);
+    if(step==="list") renderListStep(sheet);
     else if(step==="ship") renderShipStep(sheet);
     else if(step==="review") renderReviewStep(sheet);
   }
 
-  /* ---------- STEP: Tambah / Edit Produk ---------- */
-  function renderAddStep(sheet){
-    const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="add"]`);
-    const st = wizState[sheet];
-    const editing = st.editingRow !== null;
-    let prodVal = "", qtyVal = "", diskonVal = "";
-    if(editing){
-      const tr = trsOf(sheet)[st.editingRow];
-      prodVal = tr.querySelector("select.prod").value;
-      qtyVal = tr.querySelector("input.qty").value;
-      const dEl = tr.querySelector("input.diskon");
-      diskonVal = dEl ? dEl.value : "";
-    }
-    const options = prodListOf(sheet).map(p=>
-      `<option value="${p.name}" ${p.name===prodVal?"selected":""}>${p.name}</option>`).join("");
-    host.innerHTML = `
-      <div class="wiz-title">${editing ? "Edit produk" : "Tambah produk"}</div>
-      <div class="wiz-preview-strip" id="wa-preview-${sheet}">Pilih produk & isi jumlah untuk lihat estimasi harga</div>
-      <div class="wiz-section">
-        <div class="wiz-section-label"><span class="wiz-section-ic">📦</span> Produk</div>
-        <select id="wa-prod-${sheet}"><option value="">— pilih produk —</option>${options}</select>
-      </div>
-      <div class="wiz-section">
-        <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
-        <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
-        <div class="wiz-hint" id="wa-hint-${sheet}"></div>
-      </div>
-      ${sheet==="custom" ? `
-      <div class="wiz-section">
-        <div class="wiz-section-label"><span class="wiz-section-ic">🏷️</span> Diskon</div>
-        <select id="wa-diskonmode-${sheet}" style="margin-bottom:10px;">
-          <option value="persen">Persen (%)</option>
-          <option value="rupiah">Rupiah (Rp)</option>
-        </select>
-        <input type="text" inputmode="numeric" id="wa-diskon-${sheet}" placeholder="0">
-      </div>` : ``}
-      <div class="wiz-field" id="wa-err-${sheet}" style="color:var(--danger-red);font-size:12.5px;min-height:16px;"></div>
-      <div class="wiz-cta-bar">
-        <button class="wiz-btn-primary" id="wa-save-${sheet}">${editing ? "Simpan perubahan" : "Simpan produk"}</button>
-      </div>
-      ${editing ? `<button class="wiz-btn-ghost" id="wa-delete-${sheet}" style="color:var(--danger-red);">Hapus produk ini</button>` : ``}
-      ${!editing && trsOf(sheet).some(tr=>tr.querySelector("select.prod").value) ? `<button class="wiz-btn-ghost" id="wa-tolist-${sheet}">Lihat produk tersimpan</button>` : ``}
-    `;
-    const qtyEl = document.getElementById("wa-qty-"+sheet);
-    const hintEl = document.getElementById("wa-hint-"+sheet);
-    const previewEl = document.getElementById("wa-preview-"+sheet);
-    const prodEl = document.getElementById("wa-prod-"+sheet);
-    comboboxify(prodEl, "Pilih produk...");
-    function updHint(){
-      const p = findProduct(prodEl.value);
-      const q = parseFloat(qtyEl.value)||0;
-      hintEl.textContent = (p && q>0) ? `${q} ${p.satuan}` : "";
-      if(p && q>0){
-        let badge2;
-        if(sheet==="penjualan"){
-          const dv = estimateGrosirDiskon(sheet, p.name, q, st.editingRow);
-          const dtxt = dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv);
-          badge2 = `<span class="wiz-preview-badge green">Diskon ${dtxt}/${p.satuan}</span>`;
-        } else {
-          badge2 = `<span class="wiz-preview-badge green">≈ ${rupiah(p.harga*q)}</span>`;
-        }
-        previewEl.innerHTML = `
-          <div class="wiz-preview-name">${p.name}</div>
-          <div class="wiz-preview-badges">
-            <span class="wiz-preview-badge blue">${q} ${p.satuan}</span>
-            ${badge2}
-          </div>`;
-        previewEl.classList.add("filled");
-      } else {
-        previewEl.textContent = sheet==="penjualan" ? "Pilih produk & isi jumlah untuk lihat estimasi diskon" : "Pilih produk & isi jumlah untuk lihat estimasi harga";
-        previewEl.classList.remove("filled");
-      }
-    }
-    bindAutoSelect(qtyEl);
-    qtyEl.addEventListener("input", updHint);
-    prodEl.addEventListener("change", updHint);
-    updHint();
-
-    if(sheet==="custom") wireDiskonModeInput("wa-diskonmode-"+sheet, "wa-diskon-"+sheet, diskonVal);
-
-    document.getElementById("wa-save-"+sheet).addEventListener("click", ()=>{
-      const errEl = document.getElementById("wa-err-"+sheet);
-      errEl.textContent = "";
-      if(!prodEl.value){ errEl.textContent = "Pilih produk dulu."; return; }
-      const qty = parseFloat(qtyEl.value)||0;
-      if(qty<=0){ errEl.textContent = "Isi jumlah lebih dari 0."; return; }
-      const trs = trsOf(sheet);
-      let targetIdx = st.editingRow;
-      const originalEditingIdx = targetIdx;
-      // Kalau produk yang dipilih sudah ada di baris lain (bukan baris yang
-      // sedang di-edit), pakai baris itu (replace), bukan bikin baris baru.
-      const dupIdx = trs.findIndex((tr,i)=> i!==targetIdx && tr.querySelector("select.prod").value===prodEl.value);
-      if(dupIdx !== -1) targetIdx = dupIdx;
-      if(targetIdx===null){
-        targetIdx = trs.findIndex(tr=> tr.querySelector("select.prod").value === "");
-        if(targetIdx === -1){ errEl.textContent = "Maksimal 7 produk per pesanan sudah tercapai."; return; }
-      }
-      // Baris asal yang sedang di-edit ternyata dipindah ke baris lain (replace) —
-      // kosongkan baris asal supaya tidak ada data lama yang nyangkut/dobel.
-      if(originalEditingIdx!==null && originalEditingIdx!==targetIdx){
-        const oldTr = trs[originalEditingIdx];
-        oldTr.querySelector("select.prod").value = "";
-        oldTr.querySelector("input.qty").value = "";
-        const oldDiskonEl = oldTr.querySelector("input.diskon");
-        if(oldDiskonEl) oldDiskonEl.value = "";
-        oldTr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
-      }
-      const tr = trs[targetIdx];
-      tr.querySelector("select.prod").value = prodEl.value;
-      tr.querySelector("input.qty").value = Math.min(1000, qty);
-      if(sheet==="custom") tr.querySelector("input.diskon").value = readDiskonModeValue("wa-diskonmode-"+sheet, "wa-diskon-"+sheet);
-      tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
-      tr.querySelector("input.qty").dispatchEvent(new Event("input", {bubbles:true}));
-      st.editingRow = null;
-      wizGo(sheet, "list");
-    });
-    const delBtn = document.getElementById("wa-delete-"+sheet);
-    if(delBtn) delBtn.addEventListener("click", ()=>{
-      const tr = trsOf(sheet)[st.editingRow];
-      tr.querySelector("select.prod").value = "";
-      tr.querySelector("input.qty").value = "";
-      const dEl = tr.querySelector("input.diskon");
-      if(dEl) dEl.value = "";
-      tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
-      st.editingRow = null;
-      wizGo(sheet, "list");
-    });
-    const toListBtn = document.getElementById("wa-tolist-"+sheet);
-    if(toListBtn) toListBtn.addEventListener("click", ()=> wizGo(sheet, "list"));
+  /* ---------- STEP: Input Penjualan (daftar produk + form tambah/edit inline) ----------
+     Digabung jadi satu layar: form tambah/edit produk sekarang tampil
+     LANGSUNG DI BAWAH daftar produk tersimpan (bukan pindah ke layar
+     terpisah), supaya lebih gampang dikoreksi sambil tetap lihat
+     produk yang sudah ada. */
+  function openForm(sheet, editingRow){
+    wizState[sheet].editingRow = editingRow;
+    wizState[sheet].formOpen = true;
+    renderListStep(sheet);
+    const formEl = document.getElementById("wa-form-"+sheet);
+    if(formEl) formEl.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  function closeForm(sheet){
+    wizState[sheet].editingRow = null;
+    wizState[sheet].formOpen = false;
+    renderListStep(sheet);
   }
 
-  /* ---------- STEP: Tersimpan (daftar produk) ---------- */
   function renderListStep(sheet){
     const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="list"]`);
+    const st = wizState[sheet];
     const trs = trsOf(sheet);
     const filled = trs.map((tr,i)=>({tr,i})).filter(o=> o.tr.querySelector("select.prod").value);
     const cardsHtml = filled.length ? filled.map(({tr,i})=>{
@@ -3362,20 +3394,66 @@ if ("serviceWorker" in navigator) {
           </div>
         </div>
       </div>`;
-    }).join("") : `<div class="wiz-empty">Belum ada produk. Ketuk "Tambah produk" untuk mulai.</div>`;
+    }).join("") : `<div class="wiz-empty">Belum ada produk. Ketuk "+ Tambah produk" untuk mulai.</div>`;
+
+    const showForm = st.formOpen;
+    const editing = st.editingRow !== null;
+    let prodVal = "", qtyVal = "", diskonVal = "";
+    if(editing){
+      const tr = trsOf(sheet)[st.editingRow];
+      prodVal = tr.querySelector("select.prod").value;
+      qtyVal = tr.querySelector("input.qty").value;
+      const dEl = tr.querySelector("input.diskon");
+      diskonVal = dEl ? dEl.value : "";
+    }
+    const options = prodListOf(sheet).map(p=>
+      `<option value="${p.name}" ${p.name===prodVal?"selected":""}>${p.name}</option>`).join("");
+
+    const formHtml = showForm ? `
+      <div class="wiz-inline-form" id="wa-form-${sheet}">
+        <div class="wiz-title">${editing ? "Edit produk" : "Tambah produk"}</div>
+        <div class="wiz-preview-strip" id="wa-preview-${sheet}">Pilih produk & isi jumlah untuk lihat estimasi harga</div>
+        <div class="wiz-section">
+          <div class="wiz-section-label"><span class="wiz-section-ic">📦</span> Produk</div>
+          <select id="wa-prod-${sheet}"><option value="">— pilih produk —</option>${options}</select>
+        </div>
+        <div class="wiz-section">
+          <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
+          <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
+          <div class="wiz-hint" id="wa-hint-${sheet}"></div>
+        </div>
+        ${sheet==="custom" ? `
+        <div class="wiz-section">
+          <div class="wiz-section-label"><span class="wiz-section-ic">🏷️</span> Diskon</div>
+          <select id="wa-diskonmode-${sheet}" style="margin-bottom:10px;">
+            <option value="persen">Persen (%)</option>
+            <option value="rupiah">Rupiah (Rp)</option>
+          </select>
+          <input type="text" inputmode="numeric" id="wa-diskon-${sheet}" placeholder="0">
+        </div>` : ``}
+        <div class="wiz-field" id="wa-err-${sheet}" style="color:var(--danger-red);font-size:12.5px;min-height:16px;"></div>
+        <div class="wiz-inline-form-btns">
+          <button class="wiz-btn-primary" id="wa-save-${sheet}">${editing ? "Simpan perubahan" : "Simpan produk"}</button>
+          <button class="wiz-btn-ghost" id="wa-cancel-${sheet}">Batal</button>
+          ${editing ? `<button class="wiz-btn-ghost" id="wa-delete-${sheet}" style="color:var(--danger-red);">Hapus produk ini</button>` : ``}
+        </div>
+      </div>
+    ` : ``;
+
     host.innerHTML = `
-      <div class="wiz-title">${filled.length} produk tersimpan</div>
+      <div class="wiz-title">Input Penjualan</div>
+      ${filled.length ? `<div class="wiz-subtle">${filled.length} produk tersimpan</div>` : ``}
       ${cardsHtml}
+      ${formHtml}
       <div class="wiz-cta-bar">
-        <button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button>
+        ${!showForm ? `<button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button>` : ``}
         <button class="wiz-btn-primary" id="wl-next-${sheet}" ${filled.length? "" : "disabled style=\"opacity:.5;\""}>Lanjut ke pengiriman</button>
       </div>
     `;
     host.querySelectorAll("[data-editrow]").forEach(el=>{
       el.addEventListener("click", (e)=>{
         e.stopPropagation();
-        wizState[sheet].editingRow = +el.dataset.editrow;
-        wizGo(sheet, "add");
+        openForm(sheet, +el.dataset.editrow);
       });
     });
     host.querySelectorAll("[data-togglerow]").forEach(el=>{
@@ -3390,9 +3468,9 @@ if ("serviceWorker" in navigator) {
       // gampang ke-trigger tidak sengaja tetap aman untuk dibatalkan.
       const tr = trsOf(sheet)[i];
       const nama = tr.querySelector("select.prod").value;
-      const qtyVal = tr.querySelector("input.qty").value;
+      const qtyVal2 = tr.querySelector("input.qty").value;
       const dEl = tr.querySelector("input.diskon");
-      const diskonVal = dEl ? dEl.value : null;
+      const diskonVal2 = dEl ? dEl.value : null;
 
       tr.querySelector("select.prod").value = "";
       tr.querySelector("input.qty").value = "";
@@ -3402,8 +3480,8 @@ if ("serviceWorker" in navigator) {
 
       showUndoSnackbar(`"${nama}" dihapus dari pesanan`, ()=>{
         tr.querySelector("select.prod").value = nama;
-        tr.querySelector("input.qty").value = qtyVal;
-        if(dEl) dEl.value = diskonVal;
+        tr.querySelector("input.qty").value = qtyVal2;
+        if(dEl) dEl.value = diskonVal2;
         tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
         renderListStep(sheet);
       });
@@ -3412,12 +3490,98 @@ if ("serviceWorker" in navigator) {
       el.addEventListener("click", ()=> doDelete(+el.dataset.delrow));
     });
     host.querySelectorAll(".wiz-pcard").forEach(card=> attachSwipe(card, ()=> doDelete(+card.dataset.row)));
-    document.getElementById("wl-add-"+sheet).addEventListener("click", ()=>{
-      wizState[sheet].editingRow = null;
-      wizGo(sheet, "add");
-    });
+    const addBtn = document.getElementById("wl-add-"+sheet);
+    if(addBtn) addBtn.addEventListener("click", ()=> openForm(sheet, null));
     const nextBtn = document.getElementById("wl-next-"+sheet);
     if(filled.length) nextBtn.addEventListener("click", ()=> wizGo(sheet, "ship"));
+
+    if(!showForm) return;
+
+    /* ---------- wiring form tambah/edit (cuma dipasang kalau form lagi tampil) ---------- */
+    const qtyEl = document.getElementById("wa-qty-"+sheet);
+    const hintEl = document.getElementById("wa-hint-"+sheet);
+    const previewEl = document.getElementById("wa-preview-"+sheet);
+    const prodEl = document.getElementById("wa-prod-"+sheet);
+    comboboxify(prodEl, "Pilih produk...");
+    function updHint(){
+      const p = findProduct(prodEl.value);
+      const q = parseFloat(qtyEl.value)||0;
+      hintEl.textContent = (p && q>0) ? `${q} ${p.satuan}` : "";
+      if(p && q>0){
+        let badge2;
+        if(sheet==="penjualan"){
+          const dv = estimateGrosirDiskon(sheet, p.name, q, st.editingRow);
+          const dtxt = dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv);
+          badge2 = `<span class="wiz-preview-badge badge-est">Diskon ${dtxt}/${p.satuan}</span>`;
+        } else {
+          badge2 = `<span class="wiz-preview-badge badge-est">≈ ${rupiah(p.harga*q)}</span>`;
+        }
+        previewEl.innerHTML = `
+          <div class="wiz-preview-name">${p.name}</div>
+          <div class="wiz-preview-badges">
+            <span class="wiz-preview-badge badge-qty">${q} ${p.satuan}</span>
+            ${badge2}
+          </div>`;
+        previewEl.classList.add("filled");
+      } else {
+        previewEl.textContent = sheet==="penjualan" ? "Pilih produk & isi jumlah untuk lihat estimasi diskon" : "Pilih produk & isi jumlah untuk lihat estimasi harga";
+        previewEl.classList.remove("filled");
+      }
+    }
+    bindAutoSelect(qtyEl);
+    qtyEl.addEventListener("input", updHint);
+    prodEl.addEventListener("change", updHint);
+    updHint();
+
+    if(sheet==="custom") wireDiskonModeInput("wa-diskonmode-"+sheet, "wa-diskon-"+sheet, diskonVal);
+
+    document.getElementById("wa-save-"+sheet).addEventListener("click", ()=>{
+      const errEl = document.getElementById("wa-err-"+sheet);
+      errEl.textContent = "";
+      if(!prodEl.value){ errEl.textContent = "Pilih produk dulu."; return; }
+      const qty = parseFloat(qtyEl.value)||0;
+      if(qty<=0){ errEl.textContent = "Isi jumlah lebih dari 0."; return; }
+      const trs2 = trsOf(sheet);
+      let targetIdx = st.editingRow;
+      const originalEditingIdx = targetIdx;
+      // Kalau produk yang dipilih sudah ada di baris lain (bukan baris yang
+      // sedang di-edit), pakai baris itu (replace), bukan bikin baris baru.
+      const dupIdx = trs2.findIndex((tr,i)=> i!==targetIdx && tr.querySelector("select.prod").value===prodEl.value);
+      if(dupIdx !== -1) targetIdx = dupIdx;
+      if(targetIdx===null){
+        targetIdx = trs2.findIndex(tr=> tr.querySelector("select.prod").value === "");
+        if(targetIdx === -1){ errEl.textContent = "Maksimal 7 produk per pesanan sudah tercapai."; return; }
+      }
+      // Baris asal yang sedang di-edit ternyata dipindah ke baris lain (replace) —
+      // kosongkan baris asal supaya tidak ada data lama yang nyangkut/dobel.
+      if(originalEditingIdx!==null && originalEditingIdx!==targetIdx){
+        const oldTr = trs2[originalEditingIdx];
+        oldTr.querySelector("select.prod").value = "";
+        oldTr.querySelector("input.qty").value = "";
+        const oldDiskonEl = oldTr.querySelector("input.diskon");
+        if(oldDiskonEl) oldDiskonEl.value = "";
+        oldTr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+      }
+      const tr = trs2[targetIdx];
+      tr.querySelector("select.prod").value = prodEl.value;
+      tr.querySelector("input.qty").value = Math.min(1000, qty);
+      if(sheet==="custom") tr.querySelector("input.diskon").value = readDiskonModeValue("wa-diskonmode-"+sheet, "wa-diskon-"+sheet);
+      tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+      tr.querySelector("input.qty").dispatchEvent(new Event("input", {bubbles:true}));
+      closeForm(sheet);
+    });
+    const delBtn = document.getElementById("wa-delete-"+sheet);
+    if(delBtn) delBtn.addEventListener("click", ()=>{
+      const tr = trsOf(sheet)[st.editingRow];
+      tr.querySelector("select.prod").value = "";
+      tr.querySelector("input.qty").value = "";
+      const dEl = tr.querySelector("input.diskon");
+      if(dEl) dEl.value = "";
+      tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+      closeForm(sheet);
+    });
+    const cancelBtn = document.getElementById("wa-cancel-"+sheet);
+    if(cancelBtn) cancelBtn.addEventListener("click", ()=> closeForm(sheet));
   }
 
   /* ---------- STEP: Pengiriman (mirror field asli + progressive disclosure) ---------- */
@@ -3522,7 +3686,14 @@ if ("serviceWorker" in navigator) {
       let diskonTxt = "Tidak ada";
       if(diskonEl){
         const raw = diskonEl.tagName==="INPUT" ? diskonEl.value.trim() : diskonEl.textContent.trim();
-        if(raw && raw!=="–") diskonTxt = diskonEl.tagName==="INPUT" ? raw : raw+" / "+satuan;
+        if(raw && raw!=="–"){
+          if(diskonEl.tagName==="INPUT"){
+            const dv = parseFloat(raw)||0;
+            diskonTxt = dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv);
+          } else {
+            diskonTxt = raw+" / "+satuan;
+          }
+        }
       }
       return `<div class="wiz-pcard-rev">
         <div class="wiz-pcard-rev-top"><span>${prod}</span><span>${qty} ${satuan}</span></div>
@@ -3538,13 +3709,19 @@ if ("serviceWorker" in navigator) {
         <div class="wiz-revrow"><span>Subtotal</span><span>${document.getElementById(pfx+"-subtotal").textContent}</span></div>
         <div class="wiz-revrow"><span>Ongkir</span><span>${document.getElementById(pfx+"-ongkir").textContent}</span></div>
       </div>
-      <div class="wiz-totalcard"><span class="l">Grand total</span><span class="v">${document.getElementById(pfx+"-grandtotal").textContent}</span></div>
+      <div class="wiz-totalcard"><span class="l">Grand total</span><span class="v wiz-copyable" id="wr-grandtotal-${sheet}" title="Ketuk untuk salin angka">${document.getElementById(pfx+"-grandtotal").textContent}</span></div>
       <div class="wiz-cta-bar">
         <button class="wiz-btn-primary" id="wr-confirm-${sheet}">Pesanan sudah benar</button>
       </div>
       <button class="wiz-btn-ghost" id="wr-back-${sheet}">‹ Kembali ke pengiriman</button>
       <div id="wr-confirmed-${sheet}"></div>
     `;
+    document.getElementById("wr-grandtotal-"+sheet).addEventListener("click", (e)=>{
+      // Salin ANGKA MURNI (tanpa "Rp" & tanpa titik pemisah ribuan) —
+      // supaya gampang ditempel ke aplikasi bank/transfer/chat.
+      const rawDigits = e.currentTarget.textContent.replace(/[^0-9]/g, "");
+      copyPlainNumber(rawDigits, "Grand total");
+    });
     document.getElementById("wr-back-"+sheet).addEventListener("click", ()=> wizGo(sheet, "ship"));
     document.getElementById("wr-confirm-"+sheet).addEventListener("click", ()=>{
       document.getElementById(pfx+"-nota-col").classList.add("wiz-show");
@@ -3578,10 +3755,10 @@ if ("serviceWorker" in navigator) {
   document.querySelectorAll(".wiz-dots button").forEach(btn=>{
     btn.addEventListener("click", ()=> wizGo(btn.closest(".wiz-dots").dataset.wizdots, btn.dataset.step));
   });
-  wizGo("penjualan","add");
-  wizGo("custom","add");
-  wizState.penjualan.step = "add";
-  wizState.custom.step = "add";
+  wizGo("penjualan","list");
+  wizGo("custom","list");
+  wizState.penjualan.step = "list";
+  wizState.custom.step = "list";
 })();
 
 /* ============================================================
@@ -3660,7 +3837,7 @@ if ("serviceWorker" in navigator) {
     if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
       setPin(DEFAULT_PIN);
       pinErr.textContent = "PIN sudah direset ke PIN bawaan.";
-      pinErr.style.color = "var(--ledger-green)";
+      pinErr.style.color = "var(--primary-blue)";
     }
   });
   document.getElementById("md-pin-submit").addEventListener("click", submitPin);
@@ -3801,7 +3978,7 @@ if ("serviceWorker" in navigator) {
     if(!/^\d{6}$/.test(newV)){ errEl.textContent = "PIN baru harus 6 digit angka."; return; }
     if(newV !== new2){ errEl.textContent = "Konfirmasi PIN baru tidak cocok."; return; }
     setPin(newV);
-    errEl.style.color = "var(--ledger-green)";
+    errEl.style.color = "var(--primary-blue)";
     errEl.textContent = "PIN berhasil diganti.";
     document.getElementById("md-pin-old").value = "";
     document.getElementById("md-pin-new").value = "";
@@ -3811,7 +3988,7 @@ if ("serviceWorker" in navigator) {
     if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
       setPin(DEFAULT_PIN);
       const errEl = document.getElementById("md-pin-change-err");
-      errEl.style.color = "var(--ledger-green)";
+      errEl.style.color = "var(--primary-blue)";
       errEl.textContent = "PIN sudah direset ke PIN bawaan.";
     }
   });
