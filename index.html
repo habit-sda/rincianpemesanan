@@ -963,7 +963,7 @@
   .md-switch input:checked + .md-switch-track .md-switch-knob{left:20px;}
   .md-card h3{margin:0 0 14px;font-size:14.5px;}
   .md-row{
-    display:grid;grid-template-columns:1fr 95px 75px 85px 34px 34px;gap:8px;align-items:center;
+    display:grid;grid-template-columns:1fr 95px 75px 85px 34px;gap:8px;align-items:center;
     padding:8px 0;border-bottom:1px solid var(--line);
   }
   .md-row:last-child{border-bottom:none;}
@@ -971,7 +971,17 @@
     height:38px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-size:13px;font-family:inherit;
     background:var(--card);
   }
-  .md-row-del{background:none;border:none;color:var(--danger-red);font-size:16px;cursor:pointer;}
+  .md-p-namewrap, .md-e-namewrap{display:flex;align-items:center;gap:6px;min-width:0;}
+  .md-p-namewrap input, .md-e-namewrap input{flex:1;min-width:0;}
+  .md-kode-badge{
+    display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+    min-width:40px;height:38px;padding:0 8px;border-radius:7px;
+    background:#e3f0fa;color:var(--primary-green);font-family:'Roboto Mono',monospace;
+    font-size:11px;font-weight:700;letter-spacing:.02em;cursor:pointer;user-select:none;
+    border:1px solid var(--line);transition:background .12s ease;
+  }
+  .md-kode-badge:active{background:#c9e3f5;}
+  .md-kode-badge.md-kode-badge-copied{background:var(--primary-green);color:#fff;border-color:var(--primary-green);}
   .md-row-detail{
     background:#e6f4ea;border:none;border-radius:7px;color:var(--primary-green);cursor:pointer;
     height:38px;display:flex;align-items:center;justify-content:center;
@@ -981,9 +991,18 @@
     margin-top:12px;width:100%;height:44px;border-radius:9px;border:1.5px dashed var(--primary-green);
     background:#e3f0fa;color:var(--primary-green);font-weight:700;font-size:13px;cursor:pointer;
   }
-  .md-eksrow{display:grid;grid-template-columns:1fr 40px;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);}
+  .md-eksrow{padding:6px 0;border-bottom:1px solid var(--line);}
   .md-eksrow:last-child{border-bottom:none;}
   .md-eksrow input{height:38px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;font-family:inherit;background:var(--card);}
+  /* ---------- Tab "Hapus Data" (hapus produk/ekspedisi via kode) ---------- */
+  .md-hapus-preview{margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--paper-dark);}
+  .md-hapus-preview-tipe{font-size:11.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+  .md-hapus-preview-nama{font-size:15px;font-weight:700;margin:4px 0 12px;}
+  .md-hapus-refrow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+  .md-hapus-refrow:last-child{border-bottom:none;}
+  .md-hapus-refrow:hover{background:var(--paper-dark);}
+  .md-hapus-refname{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .md-hapus-reftipe{font-size:11px;color:var(--ink-soft);flex-shrink:0;}
   .md-pinform label{display:block;font-size:12.5px;color:var(--ink-soft);margin:14px 0 6px;}
   .md-pinform input{width:100%;max-width:220px;height:44px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:16px;background:var(--card);}
   .md-btn{
@@ -998,12 +1017,11 @@
     .md-panel-sheet{border-radius:0;max-width:none;box-shadow:none;padding:16px 16px 40px;}
     .md-row-header{display:none;}
     .md-row{
-      grid-template-columns:1fr 1fr 1fr 30px;
-      grid-template-areas:"name name name del" "harga berat satuan detail";
+      grid-template-columns:1fr 1fr 1fr 1fr;
+      grid-template-areas:"name name name name" "harga berat satuan detail";
       gap:6px 8px;padding:10px 0;
     }
-    .md-p-name{grid-area:name;}
-    .md-row .md-row-del{grid-area:del;}
+    .md-p-namewrap{grid-area:name;}
     .md-p-harga{grid-area:harga;}
     .md-p-berat.md-col-berat{grid-area:berat;display:block;}
     .md-p-satuan.md-col-satuan{grid-area:satuan;display:block;}
@@ -1397,6 +1415,7 @@
     <div class="md-tabs">
       <button class="md-tab active" data-md-tab="produk">📦 Produk</button>
       <button class="md-tab" data-md-tab="ekspedisi">🚚 Ekspedisi</button>
+      <button class="md-tab" data-md-tab="hapus">🗑️ Hapus Data</button>
       <button class="md-tab" data-md-tab="tampilan">⚙️ Tampilan</button>
       <button class="md-tab" data-md-tab="rumus">🧮 Rumus</button>
       <button class="md-tab" data-md-tab="keamanan">🔒 Keamanan PIN</button>
@@ -1420,6 +1439,34 @@
         <h3>Daftar ekspedisi</h3>
         <div id="md-ekspedisi-list"></div>
         <button class="md-addrow" id="md-ekspedisi-add">+ Tambah ekspedisi</button>
+      </div>
+    </div>
+
+    <div class="md-section" id="md-sec-hapus">
+      <div class="md-card md-pinform">
+        <h3>Hapus data via kode</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Produk &amp; ekspedisi HANYA bisa dihapus dari sini. Klik badge kode di tab
+          Produk/Ekspedisi (atau di daftar bawah) untuk menyalinnya, tempel di kolom ini,
+          lalu cari. Data yang sudah terpakai di pesanan berjalan tidak otomatis ikut terhapus dari situ.
+        </div>
+        <label>Kode data</label>
+        <input type="text" id="md-hapus-kode" placeholder="mis. P01 atau E01" style="text-transform:uppercase;max-width:220px;">
+        <div class="md-pin-err" id="md-hapus-err"></div>
+        <button class="md-btn primary" id="md-hapus-cari">Cari kode</button>
+
+        <div class="md-hapus-preview" id="md-hapus-preview" hidden>
+          <div class="md-hapus-preview-tipe" id="md-hapus-preview-tipe"></div>
+          <div class="md-hapus-preview-nama" id="md-hapus-preview-nama"></div>
+          <button class="md-btn danger" id="md-hapus-confirm">Hapus data ini</button>
+          <button class="md-btn" id="md-hapus-cancel">Batal</button>
+        </div>
+      </div>
+
+      <div class="md-card">
+        <h3>Semua kode terdaftar</h3>
+        <div class="md-note" style="margin-bottom:10px;">Klik kode untuk menyalin, atau klik baris untuk mengisi otomatis kolom pencarian di atas.</div>
+        <div id="md-hapus-reflist"></div>
       </div>
     </div>
 
@@ -2610,8 +2657,8 @@ function calc(sheet){
 function buildEkspedisi(sheet){
   const sel = document.getElementById((sheet==="penjualan"?"pj":"cs")+"-ekspedisi");
   const prevValue = sel.value;
-  sel.innerHTML = `<option value="">— pilih ekspedisi —</option>` + EKSPEDISI.map(e=>`<option value="${e}">${e}</option>`).join("");
-  if(EKSPEDISI.includes(prevValue)) sel.value = prevValue;
+  sel.innerHTML = `<option value="">— pilih ekspedisi —</option>` + EKSPEDISI.map(e=>`<option value="${e.name}">${e.name}</option>`).join("");
+  if(EKSPEDISI.some(e=>e.name===prevValue)) sel.value = prevValue;
   // dijaga supaya listener "change" cuma terpasang sekali walau buildEkspedisi
   // dipanggil ulang (mis. setelah ubah data ekspedisi lewat Master Data).
   if(!sel.dataset.boundChange){
@@ -4167,7 +4214,7 @@ if ("serviceWorker" in navigator) {
       <div class="wiz-fieldcard">
         <div class="wiz-section">
           <div class="wiz-section-label"><span class="wiz-section-ic-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 7v10l8 4 8-4V7l-8-4z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><path d="M4 7l8 4 8-4M12 11v10" stroke="var(--primary-green)" stroke-width="1.4"/></svg></span> Ekspedisi</div>
-          <select id="ws-eksp-${sheet}"><option value="">— pilih ekspedisi —</option>${EKSPEDISI.map(e=>`<option value="${e}">${e}</option>`).join("")}</select>
+          <select id="ws-eksp-${sheet}"><option value="">— pilih ekspedisi —</option>${EKSPEDISI.map(e=>`<option value="${e.name}">${e.name}</option>`).join("")}</select>
         </div>
         <div class="wiz-section">
           <div class="wiz-section-label"><span class="wiz-section-ic-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12.5 3.5H20v7.5L11 20l-8-8 9.5-8.5z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><circle cx="15.5" cy="7.5" r="1.3" fill="var(--primary-green)"/></svg></span> Rate ongkir (Rp / kg)</div>
@@ -4408,8 +4455,55 @@ if ("serviceWorker" in navigator) {
   /* Ekspedisi selalu diurutkan A-Z otomatis — supaya gampang dicari,
      berlaku juga untuk data yang baru ditambahkan/diubah namanya. */
   function sortEkspedisi(){
-    EKSPEDISI.sort((a,b)=> a.localeCompare(b, "id", {sensitivity:"base", numeric:true}));
+    EKSPEDISI.sort((a,b)=> (a.name||"").localeCompare(b.name||"", "id", {sensitivity:"base", numeric:true}));
   }
+
+  /* ============================================================
+     KODE PRODUK/EKSPEDISI — identitas permanen tiap data (P01, P02,
+     ... / E01, E02, ...), TIDAK berubah walau urutan/isi baris lain
+     diedit. Dipakai untuk salin (klik badge) & sebagai kunci pencarian
+     di tab "Hapus Data" — jadi hapus produk/ekspedisi HANYA lewat
+     tab itu, tidak ada lagi tombol hapus langsung di baris.
+     ============================================================ */
+  function nextKode(prefix){
+    const arr = prefix === "P" ? PRODUCTS : EKSPEDISI;
+    let max = 0;
+    arr.forEach(item=>{
+      const k = item && item.kode;
+      if(typeof k === "string" && k.toUpperCase().startsWith(prefix)){
+        const n = parseInt(k.slice(prefix.length), 10);
+        if(!isNaN(n) && n > max) max = n;
+      }
+    });
+    return prefix + String(max + 1).padStart(2, "0");
+  }
+  // Migrasi data lama (produk tanpa field kode, ekspedisi masih berupa
+  // string polos) supaya semua data dijamin punya kode unik & permanen.
+  // Aman dipanggil berulang kali — kalau semua sudah punya kode, tidak
+  // melakukan apa-apa dan return false.
+  function migrateMasterData(){
+    let changed = false;
+    PRODUCTS.forEach(p=>{
+      if(!p || typeof p.kode !== "string" || !p.kode.trim()){
+        p.kode = nextKode("P");
+        changed = true;
+      }
+    });
+    for(let i = 0; i < EKSPEDISI.length; i++){
+      if(typeof EKSPEDISI[i] === "string"){
+        EKSPEDISI[i] = { kode: null, name: EKSPEDISI[i] };
+        changed = true;
+      }
+    }
+    EKSPEDISI.forEach(e=>{
+      if(!e || typeof e.kode !== "string" || !e.kode.trim()){
+        e.kode = nextKode("E");
+        changed = true;
+      }
+    });
+    return changed;
+  }
+
   function refreshAfterDataChange(){
     sortEkspedisi();
     syncPenjualanSlice();
@@ -4418,8 +4512,10 @@ if ("serviceWorker" in navigator) {
     buildEkspedisi("penjualan"); buildEkspedisi("custom");
     calc("penjualan"); calc("custom");
     pushMasterDataToServer();
+    if(typeof renderHapusReflist === "function") renderHapusReflist();
   }
   loadMasterData();
+  if(migrateMasterData()) saveMasterData();
   sortEkspedisi();
   syncPenjualanSlice();
 
@@ -4434,6 +4530,10 @@ if ("serviceWorker" in navigator) {
     if(Array.isArray(remote.ekspedisi) && remote.ekspedisi.length) EKSPEDISI.splice(0, EKSPEDISI.length, ...remote.ekspedisi);
     if(remote.settings && typeof remote.settings === "object") Object.assign(SETTINGS, remote.settings);
     if(typeof remote.pin === "string" && /^\d{6}$/.test(remote.pin)) setPin(remote.pin);
+    // Data dari server bisa juga versi lama (belum ada kode) — migrasi lagi,
+    // dan kalau ada perubahan, kirim balik ke server supaya kode konsisten
+    // di semua HP.
+    const migratedAfterPull = migrateMasterData();
     sortEkspedisi();
     syncPenjualanSlice();
     saveMasterData();
@@ -4443,6 +4543,8 @@ if ("serviceWorker" in navigator) {
     buildEkspedisi("penjualan"); buildEkspedisi("custom");
     calc("penjualan"); calc("custom");
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
+    if(typeof renderHapusReflist === "function") renderHapusReflist();
+    if(migratedAfterPull) pushMasterDataToServer();
   })();
 
   /* ---------- toggle Autocomplete (Tampilan) ---------- */
@@ -4564,6 +4666,53 @@ if ("serviceWorker" in navigator) {
     panel.hidden = false;
     renderProdukList();
     renderEkspedisiList();
+    renderHapusReflist();
+    resetHapusForm();
+  }
+
+  /* ---------- Salin kode (klik badge) ---------- */
+  // Dipasang ke semua elemen [data-copy-kode] di dalam sebuah container
+  // (baris produk, baris ekspedisi, atau daftar referensi di tab Hapus Data).
+  function bindKodeBadgeCopy(container){
+    container.querySelectorAll("[data-copy-kode]").forEach(badge=>{
+      badge.addEventListener("click", (ev)=>{
+        ev.stopPropagation();
+        copyKodeToClipboard(badge.dataset.copyKode, badge);
+      });
+    });
+  }
+  async function copyKodeToClipboard(text, badgeEl){
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+      } else {
+        throw new Error("Clipboard API tidak tersedia");
+      }
+    }catch(err){
+      try{
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }catch(err2){
+        showToast("Gagal menyalin kode " + text + ".", true);
+        return;
+      }
+    }
+    showToast("Kode " + text + " disalin.");
+    if(badgeEl){
+      const original = badgeEl.textContent;
+      badgeEl.textContent = "✓";
+      badgeEl.classList.add("md-kode-badge-copied");
+      clearTimeout(badgeEl._copyTimer);
+      badgeEl._copyTimer = setTimeout(()=>{
+        badgeEl.textContent = original;
+        badgeEl.classList.remove("md-kode-badge-copied");
+      }, 900);
+    }
   }
 
   document.querySelectorAll(".md-tab").forEach(tab=>{
@@ -4576,18 +4725,23 @@ if ("serviceWorker" in navigator) {
   });
 
   /* ---------- Kelola Produk ---------- */
+  // CATATAN: produk TIDAK bisa dihapus dari sini lagi — hanya lewat tab
+  // "Hapus Data" (masukkan kode produknya, mis. P01). Klik badge kode di
+  // setiap baris untuk menyalinnya.
   function renderProdukList(){
     const list = document.getElementById("md-produk-list");
     list.innerHTML = PRODUCTS.map((p,i)=>`
       <div class="md-row" data-idx="${i}">
-        <input type="text" class="md-p-name" value="${p.name}" placeholder="Nama produk">
+        <div class="md-p-namewrap">
+          <span class="md-kode-badge" data-copy-kode="${p.kode}" title="Klik untuk salin kode">${p.kode}</span>
+          <input type="text" class="md-p-name" value="${p.name}" placeholder="Nama produk">
+        </div>
         <input type="text" inputmode="numeric" class="md-p-harga" value="${(p.harga||0).toLocaleString('id-ID')}" placeholder="Harga">
         <input type="number" step="0.01" class="md-p-berat md-col-berat" value="${p.berat}" placeholder="Berat">
         <input type="text" class="md-p-satuan md-col-satuan" value="${p.satuan}" placeholder="Satuan">
         <button class="md-row-detail" data-detail="${i}" title="Detail: diskon tier, subsidi ongkir & link gambar" aria-label="Detail produk">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 15.5l4.5-4 3 2.5L16.5 9 20 13" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         </button>
-        <button class="md-row-del" title="Hapus produk" data-del="${i}">✕</button>
       </div>
     `).join("");
     list.querySelectorAll(".md-row").forEach(row=>{
@@ -4604,19 +4758,10 @@ if ("serviceWorker" in navigator) {
     list.querySelectorAll("[data-detail]").forEach(btn=>{
       btn.addEventListener("click", ()=> openProdukDetail(+btn.dataset.detail));
     });
-    list.querySelectorAll("[data-del]").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const idx = +btn.dataset.del;
-        if(confirm(`Hapus produk "${PRODUCTS[idx].name}"? Produk yang sudah terpakai di pesanan berjalan tidak akan otomatis terhapus dari situ.`)){
-          PRODUCTS.splice(idx,1);
-          refreshAfterDataChange();
-          renderProdukList();
-        }
-      });
-    });
+    bindKodeBadgeCopy(list);
   }
   document.getElementById("md-produk-add").addEventListener("click", ()=>{
-    PRODUCTS.push({name:"Produk baru", harga:0, diskon:[0,0,0], subsidi:[0,0,0], berat:1, satuan:"Pack", gambar:""});
+    PRODUCTS.push({kode: nextKode("P"), name:"Produk baru", harga:0, diskon:[0,0,0], subsidi:[0,0,0], berat:1, satuan:"Pack", gambar:""});
     refreshAfterDataChange();
     renderProdukList();
   });
@@ -4648,37 +4793,136 @@ if ("serviceWorker" in navigator) {
   });
 
   /* ---------- Kelola Ekspedisi ---------- */
+  // Sama seperti produk: ekspedisi TIDAK bisa dihapus dari sini lagi —
+  // hanya lewat tab "Hapus Data" pakai kodenya (mis. E01).
   function renderEkspedisiList(){
     const list = document.getElementById("md-ekspedisi-list");
     list.innerHTML = EKSPEDISI.map((e,i)=>`
       <div class="md-eksrow" data-idx="${i}">
-        <input type="text" class="md-e-name" value="${e}">
-        <button class="md-row-del" data-del="${i}">✕</button>
+        <div class="md-e-namewrap">
+          <span class="md-kode-badge" data-copy-kode="${e.kode}" title="Klik untuk salin kode">${e.kode}</span>
+          <input type="text" class="md-e-name" value="${e.name}">
+        </div>
       </div>
     `).join("");
     list.querySelectorAll(".md-e-name").forEach((inp,i)=>{
       bindAutoSelect(inp);
       inp.addEventListener("change", ()=>{
-        EKSPEDISI[i] = inp.value.trim() || EKSPEDISI[i];
+        EKSPEDISI[i].name = inp.value.trim() || EKSPEDISI[i].name;
         refreshAfterDataChange();
         renderEkspedisiList();
       });
     });
-    list.querySelectorAll("[data-del]").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const idx = +btn.dataset.del;
-        if(confirm(`Hapus ekspedisi "${EKSPEDISI[idx]}"?`)){
-          EKSPEDISI.splice(idx,1);
-          refreshAfterDataChange();
-          renderEkspedisiList();
-        }
-      });
-    });
+    bindKodeBadgeCopy(list);
   }
   document.getElementById("md-ekspedisi-add").addEventListener("click", ()=>{
-    EKSPEDISI.push("Ekspedisi baru");
+    EKSPEDISI.push({kode: nextKode("E"), name:"Ekspedisi baru"});
     refreshAfterDataChange();
     renderEkspedisiList();
+  });
+
+  /* ============================================================
+     Tab "Hapus Data" — SATU-SATUNYA jalan untuk menghapus produk
+     maupun ekspedisi, lewat kode masing-masing (P01, E01, dst).
+     ============================================================ */
+  function allKodeEntries(){
+    return [
+      ...PRODUCTS.map((p,i)=> ({ kode:p.kode, nama:p.name, tipe:"Produk", idx:i })),
+      ...EKSPEDISI.map((e,i)=> ({ kode:e.kode, nama:e.name, tipe:"Ekspedisi", idx:i })),
+    ];
+  }
+  function findByKode(kode){
+    const k = (kode || "").trim().toUpperCase();
+    if(!k) return null;
+    return allKodeEntries().find(en=> (en.kode||"").toUpperCase() === k) || null;
+  }
+  function renderHapusReflist(){
+    const list = document.getElementById("md-hapus-reflist");
+    if(!list) return;
+    const entries = allKodeEntries().sort((a,b)=> (a.kode||"").localeCompare(b.kode||"", "id", {numeric:true}));
+    if(!entries.length){
+      list.innerHTML = `<div class="md-note">Belum ada produk/ekspedisi.</div>`;
+      return;
+    }
+    list.innerHTML = entries.map(en=>`
+      <div class="md-hapus-refrow" data-kode="${en.kode}">
+        <span class="md-kode-badge" data-copy-kode="${en.kode}" title="Klik untuk salin kode">${en.kode}</span>
+        <span class="md-hapus-refname">${en.nama}</span>
+        <span class="md-hapus-reftipe">${en.tipe}</span>
+      </div>
+    `).join("");
+    list.querySelectorAll(".md-hapus-refrow").forEach(row=>{
+      row.addEventListener("click", (ev)=>{
+        if(ev.target.closest("[data-copy-kode]")) return; // badge tetap fungsi salin, bukan isi form
+        document.getElementById("md-hapus-kode").value = row.dataset.kode;
+        cariKodeHapus();
+      });
+    });
+    bindKodeBadgeCopy(list);
+  }
+  function resetHapusForm(){
+    __hapusFound = null;
+    const preview = document.getElementById("md-hapus-preview");
+    const err = document.getElementById("md-hapus-err");
+    const inp = document.getElementById("md-hapus-kode");
+    if(preview) preview.hidden = true;
+    if(err) err.textContent = "";
+    if(inp) inp.value = "";
+  }
+  let __hapusFound = null;
+  function cariKodeHapus(){
+    const errEl = document.getElementById("md-hapus-err");
+    const preview = document.getElementById("md-hapus-preview");
+    const kodeInp = document.getElementById("md-hapus-kode");
+    errEl.textContent = "";
+    const found = findByKode(kodeInp.value);
+    if(!found){
+      __hapusFound = null;
+      preview.hidden = true;
+      errEl.textContent = kodeInp.value.trim()
+        ? `Kode "${kodeInp.value.trim().toUpperCase()}" tidak ditemukan.`
+        : "Masukkan kode terlebih dahulu.";
+      return;
+    }
+    __hapusFound = found;
+    document.getElementById("md-hapus-preview-tipe").textContent = found.tipe + " — kode " + found.kode;
+    document.getElementById("md-hapus-preview-nama").textContent = found.nama;
+    preview.hidden = false;
+  }
+  document.getElementById("md-hapus-cari").addEventListener("click", cariKodeHapus);
+  document.getElementById("md-hapus-kode").addEventListener("keydown", (ev)=>{
+    if(ev.key === "Enter"){ ev.preventDefault(); cariKodeHapus(); }
+  });
+  document.getElementById("md-hapus-kode").addEventListener("input", ()=>{
+    // ketik ulang membatalkan hasil pencarian lama supaya tidak salah hapus
+    if(!document.getElementById("md-hapus-preview").hidden){
+      document.getElementById("md-hapus-preview").hidden = true;
+      __hapusFound = null;
+    }
+  });
+  document.getElementById("md-hapus-cancel").addEventListener("click", resetHapusForm);
+  document.getElementById("md-hapus-confirm").addEventListener("click", ()=>{
+    if(!__hapusFound) return;
+    // cari ulang berdasar kode (bukan pakai idx lama) — jaga-jaga kalau
+    // daftar produk/ekspedisi sempat berubah selagi preview ini terbuka.
+    const fresh = findByKode(__hapusFound.kode);
+    if(!fresh){
+      resetHapusForm();
+      document.getElementById("md-hapus-err").textContent = "Data ini sudah tidak ada (mungkin sudah terhapus sebelumnya).";
+      return;
+    }
+    if(!confirm(`Hapus ${fresh.tipe.toLowerCase()} "${fresh.nama}" (kode ${fresh.kode})? Data yang sudah terpakai di pesanan berjalan tidak akan otomatis terhapus dari situ.`)) return;
+    if(fresh.tipe === "Produk"){
+      PRODUCTS.splice(fresh.idx, 1);
+      renderProdukList();
+    } else {
+      EKSPEDISI.splice(fresh.idx, 1);
+      renderEkspedisiList();
+    }
+    refreshAfterDataChange();
+    renderHapusReflist();
+    resetHapusForm();
+    showToast(`${fresh.tipe} "${fresh.nama}" dihapus.`);
   });
 
   /* ---------- Ubah / Reset PIN ---------- */
