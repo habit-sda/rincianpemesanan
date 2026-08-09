@@ -633,9 +633,12 @@
       padding-top:calc(14px + env(safe-area-inset-top));
     }
     .btn-back{
-      background:var(--card);border:1px solid var(--line);border-radius:8px;
-      width:36px;height:36px;flex-shrink:0;font-size:16px;color:var(--ink);cursor:pointer;
+      display:flex;align-items:center;gap:5px;
+      background:#e6f4ea;border:1px solid var(--primary-green);border-radius:20px;
+      height:34px;padding:0 12px 0 10px;flex-shrink:0;
+      font-size:12.5px;font-weight:700;color:var(--primary-green);cursor:pointer;
     }
+    .btn-back svg{width:17px;height:17px;flex-shrink:0;}
     .panel-topbar-title{font-weight:700;font-size:15px;color:var(--ink);}
 
     /* --- sembunyikan layout desktop (tabel + field ongkir + nota) --- */
@@ -1176,7 +1179,10 @@
   <!-- ================= PENJUALAN ================= -->
   <div class="panel active" id="panel-penjualan">
     <div class="panel-topbar mobile-only">
-      <button class="btn-back" data-back title="Kembali ke beranda">‹</button>
+      <button class="btn-back" data-back title="Kembali ke beranda">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 11.5L12 4l8 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-5.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20h3a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Beranda</span>
+      </button>
       <span class="panel-topbar-title">Penjualan (Grosir)</span>
     </div>
     <div class="wiz mobile-only" id="wiz-penjualan" data-sheet="penjualan">
@@ -1270,7 +1276,10 @@
   <!-- ================= CUSTOM ================= -->
   <div class="panel" id="panel-custom">
     <div class="panel-topbar mobile-only">
-      <button class="btn-back" data-back title="Kembali ke beranda">‹</button>
+      <button class="btn-back" data-back title="Kembali ke beranda">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 11.5L12 4l8 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-5.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20h3a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Beranda</span>
+      </button>
       <span class="panel-topbar-title">Custom</span>
     </div>
     <div class="wiz mobile-only" id="wiz-custom" data-sheet="custom">
@@ -2349,7 +2358,7 @@ function buildRows(sheet){
       <td class="num readout" data-r="${i}" data-f="total" data-label="Total">–</td>
     `;
     tbody.appendChild(tr);
-    comboboxify(tr.querySelector("select.prod"), "Pilih produk...");
+    if(SETTINGS.autocompleteProduk) comboboxify(tr.querySelector("select.prod"), "Pilih produk...");
   }
   tbody.querySelectorAll("select.prod, input.qty, input.diskon").forEach(el=>{
     el.addEventListener("input", ()=>calc(sheet));
