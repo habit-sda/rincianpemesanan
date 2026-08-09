@@ -904,13 +904,38 @@
   }
   .md-pinbox h3{margin:0 0 6px;font-size:16px;}
   .md-pinbox p{margin:0 0 18px;font-size:12.5px;color:var(--ink-soft);}
-  .md-pin-input{
-    width:100%;height:52px;border:1px solid var(--line);border-radius:10px;text-align:center;
-    font-size:22px;letter-spacing:.4em;font-family:'Roboto Mono',monospace;
-  }
   .md-pin-err{font-size:12px;color:var(--danger-red);min-height:16px;margin-top:8px;}
   .md-pinbox .wiz-btn-primary{margin-top:16px;}
-  .md-pin-reset{background:none;border:none;color:var(--ink-soft);font-size:12px;text-decoration:underline;margin-top:14px;cursor:pointer;}
+  .md-pin-reset{background:none;border:none;color:var(--primary-green);font-size:12px;text-decoration:underline;margin-top:14px;cursor:pointer;}
+
+  /* ---- Tombol & elemen modal Master Data — SENGAJA di luar media query
+     manapun (beda dari .wiz-btn-primary) supaya konsisten tampil di
+     desktop maupun mobile. Sebelumnya tombol utama modal ini memakai
+     .wiz-btn-primary yang cuma didefinisikan di dalam @media mobile,
+     jadi di desktop jatuh balik ke tombol polos tanpa gaya sama sekali. ---- */
+  .md-modal-icon{
+    width:44px;height:44px;border-radius:50%;background:#e6f4ea;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 14px;
+  }
+  .md-modal-icon svg{width:20px;height:20px;}
+  .md-modal-primary{
+    width:100%;height:48px;border:none;border-radius:10px;background:var(--primary-green);color:#fff;
+    font-weight:700;font-size:14.5px;cursor:pointer;margin-top:18px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .md-modal-primary:hover{background:#006b4c;}
+  .md-modal-primary:active{transform:translateY(1px);}
+  .md-modal-secondary{
+    width:100%;height:44px;margin-top:8px;border:1px solid var(--line);border-radius:10px;background:#fff;
+    color:var(--ink-soft);font-weight:700;font-size:13px;cursor:pointer;
+  }
+  .md-modal-secondary:hover{background:var(--paper-dark);}
+  .md-pin-otp{display:flex;gap:6px;justify-content:center;margin-bottom:6px;}
+  .md-pin-otp input{
+    width:38px;height:46px;border:1.5px solid var(--line);border-radius:8px;text-align:center;
+    font-size:18px;font-weight:700;color:var(--ink);font-family:'Roboto Mono',monospace;
+  }
+  .md-pin-otp input:focus{border-color:var(--primary-green);box-shadow:0 0 0 3px rgba(0,132,95,.15);outline:none;}
 
   .md-panel{
     position:fixed;inset:0;background:rgba(20,20,20,.55);z-index:1250;
@@ -1386,17 +1411,23 @@
   <!-- ================= MASTER DATA: modal PIN ================= -->
   <div class="md-overlay" id="md-pin-overlay" hidden>
     <div class="md-pinbox">
+      <div class="md-modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" stroke="#00845f" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="#00845f" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
       <h3>Masuk Master Data</h3>
       <p>Masukkan PIN 6 digit untuk membuka pengaturan produk, ekspedisi, dan keamanan.</p>
-      <input type="password" inputmode="numeric" maxlength="6" class="md-pin-input" id="md-pin-input" placeholder="••••••">
+      <div class="md-pin-otp" id="md-pin-otp">
+        <input type="password" inputmode="numeric" maxlength="1" class="md-pin-digit" data-pin-idx="0">
+        <input type="password" inputmode="numeric" maxlength="1" class="md-pin-digit" data-pin-idx="1">
+        <input type="password" inputmode="numeric" maxlength="1" class="md-pin-digit" data-pin-idx="2">
+        <input type="password" inputmode="numeric" maxlength="1" class="md-pin-digit" data-pin-idx="3">
+        <input type="password" inputmode="numeric" maxlength="1" class="md-pin-digit" data-pin-idx="4">
+        <input type="password" inputmode="numeric" maxlength="1" class="md-pin-digit" data-pin-idx="5">
+      </div>
       <div class="md-pin-err" id="md-pin-err"></div>
-      <button class="wiz-btn-primary" id="md-pin-submit">Buka</button>
-      <div>
-        <button class="md-pin-reset" id="md-pin-forgot">Lupa PIN? Reset ke PIN bawaan</button>
-      </div>
-      <div>
-        <button class="md-pin-reset" id="md-pin-cancel">Batal</button>
-      </div>
+      <button class="md-modal-primary" id="md-pin-submit">Buka</button>
+      <button class="md-modal-secondary" id="md-pin-cancel">Batal</button>
+      <button class="md-pin-reset" id="md-pin-forgot">Lupa PIN? Reset ke PIN bawaan</button>
     </div>
   </div>
 
@@ -1598,8 +1629,8 @@
         </div>
         <div class="md-note" style="margin-top:4px;">Dipakai untuk baris "Harga per Sachet/Renteng/Pack" di ringkasan Penjualan. Isi 0 kalau produk ini tidak punya satuan tersebut (mis. produk Pack biasanya tidak punya sachet/renteng).</div>
       </div>
-      <button class="wiz-btn-primary" id="md-pd-save">Simpan detail</button>
-      <button class="md-pin-reset" id="md-pd-cancel">Batal</button>
+      <button class="md-modal-primary" id="md-pd-save">Simpan detail</button>
+      <button class="md-modal-secondary" id="md-pd-cancel">Batal</button>
     </div>
   </div>
 
@@ -1649,8 +1680,8 @@
         <input type="number" inputmode="numeric" id="md-ed-subsidibatas" min="0" max="100" style="max-width:140px;">
         <div class="md-note" id="md-ed-preview" style="margin-top:10px;font-weight:700;color:var(--ink);"></div>
       </div>
-      <button class="wiz-btn-primary" id="md-ed-save">Simpan rumus</button>
-      <button class="md-pin-reset" id="md-ed-cancel">Batal</button>
+      <button class="md-modal-primary" id="md-ed-save">Simpan rumus</button>
+      <button class="md-modal-secondary" id="md-ed-cancel">Batal</button>
     </div>
   </div>
 
@@ -1697,7 +1728,14 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.9.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.9.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug tampilan (desktop):</b> tombol utama di 3 dialog Master Data (Masuk PIN, Detail Produk, Detail Ekspedisi) sebelumnya jatuh balik jadi kotak polos tanpa gaya di layar lebar — class CSS-nya ternyata cuma aktif untuk layar mobile. Sekarang pakai gaya tombol khusus modal yang konsisten di desktop maupun mobile.</li>
+            <li>Dialog "Masuk Master Data": input PIN diganti dari satu kotak titik-titik jadi 6 kotak terpisah per digit (auto-pindah kotak, bisa tempel PIN sekaligus), ditambah ikon gembok, dan tombol Batal jadi tombol tersendiri (bukan lagi teks link) supaya lebih jelas dan enak dipencet.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.9.0</div>
           <ul>
             <li>Master Data → tab 🚚 Ekspedisi: baris ekspedisi sekarang punya ikon <b>🧮 Rumus</b> untuk atur <b>pembulatan berat</b> (longgar/ketat), <b>berat minimum charge (kg)</b>, dan <b>skema subsidi ongkir khusus</b> — aturan yang sebelumnya tertanam tetap di kode berdasarkan nama ekspedisi (mis. "IDTruck", "Sentral Cargo") sekarang bisa diatur sendiri per ekspedisi, termasuk untuk ekspedisi baru.</li>
             <li>Master Data → tab 📦 Produk → Detail: field baru <b>"Isi per Karton"</b> (Sachet/Renteng/Pack) per produk — dipakai untuk baris "Harga per Sachet/Renteng/Pack" di ringkasan Penjualan, menggantikan angka tetap (384/32/16) yang sebelumnya dipakai sama untuk semua produk apa pun isinya.</li>
@@ -4761,11 +4799,34 @@ if ("serviceWorker" in navigator) {
   /* ---------- buka/tutup ---------- */
   const trigger = document.getElementById("md-secret-tap");
   const pinOverlay = document.getElementById("md-pin-overlay");
-  const pinInput = document.getElementById("md-pin-input");
+  const pinDigits = [...document.querySelectorAll(".md-pin-digit")];
   const pinErr = document.getElementById("md-pin-err");
   const panel = document.getElementById("md-panel");
-  [pinInput, "md-pin-old","md-pin-new","md-pin-new2"].forEach(x=>{
-    bindAutoSelect(typeof x==="string" ? document.getElementById(x) : x);
+  ["md-pin-old","md-pin-new","md-pin-new2"].forEach(x=> bindAutoSelect(document.getElementById(x)));
+
+  /* ---- Input PIN gaya OTP: 6 kotak terpisah, auto-pindah ke kotak
+     berikutnya begitu terisi, Backspace di kotak kosong mundur ke kotak
+     sebelumnya, dan bisa tempel (paste) 6 digit sekaligus. ---- */
+  function getPinValue(){ return pinDigits.map(d=>d.value).join(""); }
+  function clearPinDigits(){ pinDigits.forEach(d=> d.value = ""); }
+  pinDigits.forEach((inp, i)=>{
+    inp.addEventListener("input", ()=>{
+      inp.value = inp.value.replace(/[^0-9]/g, "").slice(0,1);
+      if(inp.value && pinDigits[i+1]) pinDigits[i+1].focus();
+      if(getPinValue().length === 6) submitPin();
+    });
+    inp.addEventListener("keydown", (e)=>{
+      if(e.key === "Backspace" && !inp.value && pinDigits[i-1]){ pinDigits[i-1].focus(); }
+      if(e.key === "Enter") submitPin();
+    });
+    inp.addEventListener("paste", (e)=>{
+      const text = (e.clipboardData || window.clipboardData).getData("text").replace(/[^0-9]/g, "").slice(0,6);
+      if(!text) return;
+      e.preventDefault();
+      text.split("").forEach((ch, idx)=>{ if(pinDigits[idx]) pinDigits[idx].value = ch; });
+      (pinDigits[Math.min(text.length,5)] || pinDigits[5]).focus();
+      if(text.length === 6) submitPin();
+    });
   });
 
   // Gestur tersembunyi: ketuk teks "Rp" di footer 3x dalam 2 detik.
@@ -4778,23 +4839,22 @@ if ("serviceWorker" in navigator) {
     if(tapCount >= 3){
       tapCount = 0;
       clearTimeout(tapTimer);
-      pinInput.value = ""; pinErr.textContent = "";
-      pinOverlay.hidden = false; pinInput.focus();
+      clearPinDigits(); pinErr.textContent = "";
+      pinOverlay.hidden = false; pinDigits[0].focus();
     }
   });
   document.getElementById("md-pin-cancel").addEventListener("click", ()=> pinOverlay.hidden = true);
   document.getElementById("md-pin-forgot").addEventListener("click", ()=>{
     if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
       setPin(DEFAULT_PIN);
-      pinErr.textContent = "PIN sudah direset ke PIN bawaan.";
       pinErr.style.color = "var(--primary-green)";
+      pinErr.textContent = "PIN sudah direset ke PIN bawaan.";
       pushMasterDataToServer();
     }
   });
   document.getElementById("md-pin-submit").addEventListener("click", submitPin);
-  pinInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") submitPin(); });
   function submitPin(){
-    if(pinInput.value === getPin()){
+    if(getPinValue() === getPin()){
       pinOverlay.hidden = true;
       openPanel();
     } else {
