@@ -659,6 +659,8 @@
     .wiz-section{padding:16px 0;border-bottom:1px solid var(--line);}
     .wiz-section:first-of-type{padding-top:2px;}
     .wiz-section:last-of-type{border-bottom:none;}
+    .wiz-section-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);}
+    .wiz-section-row .wiz-section{padding:0;border-bottom:none;}
     .wiz-section-label{
       display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);
       font-weight:500;margin-bottom:8px;
@@ -727,6 +729,10 @@
       touch-action:pan-y;user-select:none;
     }
     .wiz-pcard-body{flex:1;min-width:0;cursor:pointer;}
+    .wiz-pcard-img{
+      width:52px;height:52px;border-radius:10px;object-fit:cover;
+      flex-shrink:0;margin-right:12px;background:#f5ede1;
+    }
     .wiz-pcard-nameline{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;}
     .wiz-pcard-name{font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
     .wiz-qty-badge{
@@ -1322,6 +1328,9 @@
           <input type="text" inputmode="numeric" id="md-pd-subsidi2" style="max-width:none;">
           <input type="text" inputmode="numeric" id="md-pd-subsidi3" style="max-width:none;">
         </div>
+        <label>Link gambar produk (URL)</label>
+        <input type="text" inputmode="url" id="md-pd-gambar" placeholder="https://... (kosongkan untuk gambar bawaan)" style="max-width:none;">
+        <div class="md-note" style="margin-top:4px;">Tempel link gambar dari internet (bukan unggah file) supaya tidak menghabiskan penyimpanan. Kalau dikosongkan, tampil gambar kardus polos.</div>
       </div>
       <button class="wiz-btn-primary" id="md-pd-save">Simpan detail</button>
       <button class="md-pin-reset" id="md-pd-cancel">Batal</button>
@@ -1339,7 +1348,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.0.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.1.0</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
     </div>
   </footer>
@@ -1371,7 +1380,15 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.0.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.1.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Fitur baru: <b>gambar produk</b>. Kartu produk tersimpan di "Input Penjualan" sekarang menampilkan foto produk (kalau belum diatur, tampil gambar kardus polos bawaan — tidak makan penyimpanan sama sekali).</li>
+            <li>Master Data → Produk → Detail (klik dua kali nama produk) sekarang punya field baru <b>"Link gambar produk (URL)"</b>. Cukup tempel link gambar dari internet — bukan unggah file — supaya tidak menghabiskan penyimpanan. Begitu link diisi & disimpan, gambar di kartu produk otomatis berubah.</li>
+            <li>Form Tambah/Edit produk (Custom): field Jumlah &amp; Diskon sekarang berdampingan 2 kolom, bukan bertumpuk.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.0.0</div>
           <ul>
             <li><b>Rebranding penuh ke "Habit"</b> — nama aplikasi, logo, ikon PWA, dan judul halaman semuanya diganti. Data bisnis (PT. Halawa Bintang Utama, rekening bank, daftar produk) tidak berubah — cuma identitas aplikasinya yang di-rebrand.</li>
             <li>Beranda (HP) dirombak total mengikuti desain baru: header logo + tombol Bantuan, ilustrasi hero, kartu Grosir/Custom dengan tombol "Mulai →" berwarna di footer kartu, daftar "Aksi cepat" dengan ikon berwarna per-item (Telegram biru, Bayar Pesanan hijau, Kalkulator ungu), dan <b>Reset kini diisolasi</b> dari navigasi utama (border merah tersendiri + keterangan "Hapus semua data input dan mulai baru") supaya tidak tersenggol tidak sengaja.</li>
@@ -1793,16 +1810,28 @@
 <script>
 /* ============ DATA (persis dari sheet Data) ============ */
 const PRODUCTS = [
-  {name:"Halawa rasa Ayam",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:5.6, satuan:"Karton"},
-  {name:"Halawa rasa Sapi",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:5.6, satuan:"Karton"},
-  {name:"Halawa rasa Jamur",  harga:384000, diskon:[0.16,0.21,0.24],     subsidi:[0,9000,9000], berat:4.1, satuan:"Karton"},
-  {name:"Halawa Ayam 500 g",  harga:400000, diskon:[55000,75000,85000],  subsidi:[0,9000,9000], berat:5.3, satuan:"Karton"},
-  {name:"Halawa Sapi 500 g",  harga:400000, diskon:[55000,75000,85000],  subsidi:[0,9000,9000], berat:5.3, satuan:"Karton"},
-  {name:"Halawa Ayam (Pack)", harga:24000,  diskon:[0,0,0],              subsidi:[0,0,0],       berat:0.35,satuan:"Pack"},
-  {name:"Halawa Sapi (Pack)", harga:24000,  diskon:[0,0,0],              subsidi:[0,0,0],       berat:0.35,satuan:"Pack"},
-  {name:"Halawa Jamur (Pack)",harga:24000,  diskon:[0,0,0],              subsidi:[0,0,0],       berat:0.27,satuan:"Pack"},
+  {name:"Halawa rasa Ayam",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:5.6, satuan:"Karton", gambar:""},
+  {name:"Halawa rasa Sapi",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:5.6, satuan:"Karton", gambar:""},
+  {name:"Halawa rasa Jamur",  harga:384000, diskon:[0.16,0.21,0.24],     subsidi:[0,9000,9000], berat:4.1, satuan:"Karton", gambar:""},
+  {name:"Halawa Ayam 500 g",  harga:400000, diskon:[55000,75000,85000],  subsidi:[0,9000,9000], berat:5.3, satuan:"Karton", gambar:""},
+  {name:"Halawa Sapi 500 g",  harga:400000, diskon:[55000,75000,85000],  subsidi:[0,9000,9000], berat:5.3, satuan:"Karton", gambar:""},
+  {name:"Halawa Ayam (Pack)", harga:24000,  diskon:[0,0,0],              subsidi:[0,0,0],       berat:0.35,satuan:"Pack",   gambar:""},
+  {name:"Halawa Sapi (Pack)", harga:24000,  diskon:[0,0,0],              subsidi:[0,0,0],       berat:0.35,satuan:"Pack",   gambar:""},
+  {name:"Halawa Jamur (Pack)",harga:24000,  diskon:[0,0,0],              subsidi:[0,0,0],       berat:0.27,satuan:"Pack",   gambar:""},
 ];
 const PRODUCTS_PENJUALAN = PRODUCTS.slice(0,5); // dropdown Penjualan hanya A4:A8, sesuai file asli
+/* Gambar default produk (kardus kosong) — dipakai kalau produk belum diisi
+   Link Gambar di Master Data, atau kalau link gambarnya gagal dimuat.
+   Berbentuk SVG inline (bukan file terpisah) supaya TIDAK menambah beban
+   penyimpanan/hosting sama sekali. */
+const PRODUCT_IMG_PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <circle cx="32" cy="32" r="32" fill="#f5ede1"/>
+    <path d="M17 24l15-7 15 7-15 7-15-7z" fill="#e3c396" stroke="#b98b52" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M17 24v16l15 7V31L17 24z" fill="#d9b382" stroke="#b98b52" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M47 24v16l-15 7V31l15-7z" fill="#c9a06e" stroke="#b98b52" stroke-width="1.4" stroke-linejoin="round"/>
+  </svg>`
+);
 const EKSPEDISI = ["313 Express","APM Logistics","Baraka Express","Buton Express","Diambil Sendiri","Duta Express","IDTruck","Indah Logistik","JNE Express","JNE Trucking","JNT Cargo","JNT Express","KALOG","Laris Cargo","LSJ Cargo","Pangeran Express","Papandayan Cargo","Sajira Mahardika","Sentral Cargo","TAM Cargo","Toyyib Logistik","Tri Tunggal","Wahana","CalistaExpress","Lion Parcel"];
 const REGIONS = [
   ["JAWA TIMUR",3500],["JAWA TENGAH",4250],["JAWA BARAT",5000],["JAKARTA",null],
@@ -3540,9 +3569,11 @@ if ("serviceWorker" in navigator) {
         const diskonPart = raw==="" ? "Tidak ada diskon" : `Diskon ${dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv)}/${satuan}`;
         detailTxt = `${diskonPart} · Harga ${hargaSatuanTxt}/${satuan}`;
       }
+      const imgSrc = (p && p.gambar) ? p.gambar : PRODUCT_IMG_PLACEHOLDER;
       return `<div class="wiz-pcard-wrap">
         <div class="wiz-pcard-delbg" data-delrow="${i}">Hapus</div>
         <div class="wiz-pcard" data-row="${i}">
+          <img class="wiz-pcard-img" src="${imgSrc}" alt="" onerror="this.onerror=null;this.src='${PRODUCT_IMG_PLACEHOLDER}';">
           <div class="wiz-pcard-body" data-togglerow="${i}">
             <div class="wiz-pcard-nameline">
               <span class="wiz-pcard-name">${prod}</span>
@@ -3583,20 +3614,27 @@ if ("serviceWorker" in navigator) {
           <div class="wiz-section-label"><span class="wiz-section-ic">📦</span> Produk</div>
           <select id="wa-prod-${sheet}"><option value="">— pilih produk —</option>${options}</select>
         </div>
+        ${sheet==="custom" ? `
+        <div class="wiz-section-row">
+          <div class="wiz-section">
+            <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
+            <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
+            <div class="wiz-hint" id="wa-hint-${sheet}"></div>
+          </div>
+          <div class="wiz-section">
+            <div class="wiz-section-label"><span class="wiz-section-ic">🏷️</span> Diskon</div>
+            <select id="wa-diskonmode-${sheet}" style="margin-bottom:10px;">
+              <option value="persen">Persen (%)</option>
+              <option value="rupiah">Rupiah (Rp)</option>
+            </select>
+            <input type="text" inputmode="numeric" id="wa-diskon-${sheet}" placeholder="0">
+          </div>
+        </div>` : `
         <div class="wiz-section">
           <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
           <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
           <div class="wiz-hint" id="wa-hint-${sheet}"></div>
-        </div>
-        ${sheet==="custom" ? `
-        <div class="wiz-section">
-          <div class="wiz-section-label"><span class="wiz-section-ic">🏷️</span> Diskon</div>
-          <select id="wa-diskonmode-${sheet}" style="margin-bottom:10px;">
-            <option value="persen">Persen (%)</option>
-            <option value="rupiah">Rupiah (Rp)</option>
-          </select>
-          <input type="text" inputmode="numeric" id="wa-diskon-${sheet}" placeholder="0">
-        </div>` : ``}
+        </div>`}
         <div class="wiz-field" id="wa-err-${sheet}" style="color:var(--danger-red);font-size:12.5px;min-height:16px;"></div>
         <div class="wiz-inline-form-btns">
           <button class="wiz-btn-primary" id="wa-save-${sheet}">${editing ? "Simpan perubahan" : "Simpan produk"}</button>
@@ -4078,7 +4116,7 @@ if ("serviceWorker" in navigator) {
     });
   }
   document.getElementById("md-produk-add").addEventListener("click", ()=>{
-    PRODUCTS.push({name:"Produk baru", harga:0, diskon:[0,0,0], subsidi:[0,0,0], berat:1, satuan:"Pack"});
+    PRODUCTS.push({name:"Produk baru", harga:0, diskon:[0,0,0], subsidi:[0,0,0], berat:1, satuan:"Pack", gambar:""});
     refreshAfterDataChange();
     renderProdukList();
   });
@@ -4096,6 +4134,7 @@ if ("serviceWorker" in navigator) {
       formatRibuan(el);
       el.value = (p.subsidi[n-1]||0).toLocaleString("id-ID");
     });
+    document.getElementById("md-pd-gambar").value = p.gambar || "";
     pdOverlay.hidden = false;
   }
   document.getElementById("md-pd-cancel").addEventListener("click", ()=> pdOverlay.hidden = true);
@@ -4103,6 +4142,7 @@ if ("serviceWorker" in navigator) {
     const p = PRODUCTS[pdEditIdx];
     p.diskon = [1,2,3].map(n=> parseFloat(readDiskonModeValue("md-pd-diskonmode"+n, "md-pd-diskon"+n))||0);
     p.subsidi = [0,1,2].map(i=> parseRp(document.getElementById("md-pd-subsidi"+(i+1)).value));
+    p.gambar = document.getElementById("md-pd-gambar").value.trim();
     refreshAfterDataChange();
     pdOverlay.hidden = true;
   });
