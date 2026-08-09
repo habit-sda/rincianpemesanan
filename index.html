@@ -988,9 +988,10 @@
   .md-switch input:checked + .md-switch-track .md-switch-knob{left:20px;}
   .md-card h3{margin:0 0 14px;font-size:14.5px;}
   .md-row{
-    display:grid;grid-template-columns:1fr 95px 75px 85px 34px;gap:8px;align-items:center;
+    display:grid;grid-template-columns:22px 1fr 95px 75px 85px 34px 30px;gap:8px;align-items:center;
     padding:8px 0;border-bottom:1px solid var(--line);
   }
+  .md-row.dragging{opacity:.4;}
   .md-row:last-child{border-bottom:none;}
   .md-row input{
     height:38px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-size:13px;font-family:inherit;
@@ -1012,6 +1013,28 @@
     height:38px;display:flex;align-items:center;justify-content:center;
   }
   .md-row-detail svg{width:16px;height:16px;}
+  /* ---- Urutan tampil manual: drag handle (mouse) + tombol panah (semua
+     perangkat, termasuk HP). Urutan produk menentukan mana yang otomatis
+     masuk tab Penjualan — lihat garis pembatas "md-produk-divider". ---- */
+  .md-row-handle{
+    background:none;border:none;color:var(--ink-soft);cursor:grab;height:38px;padding:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .md-row-handle:active{cursor:grabbing;}
+  .md-row-handle svg{width:14px;height:14px;pointer-events:none;}
+  .md-row-move{display:flex;flex-direction:column;gap:2px;}
+  .md-row-move button{
+    width:28px;height:18px;border:1px solid var(--line);background:var(--card);border-radius:4px;
+    color:var(--ink-soft);cursor:pointer;font-size:9px;line-height:1;padding:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .md-row-move button:disabled{opacity:.3;cursor:default;}
+  .md-row-move button:not(:disabled):hover{background:var(--paper-dark);color:var(--primary-green);border-color:var(--primary-green);}
+  .md-produk-divider{
+    display:flex;align-items:center;gap:8px;margin:4px 0;font-size:10.5px;font-weight:700;
+    color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;
+  }
+  .md-produk-divider::before, .md-produk-divider::after{content:"";flex:1;height:1px;background:var(--line);}
   .md-addrow{
     margin-top:12px;width:100%;height:44px;border-radius:9px;border:1.5px dashed var(--primary-green);
     background:#e3f0fa;color:var(--primary-green);font-weight:700;font-size:13px;cursor:pointer;
@@ -1037,15 +1060,18 @@
     .md-panel-sheet{border-radius:0;max-width:none;box-shadow:none;padding:16px 16px 40px;}
     .md-row-header{display:none;}
     .md-row{
-      grid-template-columns:1fr 1fr 1fr 1fr;
-      grid-template-areas:"name name name name" "harga berat satuan detail";
+      grid-template-columns:20px 1fr 1fr 30px;
+      grid-template-areas:"handle name name move" "harga berat satuan detail";
       gap:6px 8px;padding:10px 0;
     }
+    .md-row-handle{grid-area:handle;}
     .md-p-namewrap{grid-area:name;}
     .md-p-harga{grid-area:harga;}
     .md-p-berat.md-col-berat{grid-area:berat;display:block;}
     .md-p-satuan.md-col-satuan{grid-area:satuan;display:block;}
     .md-row-detail{grid-area:detail;}
+    .md-row-move{grid-area:move;flex-direction:row;}
+    .md-row-move button{width:100%;height:24px;}
   }
 
   /* Catatan: aturan tabel darurat untuk layar <380px yang dulu ada di sini
@@ -1450,9 +1476,9 @@
     <div class="md-section active" id="md-sec-produk">
       <div class="md-card">
         <h3>Daftar produk</h3>
-        <div class="md-note" style="margin-bottom:10px;">5 produk pertama otomatis jadi pilihan di tab Penjualan (Grosir); semua produk tersedia di tab Custom.</div>
+        <div class="md-note" style="margin-bottom:10px;">5 produk pertama (lihat urutan di bawah) otomatis jadi pilihan di tab Penjualan (Grosir); sisanya tersedia di tab Custom. Geser ikon ⠿ atau pakai tombol ▲▼ untuk mengubah urutan.</div>
         <div class="md-row md-row-header" style="font-size:11.5px;color:var(--ink-soft);font-weight:700;border-bottom:2px solid var(--line);">
-          <span>Nama produk</span><span>Harga</span><span class="md-col-berat">Berat (kg)</span><span class="md-col-satuan">Satuan</span><span></span>
+          <span></span><span>Nama produk</span><span>Harga</span><span class="md-col-berat">Berat (kg)</span><span class="md-col-satuan">Satuan</span><span></span><span></span>
         </div>
         <div id="md-produk-list"></div>
         <button class="md-addrow" id="md-produk-add">+ Tambah produk</button>
@@ -1728,7 +1754,13 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.9.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.9.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Master Data → tab 📦 Produk: <b>urutan produk sekarang bisa diatur manual</b> — geser ikon ⠿ (drag & drop, mouse) atau ketuk tombol ▲▼ (kerja di HP juga). Ada garis pembatas otomatis yang menunjukkan mana 5 produk pertama (otomatis masuk tab Penjualan/Grosir) dan mana yang cuma tampil di Custom — garis ini ikut pindah begitu urutan diubah. Sebelumnya urutan cuma bisa berubah lewat urutan tambah produk, tanpa cara memindah produk yang sudah ada.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.9.1</div>
           <ul>
             <li><b>Perbaikan bug tampilan (desktop):</b> tombol utama di 3 dialog Master Data (Masuk PIN, Detail Produk, Detail Ekspedisi) sebelumnya jatuh balik jadi kotak polos tanpa gaya di layar lebar — class CSS-nya ternyata cuma aktif untuk layar mobile. Sekarang pakai gaya tombol khusus modal yang konsisten di desktop maupun mobile.</li>
             <li>Dialog "Masuk Master Data": input PIN diganti dari satu kotak titik-titik jadi 6 kotak terpisah per digit (auto-pindah kotak, bisa tempel PIN sekaligus), ditambah ikon gembok, dan tombol Batal jadi tombol tersendiri (bukan lagi teks link) supaya lebih jelas dan enak dipencet.</li>
@@ -4931,8 +4963,13 @@ if ("serviceWorker" in navigator) {
   // setiap baris untuk menyalinnya.
   function renderProdukList(){
     const list = document.getElementById("md-produk-list");
-    list.innerHTML = PRODUCTS.map((p,i)=>`
+    list.innerHTML = PRODUCTS.map((p,i)=>{
+      const divider = i===5 ? `<div class="md-produk-divider">Di bawah ini hanya tampil di Custom</div>` : "";
+      return divider + `
       <div class="md-row" data-idx="${i}">
+        <button class="md-row-handle" draggable="true" data-drag-idx="${i}" aria-label="Geser urutan" title="Tahan &amp; geser untuk urutkan">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="6" r="1.4" fill="currentColor"/><circle cx="9" cy="12" r="1.4" fill="currentColor"/><circle cx="9" cy="18" r="1.4" fill="currentColor"/><circle cx="15" cy="6" r="1.4" fill="currentColor"/><circle cx="15" cy="12" r="1.4" fill="currentColor"/><circle cx="15" cy="18" r="1.4" fill="currentColor"/></svg>
+        </button>
         <div class="md-p-namewrap">
           <span class="md-kode-badge" data-copy-kode="${p.kode}" title="Klik untuk salin kode">${p.kode}</span>
           <input type="text" class="md-p-name" value="${p.name}" placeholder="Nama produk">
@@ -4943,8 +4980,13 @@ if ("serviceWorker" in navigator) {
         <button class="md-row-detail" data-detail="${i}" title="Detail: diskon tier, subsidi ongkir & link gambar" aria-label="Detail produk">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 15.5l4.5-4 3 2.5L16.5 9 20 13" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         </button>
+        <div class="md-row-move">
+          <button data-move-up="${i}" aria-label="Naikkan urutan" ${i===0 ? "disabled" : ""}>&#9650;</button>
+          <button data-move-down="${i}" aria-label="Turunkan urutan" ${i===PRODUCTS.length-1 ? "disabled" : ""}>&#9660;</button>
+        </div>
       </div>
-    `).join("");
+    `;
+    }).join("");
     list.querySelectorAll(".md-row").forEach(row=>{
       const idx = +row.dataset.idx;
       formatRibuan(row.querySelector(".md-p-harga"));
@@ -4958,6 +5000,49 @@ if ("serviceWorker" in navigator) {
     });
     list.querySelectorAll("[data-detail]").forEach(btn=>{
       btn.addEventListener("click", ()=> openProdukDetail(+btn.dataset.detail));
+    });
+    /* ---- Urutan manual: tombol panah (kerja di semua perangkat) ---- */
+    function moveProduk(idx, dir){
+      const j = idx + dir;
+      if(j<0 || j>=PRODUCTS.length) return;
+      const tmp = PRODUCTS[idx]; PRODUCTS[idx] = PRODUCTS[j]; PRODUCTS[j] = tmp;
+      refreshAfterDataChange();
+      renderProdukList();
+    }
+    list.querySelectorAll("[data-move-up]").forEach(btn=>{
+      btn.addEventListener("click", ()=> moveProduk(+btn.dataset.moveUp, -1));
+    });
+    list.querySelectorAll("[data-move-down]").forEach(btn=>{
+      btn.addEventListener("click", ()=> moveProduk(+btn.dataset.moveDown, 1));
+    });
+    /* ---- Urutan manual: drag & drop (mouse desktop) — pegang ikon ⠿ ---- */
+    let dragSrcIdx = null;
+    list.querySelectorAll(".md-row-handle").forEach(handle=>{
+      handle.addEventListener("dragstart", (e)=>{
+        dragSrcIdx = +handle.dataset.dragIdx;
+        const row = handle.closest(".md-row");
+        if(row) row.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+      });
+      handle.addEventListener("dragend", ()=>{
+        const row = handle.closest(".md-row");
+        if(row) row.classList.remove("dragging");
+        dragSrcIdx = null;
+      });
+    });
+    list.querySelectorAll(".md-row").forEach(row=>{
+      row.addEventListener("dragover", (e)=>{ if(dragSrcIdx!==null) e.preventDefault(); });
+      row.addEventListener("drop", (e)=>{
+        if(dragSrcIdx===null) return;
+        e.preventDefault();
+        const targetIdx = +row.dataset.idx;
+        if(targetIdx===dragSrcIdx) return;
+        const moved = PRODUCTS.splice(dragSrcIdx,1)[0];
+        PRODUCTS.splice(targetIdx,0,moved);
+        dragSrcIdx = null;
+        refreshAfterDataChange();
+        renderProdukList();
+      });
     });
     bindKodeBadgeCopy(list);
   }
