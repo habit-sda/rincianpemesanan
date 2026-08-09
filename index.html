@@ -25,7 +25,8 @@
     --paper-dark:#f8f9fa;
     --ink:#1a1a1a;
     --ink-soft:#5f6368;
-    --stamp-red:#1a73e8;
+    --accent-blue:#1a73e8;
+    --danger-red:#c5221f;
     --ledger-green:#188038;
     --line:#d3d6db;
     --card:#ffffff;
@@ -66,11 +67,12 @@
     padding:9px 20px;cursor:pointer;color:var(--ink-soft);
     border-radius:4px 4px 0 0;position:relative;top:1px;
   }
-  .tab-btn.active{background:var(--card);color:var(--ink);border-bottom:2px solid var(--stamp-red);font-weight:700;}
-  .action-btn.reset-btn{
-    color:#ffffff;font-weight:700;border-color:#c5221f;background:#c5221f;letter-spacing:.03em;
+  .tab-btn.active{background:var(--card);color:var(--ink);border-bottom:2px solid var(--accent-blue);font-weight:700;}
+  .reset-btn{
+    margin-left:auto;color:var(--danger-red);font-weight:700;border-color:var(--line);
+    background:var(--paper-dark);letter-spacing:.03em;
   }
-  .action-btn.reset-btn:hover{background:#a11b18;border-color:#a11b18;}
+  .reset-btn:hover{background:#fce8e6;border-color:#f3b4ae;}
   .panel{display:none;}
   .panel.active{display:block;animation:fade .2s ease;}
   @keyframes fade{from{opacity:0;}to{opacity:1;}}
@@ -81,9 +83,38 @@
     background:var(--card);border:1px solid var(--line);color:var(--ink);
     padding:7px 14px;border-radius:4px;cursor:pointer;
   }
-  .action-btn:hover{background:var(--paper-dark);border-color:var(--stamp-red);}
+  .action-btn:hover{background:var(--paper-dark);border-color:var(--accent-blue);}
   .action-btn:disabled{opacity:.5;cursor:wait;}
   .toolbar-msg{font-size:12px;color:var(--ink-soft);}
+
+  /* ============ Toast & Undo-snackbar khusus mobile ============
+     #toolbar-msg (tempat pesan status Unduh/Bagikan/Salin) ada di dalam
+     .toolbar yang di-hide total di layar HP, jadi tanpa ini user tidak
+     dapat konfirmasi visual apa pun setelah menekan aksi tersebut. */
+  #mobile-toast{
+    position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));
+    transform:translate(-50%,20px);max-width:calc(100% - 32px);
+    background:#1a1a1a;color:#fff;font-size:12.5px;font-weight:500;
+    padding:10px 16px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+    z-index:2000;text-align:center;
+  }
+  #mobile-toast.show{opacity:1;transform:translate(-50%,0);}
+  #mobile-toast.is-error{background:var(--danger-red);}
+  #undo-snackbar{
+    position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));
+    transform:translate(-50%,20px);max-width:calc(100% - 32px);min-width:240px;
+    background:#1a1a1a;color:#fff;font-size:12.5px;padding:10px 8px 10px 16px;
+    border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+    z-index:2001;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  #undo-snackbar.show{opacity:1;transform:translate(-50%,0);pointer-events:auto;}
+  #undo-snackbar-btn{
+    background:none;border:none;color:#8ab4f8;font-weight:700;font-size:12.5px;
+    padding:6px 8px;cursor:pointer;flex-shrink:0;font-family:'Roboto',sans-serif;
+  }
+  @media (min-width:601px){ #mobile-toast, #undo-snackbar{display:none;} }
 
   /* ============ POPUP KALKULATOR MANUAL ============ */
   .calc-overlay{
@@ -109,7 +140,7 @@
   .calc-curr{font-size:26px;font-weight:700;font-family:'Roboto Mono',monospace;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .calc-actionrow{display:flex;gap:6px;padding:8px 10px;background:var(--paper-dark);border-bottom:1px solid var(--line);}
   .calc-actbtn{flex:1;border:none;border-radius:6px;padding:8px 0;font-size:11.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
-  .calc-clearbtn{background:#fce8e6;color:#c5221f;}
+  .calc-clearbtn{background:#fce8e6;color:var(--danger-red);}
   .calc-copybtn{background:var(--ledger-green);color:#fff;}
   .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);padding:1px;}
   .calc-key{
@@ -118,7 +149,7 @@
   }
   .calc-key:active{background:#eef0f2;}
   .calc-fn{background:#f1f5fe;color:var(--ink-soft);font-family:'Roboto',sans-serif;font-size:13px;}
-  .calc-op{background:#f1f5fe;color:var(--stamp-red);}
+  .calc-op{background:#f1f5fe;color:var(--accent-blue);}
   .calc-eq{background:var(--ledger-green);color:#fff;}
   .calc-zero{grid-column:span 1;}
   .calc-msg{font-size:11px;color:var(--ink-soft);text-align:center;padding:6px 10px 10px;min-height:26px;}
@@ -129,14 +160,14 @@
   .confirm-popup{width:300px;}
   .confirm-body{padding:16px;}
   .confirm-body p{margin:0 0 6px;font-size:13.5px;color:var(--ink);line-height:1.5;}
-  .confirm-body .confirm-warning{font-size:11.5px;color:#c5221f;margin-bottom:0;}
+  .confirm-body .confirm-warning{font-size:11.5px;color:var(--danger-red);margin-bottom:0;}
   .confirm-actionrow{display:flex;gap:8px;padding:0 16px 16px;}
   .confirm-actionrow button{flex:1;border:none;border-radius:6px;padding:10px 0;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
-  .confirm-okbtn{background:#c5221f;color:#fff;}
+  .confirm-okbtn{background:var(--danger-red);color:#fff;}
   #update-apply.confirm-okbtn{background:var(--ledger-green);}
 
   .changelog-link{
-    background:none;border:none;color:var(--stamp-red);font-size:inherit;text-decoration:underline;
+    background:none;border:none;color:var(--accent-blue);font-size:inherit;text-decoration:underline;
     cursor:pointer;padding:0;font-family:'Roboto',sans-serif;
   }
   .changelog-popup{width:360px;max-height:80vh;display:flex;flex-direction:column;}
@@ -233,7 +264,7 @@
     background:#fff;border:1px solid var(--line);border-radius:3px;
     padding:4px 6px;color:var(--ink);width:100%;min-width:0;
   }
-  select:focus, input:focus{outline:2px solid var(--stamp-red);outline-offset:-1px;border-color:var(--stamp-red);}
+  select:focus, input:focus{outline:2px solid var(--accent-blue);outline-offset:-1px;border-color:var(--accent-blue);}
   input[readonly]{background:transparent;border-color:transparent;color:var(--ink-soft);padding-left:2px;}
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
@@ -242,6 +273,27 @@
   select.prod{max-width:320px;}
 
   .readout{font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;}
+
+  /* ============ COMBOBOX (dropdown produk/ekspedisi dengan pencarian) ============
+     Menggantikan tampilan <select> polos dengan kotak ketik + daftar saran
+     yang bisa difilter langsung. <select> aslinya tetap ada di DOM (cuma
+     disembunyikan) sebagai satu-satunya sumber nilai, lihat fungsi
+     comboboxify() di JS. */
+  .combo-wrap{position:relative;}
+  .combo-wrap select.combo-native{display:none;}
+  .combo-input{cursor:pointer;}
+  td .combo-input{max-width:320px;}
+  .combo-list{
+    position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;
+    border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.14);
+    max-height:220px;overflow-y:auto;z-index:60;display:none;
+  }
+  .combo-list.show{display:block;}
+  .combo-item{padding:10px 12px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line);}
+  .combo-item:last-child{border-bottom:none;}
+  .combo-item:hover, .combo-item.active{background:#e6f4ea;}
+  .combo-item b{color:var(--ledger-green);}
+  .combo-empty{padding:12px;font-size:12px;color:var(--ink-soft);text-align:center;}
 
   .receipt{
     background:var(--card);border:1px solid var(--line);border-radius:0;padding:14px 16px;
@@ -255,6 +307,14 @@
   .row .val{font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;}
   .row.total .val{color:var(--ledger-green);}
   .row input{max-width:150px;text-align:right;}
+
+  /* ============ Status bayar berwarna ============
+     Merah = kurang bayar, Hijau = lunas, Biru = ada kembalian/lebih bayar.
+     Supaya status langsung tertangkap mata tanpa perlu baca teksnya. */
+  .status-row .lbl, .status-row .val{font-weight:700;transition:color .15s;}
+  .status-row.status-kurang .lbl, .status-row.status-kurang .val{color:var(--danger-red);}
+  .status-row.status-lunas .lbl, .status-row.status-lunas .val{color:var(--ledger-green);}
+  .status-row.status-kembalian .lbl, .status-row.status-kembalian .val{color:var(--accent-blue);}
 
   .field{margin-bottom:10px;}
   .field label{display:block;font-size:11.5px;color:var(--ink);margin-bottom:4px;font-weight:600;}
@@ -274,10 +334,8 @@
   .ongkir-indicator.is-filled{border-color:var(--ledger-green);background:#f2f8f2;}
   .ongkir-indicator.is-filled .ongkir-indicator-badge{display:inline-block;}
   .ongkir-indicator.is-filled input{font-weight:700;}
-  .ongkir-indicator-red.is-filled{border-color:#c5221f;background:#fdecea;}
-  .ongkir-indicator-red.is-filled .ongkir-indicator-badge{background:#c5221f;}
-  .ongkir-indicator-blue.is-filled{border-color:#1a56db;background:#eaf1fd;}
-  .ongkir-indicator-blue.is-filled .ongkir-indicator-badge{background:#1a56db;}
+  .ongkir-indicator-red.is-filled{border-color:var(--danger-red);background:#fdecea;}
+  .ongkir-indicator-red.is-filled .ongkir-indicator-badge{background:var(--danger-red);}
 
   .breakdown{margin-top:12px;border-top:1px solid var(--line);padding-top:8px;}
   .breakdown .row{font-size:12px;border-bottom:none;}
@@ -305,15 +363,9 @@
   footer b{color:var(--ink);}
 
   .note{
-    font-size:11px;color:var(--ink-soft);background:var(--paper-dark);border-left:3px solid var(--stamp-red);
+    font-size:11px;color:var(--ink-soft);background:var(--paper-dark);border-left:3px solid var(--accent-blue);
     padding:8px 12px;border-radius:0;margin-top:12px;line-height:1.5;
   }
-  /* Catatan khusus tab Custom (#cs-note) sengaja dibuat MERAH, terpisah dari
-     variabel --stamp-red (yang sebenarnya biru & dipakai di banyak elemen
-     lain seperti tab aktif/tombol/link) — supaya catatan penting ini
-     langsung menonjol tanpa mengubah warna aksen di seluruh halaman. */
-  #cs-note{border-left-color:#c5221f;background:#fdecea;color:#8a1c17;}
-  #cs-note b{color:#8a1c17;}
 
   /* ===== template nota untuk unduh/salin gambar ===== */
   .pnota{
@@ -354,16 +406,6 @@
   }
   .pnota-grand .l{font-size:29px;font-weight:700;color:#1f6b3a;font-style:italic;}
   .pnota-grand .v{font-size:40px;font-weight:800;color:#c1272d;}
-  /* Warna band nota (header & Grand Total) mengikuti tingkat Total Qty:
-     < 14 = kuning, 14–49 = hijau (default di atas), > 49 = biru.
-     Hanya berlaku di gambar Nota hasil unduhan/salin, bukan di tampilan layar. */
-  .pnota-head.qty-yellow, .pnota-grand.qty-yellow{background:#fdf3d0;}
-  .pnota-grand.qty-yellow .l{color:#8a6d1f;}
-  .pnota-head.qty-blue, .pnota-grand.qty-blue{background:#e3edf9;}
-  .pnota-grand.qty-blue .l{color:#1a56a8;}
-  .pnota-grand.qty-blue .v{color:#0b2f57;}
-  .pnota.qty-yellow thead th{background:#fdf3d0;}
-  .pnota.qty-blue thead th{background:#e3edf9;}
   .pnota-pay{border-top:3px solid #1a1a1a;}
   .pnota-payline{
     display:flex;justify-content:space-between;align-items:center;padding:16px 36px;
@@ -375,8 +417,14 @@
   .pnota-payline.pnota-status .l{font-weight:800;}
   .pnota-payline.pnota-status .v{font-weight:800;font-size:27px;}
 
-  /* ===== responsive: HP / layar sempit ===== */
-  @media (max-width:600px){
+  /* ===== responsive: HP / layar sempit =====
+     Kondisi kedua (max-height + landscape + pointer:coarse) supaya HP yang
+     diputar landscape (lebar >600px tapi tinggi pendek) TETAP dianggap
+     "mobile", bukan balik ke layout tabel desktop yang sempit di tinggi
+     layar segitu. pointer:coarse memastikan ini hanya kena perangkat
+     sentuh (HP/tablet), bukan jendela browser desktop yang sekadar
+     di-resize pendek. ===== */
+  @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
     body{padding:16px 10px 60px;}
     header{align-items:flex-start;gap:8px;padding-bottom:10px;margin-bottom:14px;}
     header .sub{font-size:11.5px;}
@@ -435,18 +483,308 @@
     footer{font-size:11px;}
   }
 
-  @media (max-width:380px){
-    table{font-size:7.5px;}
-    .col-no{width:6%;}
-    .col-desk{width:auto;}
-    .col-qty{width:14%;}
-    .col-diskon{width:22%;}
-    .col-satuan{width:25%;}
-    thead th{padding:3px 2px;font-size:7px;}
-    tbody td{padding:3px 2px;}
-    select.prod{font-size:9px;padding:4px 2px;}
-    input.qty{font-size:10px;padding:4px 2px;}
+  /* ================================================================
+     MOBILE APP MODE (≤600px) — Home screen + kartu produk + bottom sheet
+     Menimpa tampilan tabel spreadsheet dengan alur: Beranda -> pilih
+     Grosir/Custom -> isi lewat kartu & form, bukan tabel sempit.
+     Tidak mengubah SATU PUN logika hitung — cuma UI baru yang membaca
+     & menulis ke elemen tabel asli (disembunyikan, tetap ada di DOM).
+     ================================================================ */
+  .home-screen{display:none;}
+  .mobile-only{display:none;}
+
+  @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
+    /* Latar putih bersih khusus mobile (desktop tetap abu muda seperti semula) */
+    body{background:#ffffff;}
+    .wrap{background:#ffffff;}
+
+    /* Header, tab atas, toolbar aksi, dan referensi ongkir wilayah adalah
+       "chrome" desktop — di mobile digantikan sepenuhnya oleh Beranda +
+       navigasi wizard sendiri (tombol kembali, judul langkah, dst),
+       supaya tidak ada ornamen ganda/membingungkan. */
+    header, .tabs, .toolbar, details.region{display:none;}
+    footer{display:none;}
+    body.showing-home footer{display:block;}
+    body.showing-home .tabs,
+    body.showing-home .toolbar,
+    body.showing-home .panel,
+    body.showing-home details.region{display:none;}
+    body.showing-home .home-screen{display:flex;}
+
+    .home-screen{
+      flex-direction:column;gap:14px;padding:calc(18px + env(safe-area-inset-top)) 2px 10px;
+    }
+    .home-hero{margin-bottom:4px;}
+    .home-hero h1{font-size:21px;margin:0 0 3px;font-weight:700;}
+    .home-hero .sub{font-size:12.5px;color:var(--ink-soft);}
+    .home-tile{
+      display:flex;align-items:center;gap:14px;width:100%;
+      background:var(--card);border:1px solid var(--line);border-radius:14px;
+      padding:18px 16px;text-align:left;cursor:pointer;
+      box-shadow:0 1px 3px rgba(0,0,0,.05);
+    }
+    .home-tile:active{background:#fafafa;border-color:var(--line);}
+    .home-tile-icon{
+      flex-shrink:0;width:52px;height:52px;border-radius:16px;
+      display:flex;align-items:center;justify-content:center;font-size:24px;
+      background:#ffe0b2;color:#e65100;
+    }
+    .home-tile.tile-custom .home-tile-icon{background:#b2f2e5;color:#00695c;}
+    .home-tile-body{flex:1;min-width:0;}
+    .home-tile-title{font-weight:700;font-size:15.5px;color:var(--ink);margin-bottom:2px;}
+    .home-tile-desc{font-size:12px;color:var(--ink-soft);line-height:1.4;}
+    .home-tile-arrow{font-size:18px;color:var(--ink-soft);flex-shrink:0;}
+    .home-links{display:flex;justify-content:center;gap:14px;margin-top:6px;font-size:11.5px;color:var(--ink-soft);}
+    .home-links button{background:none;border:none;color:var(--ink-soft);text-decoration:underline;font-size:inherit;padding:4px;}
+
+    /* --- back bar di dalam panel (mobile) --- */
+    .mobile-only{display:flex;}
+    .panel-topbar{
+      display:flex;align-items:center;gap:10px;margin-bottom:12px;
+      padding-top:calc(14px + env(safe-area-inset-top));
+    }
+    .btn-back{
+      background:var(--card);border:1px solid var(--line);border-radius:8px;
+      width:36px;height:36px;flex-shrink:0;font-size:16px;color:var(--ink);cursor:pointer;
+    }
+    .panel-topbar-title{font-weight:700;font-size:15px;color:var(--ink);}
+
+    /* --- sembunyikan layout desktop (tabel + field ongkir + nota) --- */
+    .table-scroll{display:none;}
+    .entry-col{display:none;}
+    .nota-col{display:none;}
+    .nota-col.wiz-show{display:block;}
+
+    /* --- wizard: 1 langkah = 1 layar --- */
+    .wiz{display:flex;flex-direction:column;}
+    .wiz-step{display:none;}
+    .wiz-step.active{display:block;}
+    .wiz-dots{display:flex;gap:6px;justify-content:center;margin-bottom:16px;}
+    .wiz-dots button{
+      flex:1;background:var(--card);border:1px solid var(--line);border-radius:9px;
+      padding:8px 2px;font-size:10.5px;color:var(--ink-soft);cursor:pointer;font-weight:700;
+    }
+    .wiz-dots button.on{border-color:var(--ledger-green);color:var(--ledger-green);background:#e6f4ea;}
+    .wiz-dots button.done{color:var(--ink);border-color:#c8ccd1;}
+    .wiz-title{font-weight:700;font-size:15px;margin-bottom:16px;}
+    .wiz-field label{display:block;font-size:12.5px;color:var(--ink-soft);margin:16px 0 6px;}
+    .wiz-section{padding:16px 0;border-bottom:1px solid var(--line);}
+    .wiz-section:first-of-type{padding-top:2px;}
+    .wiz-section:last-of-type{border-bottom:none;}
+    .wiz-section-label{
+      display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);
+      font-weight:500;margin-bottom:8px;
+    }
+    .wiz-section-ic{font-size:15px;}
+    .wiz-preview-strip{
+      font-size:12px;color:var(--ink-soft);background:#f1f3f4;border-radius:10px;
+      padding:11px 13px;margin-bottom:14px;line-height:1.4;
+    }
+    .wiz-preview-strip.filled{background:#fafbfa;border:1px solid var(--line);}
+    .wiz-preview-name{font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:7px;}
+    .wiz-preview-badges{display:flex;gap:6px;flex-wrap:wrap;}
+    .wiz-preview-badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:16px;font-family:'Roboto Mono',monospace;}
+    .wiz-preview-badge.blue{background:#d6ecfa;color:#0b5fa5;}
+    .wiz-preview-badge.green{background:#e6f4ea;color:var(--ledger-green);}
+    .wiz-field select, .wiz-field input, .wiz-section select, .wiz-section input{
+      width:100%;height:52px;border-radius:10px;border:1px solid var(--line);font-size:16px;padding:0 14px;
+    }
+    .wiz-field input.wiz-qty-big, .wiz-section input.wiz-qty-big{height:56px;font-size:24px;font-weight:700;text-align:center;}
+    .wiz-hint{font-size:12.5px;color:var(--ink-soft);margin:6px 2px 0;}
+    .wiz-btn-primary{
+      width:100%;height:52px;border:none;border-radius:10px;background:var(--ledger-green);color:#fff;
+      font-weight:700;font-size:15px;margin-top:22px;cursor:pointer;
+    }
+    .wiz-btn-dash{
+      width:100%;height:52px;border-radius:10px;border:1.5px dashed var(--accent-blue);
+      background:#f1f5fe;color:var(--accent-blue);font-weight:700;font-size:14px;margin-top:8px;cursor:pointer;
+    }
+    .wiz-btn-ghost{
+      width:100%;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+      color:var(--ink-soft);font-weight:700;font-size:13.5px;margin-top:10px;cursor:pointer;
+    }
+    /* --- CTA sticky di bawah layar: bungkus tombol aksi utama tiap langkah
+       wizard supaya selalu terjangkau ibu jari, tidak perlu scroll ke bawah
+       dulu (penting di langkah "Tersimpan" yang bisa berisi banyak kartu). --- */
+    .wiz-cta-bar{
+      position:sticky;bottom:0;left:0;right:0;background:#ffffff;
+      padding:12px 0 calc(10px + env(safe-area-inset-bottom));
+      margin-top:18px;box-shadow:0 -8px 14px -10px rgba(0,0,0,.2);z-index:5;
+    }
+    .wiz-cta-bar .wiz-btn-primary, .wiz-cta-bar .wiz-btn-dash{margin-top:0;}
+    .wiz-cta-bar > * + *{margin-top:8px;}
+    .wiz-cta-bar .wiz-actionbtns{margin-top:0;}
+    .wiz-empty{
+      text-align:center;padding:30px 16px;color:var(--ink-soft);font-size:12.5px;
+      border:1.5px dashed var(--line);border-radius:12px;
+    }
+    .wiz-pcard-wrap{position:relative;overflow:hidden;border-radius:12px;margin-bottom:10px;}
+    .wiz-pcard-delbg{
+      position:absolute;right:0;top:0;bottom:0;width:70px;background:var(--accent-blue);color:#fff;
+      display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;cursor:pointer;
+    }
+    .wiz-pcard{
+      position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;
+      padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-start;
+      touch-action:pan-y;user-select:none;
+    }
+    .wiz-pcard-body{flex:1;min-width:0;cursor:pointer;}
+    .wiz-pcard-name{font-weight:700;font-size:14.5px;}
+    .wiz-qty-badge{
+      display:inline-block;font-weight:700;font-size:12px;color:#0b5fa5;
+      background:#d6ecfa;padding:3px 10px;border-radius:20px;margin-top:6px;
+    }
+    .wiz-pcard-detail{
+      max-height:0;overflow:hidden;opacity:0;transition:all .18s ease;
+      font-size:12px;color:var(--ink-soft);
+    }
+    .wiz-pcard-detail.open{max-height:60px;opacity:1;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);}
+    .wiz-pcard-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:10px;}
+    .wiz-pcard-edit{font-size:13px;color:var(--ledger-green);font-weight:700;cursor:pointer;}
+    .wiz-pcard-delbtn{
+      background:none;border:none;font-size:15px;cursor:pointer;padding:2px 4px;line-height:1;
+      opacity:.7;
+    }
+    .wiz-disclose{
+      display:flex;align-items:center;gap:6px;margin-top:18px;color:var(--ledger-green);
+      font-size:13.5px;font-weight:700;cursor:pointer;
+    }
+    .wiz-disclose .arrow{transition:.15s;display:inline-block;}
+    .wiz-disclose.open .arrow{transform:rotate(90deg);}
+    .wiz-disclose-body{display:none;margin-top:6px;}
+    .wiz-disclose-body.open{display:block;}
+    .wiz-revrow{display:flex;justify-content:space-between;font-size:14px;padding:5px 0;}
+    .wiz-revrow.sub span:first-child{padding-left:10px;color:var(--ink-soft);font-size:12.5px;}
+    .wiz-revrow.total{font-weight:700;font-size:16px;padding-top:10px;}
+    .wiz-hr{border-top:1px solid var(--line);margin:10px 0;}
+    /* --- Review: kartu per produk + kartu ringkasan + kartu grand total --- */
+    .wiz-pcard-rev{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:9px;}
+    .wiz-pcard-rev-top{display:flex;justify-content:space-between;font-weight:700;font-size:14.5px;}
+    .wiz-pcard-rev-disc{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+    .wiz-sumcard{background:#f1f3f4;border-radius:12px;padding:13px 15px;margin:12px 0;}
+    .wiz-sumcard .wiz-revrow{font-size:13px;color:var(--ink-soft);padding:3px 0;}
+    .wiz-totalcard{
+      background:#e6f4ea;border-radius:12px;padding:15px;
+      display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;
+    }
+    .wiz-totalcard .l{font-weight:700;font-size:14.5px;color:var(--ink);}
+    .wiz-totalcard .v{font-weight:800;font-size:19px;color:var(--ledger-green);font-family:'Roboto Mono',monospace;}
+    .wiz-stamp{
+      background:#fdece9;border:1px solid #f3b7ac;color:var(--danger-red);border-radius:10px;
+      padding:10px 12px;font-size:12.5px;font-weight:700;text-align:center;margin-bottom:16px;
+    }
+    .wiz-actionbtns{display:flex;gap:8px;margin-top:16px;}
+    .wiz-actionbtns button{
+      flex:1;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+      font-weight:700;font-size:12px;cursor:pointer;
+    }
+    .wiz-actionbtns button.primary{background:var(--ledger-green);color:#fff;border:none;}
+
+    /* --- tombol Kalkulator & Reset di beranda --- */
+    .home-links{display:flex;gap:10px;margin-top:16px;}
+    .home-links button{
+      flex:1;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+      font-weight:700;font-size:13.5px;color:var(--ink-soft);cursor:pointer;text-decoration:none;
+    }
+    .home-links button.danger{color:var(--danger-red);border-color:#f3b7ac;}
   }
+
+  /* ================================================================
+     MASTER DATA — trigger PIN tersembunyi (gestur 5x ketuk, tanpa
+     elemen visual apa pun) + modal PIN + panel pengaturan.
+     Berlaku desktop maupun mobile (tidak dibatasi media query).
+     ================================================================ */
+  .md-overlay{
+    position:fixed;inset:0;background:rgba(20,20,20,.45);z-index:1300;
+    display:flex;align-items:center;justify-content:center;padding:16px;
+  }
+  .md-overlay[hidden]{display:none;}
+  .md-pinbox{
+    width:100%;max-width:320px;background:var(--card);border-radius:16px;padding:26px 22px;text-align:center;
+  }
+  .md-pinbox h3{margin:0 0 6px;font-size:16px;}
+  .md-pinbox p{margin:0 0 18px;font-size:12.5px;color:var(--ink-soft);}
+  .md-pin-input{
+    width:100%;height:52px;border:1px solid var(--line);border-radius:10px;text-align:center;
+    font-size:22px;letter-spacing:.4em;font-family:'Roboto Mono',monospace;
+  }
+  .md-pin-err{font-size:12px;color:var(--danger-red);min-height:16px;margin-top:8px;}
+  .md-pinbox .wiz-btn-primary{margin-top:16px;}
+  .md-pin-reset{background:none;border:none;color:var(--ink-soft);font-size:12px;text-decoration:underline;margin-top:14px;cursor:pointer;}
+
+  .md-panel{
+    position:fixed;inset:0;background:rgba(20,20,20,.55);z-index:1250;
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:28px 16px;overflow-y:auto;
+  }
+  .md-panel[hidden]{display:none;}
+  .md-panel-sheet{
+    background:var(--card);border-radius:16px;max-width:900px;width:100%;
+    padding:22px 22px 32px;box-shadow:0 12px 40px rgba(0,0,0,.22);
+  }
+  .md-panel-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .md-panel-head h2{margin:0;font-size:18px;flex:1;}
+  .md-panel-close{
+    width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--bg);
+    font-size:16px;cursor:pointer;
+  }
+  .md-tabs{display:flex;gap:8px;margin:0 0 18px;flex-wrap:wrap;}
+  .md-tab{
+    padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:var(--bg);
+    font-size:13px;font-weight:700;color:var(--ink-soft);cursor:pointer;
+  }
+  .md-tab.active{border-color:var(--ledger-green);color:var(--ledger-green);background:#e6f4ea;}
+  .md-section{display:none;}
+  .md-section.active{display:block;}
+  .md-card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+  .md-card h3{margin:0 0 14px;font-size:14.5px;}
+  .md-row{
+    display:grid;grid-template-columns:1fr 95px 75px 85px 34px;gap:8px;align-items:center;
+    padding:8px 0;border-bottom:1px solid var(--line);
+  }
+  .md-row:last-child{border-bottom:none;}
+  .md-row input{
+    height:38px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-size:13px;font-family:inherit;
+    background:var(--card);
+  }
+  .md-row-del{background:none;border:none;color:var(--danger-red);font-size:16px;cursor:pointer;}
+  .md-addrow{
+    margin-top:12px;width:100%;height:44px;border-radius:9px;border:1.5px dashed var(--ledger-green);
+    background:#e6f4ea;color:var(--ledger-green);font-weight:700;font-size:13px;cursor:pointer;
+  }
+  .md-eksrow{display:grid;grid-template-columns:1fr 40px;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);}
+  .md-eksrow:last-child{border-bottom:none;}
+  .md-eksrow input{height:38px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;font-family:inherit;background:var(--card);}
+  .md-pinform label{display:block;font-size:12.5px;color:var(--ink-soft);margin:14px 0 6px;}
+  .md-pinform input{width:100%;max-width:220px;height:44px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:16px;background:var(--card);}
+  .md-btn{
+    height:42px;padding:0 18px;border-radius:9px;border:1px solid var(--line);background:var(--card);
+    font-weight:700;font-size:12.5px;cursor:pointer;margin-top:14px;margin-right:8px;
+  }
+  .md-btn.primary{background:var(--ledger-green);color:#fff;border:none;}
+  .md-btn.danger{color:var(--danger-red);border-color:#f3b7ac;}
+  .md-note{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
+  @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
+    .md-panel{padding:0;display:block;background:#ffffff;}
+    .md-panel-sheet{border-radius:0;max-width:none;box-shadow:none;padding:16px 16px 40px;}
+    .md-row-header{display:none;}
+    .md-row{
+      grid-template-columns:1fr 1fr 1fr 30px;
+      grid-template-areas:"name name name del" "harga berat satuan satuan";
+      gap:6px 8px;padding:10px 0;
+    }
+    .md-p-name{grid-area:name;}
+    .md-row .md-row-del{grid-area:del;}
+    .md-p-harga{grid-area:harga;}
+    .md-p-berat.md-col-berat{grid-area:berat;display:block;}
+    .md-p-satuan.md-col-satuan{grid-area:satuan;display:block;}
+  }
+
+  /* Catatan: aturan tabel darurat untuk layar <380px yang dulu ada di sini
+     sudah dihapus — sejak mode "MOBILE APP" aktif, tabel asli (.table-scroll)
+     di-sembunyikan total di ≤600px dan digantikan tampilan kartu wizard,
+     jadi aturan font tabel super-kecil itu sudah tidak pernah kepakai lagi
+     (dead code) di HP mana pun. */
 </style>
 </head>
 <body>
@@ -463,9 +801,41 @@
     </div>
   </header>
 
+  <!-- ================= HOME SCREEN (khusus mobile) ================= -->
+  <div class="home-screen" id="home-screen">
+    <div class="home-hero">
+      <h1>Mau buat nota apa?</h1>
+      <div class="sub">Pilih salah satu di bawah untuk mulai isi pesanan.</div>
+    </div>
+    <button class="home-tile tile-grosir" data-open-tab="penjualan">
+      <div class="home-tile-icon">📦</div>
+      <div class="home-tile-body">
+        <div class="home-tile-title">Penjualan (Grosir)</div>
+        <div class="home-tile-desc">Harga & diskon otomatis mengikuti jumlah pesanan.</div>
+      </div>
+      <div class="home-tile-arrow">›</div>
+    </button>
+    <button class="home-tile tile-custom" data-open-tab="custom">
+      <div class="home-tile-icon">🧾</div>
+      <div class="home-tile-body">
+        <div class="home-tile-title">Custom</div>
+        <div class="home-tile-desc">Isi item bebas satu per satu, diskon diatur manual.</div>
+      </div>
+      <div class="home-tile-arrow">›</div>
+    </button>
+    <div class="home-links">
+      <button type="button" id="home-link-calc">🧮 Kalkulator</button>
+      <button type="button" id="home-link-reset" class="danger">↺ Reset</button>
+    </div>
+    <div style="text-align:center;margin-top:10px;">
+      <button type="button" id="home-link-changelog" style="background:none;border:none;color:var(--ink-soft);font-size:11.5px;text-decoration:underline;">Riwayat Update</button>
+    </div>
+  </div>
+
   <div class="tabs">
     <button class="tab-btn active" data-tab="penjualan">Penjualan (Grosir)</button>
     <button class="tab-btn" data-tab="custom">Custom</button>
+    <button class="tab-btn reset-btn" id="btn-reset" title="Kosongkan semua isian di tab yang aktif">RESET</button>
   </div>
 
   <div class="toolbar">
@@ -473,7 +843,6 @@
     <button class="action-btn" id="btn-share">⇪ Bagikan</button>
     <button class="action-btn" id="btn-copy">⧉ Salin ke Clipboard</button>
     <button class="action-btn" id="btn-calc-toggle">🧮 Kalkulator</button>
-    <button class="action-btn reset-btn" id="btn-reset" title="Kosongkan semua isian di tab yang aktif">🗑 RESET</button>
     <span class="toolbar-msg" id="toolbar-msg"></span>
   </div>
 
@@ -519,9 +888,25 @@
 
   <!-- ================= PENJUALAN ================= -->
   <div class="panel active" id="panel-penjualan">
+    <div class="panel-topbar mobile-only">
+      <button class="btn-back" data-back title="Kembali ke beranda">‹</button>
+      <span class="panel-topbar-title">Penjualan (Grosir)</span>
+    </div>
+    <div class="wiz mobile-only" id="wiz-penjualan" data-sheet="penjualan">
+      <div class="wiz-dots" data-wizdots="penjualan">
+        <button type="button" data-step="add">Tambah</button>
+        <button type="button" data-step="list">Tersimpan</button>
+        <button type="button" data-step="ship">Kirim</button>
+        <button type="button" data-step="review">Review</button>
+      </div>
+      <div class="wiz-step active" data-wstep="add"></div>
+      <div class="wiz-step" data-wstep="list"></div>
+      <div class="wiz-step" data-wstep="ship"></div>
+      <div class="wiz-step" data-wstep="review"></div>
+    </div>
     <div class="sheet" id="capture-penjualan">
       <div class="grid">
-        <div>
+        <div class="entry-col">
           <h2 class="section-title">Rincian Pemesanan</h2>
           <div class="table-scroll">
           <table>
@@ -561,11 +946,11 @@
               <label>Kelebihan bayar sebelumnya</label>
               <span class="ongkir-indicator-badge" id="pj-kelebihan-badge">ADA ISINYA</span>
             </div>
-            <input type="text" inputmode="numeric" id="pj-kelebihan" class="rate-input" value="0">
+            <input type="text" inputmode="numeric" id="pj-kelebihan" value="0">
           </div>
         </div>
 
-        <div>
+        <div class="nota-col" id="pj-nota-col">
           <h2 class="section-title">Nota</h2>
           <div class="receipt">
             <div class="row"><span class="lbl">Subtotal Produk</span><span class="val" id="pj-subtotal">–</span></div>
@@ -573,7 +958,7 @@
             <div class="row"><span class="lbl">Diskon Ongkir (subsidi)</span><span class="val" id="pj-diskonongkir">–</span></div>
             <div class="row total"><span class="lbl">Grand Total</span><span class="val" id="pj-grandtotal">–</span></div>
 
-            <div class="row"><span class="lbl" id="pj-statuslabel">Kurang bayar</span><span class="val" id="pj-selisih">–</span></div>
+            <div class="row status-row" id="pj-statusrow"><span class="lbl" id="pj-statuslabel">Kurang bayar</span><span class="val" id="pj-selisih">–</span></div>
 
             <div class="breakdown" id="pj-breakdown">
               <div class="row"><span class="lbl">Harga per Sachet</span><span class="val" id="pj-sachet">–</span></div>
@@ -590,9 +975,25 @@
 
   <!-- ================= CUSTOM ================= -->
   <div class="panel" id="panel-custom">
+    <div class="panel-topbar mobile-only">
+      <button class="btn-back" data-back title="Kembali ke beranda">‹</button>
+      <span class="panel-topbar-title">Custom</span>
+    </div>
+    <div class="wiz mobile-only" id="wiz-custom" data-sheet="custom">
+      <div class="wiz-dots" data-wizdots="custom">
+        <button type="button" data-step="add">Tambah</button>
+        <button type="button" data-step="list">Tersimpan</button>
+        <button type="button" data-step="ship">Kirim</button>
+        <button type="button" data-step="review">Review</button>
+      </div>
+      <div class="wiz-step active" data-wstep="add"></div>
+      <div class="wiz-step" data-wstep="list"></div>
+      <div class="wiz-step" data-wstep="ship"></div>
+      <div class="wiz-step" data-wstep="review"></div>
+    </div>
     <div class="sheet" id="capture-custom">
       <div class="grid">
-        <div>
+        <div class="entry-col">
           <h2 class="section-title">Rincian Pemesanan (Custom)</h2>
           <div class="table-scroll">
           <table>
@@ -632,24 +1033,23 @@
               <label>Kelebihan bayar sebelumnya</label>
               <span class="ongkir-indicator-badge" id="cs-kelebihan-badge">ADA ISINYA</span>
             </div>
-            <input type="text" inputmode="numeric" id="cs-kelebihan" class="rate-input" value="0">
+            <input type="text" inputmode="numeric" id="cs-kelebihan" value="0">
           </div>
-          <div class="note" id="cs-note">Catatan khusus tab Custom (mengikuti struktur asli file Excel): kolom <b>Diskon</b> di tabel harus diisi <b>manual per baris</b> oleh Anda sendiri, tidak dihitung otomatis oleh sistem. Ekspedisi IDTruck di tab ini <b>tidak</b> dikenakan aturan berat minimum 10&nbsp;kg (beda dengan tab Penjualan). <b>Diskon Ongkir</b> juga wajib diisi manual di kolom Nota — <b>tidak ada</b> perhitungan subsidi ongkir otomatis seperti di tab Penjualan.</div>
+          <div class="note" id="cs-note">Di sheet Custom: kolom <b>Diskon</b> diisi manual per baris (bukan otomatis), tidak ada aturan minimum 10&nbsp;kg untuk IDTruck, dan subsidi ongkir tidak otomatis (isi manual). Ini sesuai struktur asli filenya.</div>
         </div>
 
-        <div>
+        <div class="nota-col" id="cs-nota-col">
           <h2 class="section-title">Nota</h2>
           <div class="receipt">
             <div class="row"><span class="lbl">Subtotal Produk</span><span class="val" id="cs-subtotal">–</span></div>
             <div class="row"><span class="lbl">Ongkir</span><span class="val" id="cs-ongkir">–</span></div>
-            <div class="row ongkir-indicator ongkir-indicator-blue" id="cs-diskonongkir-wrap" style="margin:-6px -8px 4px;">
+            <div class="row">
               <span class="lbl">Diskon Ongkir (manual)</span>
-              <span class="ongkir-indicator-badge" id="cs-diskonongkir-badge" style="margin-right:6px;">ADA ISINYA</span>
-              <input type="text" inputmode="numeric" id="cs-diskonongkir" class="rate-input" value="0" style="max-width:130px;text-align:right;">
+              <input type="text" inputmode="numeric" id="cs-diskonongkir" value="0" style="max-width:130px;text-align:right;">
             </div>
             <div class="row total"><span class="lbl">Grand Total</span><span class="val" id="cs-grandtotal">–</span></div>
 
-            <div class="row"><span class="lbl" id="cs-statuslabel">Kurang bayar</span><span class="val" id="cs-selisih">–</span></div>
+            <div class="row status-row" id="cs-statusrow"><span class="lbl" id="cs-statuslabel">Kurang bayar</span><span class="val" id="cs-selisih">–</span></div>
 
             <div class="breakdown">
               <div class="row"><span class="lbl">Diskon produk (total nilai)</span><span class="val" id="cs-diskonproduk">–</span></div>
@@ -657,6 +1057,109 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ================= MASTER DATA: modal PIN ================= -->
+  <div class="md-overlay" id="md-pin-overlay" hidden>
+    <div class="md-pinbox">
+      <h3>Masuk Master Data</h3>
+      <p>Masukkan PIN 6 digit untuk membuka pengaturan produk, ekspedisi, dan keamanan.</p>
+      <input type="password" inputmode="numeric" maxlength="6" class="md-pin-input" id="md-pin-input" placeholder="••••••">
+      <div class="md-pin-err" id="md-pin-err"></div>
+      <button class="wiz-btn-primary" id="md-pin-submit">Buka</button>
+      <div>
+        <button class="md-pin-reset" id="md-pin-forgot">Lupa PIN? Reset ke PIN bawaan</button>
+      </div>
+      <div>
+        <button class="md-pin-reset" id="md-pin-cancel">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MASTER DATA: panel pengaturan ================= -->
+  <div class="md-panel" id="md-panel" hidden>
+    <div class="md-panel-sheet">
+    <div class="md-panel-head">
+      <h2>Master Data</h2>
+      <button class="md-panel-close" id="md-panel-close" aria-label="Tutup">✕</button>
+    </div>
+    <div class="md-tabs">
+      <button class="md-tab active" data-md-tab="produk">📦 Produk</button>
+      <button class="md-tab" data-md-tab="ekspedisi">🚚 Ekspedisi</button>
+      <button class="md-tab" data-md-tab="keamanan">🔒 Keamanan PIN</button>
+    </div>
+
+    <div class="md-section active" id="md-sec-produk">
+      <div class="md-card">
+        <h3>Daftar produk</h3>
+        <div class="md-note" style="margin-bottom:10px;">5 produk pertama otomatis jadi pilihan di tab Penjualan (Grosir); semua produk tersedia di tab Custom.</div>
+        <div class="md-row md-row-header" style="font-size:11.5px;color:var(--ink-soft);font-weight:700;border-bottom:2px solid var(--line);">
+          <span>Nama produk</span><span>Harga</span><span class="md-col-berat">Berat (kg)</span><span class="md-col-satuan">Satuan</span><span></span>
+        </div>
+        <div id="md-produk-list"></div>
+        <button class="md-addrow" id="md-produk-add">+ Tambah produk</button>
+        <div class="md-note">Ubah diskon tier & subsidi ongkir per produk lewat tombol "Detail" (klik dua kali nama produk).</div>
+      </div>
+    </div>
+
+    <div class="md-section" id="md-sec-ekspedisi">
+      <div class="md-card">
+        <h3>Daftar ekspedisi</h3>
+        <div id="md-ekspedisi-list"></div>
+        <button class="md-addrow" id="md-ekspedisi-add">+ Tambah ekspedisi</button>
+      </div>
+    </div>
+
+    <div class="md-section" id="md-sec-keamanan">
+      <div class="md-card md-pinform">
+        <h3>Ubah PIN</h3>
+        <label>PIN saat ini</label>
+        <input type="password" inputmode="numeric" maxlength="6" id="md-pin-old">
+        <label>PIN baru (6 digit)</label>
+        <input type="password" inputmode="numeric" maxlength="6" id="md-pin-new">
+        <label>Ulangi PIN baru</label>
+        <input type="password" inputmode="numeric" maxlength="6" id="md-pin-new2">
+        <div class="md-pin-err" id="md-pin-change-err"></div>
+        <div>
+          <button class="md-btn primary" id="md-pin-save">Simpan PIN baru</button>
+          <button class="md-btn danger" id="md-pin-reset-btn">Reset ke PIN bawaan</button>
+        </div>
+        <div class="md-note">Kalau PIN lupa, gunakan tombol "Lupa PIN?" di layar buka Master Data — otomatis kembali ke PIN bawaan (hubungi pengelola sistem kalau tidak tahu PIN bawaannya).</div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- ================= MASTER DATA: form detail produk (tier diskon/subsidi) ================= -->
+  <div class="md-overlay" id="md-produk-detail-overlay" hidden>
+    <div class="md-pinbox" style="max-width:380px;text-align:left;">
+      <h3 id="md-pd-title">Detail produk</h3>
+      <div class="md-pinform">
+        <label>Diskon tier 1 / 2 / 3</label>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;">
+            <select id="md-pd-diskonmode1" style="width:100%;height:34px;font-size:11.5px;margin-bottom:4px;"><option value="persen">%</option><option value="rupiah">Rp</option></select>
+            <input type="text" inputmode="numeric" id="md-pd-diskon1" style="max-width:none;">
+          </div>
+          <div style="flex:1;">
+            <select id="md-pd-diskonmode2" style="width:100%;height:34px;font-size:11.5px;margin-bottom:4px;"><option value="persen">%</option><option value="rupiah">Rp</option></select>
+            <input type="text" inputmode="numeric" id="md-pd-diskon2" style="max-width:none;">
+          </div>
+          <div style="flex:1;">
+            <select id="md-pd-diskonmode3" style="width:100%;height:34px;font-size:11.5px;margin-bottom:4px;"><option value="persen">%</option><option value="rupiah">Rp</option></select>
+            <input type="text" inputmode="numeric" id="md-pd-diskon3" style="max-width:none;">
+          </div>
+        </div>
+        <label>Subsidi ongkir tier 1 / 2 / 3 (Rp)</label>
+        <div style="display:flex;gap:6px;">
+          <input type="text" inputmode="numeric" id="md-pd-subsidi1" style="max-width:none;">
+          <input type="text" inputmode="numeric" id="md-pd-subsidi2" style="max-width:none;">
+          <input type="text" inputmode="numeric" id="md-pd-subsidi3" style="max-width:none;">
+        </div>
+      </div>
+      <button class="wiz-btn-primary" id="md-pd-save">Simpan detail</button>
+      <button class="md-pin-reset" id="md-pd-cancel">Batal</button>
     </div>
   </div>
 
@@ -671,7 +1174,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      Rp &nbsp;·&nbsp; versi <span id="app-current-version">1.16.3</span>
+      <span id="md-secret-tap" style="cursor:default;">Rp</span> &nbsp;·&nbsp; versi <span id="app-current-version">1.23.0</span>
       &nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button>
     </div>
   </footer>
@@ -703,72 +1206,169 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.16.3 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v1.23.0 <span class="changelog-tag">Sekarang</span></div>
           <ul>
-            <li>Perbarui data gramatur produk "Halawa rasa Sapi" dari 5,6 Kg menjadi 4,8 Kg per Karton. Tidak ada perubahan alur/fitur sistem.</li>
+            <li>Status pembayaran (<b>Kurang bayar</b> / <b>Lunas</b> / <b>Kembalian</b>) di ringkasan sekarang tampil dengan warna berbeda — merah, hijau, biru — supaya statusnya langsung tertangkap mata tanpa perlu baca teksnya dulu. Warna yang sama juga dipakai di nota hasil unduhan/gambar.</li>
+            <li>Rapi-rapi sistem warna internal: variabel warna biru yang sebelumnya bernama <code>--stamp-red</code> (padahal warnanya biru, cuma penamaan lama yang salah kaprah) diganti jadi <code>--accent-blue</code>, dan warna merah untuk error/hapus yang tadinya diulang-ulang jadi kode warna terpisah sekarang dirapikan jadi satu variabel <code>--danger-red</code>. Termasuk memperbaiki dua tempat (label peringatan di ringkasan wizard &amp; tombol "Reset" di Beranda) yang sebelumnya kepasang warna biru padahal seharusnya merah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.22.0</div>
+          <ul>
+            <li>Tombol aksi utama tiap langkah wizard (Simpan produk, Lanjut ke pengiriman, Lihat review, Pesanan sudah benar, Unduh/Bagikan/Salin) sekarang <b>menempel di bawah layar</b> saat scroll — tidak perlu geser sampai bawah dulu untuk menemukannya, terutama di langkah "Tersimpan" kalau produknya banyak.</li>
+            <li>Hapus produk lewat <b>geser kartu ke kiri</b> di langkah "Tersimpan" tidak lagi pakai dialog konfirmasi bawaan browser (kadang diblokir di iframe/preview) — sekarang hapus langsung + muncul notifikasi kecil "Batalkan" beberapa detik supaya tetap aman kalau gesturnya tidak sengaja.</li>
+            <li>Ditambahkan notifikasi kecil (toast) melayang di bawah layar setelah tap Unduh/Bagikan/Salin di HP — sebelumnya pesan status ini cuma muncul di toolbar yang memang disembunyikan total di tampilan mobile, jadi user tidak dapat konfirmasi apa pun.</li>
+            <li>Tampilan mobile (Beranda, wizard, panel Master Data) sekarang tetap terpakai walau HP diputar ke posisi landscape dengan tinggi layar pendek — sebelumnya bisa balik ke layout tabel desktop yang sempit dan tidak nyaman disentuh.</li>
+            <li>Bersih-bersih kode: aturan tabel darurat untuk layar sangat sempit (&lt;380px) dihapus karena sudah tidak pernah terpakai sejak tampilan mobile beralih ke kartu wizard.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.21.0</div>
+          <ul>
+            <li>Field <b>Produk</b> &amp; <b>Ekspedisi</b> (di tabel Penjualan/Custom, dan di langkah "Tambah Produk" &amp; "Pengiriman" pada wizard HP) diganti dari dropdown biasa jadi <b>combobox dengan pencarian</b> — ketik sebagian nama untuk langsung menyaring daftar, kata yang cocok ditandai hijau tebal. Tampilannya seragam di semua HP/browser, tidak lagi ikut gaya dropdown bawaan perangkat.</li>
+            <li>Tombol Hapus cadangan (ikon 🗑 di samping "Edit" pada kartu Tersimpan) dihapus lagi — sekarang menghapus produk hanya lewat <b>geser kartu ke kiri</b>, supaya tampilan kartu lebih ringkas.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.20.1</div>
+          <ul>
+            <li>Perbaikan bug: swipe-hapus di kartu Tersimpan tidak berfungsi — penyebabnya implementasi lama pakai Pointer Events yang tidak selalu didukung penuh di WebView mobile. Diganti pakai Touch Events native yang jauh lebih kompatibel, dengan deteksi arah supaya geser vertikal (scroll halaman) tidak ikut terganggu.</li>
+            <li>Ditambahkan tombol Hapus cadangan (ikon 🗑 kecil di samping "Edit") supaya menghapus produk tetap bisa dilakukan meski gestur swipe tidak berfungsi di perangkat tertentu — tidak lagi 100% bergantung pada gestur. <i>(Dihapus lagi di v1.21.0, lihat di atas.)</i></li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.20.0</div>
+          <ul>
+            <li>Strip estimasi di "Tambah Produk" dirapikan: nama produk sekarang baris sendiri (tebal), Qty & Diskon/Harga jadi 2 "pil" warna terpisah (biru & hijau) — bukan lagi 1 baris teks panjang bersambung tanda "·".</li>
+            <li>Semua angka persen sekarang ditulis dengan spasi sebelum "%" (mis. "23 %"), konsisten di semua tempat: preview, kartu Tersimpan, Review, dan nota.</li>
+            <li>Field Diskon mode Persen: saat tidak sedang diedit tampil "23 %" (jelas ada indikatornya), begitu diketuk untuk edit otomatis berubah polos "23" saja (supaya gampang diketik ulang tanpa harus hapus "%" dulu).</li>
+            <li><b>Auto-select saat ketuk field</b> diterapkan ke SEMUA input isi-manual (Qty, Diskon, Rate Ongkir, Ongkir Manual, Kelebihan Bayar, seluruh field Master Data, PIN) — begitu field diketuk, isi lama langsung ter-blok semua, tinggal ketik ganti. Ini juga memperbaiki kasus "kelihatan seperti 2 qty nyangkut" yang dilaporkan — penyebabnya field lama tidak selalu ter-select otomatis, jadi angka baru bisa nyambung ke angka lama (mis. ketik "5" setelah "12" jadi "125") alih-alih menggantikannya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.19.0</div>
+          <ul>
+            <li>Kartu produk di langkah "Tersimpan" dirombak: Qty sekarang jadi <b>badge tebal biru muda</b> (bukan teks abu polos), tombol "Hapus" teks dihapus — ganti <b>geser kartu ke kiri</b> untuk memunculkan tombol Hapus merah di belakangnya. Ketuk badan kartu untuk buka/tutup detail diskon & estimasi harga tanpa harus masuk mode Edit.</li>
+            <li>Strip estimasi di halaman "Tambah Produk" khusus tab <b>Penjualan (Grosir)</b> sekarang menampilkan <b>Diskon</b> (perkiraan sesuai tier qty sementara), bukan lagi total Rp — karena harga final Grosir baru pasti setelah semua produk selesai diisi (tier dihitung dari total qty keseluruhan). Tab Custom tidak berubah, tetap tampilkan estimasi total Rp.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.18.0</div>
+          <ul>
+            <li><b>Produk dobel di-replace otomatis:</b> kalau pilih produk yang sudah ada di baris lain, sekarang baris itu langsung ditimpa (qty & diskonnya diganti nilai baru) — bukan lagi bikin baris duplikat baru. Kalau lagi mode Edit dan produknya dipindah ke baris lain, baris asal otomatis dikosongkan supaya tidak ada sisa data nyangkut.</li>
+            <li>Halaman "Tambah Produk" sekarang punya <b>strip estimasi harga</b> ringkas di paling atas (di bawah judul) — update otomatis begitu Produk & Jumlah diisi, ukurannya kompak 1 baris supaya tidak perlu scroll untuk lihat tombol Simpan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.17.1</div>
+          <ul>
+            <li>Halaman "Tambah Produk" ditata ulang jadi 3 bagian berikon dengan garis pemisah — 📦 Produk, 🔢 Jumlah, 🏷️ Diskon — supaya lebih mudah dipindai mata sebagai 3 blok berbeda, bukan tumpukan input polos.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.17.0</div>
+          <ul>
+            <li>Tombol <b>Hapus</b> (merah) ditambahkan di tiap kartu produk pada langkah "Tersimpan" — di samping "Edit". Sebelumnya menghapus produk harus buka Edit dulu baru cari tombol "Hapus produk ini" di dalamnya. Ada konfirmasi sebelum benar-benar terhapus.</li>
           </ul>
         </div>
         <div class="changelog-item">
           <div class="changelog-ver">v1.16.2</div>
           <ul>
-            <li>Perbarui data gramatur produk "Halawa rasa Ayam" dari 5,6 Kg menjadi 4,8 Kg per Karton. Tidak ada perubahan alur/fitur sistem.</li>
+            <li>Perbaikan bug: dropdown mode Diskon ("Persen (%)") kepotong karena dipaksa muat di kotak sempit sejajar dengan input angka. Sekarang ditata 2 baris penuh (Mode diskon di atas, Jumlah diskon di bawah) — teksnya selalu muat penuh di layar manapun.</li>
+            <li>Tombol navigasi wizard (Tambah/Tersimpan/Kirim/Review) dikasih latar kotak (pill) supaya jelas terlihat sebagai tombol yang bisa diketuk — sebelumnya cuma garis tipis di bawah teks, gampang tidak disadari.</li>
           </ul>
         </div>
         <div class="changelog-item">
           <div class="changelog-ver">v1.16.1</div>
           <ul>
-            <li>Kata "(manual)" di sebelah nilai Ongkir sekarang tidak ikut muncul di gambar Nota hasil unduhan/salin — tetap tampil seperti biasa di layar aplikasi supaya Anda tetap tahu ongkir itu diisi manual.</li>
+            <li>Titik-titik hijau di atas wizard yang tadinya cuma dekorasi (tidak bisa diketuk) sekarang jadi <b>tombol navigasi berlabel</b> (Tambah / Tersimpan / Kirim / Review) — bisa langsung ketuk untuk pindah ke langkah manapun, tidak perlu geser satu-satu lewat tombol Lanjut/Kembali.</li>
           </ul>
         </div>
         <div class="changelog-item">
           <div class="changelog-ver">v1.16.0</div>
           <ul>
-            <li>Field "Diskon (manual)" di tabel Custom sekarang otomatis dirapikan jadi format persen saat field ditinggalkan (blur) — ketik <b>0.25</b> atau <b>25%</b>, keduanya otomatis jadi tampilan <b>25%</b>. Nominal Rupiah (mis. 55000) tidak ikut berubah. Perhitungan Harga Satuan, Total, dan tampilan di gambar Nota tetap akurat mengikuti format baru ini.</li>
+            <li><b>Field Diskon dirombak</b> (wizard Custom & Detail Produk Master Data): dulu 1 kotak teks bebas ("0.2" = 20% ATAU "55000" = rupiah) sehingga tidak bisa diformat ribuan tanpa merusak arti angka persen. Sekarang dipecah jadi dropdown mode <b>Persen / Rupiah</b> + 1 kotak angka — begitu pilih "Rupiah", format ribuan otomatis aktif dengan aman.</li>
+            <li>Audit ulang semua field angka di aplikasi. Yang SUDAH pakai format ribuan: Rate Ongkir, Ongkir Manual, Kelebihan Bayar, Diskon Ongkir, Harga & Subsidi Produk, dan sekarang Diskon (mode Rupiah). Yang TETAP tidak diformat (dengan alasan): Qty (maks 1000, angka selalu kecil), Berat produk (desimal kg seperti 4,1 — bukan uang), dan PIN (kode akses, bukan nominal).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.15.6</div>
+          <ul>
+            <li>Perbaikan lanjutan: latar tembus di panel Master Data (mobile) masih muncul karena trik <code>min-height</code> sebelumnya ternyata belum cukup andal di semua browser. Diganti pendekatan yang lebih sederhana — khusus mobile, panel langsung jadi satu blok putih solid penuh layar (bukan lagi "kartu mengambang di atas backdrop gelap" seperti di desktop), jadi tidak ada celah untuk latar belakang tembus sama sekali.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.15.5</div>
+          <ul>
+            <li><b>Perbaikan keamanan:</b> nomor PIN bawaan tidak lagi ditampilkan di mana pun dalam teks aplikasi — termasuk di tombol "Lupa PIN?" pada layar sebelum berhasil masuk, dan di catatan Riwayat Update yang bisa dibaca siapa saja tanpa PIN. Fungsi reset PIN tetap jalan seperti biasa, cuma angkanya tidak lagi ditulis terang-terangan di layar.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.15.4</div>
+          <ul>
+            <li>Perbaikan bug: sheet Master Data di mobile tidak menutupi layar penuh (memakai <code>min-height:100%</code> yang tidak reliable di dalam kontainer flex+scroll), jadi bagian bawahnya kelihatan tembus ke halaman Beranda yang meredup di belakang. Sekarang dipaksa penuh 1 layar pakai satuan viewport (<code>100dvh</code>).</li>
+            <li>Perbaikan bug: kolom <b>Berat</b> dan <b>Satuan</b> di daftar produk Master Data ternyata disembunyikan total di mobile (bukan cuma dipersempit) — jadi hanya Nama & Harga yang kelihatan. Sekarang tiap produk ditata 2 baris (Nama di atas; Harga/Berat/Satuan berjajar di bawahnya) supaya semua kolom tetap terlihat & bisa diedit di mobile.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.15.3</div>
+          <ul>
+            <li>Perbaikan: latar app di mobile ternyata masih pakai warna <code>#f8f9fa</code> (abu sangat muda) bawaan dari variabel yang sama dipakai desktop — sekarang khusus mobile dipaksa putih murni (<code>#ffffff</code>). Tampilan desktop tidak berubah, tetap abu muda seperti semula.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.15.2</div>
+          <ul>
+            <li>Kotak ikon di tile Beranda (Grosir/Custom) diperbesar & diberi warna pastel bold (oranye untuk Grosir, tosca untuk Custom) — kartu tetap latar putih bersih, cuma kotak ikonnya yang lebih menarik dan mudah dibedakan sekilas.</li>
           </ul>
         </div>
         <div class="changelog-item">
           <div class="changelog-ver">v1.15.1</div>
           <ul>
-            <li>Header tabel (NO/DESKRIPSI/QTY/dst) pada gambar Nota sekarang ikut berubah warna mengikuti tingkat Total Qty (kuning/hijau/biru) — sebelumnya cuma band judul atas & Grand Total yang berubah, header tabel tetap abu-abu.</li>
+            <li>Layar Review pesanan dirombak jadi <b>kartu per produk</b>: tiap produk + diskonnya dalam satu kotak bertepi jelas, ringkasan (Total qty/berat/Subtotal/Ongkir) jadi kartu abu-abu terpisah, dan Grand Total dapat kartu hijau muda sendiri — supaya lebih mudah dibedakan mana data pesanan dan mana angka final.</li>
           </ul>
         </div>
         <div class="changelog-item">
           <div class="changelog-ver">v1.15.0</div>
           <ul>
-            <li>Gambar Nota hasil unduhan/salin: baris "Kelebihan bayar sebelumnya" dan status pembayaran (Kurang bayar/Kembalian/Lunas) sekarang otomatis disembunyikan kalau Kelebihan bayar sebelumnya bernilai Rp 0 — nota langsung berhenti di Grand Total. Kalau ada isinya, kedua baris tetap tampil seperti biasa. Berlaku di tab Penjualan & Custom.</li>
+            <li><b>Format ribuan otomatis</b> saat mengetik di semua field rupiah: Rate Ongkir, Ongkir Manual, Kelebihan Bayar, Diskon Ongkir (Custom), serta Harga & Subsidi Tier di Master Data. (Field Qty dan Diskon per baris sengaja dikecualikan — Qty tidak butuh pengelompokan ribuan, dan Diskon berisi campuran format persen/rupiah yang bisa rusak kalau diformat paksa.)</li>
+            <li>Mobile dibersihkan total dari "chrome" desktop: header judul, tab atas (Penjualan/Custom/Reset), toolbar (Unduh/Bagikan/Salin/Kalkulator), dan referensi ongkir wilayah kini disembunyikan di semua langkah wizard — bukan cuma di Beranda. Footer cuma tampil di layar Beranda.</li>
+            <li>Perbaikan bug: toolbar desktop yang sebelumnya masih nyelip terlihat di langkah wizard mobile (termasuk langkah Pengiriman) — inilah yang membuat tombol Unduh/Bagikan/Salin terasa "tidak berfungsi" karena tombol yang tersentuh bukan yang dimaksud. Sekarang satu-satunya tombol itu di mobile ada di layar Konfirmasi (setelah "Pesanan sudah benar").</li>
+            <li>Perbaikan bug: popup "Detail produk" di Master Data merujuk field berat yang sudah dipindah ke baris inline pada versi sebelumnya — berpotensi error saat dibuka, sudah diperbaiki.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.14.2</div>
+          <ul>
+            <li>Gestur buka Master Data dikurangi dari 5x ketuk jadi <b>3x ketuk cepat</b> pada tulisan "Rp" di footer — lebih ringan tanpa mengurangi kerahasiaannya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.14.1</div>
+          <ul>
+            <li>Trigger Master Data diperbarui: tombol titik kecil di footer dihapus (masih terlalu kelihatan), diganti gestur tersembunyi <b>ketuk teks "Rp" di footer 5x cepat berturut-turut</b> — tidak ada elemen visual yang menandakan itu bisa diketuk.</li>
           </ul>
         </div>
         <div class="changelog-item">
           <div class="changelog-ver">v1.14.0</div>
           <ul>
-            <li>Warna band header & Grand Total pada gambar Nota hasil unduhan/salin sekarang otomatis menyesuaikan Total Qty: kuning kalau di bawah 14, hijau muda kalau 14–49 (seperti sebelumnya), dan biru kalau di atas 49 — berlaku di tab Penjualan maupun Custom. Tampilan di layar aplikasi (sebelum diunduh) tidak berubah.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v1.13.1</div>
-          <ul>
-            <li>Tombol RESET dibuat lebih mencolok: sekarang solid merah penuh (sebelumnya cuma teks merah dengan latar terang) dan ditambah ikon 🗑, supaya lebih jelas terlihat sebagai aksi yang perlu hati-hati.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v1.13.0</div>
-          <ul>
-            <li>Field "Kelebihan bayar sebelumnya" (Penjualan & Custom) dan "Diskon Ongkir (manual)" (Custom) sekarang otomatis diformat titik ribuan saat mengetik, mis. 2000 → 2.000 — sama seperti field Rate Ongkir/Ongkir Manual.</li>
-            <li>Tombol RESET dipindah dari baris tab ke toolbar, tepat di sebelah kanan tombol Kalkulator, supaya lebih mudah dijangkau (terutama di HP).</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v1.12.1</div>
-          <ul>
-            <li>Perjelas isi catatan khusus tab Custom (soal kolom Diskon manual, tidak ada aturan minimum 10 kg IDTruck, dan Diskon Ongkir manual) supaya lebih mudah dipahami.</li>
-            <li>Warna catatan tersebut diubah jadi merah (sebelumnya biru) — dibuat terpisah dari variabel warna aksen global supaya tidak ikut mengubah warna tab/tombol/link lain di halaman.</li>
+            <li>Tampilan mobile dirombak ulang total jadi <b>alur wizard 1 langkah = 1 keputusan</b>: Beranda → Tambah Produk → Tersimpan (kartu, bisa Edit) → Pengiriman → Review → Konfirmasi — bukan lagi kartu spreadsheet.</li>
+            <li>Produk sekarang diisi satu per satu lewat form besar (qty langsung diketik + auto-select saat diketuk), muncul sebagai kartu ringkas "Nama — Qty" dengan tombol Edit, bukan tabel padat.</li>
+            <li>Langkah Pengiriman: Ongkir Manual, Kelebihan Bayar, dan (khusus Custom) Diskon Ongkir Manual disembunyikan di balik toggle "progressive disclosure" — tidak semua field ongkir tampil sekaligus.</li>
+            <li>Langkah Review menampilkan <b>diskon per produk</b> (bukan total gabungan), lalu setelah "Pesanan sudah benar" otomatis tampil nota asli (styling sama seperti sebelumnya) + tombol Unduh / Bagikan / Salin.</li>
+            <li>Tombol Kalkulator & Reset di Beranda diperbesar jadi tombol sekunder yang nyaman disentuh (Reset diberi konfirmasi karena aksi berisiko).</li>
+            <li>Menu baru <b>Master Data</b> (desktop &amp; mobile): tombol titik kecil di footer (di samping "Riwayat Update") → masukkan PIN (bisa diganti/di-reset di dalam menu) → kelola daftar produk (harga, satuan, diskon tier, subsidi ongkir) dan daftar ekspedisi (tambah/hapus). Tidak mengubah rumus perhitungan — hanya menambah/mengurangi data yang dipakai rumus yang sudah ada.</li>
+            <li>Tampilan desktop/tablet tidak berubah sama sekali — tetap tabel seperti sebelumnya.</li>
           </ul>
         </div>
         <div class="changelog-item">
           <div class="changelog-ver">v1.12.0</div>
           <ul>
-            <li>Field "Kelebihan bayar sebelumnya" (Penjualan & Custom) dan "Diskon Ongkir (manual)" (Custom): angka "0" bawaan sekarang otomatis ter-select begitu field diklik/fokus, jadi langsung tertimpa saat mulai mengetik — tidak perlu hapus manual dulu. Kalau field dikosongkan lalu ditinggal, otomatis kembali jadi "0" supaya perhitungan tetap aman.</li>
-            <li>Field "Diskon Ongkir (manual)" di tab Custom sekarang punya tanda visual biru (border + badge "ADA ISINYA") saat diisi, konsisten dengan pola indikator Rate Ongkir/Ongkir Manual (hijau) dan Kelebihan Bayar (merah) — mempermudah melihat sekilas field mana saja yang sedang aktif.</li>
+            <li>Tampilan mobile dirombak total: sekarang ada <b>halaman Beranda</b> dengan 2 pilihan besar "Penjualan (Grosir)" &amp; "Custom" — tabel sempit di HP diganti kartu yang lebih mudah dibaca.</li>
+            <li>Tab <b>Penjualan (Grosir)</b> di HP: 5 produk tampil sebagai kartu dengan kontrol qty <b>−/angka/+</b> — angka di tengah bisa diketik manual (untuk qty besar) atau pakai tombol (tekan lama untuk naik/turun cepat).</li>
+            <li>Tab <b>Custom</b> di HP: item ditambah lewat tombol "+ Tambah Item" yang membuka form fokus (Deskripsi, Qty, Diskon), lalu tampil sebagai kartu ringkas — bisa diketuk untuk edit/hapus.</li>
+            <li>Tambahan bar ringkasan Grand Total yang menempel di bawah layar (HP) supaya total selalu terlihat tanpa perlu scroll.</li>
+            <li>Tampilan desktop/tablet tidak berubah — tetap memakai tabel seperti sebelumnya.</li>
           </ul>
         </div>
         <div class="changelog-item">
@@ -949,8 +1549,8 @@
 <script>
 /* ============ DATA (persis dari sheet Data) ============ */
 const PRODUCTS = [
-  {name:"Halawa rasa Ayam",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:4.8, satuan:"Karton"},
-  {name:"Halawa rasa Sapi",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:4.8, satuan:"Karton"},
+  {name:"Halawa rasa Ayam",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:5.6, satuan:"Karton"},
+  {name:"Halawa rasa Sapi",   harga:384000, diskon:[0.15,0.2,0.23],      subsidi:[0,9000,9000], berat:5.6, satuan:"Karton"},
   {name:"Halawa rasa Jamur",  harga:384000, diskon:[0.16,0.21,0.24],     subsidi:[0,9000,9000], berat:4.1, satuan:"Karton"},
   {name:"Halawa Ayam 500 g",  harga:400000, diskon:[55000,75000,85000],  subsidi:[0,9000,9000], berat:5.3, satuan:"Karton"},
   {name:"Halawa Sapi 500 g",  harga:400000, diskon:[55000,75000,85000],  subsidi:[0,9000,9000], berat:5.3, satuan:"Karton"},
@@ -968,6 +1568,185 @@ const REGIONS = [
 const ROWS = 7; // C5:C11
 
 const rupiah = n => "Rp " + Math.round(n||0).toLocaleString("id-ID");
+
+/* ============ Format ribuan otomatis untuk field angka rupiah ============
+   Satu sumber kebenaran untuk parsing & format, dipakai konsisten di semua
+   field rupiah (rate ongkir, ongkir manual, kelebihan bayar, diskon ongkir,
+   harga produk di Master Data). SENGAJA TIDAK dipakai di field Qty (karena
+   maksimal cuma 1000 — mengelompokkan ribuan tidak berguna, malah berisiko
+   kalau ada kode lain yang masih baca angka mentah tanpa strip titik) dan
+   field Diskon per baris (karena isinya campuran: "0.2" = 20% ATAU "55000"
+   = potongan rupiah — auto-format akan merusak arti "0.2"-nya). */
+function parseRp(str){
+  return parseFloat(String(str||"").replace(/\./g,"").replace(/,/g,"."))||0;
+}
+/* ============ Auto-select saat field manual disentuh ============
+   Supaya proses edit gampang: begitu field diketuk, isi lama langsung
+   ter-select semua, tinggal ketik ganti tanpa perlu hapus manual dulu. */
+function bindAutoSelect(el){
+  if(!el || el.dataset.autoselectBound) return;
+  el.dataset.autoselectBound = "1";
+  el.addEventListener("focus", ()=> setTimeout(()=>{ try{ el.select(); }catch(e){} }, 0));
+}
+function formatRibuan(input){
+  bindAutoSelect(input);
+  input.addEventListener("input", ()=>{
+    const cursorFromEnd = input.value.length - input.selectionStart;
+    const digits = input.value.replace(/\D/g,"");
+    const formatted = digits === "" ? "" : parseInt(digits,10).toLocaleString("id-ID");
+    input.value = formatted;
+    const pos = Math.max(0, formatted.length - cursorFromEnd);
+    input.setSelectionRange(pos, pos);
+  });
+}
+function applyRibuanTo(...ids){
+  ids.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el && !el.dataset.ribuanBound){ formatRibuan(el); el.dataset.ribuanBound = "1"; }
+  });
+}
+
+/* ============ Field Diskon bermode (Persen / Rupiah) ============
+   Field diskon di file asli bisa berisi "0.2" (=20%) ATAU "55000"
+   (=potongan rupiah) dalam SATU input teks bebas — makanya field itu
+   TIDAK BISA diberi format ribuan otomatis (titik ribuan akan bentrok
+   sama arti angka desimal "0.2"). Solusinya: dipisah jadi 2 kontrol
+   yang jelas artinya — dropdown mode + 1 input angka. Baru di mode
+   "Rupiah" format ribuan aman dipasang, karena tidak akan pernah
+   bentrok makna dengan pecahan persen lagi. Dipakai di wizard Custom
+   dan di popup Detail Produk (Master Data).
+   Mode Persen: saat TIDAK fokus tampil "N %" (jelas ada indikatornya),
+   saat SEDANG diedit tampil polos "N" saja (gampang diketik ulang). */
+function wireDiskonModeInput(modeSelId, valueId, rawValue){
+  const modeSel = document.getElementById(modeSelId);
+  const valEl = document.getElementById(valueId);
+  const raw = parseFloat(rawValue);
+  if(rawValue === "" || rawValue === undefined || rawValue === null || isNaN(raw)){
+    modeSel.value = "persen"; valEl.value = "";
+  } else if(raw < 1){
+    modeSel.value = "persen"; valEl.value = String(Math.round(raw*100));
+  } else {
+    modeSel.value = "rupiah"; valEl.value = raw.toLocaleString("id-ID");
+  }
+  function reformatForMode(){
+    const digits = valEl.value.replace(/\D/g,"");
+    if(modeSel.value === "rupiah"){
+      valEl.value = digits === "" ? "" : parseInt(digits,10).toLocaleString("id-ID");
+      if(!valEl.dataset.ribuanBound){ formatRibuan(valEl); valEl.dataset.ribuanBound = "1"; }
+    } else {
+      const n = digits === "" ? "" : String(Math.min(100, parseInt(digits,10)));
+      const focused = document.activeElement===valEl;
+      valEl.value = (n!=="" && !focused) ? n+" %" : n;
+    }
+  }
+  modeSel.addEventListener("change", reformatForMode);
+  valEl.addEventListener("input", ()=>{ if(modeSel.value==="persen") reformatForMode(); });
+  valEl.addEventListener("focus", ()=> setTimeout(()=>{ reformatForMode(); valEl.select(); }, 0));
+  valEl.addEventListener("blur", reformatForMode);
+  reformatForMode();
+}
+function readDiskonModeValue(modeSelId, valueId){
+  const modeSel = document.getElementById(modeSelId);
+  const valEl = document.getElementById(valueId);
+  const digits = valEl.value.replace(/\D/g,"");
+  if(digits === "") return "";
+  const v = parseInt(digits,10);
+  return modeSel.value === "persen" ? String(v/100) : String(v);
+}
+/* ============ Combobox custom (dropdown produk/ekspedisi dengan pencarian) ============
+   Membungkus <select> dengan kotak ketik + daftar saran yang bisa difilter,
+   TANPA memindah/mengganti <select> aslinya — select tetap satu-satunya
+   sumber nilai (disembunyikan lewat CSS .combo-native), supaya semua kode
+   lain yang baca .value / dengar event "change" pada select tetap jalan
+   apa adanya. Dipakai untuk field yang opsinya banyak & terus bisa
+   bertambah lewat Master Data (Produk & Ekspedisi). Field dropdown 2
+   pilihan (mis. mode diskon %/Rp) sengaja TIDAK dipakaikan ini karena
+   tidak butuh pencarian.
+   Aman dipanggil berkali-kali pada select yang sama (mis. tiap kali
+   opsinya di-refresh) — panggilan kedua+ cuma menyinkronkan tampilan. */
+function comboboxify(select, placeholder){
+  if(select.dataset.comboified){
+    if(select._comboSync) select._comboSync();
+    return select._comboInput;
+  }
+  select.dataset.comboified = "1";
+
+  const wrap = document.createElement("div");
+  wrap.className = "combo-wrap";
+  select.parentNode.insertBefore(wrap, select);
+  wrap.appendChild(select);
+  select.classList.add("combo-native");
+  select.tabIndex = -1;
+
+  const isProd = select.classList.contains("prod");
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "combo-input" + (isProd ? " prod-combo" : "");
+  input.autocomplete = "off";
+  input.placeholder = placeholder || "";
+  input.dataset.linkedId = select.id || "";
+  wrap.appendChild(input);
+
+  const list = document.createElement("div");
+  list.className = "combo-list";
+  wrap.appendChild(list);
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+  function labelFor(val){
+    const opt = [...select.options].find(o=>o.value===val);
+    return opt ? opt.textContent : "";
+  }
+  function syncFromSelect(){ input.value = labelFor(select.value); }
+  select._comboSync = syncFromSelect;
+  select._comboInput = input;
+  syncFromSelect();
+  // kode lain di app ini banyak yang set select.value langsung lalu
+  // dispatchEvent(change) sendiri (lihat wizard: simpan/hapus produk,
+  // mirror ekspedisi, dst) — dengan listener ini, tampilan combobox
+  // otomatis ikut ter-update setiap kali itu terjadi, tanpa perlu
+  // menyentuh kode-kode tersebut satu per satu.
+  select.addEventListener("change", syncFromSelect);
+
+  function renderList(query){
+    const q = (query||"").trim().toLowerCase();
+    const items = [...select.options].filter(o=> o.value!=="" && o.textContent.toLowerCase().includes(q));
+    list.innerHTML = items.length ? items.map(o=>{
+      const text = o.textContent;
+      const idx = q ? text.toLowerCase().indexOf(q) : -1;
+      const hl = idx>-1 ? esc(text.slice(0,idx))+"<b>"+esc(text.slice(idx,idx+q.length))+"</b>"+esc(text.slice(idx+q.length)) : esc(text);
+      return `<div class="combo-item" data-val="${esc(o.value)}">${hl}</div>`;
+    }).join("") : `<div class="combo-empty">Tidak ditemukan</div>`;
+    list.classList.add("show");
+  }
+
+  input.addEventListener("focus", ()=>{
+    renderList(input.value === labelFor(select.value) ? "" : input.value);
+  });
+  input.addEventListener("input", ()=> renderList(input.value));
+  input.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape"){ list.classList.remove("show"); input.blur(); }
+  });
+  list.addEventListener("click", (e)=>{
+    const item = e.target.closest(".combo-item");
+    if(!item) return;
+    select.value = item.dataset.val;
+    syncFromSelect();
+    list.classList.remove("show");
+    select.dispatchEvent(new Event("change", {bubbles:true}));
+  });
+  input.addEventListener("blur", ()=>{
+    // delay dikit supaya klik di daftar (di atas) sempat kepencet dulu
+    // sebelum daftarnya ditutup & teks di-sinkronkan ulang.
+    setTimeout(()=>{
+      list.classList.remove("show");
+      syncFromSelect();
+    }, 150);
+  });
+
+  return input;
+}
 const fmtNum = n => (n||0).toLocaleString("id-ID", {maximumFractionDigits:2});
 
 /* ============ tanggal ============ */
@@ -1025,6 +1804,7 @@ function buildRows(sheet){
       <td class="num readout" data-r="${i}" data-f="total" data-label="Total">–</td>
     `;
     tbody.appendChild(tr);
+    comboboxify(tr.querySelector("select.prod"), "Pilih produk...");
   }
   tbody.querySelectorAll("select.prod, input.qty, input.diskon").forEach(el=>{
     el.addEventListener("input", ()=>calc(sheet));
@@ -1062,37 +1842,6 @@ function formatQtyBreakdown(raw){
   order.forEach(k=>{ if(groups[k]) parts.push(`${groups[k]} ${k}`); });
   Object.keys(groups).forEach(k=>{ if(!order.includes(k)) parts.push(`${groups[k]} ${k}`); });
   return parts.length ? parts.join(", ") : "0 Karton";
-}
-
-/* Helper global: baca angka dari input yang formatnya pakai titik ribuan
-   (mis. "2.000" -> 2000). Dipakai untuk field yang sekarang auto-format
-   ribuan: Kelebihan bayar sebelumnya & Diskon Ongkir (manual). */
-function parseRibuan(str){
-  const v = parseFloat(String(str).trim().replace(/\./g,"").replace(/,/g,"."));
-  return isNaN(v) ? 0 : v;
-}
-
-/* Helper global untuk field "Diskon (manual)" di tabel Custom.
-   Field ini serbaguna: ketik desimal (mis. 0.25) atau nominal Rupiah
-   (mis. 55000). parseDiskonInput membaca nilai apa adanya (mendukung
-   juga tanda "%" kalau sudah diketik/diformat), formatDiskonInput
-   merapikan tampilan jadi "25%" begitu field ditinggalkan (blur). */
-function parseDiskonInput(raw){
-  const txt = String(raw).trim();
-  if(txt === "") return 0;
-  const num = parseFloat(txt.replace(/[^\d.]/g,"")) || 0;
-  return txt.includes("%") ? num/100 : num;
-}
-function formatDiskonInput(el){
-  const raw = el.value.trim();
-  if(raw === "") return;
-  const num = parseFloat(raw.replace(/[^\d.]/g,""));
-  if(isNaN(num)) return;
-  const isPercent = raw.includes("%") || (num > 0 && num < 1);
-  if(isPercent){
-    const pct = raw.includes("%") ? num : num*100;
-    el.value = (Math.round(pct*100)/100) + "%";
-  }
 }
 
 function calc(sheet){
@@ -1133,10 +1882,10 @@ function calc(sheet){
     let diskonVal;
     if(sheet==="penjualan"){
       diskonVal = r.qty>0 ? r.prod.diskon[tIdx] : "";
-      if(diskonReadout) diskonReadout.textContent = diskonVal===""? "–" : (diskonVal<1 ? (diskonVal*100).toFixed(0)+"%" : rupiah(diskonVal));
+      if(diskonReadout) diskonReadout.textContent = diskonVal===""? "–" : (diskonVal<1 ? (diskonVal*100).toFixed(0)+" %" : rupiah(diskonVal));
     } else {
       const txt = diskonInput.value.trim();
-      diskonVal = parseDiskonInput(txt);
+      diskonVal = txt===""? 0 : parseFloat(txt.replace(/[^\d.]/g,""))||0;
     }
 
     const hargaSatuan = diskonVal==="" ? 0 : (diskonVal<1 ? harga-(harga*diskonVal) : harga-diskonVal);
@@ -1156,7 +1905,6 @@ function calc(sheet){
   });
 
   document.getElementById(pfx+"-totalqty").textContent = formatQtyBreakdown(raw);
-  document.getElementById(pfx+"-totalqty").dataset.raw = totalQty;
   document.getElementById(pfx+"-subtotal").textContent = rupiah(subtotal);
 
   const ekspedisi = document.getElementById(pfx+"-ekspedisi").value;
@@ -1186,10 +1934,11 @@ function calc(sheet){
     document.getElementById("pj-diskonongkir").textContent = rupiah(diskonOngkir);
     document.getElementById("pj-grandtotal").textContent = rupiah(grandTotal);
 
-    const kelebihan = parseRibuan(document.getElementById("pj-kelebihan").value);
+    const kelebihan = parseRp(document.getElementById("pj-kelebihan").value);
     const selisih = kelebihan - grandTotal;
     document.getElementById("pj-selisih").textContent = rupiah(Math.abs(selisih));
     document.getElementById("pj-statuslabel").textContent = selisih>0 ? "Kembalian" : (selisih<0 ? "Kurang bayar" : "Lunas");
+    document.getElementById("pj-statusrow").className = "row status-row " + (selisih>0 ? "status-kembalian" : (selisih<0 ? "status-kurang" : "status-lunas"));
 
     document.getElementById("pj-sachet").textContent = totalKarton>0 ? rupiah(grandTotal/(totalKarton*384)) : "–";
     document.getElementById("pj-renteng").textContent = totalKarton>0 ? rupiah(grandTotal/(totalKarton*32)) : "–";
@@ -1204,25 +1953,36 @@ function calc(sheet){
     const csPakaiManual = csManualStr !== "" && !isNaN(csManualVal) && csManualVal !== 0;
     if(csPakaiManual) ongkir = csManualVal;
 
-    diskonOngkir = parseRibuan(document.getElementById("cs-diskonongkir").value);
+    diskonOngkir = parseRp(document.getElementById("cs-diskonongkir").value);
     grandTotal = (subtotal + ongkir) - diskonOngkir;
 
     document.getElementById("cs-ongkir").textContent = rupiah(ongkir) + (csPakaiManual ? " (manual)" : "");
     document.getElementById("cs-grandtotal").textContent = rupiah(grandTotal);
     document.getElementById("cs-diskonproduk").textContent = rupiah(totalDiskonProduk);
 
-    const kelebihan = parseRibuan(document.getElementById("cs-kelebihan").value);
+    const kelebihan = parseRp(document.getElementById("cs-kelebihan").value);
     const selisih = kelebihan - grandTotal;
     document.getElementById("cs-selisih").textContent = rupiah(Math.abs(selisih));
     document.getElementById("cs-statuslabel").textContent = selisih>0 ? "Kembalian" : (selisih<0 ? "Kurang bayar" : "Lunas");
+    document.getElementById("cs-statusrow").className = "row status-row " + (selisih>0 ? "status-kembalian" : (selisih<0 ? "status-kurang" : "status-lunas"));
   }
+
+  if(window.__renderMobileCards) window.__renderMobileCards(sheet);
 }
 
 /* ============ ekspedisi + region ============ */
 function buildEkspedisi(sheet){
   const sel = document.getElementById((sheet==="penjualan"?"pj":"cs")+"-ekspedisi");
+  const prevValue = sel.value;
   sel.innerHTML = `<option value="">— pilih ekspedisi —</option>` + EKSPEDISI.map(e=>`<option value="${e}">${e}</option>`).join("");
-  sel.addEventListener("change", ()=>calc(sheet));
+  if(EKSPEDISI.includes(prevValue)) sel.value = prevValue;
+  // dijaga supaya listener "change" cuma terpasang sekali walau buildEkspedisi
+  // dipanggil ulang (mis. setelah ubah data ekspedisi lewat Master Data).
+  if(!sel.dataset.boundChange){
+    sel.addEventListener("change", ()=>calc(sheet));
+    sel.dataset.boundChange = "1";
+  }
+  comboboxify(sel, "Pilih ekspedisi...");
 }
 
 function buildRegionTable(){
@@ -1261,9 +2021,51 @@ function activeCaptureEl(){
 function showMsg(text, isError){
   const el = document.getElementById("toolbar-msg");
   el.textContent = text;
-  el.style.color = isError ? "var(--stamp-red)" : "var(--ink-soft)";
+  el.style.color = isError ? "var(--accent-blue)" : "var(--ink-soft)";
   clearTimeout(showMsg._t);
   showMsg._t = setTimeout(()=>{ el.textContent=""; }, 3500);
+  showToast(text, isError);
+}
+
+/* ============ Toast mobile (pengganti #toolbar-msg yang tersembunyi di HP) ============ */
+let __toastEl = null, __toastTimer = null;
+function showToast(text, isError){
+  if(window.innerWidth > 600) return; // desktop sudah punya #toolbar-msg
+  if(!__toastEl){
+    __toastEl = document.createElement("div");
+    __toastEl.id = "mobile-toast";
+    document.body.appendChild(__toastEl);
+  }
+  __toastEl.textContent = text;
+  __toastEl.classList.toggle("is-error", !!isError);
+  __toastEl.classList.add("show");
+  if(navigator.vibrate) navigator.vibrate(isError ? [30,40,30] : 30);
+  clearTimeout(__toastTimer);
+  __toastTimer = setTimeout(()=> __toastEl.classList.remove("show"), 3200);
+}
+
+/* ============ Undo-snackbar mobile (dipakai saat hapus kartu produk) ============ */
+let __undoEl = null, __undoTimer = null;
+function showUndoSnackbar(text, onUndo){
+  if(!__undoEl){
+    __undoEl = document.createElement("div");
+    __undoEl.id = "undo-snackbar";
+    __undoEl.innerHTML = `<span id="undo-snackbar-text"></span><button type="button" id="undo-snackbar-btn">Batalkan</button>`;
+    document.body.appendChild(__undoEl);
+  }
+  clearTimeout(__undoTimer);
+  document.getElementById("undo-snackbar-text").textContent = text;
+  const oldBtn = document.getElementById("undo-snackbar-btn");
+  const newBtn = oldBtn.cloneNode(true); // buang listener lama biar tidak dobel
+  oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+  newBtn.addEventListener("click", ()=>{
+    __undoEl.classList.remove("show");
+    clearTimeout(__undoTimer);
+    onUndo();
+  });
+  __undoEl.classList.add("show");
+  if(navigator.vibrate) navigator.vibrate(25);
+  __undoTimer = setTimeout(()=> __undoEl.classList.remove("show"), 4000);
 }
 
 /* ============ export gambar (unduh / salin) — pakai template nota rapi ============ */
@@ -1284,8 +2086,8 @@ function buildPrintNota(tab){
     let diskon = "–";
     if(diskonEl){
       if(diskonEl.tagName === "INPUT"){
-        const raw = parseDiskonInput(diskonEl.value);
-        diskon = diskonEl.value.trim()==="" ? "–" : (raw<1 ? (raw*100).toFixed(0)+"%" : rupiah(raw));
+        const raw = parseFloat((diskonEl.value||"").replace(/[^\d.]/g,""))||0;
+        diskon = diskonEl.value.trim()==="" ? "–" : (raw<1 ? (raw*100).toFixed(0)+" %" : rupiah(raw));
       } else {
         diskon = diskonEl.textContent;
       }
@@ -1305,29 +2107,24 @@ function buildPrintNota(tab){
   const totalqty = document.getElementById(pfx+"-totalqty").textContent;
   const totalberat = document.getElementById(pfx+"-totalberat").textContent;
   const subtotal = document.getElementById(pfx+"-subtotal").textContent;
-  const ongkir = document.getElementById(pfx+"-ongkir").textContent.replace(" (manual)", "");
+  const ongkir = document.getElementById(pfx+"-ongkir").textContent;
   const diskonongkir = tab==="penjualan"
     ? document.getElementById("pj-diskonongkir").textContent
-    : (document.getElementById("cs-diskonongkir").value ? rupiah(parseRibuan(document.getElementById("cs-diskonongkir").value)) : "Rp 0");
+    : (document.getElementById("cs-diskonongkir").value ? rupiah(parseRp(document.getElementById("cs-diskonongkir").value)) : "Rp 0");
   const grandtotal = document.getElementById(pfx+"-grandtotal").textContent;
 
-  const kelebihan = parseRibuan(document.getElementById(pfx+"-kelebihan").value);
+  const kelebihan = parseRp(document.getElementById(pfx+"-kelebihan").value);
   const kelebihanFmt = rupiah(kelebihan);
   const statusLabel = document.getElementById(pfx+"-statuslabel").textContent;
   const selisihFmt = document.getElementById(pfx+"-selisih").textContent;
   const isKurang = statusLabel === "Kurang bayar";
   const isKembalian = statusLabel === "Kembalian";
   const signPrefix = isKurang ? "-" : "";
-  const statusColor = isKurang ? "#c1272d" : (isKembalian ? "#1f6b3a" : "#333");
-
-  /* Tingkat warna band nota berdasarkan Total Qty mentah (bukan teks
-     breakdown-nya): < 14 = kuning, 14–49 = hijau (default), > 49 = biru. */
-  const totalQtyRaw = parseFloat(document.getElementById(pfx+"-totalqty").dataset.raw) || 0;
-  const qtyTierClass = totalQtyRaw < 14 ? "qty-yellow" : (totalQtyRaw > 49 ? "qty-blue" : "");
+  const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#188038");
 
   return `
-    <div class="pnota ${qtyTierClass}">
-      <div class="pnota-head ${qtyTierClass}">
+    <div class="pnota">
+      <div class="pnota-head">
         <div></div>
         <div class="pnota-title">Rincian Pemesanan</div>
         <div class="pnota-date"><b>${hari}</b>${tgl}</div>
@@ -1352,12 +2149,11 @@ function buildPrintNota(tab){
           <div class="pnota-sline"><span class="l">Diskon Ongkir</span><span class="v">${diskonongkir}</span></div>
         </div>
       </div>
-      <div class="pnota-grand ${qtyTierClass}"><span class="l">Grand Total</span><span class="v">${grandtotal}</span></div>
-      ${kelebihan !== 0 ? `
+      <div class="pnota-grand"><span class="l">Grand Total</span><span class="v">${grandtotal}</span></div>
       <div class="pnota-pay">
         <div class="pnota-payline"><span class="l">Kelebihan bayar sebelumnya</span><span class="v">${kelebihanFmt}</span></div>
         <div class="pnota-payline pnota-status" style="color:${statusColor}"><span class="l">${statusLabel}</span><span class="v">${signPrefix}${selisihFmt}</span></div>
-      </div>` : ""}
+      </div>
     </div>
   `;
 }
@@ -1509,31 +2305,8 @@ buildEkspedisi("penjualan"); buildEkspedisi("custom");
 buildRegionTable();
 initDate();
 
-/* Catatan: listener "input" untuk pj-kelebihan/cs-kelebihan/cs-diskonongkir
-   sekarang ditangani lewat loop .rate-input di bawah (field-field ini sudah
-   dikasih class "rate-input" supaya auto-format titik ribuan), jadi tidak
-   perlu listener input terpisah lagi di sini. */
-
-/* ============ Auto-hilang angka "0" saat field diisi ============
-   Berlaku untuk "Kelebihan bayar sebelumnya" (Penjualan & Custom) dan
-   "Diskon Ongkir (manual)" (Custom). Saat field ini di-klik/fokus dan
-   nilainya masih "0", teks "0" langsung ter-select semua — jadi begitu
-   user mulai mengetik, angka 0 otomatis tertimpa/hilang (tidak perlu
-   hapus manual dulu). Kalau field dikosongkan total lalu ditinggal
-   (blur) tanpa diisi apa-apa, otomatis diisi ulang jadi "0" supaya
-   perhitungan tidak error. */
 ["pj-kelebihan","cs-kelebihan","cs-diskonongkir"].forEach(id=>{
-  const el = document.getElementById(id);
-  el.addEventListener("focus", ()=>{
-    if(el.value.trim() === "0") el.select();
-  });
-  el.addEventListener("blur", ()=>{
-    if(el.value.trim() === ""){
-      el.value = "0";
-      calc(id.startsWith("pj")?"penjualan":"custom");
-      if(window.__refreshOngkirIndicators) window.__refreshOngkirIndicators();
-    }
-  });
+  document.getElementById(id).addEventListener("input", ()=>calc(id.startsWith("pj")?"penjualan":"custom"));
 });
 
 /* format titik ribuan otomatis untuk input Rate Ongkir */
@@ -1585,6 +2358,7 @@ function setupOngkirExclusive(rateId, manualId, sheetName){
 }
 setupOngkirExclusive("pj-rate", "pj-ongkir-manual", "penjualan");
 setupOngkirExclusive("cs-rate", "cs-ongkir-manual", "custom");
+applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-manual","cs-kelebihan","cs-diskonongkir");
 
 /* ============ Indikator visual field Ongkir (murni tampilan) ============
    TIDAK menyentuh setupOngkirExclusive() di atas sama sekali — cuma
@@ -1594,7 +2368,7 @@ setupOngkirExclusive("cs-rate", "cs-ongkir-manual", "custom");
    Setiap ada perubahan di SALAH SATU field, kita cek ULANG SEMUA field —
    soalnya setupOngkirExclusive() men-nol-kan field pasangannya lewat JS
    (bukan ketikan user), jadi field itu juga perlu ikut diperiksa ulang. */
-const ONGKIR_INDICATOR_IDS = ["pj-rate", "pj-ongkir-manual", "pj-kelebihan", "cs-rate", "cs-ongkir-manual", "cs-kelebihan", "cs-diskonongkir"];
+const ONGKIR_INDICATOR_IDS = ["pj-rate", "pj-ongkir-manual", "pj-kelebihan", "cs-rate", "cs-ongkir-manual", "cs-kelebihan"];
 function refreshAllOngkirIndicators(){
   ONGKIR_INDICATOR_IDS.forEach(id => {
     const el = document.getElementById(id);
@@ -1659,11 +2433,15 @@ calc("penjualan"); calc("custom");
       const selEl = tr.querySelector("select.prod");
       const qtyEl = tr.querySelector("input.qty");
       const diskonEl = tr.querySelector("input.diskon");
-      if(selEl && rowData.prod) selEl.value = rowData.prod;
+      if(selEl && rowData.prod){ selEl.value = rowData.prod; if(selEl._comboSync) selEl._comboSync(); }
       if(qtyEl && rowData.qty) qtyEl.value = rowData.qty;
-      if(diskonEl && rowData.diskon) { diskonEl.value = rowData.diskon; formatDiskonInput(diskonEl); }
+      if(diskonEl && rowData.diskon) diskonEl.value = rowData.diskon;
     });
-    if(data.ekspedisi) document.getElementById(`${pfx}-ekspedisi`).value = data.ekspedisi;
+    if(data.ekspedisi){
+      const ekspSel = document.getElementById(`${pfx}-ekspedisi`);
+      ekspSel.value = data.ekspedisi;
+      if(ekspSel._comboSync) ekspSel._comboSync();
+    }
     if(data.rate) document.getElementById(`${pfx}-rate`).value = data.rate;
     if(data.ongkirManual) document.getElementById(`${pfx}-ongkir-manual`).value = data.ongkirManual;
     if(data.kelebihan) document.getElementById(`${pfx}-kelebihan`).value = data.kelebihan;
@@ -1709,13 +2487,6 @@ calc("penjualan"); calc("custom");
     if(!e.target.matches("select.prod, #pj-ekspedisi, #cs-ekspedisi")) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveDraft, 400);
-  });
-
-  // Rapikan tampilan "Diskon (manual)" di tabel Custom jadi format persen
-  // (mis. 0.25 -> 25%) begitu field ditinggalkan (blur/focusout).
-  document.addEventListener("focusout", (e)=>{
-    if(!e.target.matches("input.diskon")) return;
-    formatDiskonInput(e.target);
   });
 
   // peringatan browser bawaan sebelum keluar/refresh kalau ada isian —
@@ -1769,11 +2540,11 @@ calc("penjualan"); calc("custom");
     const pfx = activeTab === "penjualan" ? "pj" : "cs";
     const namaTab = activeTab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
 
-    document.querySelectorAll(`#rows-${activeTab} select.prod`).forEach(el => el.value = "");
+    document.querySelectorAll(`#rows-${activeTab} select.prod`).forEach(el => { el.value = ""; if(el._comboSync) el._comboSync(); });
     document.querySelectorAll(`#rows-${activeTab} input.qty`).forEach(el => el.value = "");
     document.querySelectorAll(`#rows-${activeTab} input.diskon`).forEach(el => el.value = "");
 
-    document.getElementById(`${pfx}-ekspedisi`).value = "";
+    { const ekspSel = document.getElementById(`${pfx}-ekspedisi`); ekspSel.value = ""; if(ekspSel._comboSync) ekspSel._comboSync(); }
     document.getElementById(`${pfx}-rate`).value = "";
     document.getElementById(`${pfx}-ongkir-manual`).value = "";
     document.getElementById(`${pfx}-kelebihan`).value = "0";
@@ -1839,11 +2610,20 @@ document.addEventListener("keydown", (e)=>{
 
   e.preventDefault();
 
+  // Field Produk & Ekspedisi sekarang tampil sebagai kotak combobox (lihat
+  // comboboxify()), bukan <select> asli lagi (yang itu disembunyikan) —
+  // jadi fokus & navigasi Enter harus mengarah ke kotak combobox-nya
+  // (select._comboInput), bukan ke <select> yang sudah tidak kelihatan.
+  function focusable(id){
+    const el = document.getElementById(id);
+    return (el && el._comboInput) ? el._comboInput : el;
+  }
+
   const tr = target.closest("tr");
   if(tr){
     // === di dalam tabel produk: turun ke kolom yang sama, baris berikutnya ===
     let colSelector = null;
-    if(target.matches("select.prod")) colSelector = "select.prod";
+    if(target.matches(".prod-combo")) colSelector = ".prod-combo";
     else if(target.matches("input.qty")) colSelector = "input.qty";
     else if(target.matches("input.diskon")) colSelector = "input.diskon";
     if(!colSelector) return;
@@ -1858,15 +2638,15 @@ document.addEventListener("keydown", (e)=>{
       }
     }
     // sudah baris terakhir tabel -> loncat ke field standalone pertama (Ekspedisi)
-    const first = document.getElementById(standaloneIds[0]);
+    const first = focusable(standaloneIds[0]);
     if(first){ first.focus(); if(first.select) first.select(); }
     return;
   }
 
   // === field standalone (Ekspedisi, Rate, Ongkir Manual, Kelebihan bayar) ===
-  const idx = standaloneIds.indexOf(target.id);
+  const idx = standaloneIds.indexOf(target.id || target.dataset.linkedId);
   if(idx > -1 && idx < standaloneIds.length - 1){
-    const next = document.getElementById(standaloneIds[idx + 1]);
+    const next = focusable(standaloneIds[idx + 1]);
     if(next){ next.focus(); if(next.select) next.select(); }
   } else if(idx === standaloneIds.length - 1){
     target.blur(); // sudah field paling bawah
@@ -2263,6 +3043,779 @@ if ("serviceWorker" in navigator) {
     });
   });
 }
+
+/* ============================================================
+   MOBILE WIZARD (≤600px) — Beranda -> Tambah Produk -> Tersimpan ->
+   Pengiriman -> Review -> Konfirmasi. Murni lapisan tampilan: baca &
+   tulis ke elemen tabel/field asli yang sudah dibangun di atas
+   (select.prod / input.qty / input.diskon / pj-ekspedisi / dst),
+   lalu memicu event "input"/"change" yang sama supaya calc() &
+   auto-simpan draft tetap jalan seperti biasa. Elemen asli TIDAK
+   dipindah dari DOM-nya — cuma disembunyikan lewat CSS di mobile —
+   supaya semua kode lain (calc, buildPrintNota, draft, reset) yang
+   memakai tr/getElementById(...) tetap berfungsi apa adanya.
+   Tampilan desktop sama sekali tidak disentuh oleh modul ini.
+   ============================================================ */
+(function(){
+  const body = document.body;
+
+  /* ---------- navigasi Beranda <-> panel ---------- */
+  function goHome(){ body.classList.add("showing-home"); window.scrollTo(0,0); }
+  function openTab(tab){
+    body.classList.remove("showing-home");
+    const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if(btn) btn.click();
+    wizGo(tab, "add");
+    window.scrollTo(0,0);
+  }
+  body.classList.add("showing-home");
+  document.querySelectorAll("[data-open-tab]").forEach(btn=>{
+    btn.addEventListener("click", ()=> openTab(btn.dataset.openTab));
+  });
+  document.querySelectorAll("[data-back]").forEach(btn=> btn.addEventListener("click", goHome));
+  const homeCalcLink = document.getElementById("home-link-calc");
+  if(homeCalcLink) homeCalcLink.addEventListener("click", ()=>{
+    const b = document.getElementById("btn-calc-toggle"); if(b) b.click();
+  });
+  const homeChangelogLink = document.getElementById("home-link-changelog");
+  if(homeChangelogLink) homeChangelogLink.addEventListener("click", ()=>{
+    const b = document.getElementById("btn-changelog"); if(b) b.click();
+  });
+  const homeResetLink = document.getElementById("home-link-reset");
+  if(homeResetLink) homeResetLink.addEventListener("click", ()=>{
+    const b = document.getElementById("btn-reset"); if(b) b.click();
+  });
+
+  /* ---------- helper umum ---------- */
+  const STEP_ORDER = ["add","list","ship","review"];
+  const wizState = {
+    penjualan: {step:"add", editingRow:null},
+    custom:    {step:"add", editingRow:null},
+  };
+
+  function trsOf(sheet){ return [...document.querySelectorAll("#rows-"+sheet+" tr")]; }
+  function prodListOf(sheet){ return sheet==="penjualan" ? PRODUCTS_PENJUALAN : PRODUCTS; }
+  function pfxOf(sheet){ return sheet==="penjualan" ? "pj" : "cs"; }
+
+  /* Estimasi diskon tier Grosir untuk 1 produk, berdasar total Karton
+     SEMENTARA (baris lain yang sudah tersimpan + qty yang lagi diketik).
+     Cuma untuk preview di UI — bukan angka final (angka final tetap
+     dihitung calc() seperti biasa berdasarkan total akhir semua baris). */
+  function estimateGrosirDiskon(sheet, prodName, thisQty, excludeRowIdx){
+    const trs = trsOf(sheet);
+    let totalKarton = 0;
+    trs.forEach((tr,i)=>{
+      if(i===excludeRowIdx) return;
+      const name = tr.querySelector("select.prod").value;
+      const q = parseFloat(tr.querySelector("input.qty").value)||0;
+      const prod = findProduct(name);
+      if(prod && prod.satuan==="Karton" && q>0) totalKarton += q;
+    });
+    const p = findProduct(prodName);
+    if(p && p.satuan==="Karton") totalKarton += thisQty;
+    const tIdx = tierIndex(totalKarton);
+    return p ? (p.diskon[tIdx]||0) : 0;
+  }
+
+  /* Swipe-to-delete ringan pakai Pointer Events. Geser kartu ke kiri
+     lebih dari 60px lalu lepas -> panggil onDelete(). Geser kurang dari
+     itu -> kartu kembali ke posisi semula (dibatalkan). */
+  /* Swipe-to-delete pakai Touch Events native (lebih kompatibel di
+     WebView mobile dibanding Pointer Events yang kadang tidak didukung
+     penuh). Geser kartu ke kiri lebih dari 60px lalu lepas -> panggil
+     onDelete(). Geser vertikal (scroll) dibiarkan lewat begitu saja —
+     baru "diklaim" jadi swipe horizontal kalau gerakannya memang lebih
+     ke samping daripada ke atas/bawah. */
+  function attachSwipe(cardEl, onDelete){
+    let startX=null, startY=null, currentX=0, dragging=false, decided=false, horizontal=false;
+    const THRESHOLD=60, MAX=80;
+    function start(x,y){
+      startX=x; startY=y; dragging=true; decided=false; horizontal=false;
+      cardEl.style.transition="none";
+    }
+    function move(x,y){
+      if(!dragging) return false;
+      const dx=x-startX, dy=y-startY;
+      if(!decided){
+        if(Math.abs(dx)<8 && Math.abs(dy)<8) return false;
+        decided=true;
+        horizontal = Math.abs(dx) > Math.abs(dy);
+      }
+      if(!horizontal) return false;
+      if(dx<0){ currentX=Math.max(dx,-MAX); cardEl.style.transform=`translateX(${currentX}px)`; }
+      else { currentX=0; cardEl.style.transform="translateX(0)"; }
+      return true;
+    }
+    function end(){
+      if(!dragging) return;
+      dragging=false;
+      cardEl.style.transition="transform .2s ease";
+      if(horizontal && currentX<=-THRESHOLD){
+        cardEl.style.transform=`translateX(${-MAX}px)`;
+        setTimeout(()=> onDelete(), 120);
+      } else {
+        cardEl.style.transform="translateX(0)";
+      }
+      currentX=0; startX=null; startY=null; decided=false; horizontal=false;
+    }
+    cardEl.addEventListener("touchstart", (e)=>{
+      const t=e.touches[0]; start(t.clientX, t.clientY);
+    }, {passive:true});
+    cardEl.addEventListener("touchmove", (e)=>{
+      const t=e.touches[0];
+      const claimed = move(t.clientX, t.clientY);
+      if(claimed) e.preventDefault(); // baru cegah scroll KALAU sudah pasti geser horizontal
+    }, {passive:false});
+    cardEl.addEventListener("touchend", end);
+    cardEl.addEventListener("touchcancel", end);
+    // fallback mouse, supaya bisa dites juga pakai mouse di desktop
+    cardEl.addEventListener("mousedown", (e)=> start(e.clientX, e.clientY));
+    window.addEventListener("mousemove", (e)=>{ if(dragging) move(e.clientX, e.clientY); });
+    window.addEventListener("mouseup", ()=>{ if(dragging) end(); });
+  }
+
+  function wizGo(sheet, step){
+    wizState[sheet].step = step;
+    const wiz = document.getElementById("wiz-"+sheet);
+    if(!wiz) return;
+    wiz.querySelectorAll(".wiz-step").forEach(s=> s.classList.toggle("active", s.dataset.wstep===step));
+    const idx = STEP_ORDER.indexOf(step);
+    wiz.querySelectorAll(".wiz-dots button").forEach(btn=>{
+      const bIdx = STEP_ORDER.indexOf(btn.dataset.step);
+      btn.classList.toggle("on", bIdx===idx);
+      btn.classList.toggle("done", bIdx<idx);
+    });
+    renderStep(sheet, step);
+    document.getElementById(pfxOf(sheet)+"-nota-col").classList.remove("wiz-show");
+    window.scrollTo(0,0);
+  }
+
+  function renderStep(sheet, step){
+    if(step==="add") renderAddStep(sheet);
+    else if(step==="list") renderListStep(sheet);
+    else if(step==="ship") renderShipStep(sheet);
+    else if(step==="review") renderReviewStep(sheet);
+  }
+
+  /* ---------- STEP: Tambah / Edit Produk ---------- */
+  function renderAddStep(sheet){
+    const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="add"]`);
+    const st = wizState[sheet];
+    const editing = st.editingRow !== null;
+    let prodVal = "", qtyVal = "", diskonVal = "";
+    if(editing){
+      const tr = trsOf(sheet)[st.editingRow];
+      prodVal = tr.querySelector("select.prod").value;
+      qtyVal = tr.querySelector("input.qty").value;
+      const dEl = tr.querySelector("input.diskon");
+      diskonVal = dEl ? dEl.value : "";
+    }
+    const options = prodListOf(sheet).map(p=>
+      `<option value="${p.name}" ${p.name===prodVal?"selected":""}>${p.name}</option>`).join("");
+    host.innerHTML = `
+      <div class="wiz-title">${editing ? "Edit produk" : "Tambah produk"}</div>
+      <div class="wiz-preview-strip" id="wa-preview-${sheet}">Pilih produk & isi jumlah untuk lihat estimasi harga</div>
+      <div class="wiz-section">
+        <div class="wiz-section-label"><span class="wiz-section-ic">📦</span> Produk</div>
+        <select id="wa-prod-${sheet}"><option value="">— pilih produk —</option>${options}</select>
+      </div>
+      <div class="wiz-section">
+        <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
+        <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
+        <div class="wiz-hint" id="wa-hint-${sheet}"></div>
+      </div>
+      ${sheet==="custom" ? `
+      <div class="wiz-section">
+        <div class="wiz-section-label"><span class="wiz-section-ic">🏷️</span> Diskon</div>
+        <select id="wa-diskonmode-${sheet}" style="margin-bottom:10px;">
+          <option value="persen">Persen (%)</option>
+          <option value="rupiah">Rupiah (Rp)</option>
+        </select>
+        <input type="text" inputmode="numeric" id="wa-diskon-${sheet}" placeholder="0">
+      </div>` : ``}
+      <div class="wiz-field" id="wa-err-${sheet}" style="color:var(--danger-red);font-size:12.5px;min-height:16px;"></div>
+      <div class="wiz-cta-bar">
+        <button class="wiz-btn-primary" id="wa-save-${sheet}">${editing ? "Simpan perubahan" : "Simpan produk"}</button>
+      </div>
+      ${editing ? `<button class="wiz-btn-ghost" id="wa-delete-${sheet}" style="color:var(--danger-red);">Hapus produk ini</button>` : ``}
+      ${!editing && trsOf(sheet).some(tr=>tr.querySelector("select.prod").value) ? `<button class="wiz-btn-ghost" id="wa-tolist-${sheet}">Lihat produk tersimpan</button>` : ``}
+    `;
+    const qtyEl = document.getElementById("wa-qty-"+sheet);
+    const hintEl = document.getElementById("wa-hint-"+sheet);
+    const previewEl = document.getElementById("wa-preview-"+sheet);
+    const prodEl = document.getElementById("wa-prod-"+sheet);
+    comboboxify(prodEl, "Pilih produk...");
+    function updHint(){
+      const p = findProduct(prodEl.value);
+      const q = parseFloat(qtyEl.value)||0;
+      hintEl.textContent = (p && q>0) ? `${q} ${p.satuan}` : "";
+      if(p && q>0){
+        let badge2;
+        if(sheet==="penjualan"){
+          const dv = estimateGrosirDiskon(sheet, p.name, q, st.editingRow);
+          const dtxt = dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv);
+          badge2 = `<span class="wiz-preview-badge green">Diskon ${dtxt}/${p.satuan}</span>`;
+        } else {
+          badge2 = `<span class="wiz-preview-badge green">≈ ${rupiah(p.harga*q)}</span>`;
+        }
+        previewEl.innerHTML = `
+          <div class="wiz-preview-name">${p.name}</div>
+          <div class="wiz-preview-badges">
+            <span class="wiz-preview-badge blue">${q} ${p.satuan}</span>
+            ${badge2}
+          </div>`;
+        previewEl.classList.add("filled");
+      } else {
+        previewEl.textContent = sheet==="penjualan" ? "Pilih produk & isi jumlah untuk lihat estimasi diskon" : "Pilih produk & isi jumlah untuk lihat estimasi harga";
+        previewEl.classList.remove("filled");
+      }
+    }
+    bindAutoSelect(qtyEl);
+    qtyEl.addEventListener("input", updHint);
+    prodEl.addEventListener("change", updHint);
+    updHint();
+
+    if(sheet==="custom") wireDiskonModeInput("wa-diskonmode-"+sheet, "wa-diskon-"+sheet, diskonVal);
+
+    document.getElementById("wa-save-"+sheet).addEventListener("click", ()=>{
+      const errEl = document.getElementById("wa-err-"+sheet);
+      errEl.textContent = "";
+      if(!prodEl.value){ errEl.textContent = "Pilih produk dulu."; return; }
+      const qty = parseFloat(qtyEl.value)||0;
+      if(qty<=0){ errEl.textContent = "Isi jumlah lebih dari 0."; return; }
+      const trs = trsOf(sheet);
+      let targetIdx = st.editingRow;
+      const originalEditingIdx = targetIdx;
+      // Kalau produk yang dipilih sudah ada di baris lain (bukan baris yang
+      // sedang di-edit), pakai baris itu (replace), bukan bikin baris baru.
+      const dupIdx = trs.findIndex((tr,i)=> i!==targetIdx && tr.querySelector("select.prod").value===prodEl.value);
+      if(dupIdx !== -1) targetIdx = dupIdx;
+      if(targetIdx===null){
+        targetIdx = trs.findIndex(tr=> tr.querySelector("select.prod").value === "");
+        if(targetIdx === -1){ errEl.textContent = "Maksimal 7 produk per pesanan sudah tercapai."; return; }
+      }
+      // Baris asal yang sedang di-edit ternyata dipindah ke baris lain (replace) —
+      // kosongkan baris asal supaya tidak ada data lama yang nyangkut/dobel.
+      if(originalEditingIdx!==null && originalEditingIdx!==targetIdx){
+        const oldTr = trs[originalEditingIdx];
+        oldTr.querySelector("select.prod").value = "";
+        oldTr.querySelector("input.qty").value = "";
+        const oldDiskonEl = oldTr.querySelector("input.diskon");
+        if(oldDiskonEl) oldDiskonEl.value = "";
+        oldTr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+      }
+      const tr = trs[targetIdx];
+      tr.querySelector("select.prod").value = prodEl.value;
+      tr.querySelector("input.qty").value = Math.min(1000, qty);
+      if(sheet==="custom") tr.querySelector("input.diskon").value = readDiskonModeValue("wa-diskonmode-"+sheet, "wa-diskon-"+sheet);
+      tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+      tr.querySelector("input.qty").dispatchEvent(new Event("input", {bubbles:true}));
+      st.editingRow = null;
+      wizGo(sheet, "list");
+    });
+    const delBtn = document.getElementById("wa-delete-"+sheet);
+    if(delBtn) delBtn.addEventListener("click", ()=>{
+      const tr = trsOf(sheet)[st.editingRow];
+      tr.querySelector("select.prod").value = "";
+      tr.querySelector("input.qty").value = "";
+      const dEl = tr.querySelector("input.diskon");
+      if(dEl) dEl.value = "";
+      tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+      st.editingRow = null;
+      wizGo(sheet, "list");
+    });
+    const toListBtn = document.getElementById("wa-tolist-"+sheet);
+    if(toListBtn) toListBtn.addEventListener("click", ()=> wizGo(sheet, "list"));
+  }
+
+  /* ---------- STEP: Tersimpan (daftar produk) ---------- */
+  function renderListStep(sheet){
+    const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="list"]`);
+    const trs = trsOf(sheet);
+    const filled = trs.map((tr,i)=>({tr,i})).filter(o=> o.tr.querySelector("select.prod").value);
+    const cardsHtml = filled.length ? filled.map(({tr,i})=>{
+      const prod = tr.querySelector("select.prod").value;
+      const qty = tr.querySelector("input.qty").value || 0;
+      const p = findProduct(prod);
+      const satuan = p ? p.satuan : "";
+      let detailTxt;
+      if(sheet==="penjualan"){
+        const dv = estimateGrosirDiskon(sheet, prod, parseFloat(qty)||0, i);
+        const dtxt = dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv);
+        detailTxt = `Diskon ${dtxt}/${satuan}`;
+      } else {
+        const dEl = tr.querySelector("input.diskon");
+        const raw = dEl ? dEl.value.trim() : "";
+        const dv = parseFloat(raw)||0;
+        detailTxt = raw==="" ? "Tidak ada diskon" : `Diskon ${dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv)}/${satuan} · Estimasi ${rupiah((p?p.harga:0)*(parseFloat(qty)||0))}`;
+      }
+      return `<div class="wiz-pcard-wrap">
+        <div class="wiz-pcard-delbg" data-delrow="${i}">Hapus</div>
+        <div class="wiz-pcard" data-row="${i}">
+          <div class="wiz-pcard-body" data-togglerow="${i}">
+            <div class="wiz-pcard-name">${prod}</div>
+            <span class="wiz-qty-badge">${qty} ${satuan}</span>
+            <div class="wiz-pcard-detail" id="wp-detail-${sheet}-${i}">${detailTxt}</div>
+          </div>
+          <div class="wiz-pcard-actions">
+            <span class="wiz-pcard-edit" data-editrow="${i}">Edit</span>
+          </div>
+        </div>
+      </div>`;
+    }).join("") : `<div class="wiz-empty">Belum ada produk. Ketuk "Tambah produk" untuk mulai.</div>`;
+    host.innerHTML = `
+      <div class="wiz-title">${filled.length} produk tersimpan</div>
+      ${cardsHtml}
+      <div class="wiz-cta-bar">
+        <button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button>
+        <button class="wiz-btn-primary" id="wl-next-${sheet}" ${filled.length? "" : "disabled style=\"opacity:.5;\""}>Lanjut ke pengiriman</button>
+      </div>
+    `;
+    host.querySelectorAll("[data-editrow]").forEach(el=>{
+      el.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        wizState[sheet].editingRow = +el.dataset.editrow;
+        wizGo(sheet, "add");
+      });
+    });
+    host.querySelectorAll("[data-togglerow]").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        document.getElementById(`wp-detail-${sheet}-${el.dataset.togglerow}`).classList.toggle("open");
+      });
+    });
+    function doDelete(i){
+      // Hapus INSTAN (bukan confirm() bawaan browser — kadang diblokir di
+      // iframe/preview, lihat catatan yang sama di fitur konfirmasi Reset)
+      // + snackbar "Batalkan" beberapa detik, supaya gestur swipe yang
+      // gampang ke-trigger tidak sengaja tetap aman untuk dibatalkan.
+      const tr = trsOf(sheet)[i];
+      const nama = tr.querySelector("select.prod").value;
+      const qtyVal = tr.querySelector("input.qty").value;
+      const dEl = tr.querySelector("input.diskon");
+      const diskonVal = dEl ? dEl.value : null;
+
+      tr.querySelector("select.prod").value = "";
+      tr.querySelector("input.qty").value = "";
+      if(dEl) dEl.value = "";
+      tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+      renderListStep(sheet);
+
+      showUndoSnackbar(`"${nama}" dihapus dari pesanan`, ()=>{
+        tr.querySelector("select.prod").value = nama;
+        tr.querySelector("input.qty").value = qtyVal;
+        if(dEl) dEl.value = diskonVal;
+        tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+        renderListStep(sheet);
+      });
+    }
+    host.querySelectorAll("[data-delrow]").forEach(el=>{
+      el.addEventListener("click", ()=> doDelete(+el.dataset.delrow));
+    });
+    host.querySelectorAll(".wiz-pcard").forEach(card=> attachSwipe(card, ()=> doDelete(+card.dataset.row)));
+    document.getElementById("wl-add-"+sheet).addEventListener("click", ()=>{
+      wizState[sheet].editingRow = null;
+      wizGo(sheet, "add");
+    });
+    const nextBtn = document.getElementById("wl-next-"+sheet);
+    if(filled.length) nextBtn.addEventListener("click", ()=> wizGo(sheet, "ship"));
+  }
+
+  /* ---------- STEP: Pengiriman (mirror field asli + progressive disclosure) ---------- */
+  function renderShipStep(sheet){
+    const pfx = pfxOf(sheet);
+    const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="ship"]`);
+    const ekspSel = document.getElementById(pfx+"-ekspedisi");
+    const rateInp = document.getElementById(pfx+"-rate");
+    const manualInp = document.getElementById(pfx+"-ongkir-manual");
+    const kelebihanInp = document.getElementById(pfx+"-kelebihan");
+    const diskonOngkirInp = sheet==="custom" ? document.getElementById("cs-diskonongkir") : null;
+
+    host.innerHTML = `
+      <div class="wiz-title">Pengiriman</div>
+      <div class="wiz-field">
+        <label>Ekspedisi</label>
+        <select id="ws-eksp-${sheet}"><option value="">— pilih ekspedisi —</option>${EKSPEDISI.map(e=>`<option value="${e}">${e}</option>`).join("")}</select>
+      </div>
+      <div class="wiz-field">
+        <label>Rate ongkir (Rp / kg)</label>
+        <input type="text" inputmode="numeric" id="ws-rate-${sheet}" placeholder="0">
+      </div>
+      <div class="wiz-disclose" id="ws-manual-toggle-${sheet}"><span class="arrow">›</span> Gunakan ongkir manual</div>
+      <div class="wiz-disclose-body" id="ws-manual-body-${sheet}">
+        <div class="wiz-field" style="margin-top:0;">
+          <label>Ongkir manual (override hasil hitungan)</label>
+          <input type="text" inputmode="numeric" id="ws-manualval-${sheet}" placeholder="0">
+        </div>
+      </div>
+      <div class="wiz-disclose" id="ws-kelebihan-toggle-${sheet}"><span class="arrow">›</span> Ada kelebihan bayar sebelumnya</div>
+      <div class="wiz-disclose-body" id="ws-kelebihan-body-${sheet}">
+        <div class="wiz-field" style="margin-top:0;">
+          <label>Nominal kelebihan bayar (Rp)</label>
+          <input type="text" inputmode="numeric" id="ws-kelebihanval-${sheet}" placeholder="0">
+        </div>
+      </div>
+      ${sheet==="custom" ? `
+      <div class="wiz-disclose" id="ws-diskonongkir-toggle-${sheet}"><span class="arrow">›</span> Ada diskon ongkir manual</div>
+      <div class="wiz-disclose-body" id="ws-diskonongkir-body-${sheet}">
+        <div class="wiz-field" style="margin-top:0;">
+          <label>Nominal diskon ongkir (Rp)</label>
+          <input type="text" inputmode="numeric" id="ws-diskonongkirval-${sheet}" placeholder="0">
+        </div>
+      </div>` : ``}
+      <div class="wiz-cta-bar">
+        <button class="wiz-btn-primary" id="ws-next-${sheet}">Lihat review</button>
+      </div>
+      <button class="wiz-btn-ghost" id="ws-back-${sheet}">‹ Kembali ke daftar produk</button>
+    `;
+
+    const wEksp = document.getElementById("ws-eksp-"+sheet);
+    const wRate = document.getElementById("ws-rate-"+sheet);
+    const wManualVal = document.getElementById("ws-manualval-"+sheet);
+    const wKelebihanVal = document.getElementById("ws-kelebihanval-"+sheet);
+    formatRibuan(wRate); formatRibuan(wManualVal); formatRibuan(wKelebihanVal);
+    wEksp.value = ekspSel.value; wRate.value = rateInp.value;
+    wManualVal.value = manualInp.value; wKelebihanVal.value = kelebihanInp.value==="0" ? "" : kelebihanInp.value;
+    comboboxify(wEksp, "Pilih ekspedisi...");
+    if(manualInp.value) openDisclose(sheet, "manual");
+    if(kelebihanInp.value && kelebihanInp.value!=="0") openDisclose(sheet, "kelebihan");
+
+    wEksp.addEventListener("change", ()=>{ ekspSel.value = wEksp.value; ekspSel.dispatchEvent(new Event("change",{bubbles:true})); });
+    wRate.addEventListener("input", ()=>{ rateInp.value = wRate.value; rateInp.dispatchEvent(new Event("input",{bubbles:true})); });
+    wManualVal.addEventListener("input", ()=>{ manualInp.value = wManualVal.value; manualInp.dispatchEvent(new Event("input",{bubbles:true})); });
+    wKelebihanVal.addEventListener("input", ()=>{ kelebihanInp.value = wKelebihanVal.value || "0"; kelebihanInp.dispatchEvent(new Event("input",{bubbles:true})); });
+
+    document.getElementById("ws-manual-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"manual"));
+    document.getElementById("ws-kelebihan-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"kelebihan"));
+    function toggleDisclose(sh,key){
+      const t = document.getElementById(`ws-${key}-toggle-${sh}`), b = document.getElementById(`ws-${key}-body-${sh}`);
+      t.classList.toggle("open"); b.classList.toggle("open");
+    }
+    function openDisclose(sh,key){
+      document.getElementById(`ws-${key}-toggle-${sh}`).classList.add("open");
+      document.getElementById(`ws-${key}-body-${sh}`).classList.add("open");
+    }
+
+    if(sheet==="custom" && diskonOngkirInp){
+      const wDiskonOngkir = document.getElementById("ws-diskonongkirval-"+sheet);
+      formatRibuan(wDiskonOngkir);
+      wDiskonOngkir.value = diskonOngkirInp.value==="0" ? "" : diskonOngkirInp.value;
+      if(diskonOngkirInp.value && diskonOngkirInp.value!=="0") openDisclose(sheet,"diskonongkir");
+      wDiskonOngkir.addEventListener("input", ()=>{ diskonOngkirInp.value = wDiskonOngkir.value || "0"; diskonOngkirInp.dispatchEvent(new Event("input",{bubbles:true})); });
+      document.getElementById("ws-diskonongkir-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"diskonongkir"));
+    }
+
+    document.getElementById("ws-next-"+sheet).addEventListener("click", ()=> wizGo(sheet, "review"));
+    document.getElementById("ws-back-"+sheet).addEventListener("click", ()=> wizGo(sheet, "list"));
+  }
+
+  /* ---------- STEP: Review + Konfirmasi ---------- */
+  function renderReviewStep(sheet){
+    const pfx = pfxOf(sheet);
+    const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="review"]`);
+    const trs = trsOf(sheet);
+    const filled = trs.filter(tr=> tr.querySelector("select.prod").value);
+    const rowsHtml = filled.map(tr=>{
+      const prod = tr.querySelector("select.prod").value;
+      const qty = tr.querySelector("input.qty").value || 0;
+      const satuan = findProduct(prod) ? findProduct(prod).satuan : "";
+      const diskonEl = tr.querySelector("input.diskon, span[data-f='diskon']");
+      let diskonTxt = "Tidak ada";
+      if(diskonEl){
+        const raw = diskonEl.tagName==="INPUT" ? diskonEl.value.trim() : diskonEl.textContent.trim();
+        if(raw && raw!=="–") diskonTxt = diskonEl.tagName==="INPUT" ? raw : raw+" / "+satuan;
+      }
+      return `<div class="wiz-pcard-rev">
+        <div class="wiz-pcard-rev-top"><span>${prod}</span><span>${qty} ${satuan}</span></div>
+        <div class="wiz-pcard-rev-disc">↳ Diskon ${diskonTxt}</div>
+      </div>`;
+    }).join("");
+    host.innerHTML = `
+      <div class="wiz-title">Review pesanan</div>
+      ${rowsHtml}
+      <div class="wiz-sumcard">
+        <div class="wiz-revrow"><span>Total qty</span><span>${document.getElementById(pfx+"-totalqty").textContent}</span></div>
+        <div class="wiz-revrow"><span>Total berat</span><span>${document.getElementById(pfx+"-totalberat").textContent}</span></div>
+        <div class="wiz-revrow"><span>Subtotal</span><span>${document.getElementById(pfx+"-subtotal").textContent}</span></div>
+        <div class="wiz-revrow"><span>Ongkir</span><span>${document.getElementById(pfx+"-ongkir").textContent}</span></div>
+      </div>
+      <div class="wiz-totalcard"><span class="l">Grand total</span><span class="v">${document.getElementById(pfx+"-grandtotal").textContent}</span></div>
+      <div class="wiz-cta-bar">
+        <button class="wiz-btn-primary" id="wr-confirm-${sheet}">Pesanan sudah benar</button>
+      </div>
+      <button class="wiz-btn-ghost" id="wr-back-${sheet}">‹ Kembali ke pengiriman</button>
+      <div id="wr-confirmed-${sheet}"></div>
+    `;
+    document.getElementById("wr-back-"+sheet).addEventListener("click", ()=> wizGo(sheet, "ship"));
+    document.getElementById("wr-confirm-"+sheet).addEventListener("click", ()=>{
+      document.getElementById(pfx+"-nota-col").classList.add("wiz-show");
+      document.getElementById("wr-confirm-"+sheet).style.display = "none";
+      document.getElementById("wr-back-"+sheet).style.display = "none";
+      document.getElementById("wr-confirmed-"+sheet).innerHTML = `
+        <div class="wiz-stamp">✓ Pesanan dikonfirmasi — nota siap dibagikan</div>
+        <div class="wiz-cta-bar">
+          <div class="wiz-actionbtns">
+            <button class="primary" id="wr-download-${sheet}">⬇ Unduh</button>
+            <button id="wr-share-${sheet}">↗ Bagikan</button>
+            <button id="wr-copy-${sheet}">⧉ Salin</button>
+          </div>
+        </div>
+        <button class="wiz-btn-ghost" id="wr-editagain-${sheet}">‹ Edit pesanan lagi</button>
+      `;
+      document.getElementById("wr-download-"+sheet).addEventListener("click", ()=> document.getElementById("btn-download").click());
+      document.getElementById("wr-share-"+sheet).addEventListener("click", ()=> document.getElementById("btn-share").click());
+      document.getElementById("wr-copy-"+sheet).addEventListener("click", ()=> document.getElementById("btn-copy").click());
+      document.getElementById("wr-editagain-"+sheet).addEventListener("click", ()=> wizGo(sheet, "list"));
+      window.scrollTo(0,0);
+    });
+  }
+
+  /* ---------- hook dipanggil dari akhir calc() di atas: refresh step aktif kalau perlu ---------- */
+  window.__renderMobileCards = function(sheet){
+    const st = wizState[sheet];
+    if(st.step==="list" || st.step==="review") renderStep(sheet, st.step);
+  };
+
+  document.querySelectorAll(".wiz-dots button").forEach(btn=>{
+    btn.addEventListener("click", ()=> wizGo(btn.closest(".wiz-dots").dataset.wizdots, btn.dataset.step));
+  });
+  wizGo("penjualan","add");
+  wizGo("custom","add");
+  wizState.penjualan.step = "add";
+  wizState.custom.step = "add";
+})();
+
+/* ============================================================
+   MASTER DATA — akses tersembunyi via PIN (default 150150), berlaku
+   desktop maupun mobile. Menambah/menghapus produk & ekspedisi TIDAK
+   mengubah rumus/alur perhitungan — hanya menambah/mengurangi ISI
+   array PRODUCTS/PRODUCTS_PENJUALAN/EKSPEDISI yang sudah dipakai
+   fungsi buildRows()/buildEkspedisi()/calc() apa adanya. Perubahan
+   disimpan di localStorage supaya tidak hilang saat app ditutup.
+   ============================================================ */
+(function(){
+  const PIN_KEY = "notaHalawa_pin";
+  const DATA_KEY = "notaHalawa_masterData";
+  const DEFAULT_PIN = "150150";
+
+  function getPin(){ return localStorage.getItem(PIN_KEY) || DEFAULT_PIN; }
+  function setPin(p){ try{ localStorage.setItem(PIN_KEY, p); }catch(e){} }
+
+  function loadMasterData(){
+    try{
+      const raw = localStorage.getItem(DATA_KEY);
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      if(Array.isArray(data.products) && data.products.length){
+        PRODUCTS.splice(0, PRODUCTS.length, ...data.products);
+      }
+      if(Array.isArray(data.ekspedisi) && data.ekspedisi.length){
+        EKSPEDISI.splice(0, EKSPEDISI.length, ...data.ekspedisi);
+      }
+    }catch(e){ console.log("Master data gagal dimuat:", e); }
+  }
+  function saveMasterData(){
+    try{
+      localStorage.setItem(DATA_KEY, JSON.stringify({products: PRODUCTS, ekspedisi: EKSPEDISI}));
+    }catch(e){ console.log("Master data gagal disimpan:", e); }
+  }
+  function syncPenjualanSlice(){
+    PRODUCTS_PENJUALAN.splice(0, PRODUCTS_PENJUALAN.length, ...PRODUCTS.slice(0,5));
+  }
+  function refreshAfterDataChange(){
+    syncPenjualanSlice();
+    saveMasterData();
+    buildRows("penjualan"); buildRows("custom");
+    buildEkspedisi("penjualan"); buildEkspedisi("custom");
+    calc("penjualan"); calc("custom");
+  }
+  loadMasterData();
+  syncPenjualanSlice();
+
+  /* ---------- buka/tutup ---------- */
+  const trigger = document.getElementById("md-secret-tap");
+  const pinOverlay = document.getElementById("md-pin-overlay");
+  const pinInput = document.getElementById("md-pin-input");
+  const pinErr = document.getElementById("md-pin-err");
+  const panel = document.getElementById("md-panel");
+  [pinInput, "md-pin-old","md-pin-new","md-pin-new2"].forEach(x=>{
+    bindAutoSelect(typeof x==="string" ? document.getElementById(x) : x);
+  });
+
+  // Gestur tersembunyi: ketuk teks "Rp" di footer 3x dalam 2 detik.
+  // Sengaja tanpa tombol/ikon supaya cuma admin yang tahu caranya.
+  let tapCount = 0, tapTimer = null;
+  trigger.addEventListener("click", ()=>{
+    tapCount++;
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(()=>{ tapCount = 0; }, 2000);
+    if(tapCount >= 3){
+      tapCount = 0;
+      clearTimeout(tapTimer);
+      pinInput.value = ""; pinErr.textContent = "";
+      pinOverlay.hidden = false; pinInput.focus();
+    }
+  });
+  document.getElementById("md-pin-cancel").addEventListener("click", ()=> pinOverlay.hidden = true);
+  document.getElementById("md-pin-forgot").addEventListener("click", ()=>{
+    if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
+      setPin(DEFAULT_PIN);
+      pinErr.textContent = "PIN sudah direset ke PIN bawaan.";
+      pinErr.style.color = "var(--ledger-green)";
+    }
+  });
+  document.getElementById("md-pin-submit").addEventListener("click", submitPin);
+  pinInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") submitPin(); });
+  function submitPin(){
+    if(pinInput.value === getPin()){
+      pinOverlay.hidden = true;
+      openPanel();
+    } else {
+      pinErr.style.color = "var(--danger-red)";
+      pinErr.textContent = "PIN salah, coba lagi.";
+    }
+  }
+
+  document.getElementById("md-panel-close").addEventListener("click", ()=> panel.hidden = true);
+  function openPanel(){
+    panel.hidden = false;
+    renderProdukList();
+    renderEkspedisiList();
+  }
+
+  document.querySelectorAll(".md-tab").forEach(tab=>{
+    tab.addEventListener("click", ()=>{
+      document.querySelectorAll(".md-tab").forEach(t=>t.classList.remove("active"));
+      document.querySelectorAll(".md-section").forEach(s=>s.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("md-sec-"+tab.dataset.mdTab).classList.add("active");
+    });
+  });
+
+  /* ---------- Kelola Produk ---------- */
+  function renderProdukList(){
+    const list = document.getElementById("md-produk-list");
+    list.innerHTML = PRODUCTS.map((p,i)=>`
+      <div class="md-row" data-idx="${i}">
+        <input type="text" class="md-p-name" value="${p.name}" placeholder="Nama produk" title="Klik dua kali untuk atur diskon tier & subsidi">
+        <input type="text" inputmode="numeric" class="md-p-harga" value="${(p.harga||0).toLocaleString('id-ID')}" placeholder="Harga">
+        <input type="number" step="0.01" class="md-p-berat md-col-berat" value="${p.berat}" placeholder="Berat">
+        <input type="text" class="md-p-satuan md-col-satuan" value="${p.satuan}" placeholder="Satuan">
+        <button class="md-row-del" title="Hapus produk" data-del="${i}">✕</button>
+      </div>
+    `).join("");
+    list.querySelectorAll(".md-row").forEach(row=>{
+      const idx = +row.dataset.idx;
+      formatRibuan(row.querySelector(".md-p-harga"));
+      bindAutoSelect(row.querySelector(".md-p-name"));
+      bindAutoSelect(row.querySelector(".md-p-berat"));
+      bindAutoSelect(row.querySelector(".md-p-satuan"));
+      row.querySelector(".md-p-name").addEventListener("click", (e)=>{ e.stopPropagation(); });
+      row.querySelector(".md-p-name").addEventListener("dblclick", ()=> openProdukDetail(idx));
+      row.querySelector(".md-p-name").addEventListener("change", ()=>{ PRODUCTS[idx].name = row.querySelector(".md-p-name").value.trim() || PRODUCTS[idx].name; refreshAfterDataChange(); renderProdukList(); });
+      row.querySelector(".md-p-harga").addEventListener("change", ()=>{ PRODUCTS[idx].harga = parseRp(row.querySelector(".md-p-harga").value); refreshAfterDataChange(); });
+      row.querySelector(".md-p-berat").addEventListener("change", ()=>{ PRODUCTS[idx].berat = parseFloat(row.querySelector(".md-p-berat").value)||0; refreshAfterDataChange(); });
+      row.querySelector(".md-p-satuan").addEventListener("change", ()=>{ PRODUCTS[idx].satuan = row.querySelector(".md-p-satuan").value.trim() || PRODUCTS[idx].satuan; refreshAfterDataChange(); });
+    });
+    list.querySelectorAll("[data-del]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const idx = +btn.dataset.del;
+        if(confirm(`Hapus produk "${PRODUCTS[idx].name}"? Produk yang sudah terpakai di pesanan berjalan tidak akan otomatis terhapus dari situ.`)){
+          PRODUCTS.splice(idx,1);
+          refreshAfterDataChange();
+          renderProdukList();
+        }
+      });
+    });
+    list.querySelectorAll(".md-p-name").forEach(inp=>{
+      inp.title = "Klik dua kali untuk atur diskon tier & subsidi";
+    });
+  }
+  document.getElementById("md-produk-add").addEventListener("click", ()=>{
+    PRODUCTS.push({name:"Produk baru", harga:0, diskon:[0,0,0], subsidi:[0,0,0], berat:1, satuan:"Pack"});
+    refreshAfterDataChange();
+    renderProdukList();
+  });
+
+  /* ---------- detail produk (tier diskon/subsidi) ---------- */
+  const pdOverlay = document.getElementById("md-produk-detail-overlay");
+  let pdEditIdx = null;
+  function openProdukDetail(idx){
+    pdEditIdx = idx;
+    const p = PRODUCTS[idx];
+    document.getElementById("md-pd-title").textContent = "Detail — "+p.name;
+    [1,2,3].forEach(n=> wireDiskonModeInput("md-pd-diskonmode"+n, "md-pd-diskon"+n, p.diskon[n-1]));
+    [1,2,3].forEach(n=>{
+      const el = document.getElementById("md-pd-subsidi"+n);
+      formatRibuan(el);
+      el.value = (p.subsidi[n-1]||0).toLocaleString("id-ID");
+    });
+    pdOverlay.hidden = false;
+  }
+  document.getElementById("md-pd-cancel").addEventListener("click", ()=> pdOverlay.hidden = true);
+  document.getElementById("md-pd-save").addEventListener("click", ()=>{
+    const p = PRODUCTS[pdEditIdx];
+    p.diskon = [1,2,3].map(n=> parseFloat(readDiskonModeValue("md-pd-diskonmode"+n, "md-pd-diskon"+n))||0);
+    p.subsidi = [0,1,2].map(i=> parseRp(document.getElementById("md-pd-subsidi"+(i+1)).value));
+    refreshAfterDataChange();
+    pdOverlay.hidden = true;
+  });
+
+  /* ---------- Kelola Ekspedisi ---------- */
+  function renderEkspedisiList(){
+    const list = document.getElementById("md-ekspedisi-list");
+    list.innerHTML = EKSPEDISI.map((e,i)=>`
+      <div class="md-eksrow" data-idx="${i}">
+        <input type="text" class="md-e-name" value="${e}">
+        <button class="md-row-del" data-del="${i}">✕</button>
+      </div>
+    `).join("");
+    list.querySelectorAll(".md-e-name").forEach((inp,i)=>{
+      bindAutoSelect(inp);
+      inp.addEventListener("change", ()=>{ EKSPEDISI[i] = inp.value.trim() || EKSPEDISI[i]; refreshAfterDataChange(); });
+    });
+    list.querySelectorAll("[data-del]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const idx = +btn.dataset.del;
+        if(confirm(`Hapus ekspedisi "${EKSPEDISI[idx]}"?`)){
+          EKSPEDISI.splice(idx,1);
+          refreshAfterDataChange();
+          renderEkspedisiList();
+        }
+      });
+    });
+  }
+  document.getElementById("md-ekspedisi-add").addEventListener("click", ()=>{
+    EKSPEDISI.push("Ekspedisi baru");
+    refreshAfterDataChange();
+    renderEkspedisiList();
+  });
+
+  /* ---------- Ubah / Reset PIN ---------- */
+  document.getElementById("md-pin-save").addEventListener("click", ()=>{
+    const errEl = document.getElementById("md-pin-change-err");
+    errEl.style.color = "var(--danger-red)";
+    const oldV = document.getElementById("md-pin-old").value;
+    const newV = document.getElementById("md-pin-new").value;
+    const new2 = document.getElementById("md-pin-new2").value;
+    if(oldV !== getPin()){ errEl.textContent = "PIN saat ini salah."; return; }
+    if(!/^\d{6}$/.test(newV)){ errEl.textContent = "PIN baru harus 6 digit angka."; return; }
+    if(newV !== new2){ errEl.textContent = "Konfirmasi PIN baru tidak cocok."; return; }
+    setPin(newV);
+    errEl.style.color = "var(--ledger-green)";
+    errEl.textContent = "PIN berhasil diganti.";
+    document.getElementById("md-pin-old").value = "";
+    document.getElementById("md-pin-new").value = "";
+    document.getElementById("md-pin-new2").value = "";
+  });
+  document.getElementById("md-pin-reset-btn").addEventListener("click", ()=>{
+    if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
+      setPin(DEFAULT_PIN);
+      const errEl = document.getElementById("md-pin-change-err");
+      errEl.style.color = "var(--ledger-green)";
+      errEl.textContent = "PIN sudah direset ke PIN bawaan.";
+    }
+  });
+})();
 </script>
 </body>
 </html>
