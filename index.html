@@ -690,13 +690,13 @@
     .wiz-field select, .wiz-field input, .wiz-section select, .wiz-section input{
       width:100%;height:52px;border-radius:10px;border:1px solid var(--line);font-size:16px;padding:0 14px;
     }
-    .wiz-field input.wiz-qty-big, .wiz-section input.wiz-qty-big{height:56px;font-size:24px;font-weight:700;text-align:center;}
+    .wiz-field input.wiz-qty-big, .wiz-section input.wiz-qty-big{height:56px;font-size:26px;font-weight:700;text-align:center;border-width:1.5px;border-color:var(--primary-green);}
     /* --- Stepper +/- untuk field Jumlah --- */
-    .wiz-stepper{display:flex;align-items:center;gap:10px;}
-    .wiz-stepper input.wiz-qty-big{flex:1;min-width:0;}
+    .wiz-stepper{display:flex;align-items:center;gap:12px;}
+    .wiz-stepper input.wiz-qty-big{flex:1;min-width:0;padding:0 4px;}
     .wiz-stepper-btn{
-      width:44px;height:44px;border-radius:50%;border:1.5px solid var(--primary-green);
-      background:#fff;color:var(--primary-green);font-size:21px;font-weight:700;cursor:pointer;
+      width:48px;height:48px;border-radius:50%;border:1.5px solid var(--primary-green);
+      background:#fff;color:var(--primary-green);font-size:22px;font-weight:700;cursor:pointer;
       flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;
       -webkit-tap-highlight-color:transparent;user-select:none;
     }
@@ -1516,7 +1516,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.5.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.7.0</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
     </div>
   </footer>
@@ -1548,7 +1548,19 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.5.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.7.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Perbaikan tata letak stepper Jumlah (Custom): sebelumnya berbagi ruang 2-kolom dengan Diskon jadi kelihatan sangat kecil. Sekarang Jumlah dilebarkan jadi 1 baris penuh (tombol +/− lebih besar, kotak angka lega menampung sampai ribuan), Diskon pindah ke baris di bawahnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.6.0</div>
+          <ul>
+            <li>Daftar Ekspedisi sekarang <b>otomatis terurut A-Z</b> — di dropdown/pencarian Pengiriman maupun di Master Data — termasuk saat menambah ekspedisi baru atau mengubah namanya. Tidak perlu urut manual lagi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.5.0</div>
           <ul>
             <li>Master Data → Tampilan → <b>"Tombol Bantuan"</b>: sekarang bisa atur sendiri link tujuan tombol "Bantuan" di pojok kanan atas Beranda (bebas, tidak harus Telegram).</li>
             <li>Perbaikan: tombol "Detail" produk (buat atur diskon tier, subsidi ongkir, & link gambar) sebelumnya cuma bisa dibuka lewat klik-dua-kali nama produk — gestur itu tidak jalan baik di HP. Sekarang ada <b>ikon 🖼️ Detail tersendiri</b> di tiap baris produk yang bisa langsung diketuk.</li>
@@ -3839,24 +3851,22 @@ if ("serviceWorker" in navigator) {
           <select id="wa-prod-${sheet}"><option value="">— pilih produk —</option>${options}</select>
         </div>
         ${sheet==="custom" ? `
-        <div class="wiz-section-row">
-          <div class="wiz-section">
-            <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
-            <div class="wiz-stepper">
-              <button type="button" class="wiz-stepper-btn" id="wa-qtyminus-${sheet}" aria-label="Kurangi jumlah">−</button>
-              <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
-              <button type="button" class="wiz-stepper-btn" id="wa-qtyplus-${sheet}" aria-label="Tambah jumlah">+</button>
-            </div>
-            <div class="wiz-hint" id="wa-hint-${sheet}"></div>
+        <div class="wiz-section">
+          <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
+          <div class="wiz-stepper">
+            <button type="button" class="wiz-stepper-btn" id="wa-qtyminus-${sheet}" aria-label="Kurangi jumlah">−</button>
+            <input type="number" class="wiz-qty-big" id="wa-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qtyVal}">
+            <button type="button" class="wiz-stepper-btn" id="wa-qtyplus-${sheet}" aria-label="Tambah jumlah">+</button>
           </div>
-          <div class="wiz-section">
-            <div class="wiz-section-label"><span class="wiz-section-ic">🏷️</span> Diskon</div>
-            <select id="wa-diskonmode-${sheet}" style="margin-bottom:10px;">
-              <option value="persen">Persen (%)</option>
-              <option value="rupiah">Rupiah (Rp)</option>
-            </select>
-            <input type="text" inputmode="numeric" id="wa-diskon-${sheet}" placeholder="0">
-          </div>
+          <div class="wiz-hint" id="wa-hint-${sheet}"></div>
+        </div>
+        <div class="wiz-section">
+          <div class="wiz-section-label"><span class="wiz-section-ic">🏷️</span> Diskon</div>
+          <select id="wa-diskonmode-${sheet}" style="margin-bottom:10px;">
+            <option value="persen">Persen (%)</option>
+            <option value="rupiah">Rupiah (Rp)</option>
+          </select>
+          <input type="text" inputmode="numeric" id="wa-diskon-${sheet}" placeholder="0">
         </div>` : `
         <div class="wiz-section">
           <div class="wiz-section-label"><span class="wiz-section-ic">🔢</span> Jumlah</div>
@@ -4289,7 +4299,13 @@ if ("serviceWorker" in navigator) {
   function syncPenjualanSlice(){
     PRODUCTS_PENJUALAN.splice(0, PRODUCTS_PENJUALAN.length, ...PRODUCTS.slice(0,5));
   }
+  /* Ekspedisi selalu diurutkan A-Z otomatis — supaya gampang dicari,
+     berlaku juga untuk data yang baru ditambahkan/diubah namanya. */
+  function sortEkspedisi(){
+    EKSPEDISI.sort((a,b)=> a.localeCompare(b, "id", {sensitivity:"base", numeric:true}));
+  }
   function refreshAfterDataChange(){
+    sortEkspedisi();
     syncPenjualanSlice();
     saveMasterData();
     buildRows("penjualan"); buildRows("custom");
@@ -4297,6 +4313,7 @@ if ("serviceWorker" in navigator) {
     calc("penjualan"); calc("custom");
   }
   loadMasterData();
+  sortEkspedisi();
   syncPenjualanSlice();
 
   /* ---------- toggle Autocomplete (Tampilan) ---------- */
@@ -4471,7 +4488,11 @@ if ("serviceWorker" in navigator) {
     `).join("");
     list.querySelectorAll(".md-e-name").forEach((inp,i)=>{
       bindAutoSelect(inp);
-      inp.addEventListener("change", ()=>{ EKSPEDISI[i] = inp.value.trim() || EKSPEDISI[i]; refreshAfterDataChange(); });
+      inp.addEventListener("change", ()=>{
+        EKSPEDISI[i] = inp.value.trim() || EKSPEDISI[i];
+        refreshAfterDataChange();
+        renderEkspedisiList();
+      });
     });
     list.querySelectorAll("[data-del]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
