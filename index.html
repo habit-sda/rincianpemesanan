@@ -1199,6 +1199,7 @@
   </div>
 
   <div class="toolbar">
+    <button class="action-btn" id="btn-paste-order">📋 Tempel Pesanan</button>
     <button class="action-btn" id="btn-download">⬇ Unduh sebagai Gambar</button>
     <button class="action-btn" id="btn-share">⇪ Bagikan</button>
     <button class="action-btn" id="btn-copy">⧉ Salin ke Clipboard</button>
@@ -3267,6 +3268,11 @@ function clipboardErrorMessage(err){
   return "Gagal menyalin (" + (name || err.message) + ") — perangkat/browser ini kemungkinan belum mendukung salin gambar. Gambar otomatis diunduh sebagai gantinya.";
 }
 
+document.getElementById("btn-paste-order").addEventListener("click", ()=>{
+  const tab = document.querySelector(".tab-btn.active").dataset.tab;
+  if(window.__openPasteOrderModal) window.__openPasteOrderModal(tab);
+});
+
 document.getElementById("btn-copy").addEventListener("click", async ()=>{
   const btn = document.getElementById("btn-copy");
   btn.disabled = true; showMsg("Menyalin gambar…");
@@ -4592,6 +4598,7 @@ if ("serviceWorker" in navigator) {
     renderPasteOrderInput();
     poOverlay.hidden = false;
   }
+  window.__openPasteOrderModal = openPasteOrderModal;
 
   function renderListStep(sheet){
     const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="list"]`);
