@@ -2833,7 +2833,7 @@
       <div class="home-main">
         <div class="home-hero">
           <div class="home-hero-text">
-            <div class="home-hero-greet">Selamat datang 👋</div>
+            <div class="home-hero-greet" id="home-hero-greet" hidden>Selamat datang 👋</div>
             <h1>Mau buat nota <span class="accent">apa hari ini?</span></h1>
             <div class="sub">Pilih jenis pesanan untuk mulai mengisi.</div>
           </div>
@@ -2920,7 +2920,7 @@
   </div>
 
   <div class="toolbar">
-    <button class="action-btn" id="btn-paste-order">📋 Tempel Pesanan</button>
+    <button class="action-btn paste-order-ui" id="btn-paste-order">📋 Tempel Pesanan</button>
     <button class="action-btn" id="btn-download">⬇ Unduh sebagai Gambar</button>
     <button class="action-btn" id="btn-share">⇪ Bagikan</button>
     <button class="action-btn" id="btn-copy">⧉ Salin ke Clipboard</button>
@@ -3324,6 +3324,34 @@
           </label>
         </div>
       </div>
+      <div class="md-card">
+        <h3>Tempel Pesanan (AI)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6" y="4" width="12" height="16" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M9 4V3.6c0-.66.54-1.2 1.2-1.2h3.6c.66 0 1.2.54 1.2 1.2V4" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M9 11h6M9 14h6M9 17h3" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Aktifkan Tempel Pesanan (AI)</div>
+            <div class="md-togglerow-sub">Tombol "📋 Tempel Pesanan" di toolbar & wizard Input Penjualan — matikan untuk sembunyikan</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-pasteorder">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card">
+        <h3>Cocok Otomatis Bukti Transfer (DM Bot)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12a8 8 0 1 1 8 8" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/><path d="M4 12l3-3M4 12l3 3" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Aktifkan pencocokan otomatis</div>
+            <div class="md-togglerow-sub">CS kirim bukti transfer ke chat pribadi bot → bot cocokkan ke pesanan pending by nominal & posting otomatis ke grup. Nonaktif = bot diam kalau ada foto masuk ke DM (CS tetap bisa pakai cara lama: reply foto ke pesan Rincian Pemesanan di grup).</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-dmautomatch">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
       <div class="md-card" id="md-finance-card">
         <h3>Daftar Finance</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -3574,7 +3602,10 @@
       <div class="confirm-body">
         <p>Nota akan dikirim sebagai gambar ke grup Telegram pembayaran.</p>
         <label for="kt-customer-name" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Customer <span style="color:var(--danger-red);">*wajib</span></label>
-        <input type="text" id="kt-customer-name" class="kt-input" placeholder="Isi nama customer" autocomplete="off" style="text-transform:uppercase;">
+        <div style="position:relative;">
+          <input type="text" id="kt-customer-name" class="kt-input" placeholder="Isi nama customer" autocomplete="off" style="text-transform:uppercase;">
+          <div id="kt-name-suggest" hidden style="position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:220px;overflow-y:auto;"></div>
+        </div>
         <p class="kt-hint" style="margin-top:10px;">Dikirim sebagai: <b id="kt-sender-preview">—</b> · <button type="button" id="kt-edit-sender" style="background:none;border:none;padding:0;color:var(--primary-green);font-weight:700;text-decoration:underline;cursor:pointer;font-size:11px;">Ubah</button></p>
         <p class="kt-hint" id="kt-status"></p>
       </div>
@@ -4190,7 +4221,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, financeList:[]};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, financeList:[]};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -4202,6 +4233,8 @@ function loadSettings(){
     if(typeof s.tierBatas1 === "number" && s.tierBatas1 > 0) SETTINGS.tierBatas1 = s.tierBatas1;
     if(typeof s.tierBatas2 === "number" && s.tierBatas2 > SETTINGS.tierBatas1) SETTINGS.tierBatas2 = s.tierBatas2;
     if(typeof s.telegramBotEnabled === "boolean") SETTINGS.telegramBotEnabled = s.telegramBotEnabled;
+    if(typeof s.pasteOrderEnabled === "boolean") SETTINGS.pasteOrderEnabled = s.pasteOrderEnabled;
+    if(typeof s.dmAutoMatchEnabled === "boolean") SETTINGS.dmAutoMatchEnabled = s.dmAutoMatchEnabled;
     if(Array.isArray(s.financeList)) SETTINGS.financeList = s.financeList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
@@ -4217,6 +4250,9 @@ function applySettingsToDom(){
   const canSend = SETTINGS.telegramBotEnabled && !!getTelegramSenderId();
   document.querySelectorAll(".telegram-send-ui").forEach(el=>{
     el.hidden = !canSend;
+  });
+  document.querySelectorAll(".paste-order-ui").forEach(el=>{
+    el.hidden = !SETTINGS.pasteOrderEnabled;
   });
 }
 loadSettings();
@@ -5155,6 +5191,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     setTelegramTopicId(topicInput.value.replace(/[^0-9]/g, ""));
     refreshSub();
     applySettingsToDom();
+    if(window.__refreshHomeGreeting) window.__refreshHomeGreeting();
     setTimeout(closeModal, 900);
   });
 
@@ -5167,6 +5204,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
 (function(){
   const overlay = document.getElementById("kt-overlay");
   const nameInput = document.getElementById("kt-customer-name");
+  const suggestBox = document.getElementById("kt-name-suggest");
   const statusEl = document.getElementById("kt-status");
   const senderPreview = document.getElementById("kt-sender-preview");
   const btnEditSender = document.getElementById("kt-edit-sender");
@@ -5174,6 +5212,55 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   const btnClose = document.getElementById("kt-close");
   const btnCancel = document.getElementById("kt-cancel");
   const btnSend = document.getElementById("kt-send");
+
+  /* ---------- Rekomendasi Nama Customer (riwayat dari server) ----------
+     Muncul begitu CS ketik minimal 3 huruf. Kalau ada kata "NEW" di
+     belakang nama (mis. "DESY (INDRAMAYU) NEW"), kata itu dibuang dari
+     rekomendasi — soalnya "NEW" cuma berlaku 1x buat pesanan pertama. */
+  let nameHistory = [];
+  async function loadNameHistory(){
+    if(!MASTER_DATA_WORKER_URL) return;
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names");
+      const body = await res.json().catch(()=> ({}));
+      if(Array.isArray(body.names)) nameHistory = body.names;
+    }catch(e){ console.log("Gagal ambil riwayat nama customer:", e); }
+  }
+  function stripNewTag(name){
+    return name.replace(/\s*NEW\s*$/i, "").trim();
+  }
+  function hideSuggestions(){
+    suggestBox.hidden = true;
+    suggestBox.innerHTML = "";
+  }
+  function renderSuggestions(query){
+    const q = query.trim().toUpperCase();
+    if(q.length < 3){ hideSuggestions(); return; }
+    const seen = new Set();
+    const matches = [];
+    for(const raw of nameHistory){
+      const clean = stripNewTag(raw);
+      if(!clean.toUpperCase().includes(q)) continue;
+      const key = clean.toUpperCase();
+      if(seen.has(key)) continue;
+      seen.add(key);
+      matches.push(clean);
+      if(matches.length >= 6) break;
+    }
+    if(!matches.length){ hideSuggestions(); return; }
+    suggestBox.innerHTML = matches.map(name=>
+      `<div class="kt-suggest-item" style="padding:10px 12px;cursor:pointer;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--line);">${name}</div>`
+    ).join("");
+    suggestBox.hidden = false;
+    Array.from(suggestBox.children).forEach((el, i)=>{
+      el.addEventListener("mousedown", (e)=>{
+        e.preventDefault(); // supaya input tidak keburu blur sebelum klik diproses
+        nameInput.value = matches[i];
+        hideSuggestions();
+        updateSendBtnState();
+      });
+    });
+  }
 
   function refreshSenderPreview(){
     const val = getTelegramSenderId();
@@ -5187,7 +5274,10 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     const pos = nameInput.selectionStart;
     nameInput.value = nameInput.value.toUpperCase();
     nameInput.setSelectionRange(pos, pos);
+    renderSuggestions(nameInput.value);
   });
+  nameInput.addEventListener("blur", ()=> setTimeout(hideSuggestions, 120));
+  nameInput.addEventListener("focus", ()=> renderSuggestions(nameInput.value));
 
   let isSending = false;
   function updateSendBtnState(){
@@ -5201,8 +5291,10 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     statusEl.style.color = "";
     refreshSenderPreview();
     updateSendBtnState();
+    hideSuggestions();
     overlay.hidden = false;
     setTimeout(()=> nameInput.focus(), 50);
+    loadNameHistory();
   }
   function closeModal(){
     if(isSending) return; // sedang proses kirim, jangan bisa ditutup
@@ -5270,7 +5362,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       statusEl.textContent = "Berhasil dikirim ke grup Telegram.";
       statusEl.style.color = "var(--primary-green)";
       showMsg("Bukti untuk \"" + customerName + "\" terkirim ke grup Telegram.");
-      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; }, 900);
+      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); }, 900);
     }catch(e){
       statusEl.textContent = "Gagal mengirim: " + (e.message || e);
       statusEl.style.color = "var(--danger-red)";
@@ -5281,6 +5373,47 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     }
   });
 })();
+
+/* ============ Sambutan "Selamat datang" pakai nama/username Telegram ============
+   Field "ID Telegram Saya" bisa berisi angka ID (harus dikonversi ke
+   @username asli lewat server) ATAU sudah nama/username yang diketik
+   manual (dipakai apa adanya, tanpa panggil server). Kalau belum diisi,
+   atau ID-nya angka tapi gagal di-resolve (server error/offline/bukan
+   member grup), baris sambutan ini disembunyikan total — bukan fallback
+   ke teks generik. */
+async function initHomeGreeting(){
+  const greetEl = document.getElementById("home-hero-greet");
+  if(!greetEl) return;
+  greetEl.hidden = true; // default sembunyi sampai ada nama yang bisa ditampilkan
+  const senderId = getTelegramSenderId().trim();
+  if(!senderId) return;
+
+  function renderGreeting(label){
+    greetEl.textContent = "";
+    greetEl.appendChild(document.createTextNode("Selamat datang, "));
+    const b = document.createElement("b");
+    b.style.color = "var(--primary-green)";
+    b.textContent = label;
+    greetEl.appendChild(b);
+    greetEl.appendChild(document.createTextNode(" 👋"));
+    greetEl.hidden = false;
+  }
+
+  if(!/^\d+$/.test(senderId)){
+    renderGreeting(senderId); // sudah nama/username manual, tidak perlu ke server
+    return;
+  }
+  if(!MASTER_DATA_WORKER_URL) return; // tidak ada worker -> tetap sembunyi
+
+  try{
+    const res = await fetch(MASTER_DATA_WORKER_URL + "/resolve-sender?senderId=" + encodeURIComponent(senderId));
+    const body = await res.json().catch(()=> ({}));
+    if(body && typeof body.label === "string" && body.label.trim()) renderGreeting(body.label.trim());
+    // gagal / label kosong -> tetap hidden, tidak fallback ke teks generik
+  }catch(e){ console.log("Gagal ambil nama buat sambutan:", e); }
+}
+window.__refreshHomeGreeting = initHomeGreeting;
+initHomeGreeting();
 
 /* ============ init ============ */
 buildRows("penjualan"); buildRows("custom");
@@ -6518,7 +6651,7 @@ if ("serviceWorker" in navigator) {
       ${formHtml}
       <div class="wiz-cta-bar">
         ${!showForm ? `<button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button>` : ``}
-        <button class="wiz-btn-dash" id="wl-paste-${sheet}">📋 Tempel Pesanan</button>
+        ${SETTINGS.pasteOrderEnabled ? `<button class="wiz-btn-dash paste-order-ui" id="wl-paste-${sheet}">📋 Tempel Pesanan</button>` : ``}
         <button class="wiz-btn-ghost wiz-reset-proxy" id="wl-reset-${sheet}">↻ Reset</button>
         <button class="wiz-btn-primary" id="wl-next-${sheet}" ${filled.length? "" : "disabled style=\"opacity:.5;\""}>Lanjut ke pengiriman</button>
       </div>
@@ -6718,6 +6851,10 @@ if ("serviceWorker" in navigator) {
   }
 
   /* ---------- STEP: Pengiriman (mirror field asli + progressive disclosure) ---------- */
+  window.__refreshPasteOrderUI = function(){
+    try{ renderListStep("penjualan"); }catch(e){}
+    try{ renderListStep("custom"); }catch(e){}
+  };
   function renderShipStep(sheet){
     const pfx = pfxOf(sheet);
     const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="ship"]`);
@@ -7172,6 +7309,30 @@ if ("serviceWorker" in navigator) {
     saveSettings();
     applySettingsToDom();
     showToast(SETTINGS.telegramBotEnabled ? "Bot Telegram diaktifkan." : "Bot Telegram dinonaktifkan.");
+    pushMasterDataToServer();
+  });
+
+  /* ---------- toggle Tempel Pesanan / AI (Tampilan) ---------- */
+  const togglePasteOrder = document.getElementById("md-toggle-pasteorder");
+  togglePasteOrder.checked = SETTINGS.pasteOrderEnabled;
+  togglePasteOrder.addEventListener("change", ()=>{
+    SETTINGS.pasteOrderEnabled = togglePasteOrder.checked;
+    saveSettings();
+    applySettingsToDom();
+    if(window.__refreshPasteOrderUI) window.__refreshPasteOrderUI();
+    showToast(SETTINGS.pasteOrderEnabled ? "Tempel Pesanan (AI) diaktifkan." : "Tempel Pesanan (AI) dinonaktifkan.");
+    pushMasterDataToServer();
+  });
+
+  /* ---------- toggle Cocok Otomatis Bukti Transfer / DM Bot (Tampilan) ----------
+     Murni dibaca oleh worker.js (backend) — tidak ada elemen UI di app ini yang
+     perlu disembunyikan/dimunculkan, cuma perlu tersimpan & sinkron ke server. */
+  const toggleDmAutoMatch = document.getElementById("md-toggle-dmautomatch");
+  toggleDmAutoMatch.checked = SETTINGS.dmAutoMatchEnabled;
+  toggleDmAutoMatch.addEventListener("change", ()=>{
+    SETTINGS.dmAutoMatchEnabled = toggleDmAutoMatch.checked;
+    saveSettings();
+    showToast(SETTINGS.dmAutoMatchEnabled ? "Cocok Otomatis Bukti Transfer (DM Bot) diaktifkan." : "Cocok Otomatis Bukti Transfer (DM Bot) dinonaktifkan.");
     pushMasterDataToServer();
   });
 
