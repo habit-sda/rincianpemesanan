@@ -1656,6 +1656,10 @@
           <input type="text" inputmode="numeric" id="md-pd-subsidi3" style="max-width:none;">
         </div>
         <label>Link gambar produk (URL)</label>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <img id="md-pd-gambar-preview" src="" alt="" style="width:52px;height:52px;border-radius:8px;object-fit:cover;background:#f5ede1;border:1px solid var(--line);flex-shrink:0;">
+          <span class="md-note" id="md-pd-gambar-previewnote" style="margin:0;">Preview gambar akan muncul di sini</span>
+        </div>
         <input type="text" inputmode="url" id="md-pd-gambar" placeholder="https://... (kosongkan untuk gambar bawaan)" style="max-width:none;">
         <div class="md-note" style="margin-top:4px;">Tempel link gambar dari internet (bukan unggah file) supaya tidak menghabiskan penyimpanan. Kalau dikosongkan, tampil gambar kardus polos.</div>
 
@@ -5369,6 +5373,27 @@ if ("serviceWorker" in navigator) {
   /* ---------- detail produk (tier diskon/subsidi) ---------- */
   const pdOverlay = document.getElementById("md-produk-detail-overlay");
   let pdEditIdx = null;
+  function updateGambarPreview(){
+    const url = document.getElementById("md-pd-gambar").value.trim();
+    const img = document.getElementById("md-pd-gambar-preview");
+    const note = document.getElementById("md-pd-gambar-previewnote");
+    if(!url){
+      img.src = PRODUCT_IMG_PLACEHOLDER;
+      note.textContent = "Kosong — pakai gambar kardus bawaan.";
+      note.style.color = "";
+      return;
+    }
+    note.textContent = "Memuat preview…";
+    note.style.color = "";
+    img.onload = ()=>{ note.textContent = "Link gambar valid ✓"; note.style.color = "var(--primary-green)"; };
+    img.onerror = ()=>{
+      img.onerror = null;
+      img.src = PRODUCT_IMG_PLACEHOLDER;
+      note.textContent = "Gagal memuat — link ini kemungkinan bukan direct-image link (mis. link viewer Google Drive/Instagram), coba link lain.";
+      note.style.color = "var(--danger-red)";
+    };
+    img.src = url;
+  }
   function openProdukDetail(idx){
     pdEditIdx = idx;
     const p = PRODUCTS[idx];
@@ -5380,11 +5405,13 @@ if ("serviceWorker" in navigator) {
       el.value = (p.subsidi[n-1]||0).toLocaleString("id-ID");
     });
     document.getElementById("md-pd-gambar").value = p.gambar || "";
+    updateGambarPreview();
     document.getElementById("md-pd-isisachet").value = p.isiSachet || 0;
     document.getElementById("md-pd-isirenteng").value = p.isiRenteng || 0;
     document.getElementById("md-pd-isipack").value = p.isiPack || 0;
     pdOverlay.hidden = false;
   }
+  document.getElementById("md-pd-gambar").addEventListener("input", updateGambarPreview);
   document.getElementById("md-pd-cancel").addEventListener("click", ()=> pdOverlay.hidden = true);
   document.getElementById("md-pd-save").addEventListener("click", ()=>{
     const p = PRODUCTS[pdEditIdx];
