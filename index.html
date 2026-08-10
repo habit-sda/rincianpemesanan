@@ -4195,14 +4195,68 @@ if ("serviceWorker" in navigator) {
 (function(){
   const body = document.body;
 
-  /* ---------- navigasi Beranda <-> panel ---------- */
-  function goHome(){ body.classList.add("showing-home"); body.classList.remove("nota-confirmed"); window.scrollTo(0,0); }
+  /* ---------- helper umum ---------- */
+  const STEP_ORDER = ["list","ship","review"];
+  const wizState = {
+    penjualan: {step:"list", editingRow:null, formOpen:true},
+    custom:    {step:"list", editingRow:null, formOpen:true},
+  };
+
+  /* ---------- navigasi Beranda <-> panel, terhubung ke tombol/gesture
+     Kembali di HP. Setiap pindah layar (Beranda <-> Input/Pengiriman/
+     Review) menambah 1 entri riwayat browser lewat history.pushState.
+     Saat tombol Kembali fisik/gesture HP ditekan, browser memicu event
+     "popstate" — event ini yang menangkap dan memindahkan tampilan ke
+     layar SEBELUMNYA di dalam app, bukan langsung menutup halaman.
+     applyHomeView()/applyWizStep() cuma mengubah TAMPILAN (tanpa sentuh
+     riwayat browser) — dipakai baik oleh navigasi tombol (yang push
+     riwayat baru) maupun oleh popstate (yang tidak boleh push lagi,
+     supaya tidak bikin loop maju-mundur). ---------- */
+  function applyHomeView(){
+    body.classList.add("showing-home");
+    body.classList.remove("nota-confirmed");
+    window.scrollTo(0,0);
+  }
+  function applyWizStep(sheet, step){
+    wizState[sheet].step = step;
+    const wiz = document.getElementById("wiz-"+sheet);
+    if(!wiz) return;
+    wiz.querySelectorAll(".wiz-step").forEach(s=> s.classList.toggle("active", s.dataset.wstep===step));
+    const idx = STEP_ORDER.indexOf(step);
+    wiz.querySelectorAll(".wiz-dots button").forEach(btn=>{
+      const bIdx = STEP_ORDER.indexOf(btn.dataset.step);
+      btn.classList.toggle("on", bIdx===idx);
+      btn.classList.toggle("done", bIdx<idx);
+    });
+    renderStep(sheet, step);
+    document.getElementById(pfxOf(sheet)+"-nota-col").classList.remove("wiz-show");
+    body.classList.remove("nota-confirmed");
+  }
+  function applyNavState(state){
+    if(!state || state.view === "home"){
+      applyHomeView();
+      return;
+    }
+    if(state.view === "wiz"){
+      body.classList.remove("showing-home");
+      const btn = document.querySelector(`.tab-btn[data-tab="${state.sheet}"]`);
+      if(btn && !btn.classList.contains("active")) btn.click();
+      applyWizStep(state.sheet, state.step);
+      window.scrollTo(0,0);
+    }
+  }
+  window.addEventListener("popstate", (e)=> applyNavState(e.state));
+  try{ history.replaceState({view:"home"}, ""); }catch(e){ /* mode privat/embed kadang blokir History API — app tetap jalan, cuma tombol Kembali fallback ke perilaku browser biasa */ }
+
+  function goHome(){
+    applyHomeView();
+    try{ history.pushState({view:"home"}, ""); }catch(e){}
+  }
   function openTab(tab){
     body.classList.remove("showing-home");
     const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
     if(btn) btn.click();
     wizGo(tab, "list");
-    window.scrollTo(0,0);
   }
   body.classList.add("showing-home");
   document.querySelectorAll("[data-open-tab]").forEach(btn=>{
@@ -4221,13 +4275,6 @@ if ("serviceWorker" in navigator) {
   if(homeResetLink) homeResetLink.addEventListener("click", ()=>{
     const b = document.getElementById("btn-reset"); if(b) b.click();
   });
-
-  /* ---------- helper umum ---------- */
-  const STEP_ORDER = ["list","ship","review"];
-  const wizState = {
-    penjualan: {step:"list", editingRow:null, formOpen:true},
-    custom:    {step:"list", editingRow:null, formOpen:true},
-  };
 
   function trsOf(sheet){ return [...document.querySelectorAll("#rows-"+sheet+" tr")]; }
   function prodListOf(sheet){ return sheet==="penjualan" ? PRODUCTS_PENJUALAN : PRODUCTS; }
@@ -4311,20 +4358,9 @@ if ("serviceWorker" in navigator) {
   }
 
   function wizGo(sheet, step){
-    wizState[sheet].step = step;
-    const wiz = document.getElementById("wiz-"+sheet);
-    if(!wiz) return;
-    wiz.querySelectorAll(".wiz-step").forEach(s=> s.classList.toggle("active", s.dataset.wstep===step));
-    const idx = STEP_ORDER.indexOf(step);
-    wiz.querySelectorAll(".wiz-dots button").forEach(btn=>{
-      const bIdx = STEP_ORDER.indexOf(btn.dataset.step);
-      btn.classList.toggle("on", bIdx===idx);
-      btn.classList.toggle("done", bIdx<idx);
-    });
-    renderStep(sheet, step);
-    document.getElementById(pfxOf(sheet)+"-nota-col").classList.remove("wiz-show");
-    document.body.classList.remove("nota-confirmed");
+    applyWizStep(sheet, step);
     window.scrollTo(0,0);
+    try{ history.pushState({view:"wiz", sheet, step}, ""); }catch(e){}
   }
 
   function renderStep(sheet, step){
@@ -4837,8 +4873,11 @@ if ("serviceWorker" in navigator) {
   document.querySelectorAll(".wiz-dots button").forEach(btn=>{
     btn.addEventListener("click", ()=> wizGo(btn.closest(".wiz-dots").dataset.wizdots, btn.dataset.step));
   });
-  wizGo("penjualan","list");
-  wizGo("custom","list");
+  // render awal kedua wizard (di belakang layar Beranda) — pakai
+  // applyWizStep langsung, BUKAN wizGo, supaya tidak ikut menambah
+  // entri riwayat browser saat halaman baru dibuka.
+  applyWizStep("penjualan","list");
+  applyWizStep("custom","list");
   wizState.penjualan.step = "list";
   wizState.custom.step = "list";
 })();
