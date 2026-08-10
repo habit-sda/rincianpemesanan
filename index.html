@@ -1664,6 +1664,10 @@
         <input type="text" inputmode="url" id="md-pd-gambar" placeholder="https://... (kosongkan untuk gambar bawaan)" style="max-width:none;">
         <div class="md-note" style="margin-top:4px;">Tempel link gambar dari internet (bukan unggah file) supaya tidak menghabiskan penyimpanan. Kalau dikosongkan, tampil gambar kardus polos.</div>
 
+        <label style="margin-top:14px;">Alias / kata kunci lain (buat fitur "Tempel Pesanan" AI)</label>
+        <input type="text" id="md-pd-alias" placeholder="mis. saset ayam, sachet ayam, renceng ayam, ds ayam" style="max-width:none;">
+        <div class="md-note" style="margin-top:4px;">Pisahkan pakai koma. Istilah lain yang customer sering pakai untuk produk ini di chat pesanan — makin lengkap, makin akurat AI mencocokkannya. Kosongkan kalau tidak perlu.</div>
+
         <label style="margin-top:14px;">Isi per Karton (buat pecah harga per satuan kecil di Penjualan)</label>
         <div style="display:flex;gap:6px;">
           <div style="flex:1;">
@@ -1834,6 +1838,17 @@
         <button id="md-ekspedisi-add-cancel" class="calc-actbtn calc-clearbtn">Batal</button>
         <button id="md-ekspedisi-add-save" class="calc-actbtn confirm-okbtn kt-okbtn">Tambah</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ================= POPUP TEMPEL PESANAN (AI) ================= -->
+  <div id="paste-order-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup confirm-popup" role="dialog" aria-label="Tempel pesanan" style="width:360px;max-height:82vh;overflow-y:auto;">
+      <div class="calc-head">
+        <span>📋 Tempel Pesanan (AI)</span>
+        <button id="paste-order-close" class="calc-close" aria-label="Tutup">✕</button>
+      </div>
+      <div class="confirm-body" id="paste-order-body"></div>
     </div>
   </div>
 
@@ -4432,6 +4447,152 @@ if ("serviceWorker" in navigator) {
     renderListStep(sheet);
   }
 
+  /* ============ "Tempel Pesanan" (AI) — baca teks pesanan mentah,
+     cocokkan ke katalog produk sheet ini, tampilkan sebagai preview
+     yang BISA DIKOREKSI sebelum diterapkan ke baris pesanan. ============ */
+  const poOverlay = document.getElementById("paste-order-overlay");
+  const poBody = document.getElementById("paste-order-body");
+  let poSheet = null;
+  let poItems = [];
+
+  function closePasteOrder(){ poOverlay.hidden = true; }
+  document.getElementById("paste-order-close").addEventListener("click", closePasteOrder);
+  poOverlay.addEventListener("click", (e)=>{ if(e.target === poOverlay) closePasteOrder(); });
+
+  function renderPasteOrderInput(prefill){
+    poBody.innerHTML = `
+      <p class="md-note" style="margin:0 0 8px;">Tempel mentahan chat pesanan customer di sini. AI akan coba baca jadi daftar produk — hasilnya tetap bisa dikoreksi sebelum diterapkan, tidak langsung masuk otomatis.</p>
+      <textarea id="po-textarea" rows="8" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;" placeholder="Contoh: Saset ayam 15 ds&#10;Saset sapi 5 ds&#10;Ayam 500g 1 ds">${prefill||""}</textarea>
+      <p class="kt-hint" id="po-status" style="margin-top:8px;"></p>
+      <div class="confirm-actionrow" style="padding:14px 0 0;">
+        <button id="po-cancel" class="calc-actbtn calc-clearbtn">Batal</button>
+        <button id="po-process" class="calc-actbtn confirm-okbtn kt-okbtn">Proses dengan AI</button>
+      </div>
+    `;
+    document.getElementById("po-cancel").addEventListener("click", closePasteOrder);
+    document.getElementById("po-process").addEventListener("click", processPasteOrder);
+  }
+
+  async function processPasteOrder(){
+    const ta = document.getElementById("po-textarea");
+    const statusEl = document.getElementById("po-status");
+    const btn = document.getElementById("po-process");
+    const text = ta.value.trim();
+    if(!text){
+      statusEl.textContent = "Tempel dulu teks pesanannya.";
+      statusEl.style.color = "var(--danger-red)";
+      return;
+    }
+    if(!MASTER_DATA_WORKER_URL){
+      statusEl.textContent = "URL worker belum diatur di kode (MASTER_DATA_WORKER_URL).";
+      statusEl.style.color = "var(--danger-red)";
+      return;
+    }
+    btn.disabled = true;
+    statusEl.style.color = "";
+    statusEl.textContent = "AI sedang membaca pesanan…";
+    try{
+      const productCatalog = prodListOf(poSheet).map(p=> ({ name: p.name, alias: p.alias || "" }));
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/parse-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, productCatalog }),
+      });
+      const data = await res.json().catch(()=> ({}));
+      if(!res.ok || !data.ok){
+        if(data.error === "AI_QUOTA_EXCEEDED"){
+          statusEl.textContent = "⚠️ Kuota AI gratis hari ini sudah habis. Coba lagi besok, atau isi manual dulu lewat \"+ Tambah produk\".";
+        } else {
+          statusEl.textContent = "Gagal: " + (data.message || data.error || ("HTTP " + res.status));
+        }
+        statusEl.style.color = "var(--danger-red)";
+        btn.disabled = false;
+        return;
+      }
+      poItems = data.items || [];
+      renderPasteOrderReview(text);
+    }catch(e){
+      statusEl.textContent = "Gagal memproses: " + (e.message || e);
+      statusEl.style.color = "var(--danger-red)";
+      btn.disabled = false;
+    }
+  }
+
+  function renderPasteOrderReview(originalText){
+    const catalog = prodListOf(poSheet);
+    const optionsHtml = `<option value="">— abaikan (bukan produk) —</option>` +
+      catalog.map(p=> `<option value="${p.name}">${p.name}</option>`).join("");
+    const rowsHtml = poItems.length ? poItems.map((it,i)=> `
+      <div class="po-row" data-po-rowbox="${i}" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;${it.matchedProduct ? "" : "opacity:.55;"}">
+        <div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px;">"${String(it.raw||"").replace(/[<>&]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]))}"</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <select data-po-row="${i}" class="po-select" style="flex:1;min-width:0;padding:6px;border:1px solid var(--line);border-radius:6px;">${optionsHtml}</select>
+          <input type="number" data-po-qty="${i}" class="po-qty" value="${it.qty||""}" min="0" placeholder="Qty" style="width:64px;padding:6px;border:1px solid var(--line);border-radius:6px;">
+        </div>
+      </div>
+    `).join("") : `<p class="md-note">Tidak ada baris yang terbaca dari teks itu.</p>`;
+
+    poBody.innerHTML = `
+      <p class="md-note" style="margin:0 0 8px;">Periksa hasil bacaan AI — baris pudar berarti AI menganggapnya BUKAN produk. Perbaiki dulu kalau ada yang salah, baru terapkan.</p>
+      ${rowsHtml}
+      <p class="kt-hint" id="po-status2" style="margin-top:4px;"></p>
+      <div class="confirm-actionrow" style="padding:14px 0 0;">
+        <button id="po-back" class="calc-actbtn calc-clearbtn">Kembali</button>
+        <button id="po-apply" class="calc-actbtn confirm-okbtn kt-okbtn">Terapkan ke Pesanan</button>
+      </div>
+    `;
+    poBody.querySelectorAll(".po-select").forEach(sel=>{
+      const i = +sel.dataset.poRow;
+      sel.value = poItems[i].matchedProduct || "";
+      sel.addEventListener("change", ()=>{
+        poItems[i].matchedProduct = sel.value || null;
+        const box = poBody.querySelector(`[data-po-rowbox="${i}"]`);
+        if(box) box.style.opacity = sel.value ? "1" : ".55";
+      });
+    });
+    poBody.querySelectorAll(".po-qty").forEach(inp=>{
+      const i = +inp.dataset.poQty;
+      inp.addEventListener("input", ()=>{ poItems[i].qty = parseFloat(inp.value) || null; });
+    });
+    document.getElementById("po-back").addEventListener("click", ()=> renderPasteOrderInput(originalText));
+    document.getElementById("po-apply").addEventListener("click", applyPasteOrderItems);
+  }
+
+  function applyPasteOrderItems(){
+    const statusEl = document.getElementById("po-status2");
+    const toApply = poItems.filter(it=> it.matchedProduct && it.qty > 0);
+    if(!toApply.length){
+      statusEl.textContent = "Tidak ada baris valid untuk diterapkan — pilih produk & isi jumlah dulu.";
+      statusEl.style.color = "var(--danger-red)";
+      return;
+    }
+    const trs = trsOf(poSheet);
+    let applied = 0, skipped = 0;
+    toApply.forEach(it=>{
+      // Kalau produk ini sudah ada di baris lain, timpa qty-nya (bukan
+      // bikin baris dobel); kalau belum ada, pakai baris kosong pertama.
+      let idx = trs.findIndex(tr=> tr.querySelector("select.prod").value === it.matchedProduct);
+      if(idx === -1) idx = trs.findIndex(tr=> tr.querySelector("select.prod").value === "");
+      if(idx === -1){ skipped++; return; }
+      const tr = trs[idx];
+      tr.querySelector("select.prod").value = it.matchedProduct;
+      tr.querySelector("input.qty").value = Math.min(1000, it.qty);
+      tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+      tr.querySelector("input.qty").dispatchEvent(new Event("input", {bubbles:true}));
+      applied++;
+    });
+    closePasteOrder();
+    renderListStep(poSheet);
+    showToast(`${applied} produk diterapkan ke pesanan.` + (skipped ? ` ${skipped} dilewati (baris penuh, maks 7 produk).` : ""));
+  }
+
+  function openPasteOrderModal(sheet){
+    poSheet = sheet;
+    poItems = [];
+    renderPasteOrderInput();
+    poOverlay.hidden = false;
+  }
+
   function renderListStep(sheet){
     const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="list"]`);
     const st = wizState[sheet];
@@ -4542,7 +4703,7 @@ if ("serviceWorker" in navigator) {
       ${cardsHtml}
       ${formHtml}
       <div class="wiz-cta-bar">
-        ${!showForm ? `<button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button>` : ``}
+        ${!showForm ? `<button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button><button class="wiz-btn-dash" id="wl-paste-${sheet}">📋 Tempel Pesanan</button>` : ``}
         <button class="wiz-btn-primary" id="wl-next-${sheet}" ${filled.length? "" : "disabled style=\"opacity:.5;\""}>Lanjut ke pengiriman</button>
       </div>
     `;
@@ -4588,6 +4749,8 @@ if ("serviceWorker" in navigator) {
     host.querySelectorAll(".wiz-pcard").forEach(card=> attachSwipe(card, ()=> doDelete(+card.dataset.row)));
     const addBtn = document.getElementById("wl-add-"+sheet);
     if(addBtn) addBtn.addEventListener("click", ()=> openForm(sheet, null));
+    const pasteBtn = document.getElementById("wl-paste-"+sheet);
+    if(pasteBtn) pasteBtn.addEventListener("click", ()=> openPasteOrderModal(sheet));
     const nextBtn = document.getElementById("wl-next-"+sheet);
     if(filled.length) nextBtn.addEventListener("click", ()=> wizGo(sheet, "ship"));
 
@@ -5427,6 +5590,7 @@ if ("serviceWorker" in navigator) {
     });
     document.getElementById("md-pd-gambar").value = p.gambar || "";
     updateGambarPreview();
+    document.getElementById("md-pd-alias").value = p.alias || "";
     document.getElementById("md-pd-isisachet").value = p.isiSachet || 0;
     document.getElementById("md-pd-isirenteng").value = p.isiRenteng || 0;
     document.getElementById("md-pd-isipack").value = p.isiPack || 0;
@@ -5439,6 +5603,7 @@ if ("serviceWorker" in navigator) {
     p.diskon = [1,2,3].map(n=> parseFloat(readDiskonModeValue("md-pd-diskonmode"+n, "md-pd-diskon"+n))||0);
     p.subsidi = [0,1,2].map(i=> parseRp(document.getElementById("md-pd-subsidi"+(i+1)).value));
     p.gambar = document.getElementById("md-pd-gambar").value.trim();
+    p.alias = document.getElementById("md-pd-alias").value.trim();
     p.isiSachet = parseFloat(document.getElementById("md-pd-isisachet").value)||0;
     p.isiRenteng = parseFloat(document.getElementById("md-pd-isirenteng").value)||0;
     p.isiPack = parseFloat(document.getElementById("md-pd-isipack").value)||0;
