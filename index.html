@@ -1690,6 +1690,7 @@
   <div class="md-overlay" id="md-ekspedisi-detail-overlay" hidden>
     <div class="md-pinbox" style="max-width:380px;text-align:left;">
       <h3 id="md-ed-title">Rumus ekspedisi</h3>
+      <div class="md-note" id="md-ed-newnote" hidden style="background:#e6f4ea;padding:8px 10px;border-radius:8px;margin-bottom:10px;color:var(--primary-green);font-weight:600;">Ekspedisi baru ditambahkan. Sesuaikan rumusnya sekarang, atau ketuk "Lewati" untuk pakai pengaturan default.</div>
       <div class="md-pinform">
         <div class="md-togglerow">
           <div class="md-togglerow-text">
@@ -5450,10 +5451,12 @@ if ("serviceWorker" in navigator) {
     document.getElementById(id).addEventListener("input", updateEkspedisiDetailPreview);
     document.getElementById(id).addEventListener("change", updateEkspedisiDetailPreview);
   });
-  function openEkspedisiDetail(idx){
+  function openEkspedisiDetail(idx, isNew){
     edEditIdx = idx;
     const e = EKSPEDISI[idx];
     document.getElementById("md-ed-title").textContent = "Rumus — " + e.name;
+    document.getElementById("md-ed-newnote").hidden = !isNew;
+    document.getElementById("md-ed-cancel").textContent = isNew ? "Lewati (pakai default)" : "Batal";
     document.getElementById("md-ed-longgar").checked = !!e.pembulatanLonggar;
     document.getElementById("md-ed-minberat").value = e.minBeratKg || 0;
     document.getElementById("md-ed-minbertacustom").checked = !!e.minBeratCustom;
@@ -5553,12 +5556,19 @@ if ("serviceWorker" in navigator) {
         err.style.color = "var(--danger-red)";
         return;
       }
-      EKSPEDISI.push({kode: nextKode("E"), name, pembulatanLonggar:false, minBeratKg:0, minBeratCustom:false, subsidiKhusus:false, subsidiPersenOngkir:20, subsidiPersenBatas:80});
+      const newKode = nextKode("E");
+      EKSPEDISI.push({kode: newKode, name, pembulatanLonggar:false, minBeratKg:0, minBeratCustom:false, subsidiKhusus:false, subsidiPersenOngkir:20, subsidiPersenBatas:80});
       refreshAfterDataChange();
       if(ekspedisiSearchInput) ekspedisiSearchInput.value = "";
       renderEkspedisiList();
       showToast(`Ekspedisi "${name}" ditambahkan.`);
       close();
+      const newIdx = EKSPEDISI.findIndex(e=> e.kode === newKode);
+      if(newIdx >= 0){
+        // beri jeda singkat supaya popup Tambah selesai tertutup dulu,
+        // baru popup Rumus muncul menyusul — biar tidak dobel-tumpuk.
+        setTimeout(()=> openEkspedisiDetail(newIdx, true), 200);
+      }
     });
   })();
 
