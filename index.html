@@ -1747,7 +1747,7 @@
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
     </div>
-    <div class="telegram-bot-ui" style="margin-top:2px;opacity:.6;font-size:11px;" id="footer-tgid-sub"></div>
+    <div class="telegram-bot-ui" style="margin-top:2px;opacity:.6;font-size:11px;cursor:pointer;text-decoration:underline;" id="footer-tgid-sub"></div>
   </footer>
 
   <!-- ================= POPUP KONFIRMASI RESET ================= -->
@@ -3323,6 +3323,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   function closeModal(){ overlay.hidden = true; }
 
   btnOpen.addEventListener("click", openModal);
+  subEl.addEventListener("click", openModal);
   btnClose.addEventListener("click", closeModal);
   btnCancel.addEventListener("click", closeModal);
   overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
