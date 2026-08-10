@@ -3143,7 +3143,7 @@ function buildPrintNota(tab){
   const totalqty = document.getElementById(pfx+"-totalqty").textContent;
   const totalberat = document.getElementById(pfx+"-totalberat").textContent;
   const subtotal = document.getElementById(pfx+"-subtotal").textContent;
-  const ongkir = document.getElementById(pfx+"-ongkir").textContent;
+  const ongkir = document.getElementById(pfx+"-ongkir").textContent.replace(/\s*\(manual\)\s*$/i, "");
   const diskonongkir = tab==="penjualan"
     ? document.getElementById("pj-diskonongkir").textContent
     : (document.getElementById("cs-diskonongkir").value ? rupiah(parseRp(document.getElementById("cs-diskonongkir").value)) : "Rp 0");
