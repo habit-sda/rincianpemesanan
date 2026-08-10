@@ -1812,6 +1812,25 @@
     </div>
   </div>
 
+  <!-- ================= POPUP TAMBAH EKSPEDISI BARU ================= -->
+  <div id="md-ekspedisi-add-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup confirm-popup" role="dialog" aria-label="Tambah ekspedisi baru">
+      <div class="calc-head">
+        <span>Tambah Ekspedisi Baru</span>
+        <button id="md-ekspedisi-add-close" class="calc-close" aria-label="Batal">✕</button>
+      </div>
+      <div class="confirm-body">
+        <label for="md-ekspedisi-add-name" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Ekspedisi</label>
+        <input type="text" id="md-ekspedisi-add-name" class="kt-input" placeholder="mis. JNE, J&T, IDTruck" autocomplete="off">
+        <p class="kt-hint" id="md-ekspedisi-add-err"></p>
+      </div>
+      <div class="confirm-actionrow">
+        <button id="md-ekspedisi-add-cancel" class="calc-actbtn calc-clearbtn">Batal</button>
+        <button id="md-ekspedisi-add-save" class="calc-actbtn confirm-okbtn kt-okbtn">Tambah</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= POPUP RIWAYAT UPDATE (CHANGELOG) ================= -->
   <div id="changelog-overlay" class="calc-overlay" hidden>
     <div class="calc-popup changelog-popup" role="dialog" aria-label="Riwayat update">
@@ -5460,10 +5479,47 @@ if ("serviceWorker" in navigator) {
     bindKodeBadgeCopy(list);
   }
   document.getElementById("md-ekspedisi-add").addEventListener("click", ()=>{
-    EKSPEDISI.push({kode: nextKode("E"), name:"Ekspedisi baru", pembulatanLonggar:false, minBeratKg:0, minBeratCustom:false, subsidiKhusus:false, subsidiPersenOngkir:20, subsidiPersenBatas:80});
-    refreshAfterDataChange();
-    renderEkspedisiList();
+    const overlay = document.getElementById("md-ekspedisi-add-overlay");
+    const nameInput = document.getElementById("md-ekspedisi-add-name");
+    const err = document.getElementById("md-ekspedisi-add-err");
+    nameInput.value = "";
+    err.textContent = "";
+    overlay.hidden = false;
+    setTimeout(()=> nameInput.focus(), 50);
   });
+  (function(){
+    const overlay = document.getElementById("md-ekspedisi-add-overlay");
+    const nameInput = document.getElementById("md-ekspedisi-add-name");
+    const err = document.getElementById("md-ekspedisi-add-err");
+    const btnClose = document.getElementById("md-ekspedisi-add-close");
+    const btnCancel = document.getElementById("md-ekspedisi-add-cancel");
+    const btnSave = document.getElementById("md-ekspedisi-add-save");
+    function close(){ overlay.hidden = true; }
+    btnClose.addEventListener("click", close);
+    btnCancel.addEventListener("click", close);
+    overlay.addEventListener("click", (e)=>{ if(e.target === overlay) close(); });
+    nameInput.addEventListener("keydown", (e)=>{ if(e.key === "Enter") btnSave.click(); });
+    btnSave.addEventListener("click", ()=>{
+      const name = nameInput.value.trim();
+      if(!name){
+        err.textContent = "Nama ekspedisi wajib diisi.";
+        err.style.color = "var(--danger-red)";
+        nameInput.focus();
+        return;
+      }
+      const dupe = EKSPEDISI.some(e=> (e.name||"").trim().toLowerCase() === name.toLowerCase());
+      if(dupe){
+        err.textContent = "Nama ekspedisi ini sudah ada di daftar.";
+        err.style.color = "var(--danger-red)";
+        return;
+      }
+      EKSPEDISI.push({kode: nextKode("E"), name, pembulatanLonggar:false, minBeratKg:0, minBeratCustom:false, subsidiKhusus:false, subsidiPersenOngkir:20, subsidiPersenBatas:80});
+      refreshAfterDataChange();
+      renderEkspedisiList();
+      showToast(`Ekspedisi "${name}" ditambahkan.`);
+      close();
+    });
+  })();
 
   /* ============================================================
      Tab "Hapus Data" — SATU-SATUNYA jalan untuk menghapus produk
