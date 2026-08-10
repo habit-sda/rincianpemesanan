@@ -3324,6 +3324,19 @@
           </label>
         </div>
       </div>
+      <div class="md-card" id="md-finance-card">
+        <h3>Daftar Finance</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Orang yang balasan/reaksinya di grup Telegram (ke foto Rincian Pemesanan atau bukti transfer) dianggap sistem sebagai <b>konfirmasi pembayaran resmi</b> — dicatat waktunya untuk audit. Isi Telegram ID numerik masing-masing (bukan username), bisa didapat lewat bot seperti @userinfobot.
+        </div>
+        <div id="md-finance-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input type="text" id="md-finance-name" placeholder="Nama (mis. Mila)" style="flex:1; min-width:120px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+          <input type="text" inputmode="numeric" id="md-finance-id" placeholder="Telegram ID (angka)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+        </div>
+        <div class="md-pin-err" id="md-finance-err"></div>
+        <button class="md-btn primary" id="md-finance-add" style="margin-top:10px;">+ Tambah Finance</button>
+      </div>
     </div>
 
     <div class="md-section" id="md-sec-rumus">
@@ -4177,7 +4190,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, financeList:[]};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -4189,6 +4202,7 @@ function loadSettings(){
     if(typeof s.tierBatas1 === "number" && s.tierBatas1 > 0) SETTINGS.tierBatas1 = s.tierBatas1;
     if(typeof s.tierBatas2 === "number" && s.tierBatas2 > SETTINGS.tierBatas1) SETTINGS.tierBatas2 = s.tierBatas2;
     if(typeof s.telegramBotEnabled === "boolean") SETTINGS.telegramBotEnabled = s.telegramBotEnabled;
+    if(Array.isArray(s.financeList)) SETTINGS.financeList = s.financeList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
 function saveSettings(){
@@ -5229,6 +5243,11 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     try{
       const tab = document.querySelector(".tab-btn.active").dataset.tab;
       const tabLabel = tab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
+      const pfx = tab === "penjualan" ? "pj" : "cs";
+      // Grand Total numerik diambil dari DOM (bukan dihitung ulang) supaya
+      // dijamin PERSIS sama dengan yang tampil di gambar nota — dikirim
+      // sebagai teks di caption supaya worker/bot bisa baca tanpa AI vision.
+      const grandTotalNum = parseRp(document.getElementById(pfx+"-grandtotal").textContent);
       const canvas = await renderCanvas();
       const imageDataUrl = canvas.toDataURL("image/png");
 
@@ -5242,6 +5261,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           senderId,
           tabLabel,
           topicId: getTelegramTopicId(),
+          grandTotal: grandTotalNum,
         }),
       });
       const body = await res.json().catch(()=>({}));
@@ -7120,6 +7140,7 @@ if ("serviceWorker" in navigator) {
     buildEkspedisi("penjualan"); buildEkspedisi("custom");
     calc("penjualan"); calc("custom");
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
+    if(window.__renderFinanceList) window.__renderFinanceList();
     if(migratedAfterPull) pushMasterDataToServer();
   })();
 
@@ -7153,6 +7174,61 @@ if ("serviceWorker" in navigator) {
     showToast(SETTINGS.telegramBotEnabled ? "Bot Telegram diaktifkan." : "Bot Telegram dinonaktifkan.");
     pushMasterDataToServer();
   });
+
+  /* ---------- Daftar Finance (dipakai worker untuk validasi reaction/konfirmasi) ---------- */
+  (function(){
+    const listEl = document.getElementById("md-finance-list");
+    const nameInput = document.getElementById("md-finance-name");
+    const idInput = document.getElementById("md-finance-id");
+    const errEl = document.getElementById("md-finance-err");
+    const btnAdd = document.getElementById("md-finance-add");
+
+    function renderFinanceList(){
+      if(!listEl) return;
+      if(!Array.isArray(SETTINGS.financeList) || !SETTINGS.financeList.length){
+        listEl.innerHTML = `<div class="md-note" style="margin:0;">Belum ada Finance yang ditambahkan.</div>`;
+        return;
+      }
+      listEl.innerHTML = SETTINGS.financeList.map((f, i)=> `
+        <div style="display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:9px; padding:9px 12px;">
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:700; font-size:13.5px; color:var(--ink);">${(f.name||"").replace(/</g,"&lt;")}</div>
+            <div style="font-size:11.5px; color:var(--ink-soft);">ID: ${(f.telegramId||"").replace(/</g,"&lt;")}</div>
+          </div>
+          <button type="button" class="md-btn danger" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
+        </div>
+      `).join("");
+      listEl.querySelectorAll("button[data-idx]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const idx = parseInt(btn.dataset.idx, 10);
+          SETTINGS.financeList.splice(idx, 1);
+          saveSettings();
+          renderFinanceList();
+          showToast("Finance dihapus dari daftar.");
+          pushMasterDataToServer();
+        });
+      });
+    }
+
+    btnAdd.addEventListener("click", ()=>{
+      const name = nameInput.value.trim();
+      const telegramId = idInput.value.trim();
+      errEl.textContent = "";
+      if(!name){ errEl.textContent = "Nama wajib diisi."; return; }
+      if(!/^\d+$/.test(telegramId)){ errEl.textContent = "Telegram ID harus berupa angka (bukan username)."; return; }
+      if(!Array.isArray(SETTINGS.financeList)) SETTINGS.financeList = [];
+      if(SETTINGS.financeList.some(f=> f.telegramId === telegramId)){ errEl.textContent = "Telegram ID ini sudah ada di daftar."; return; }
+      SETTINGS.financeList.push({ name, telegramId });
+      saveSettings();
+      nameInput.value = ""; idInput.value = "";
+      renderFinanceList();
+      showToast("Finance \"" + name + "\" ditambahkan.");
+      pushMasterDataToServer();
+    });
+
+    renderFinanceList();
+    window.__renderFinanceList = renderFinanceList; // dipanggil ulang setelah pull data server
+  })();
 
   /* ---------- link Bantuan (Tampilan) ---------- */
   const bantuanLinkInput = document.getElementById("md-bantuan-link");
