@@ -167,6 +167,10 @@
   .confirm-actionrow button{flex:1;border:none;border-radius:6px;padding:10px 0;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
   .confirm-okbtn{background:var(--danger-red);color:#fff;}
   #update-apply.confirm-okbtn{background:var(--primary-green);}
+  .kt-okbtn{background:var(--primary-green);}
+  .kt-input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;font-family:'Roboto',sans-serif;color:var(--ink);margin-top:8px;}
+  .kt-input:focus{outline:none;border-color:var(--primary-green);}
+  .kt-hint{font-size:11px;color:var(--ink-soft);margin-top:6px;}
 
   .changelog-link{
     background:none;border:none;color:var(--accent-green);font-size:inherit;text-decoration:underline;
@@ -621,6 +625,8 @@
     .home-actionrow.bp .home-actionrow-label{color:var(--primary-green);}
     .home-actionrow.calc .home-actionrow-icon{background:#7c4fd1;}
     .home-actionrow.calc .home-actionrow-label{color:var(--ink);}
+    .home-actionrow.tgid .home-actionrow-icon{background:#546e7a;}
+    .home-actionrow.tgid .home-actionrow-label{color:#546e7a;}
     .home-actionrow.reset{border:1.5px solid #f2b3ab;}
     .home-actionrow.reset .home-actionrow-icon{background:var(--danger-red);}
     .home-actionrow.reset .home-actionrow-label{color:var(--danger-red);}
@@ -1196,6 +1202,7 @@
     <button class="action-btn" id="btn-download">⬇ Unduh sebagai Gambar</button>
     <button class="action-btn" id="btn-share">⇪ Bagikan</button>
     <button class="action-btn" id="btn-copy">⧉ Salin ke Clipboard</button>
+    <button class="action-btn telegram-bot-ui telegram-send-ui" id="btn-kirim-telegram">📨 Kirim ke Grup Telegram</button>
     <button class="action-btn" id="btn-calc-toggle">🧮 Kalkulator</button>
     <span class="toolbar-msg" id="toolbar-msg"></span>
   </div>
@@ -1552,6 +1559,20 @@
         <div class="md-pin-err" id="md-bantuan-err"></div>
         <button class="md-btn primary" id="md-bantuan-save">Simpan link Bantuan</button>
       </div>
+      <div class="md-card">
+        <h3>Bot Telegram</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17.7 7.3l-2.1 10.1c-.16.7-.58.87-1.17.54l-3.24-2.39-1.56 1.5c-.17.17-.32.32-.65.32l.23-3.3 5.98-5.4c.26-.23-.06-.36-.4-.13l-7.4 4.66-3.18-1c-.69-.21-.7-.69.14-1.02l12.44-4.8c.58-.21 1.08.14.9 1.02z" fill="var(--primary-green)"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Aktifkan Bot Telegram</div>
+            <div class="md-togglerow-sub">Tombol "Kirim ke Grup Telegram" di toolbar, popup Salin, & Review — matikan untuk sembunyikan semuanya</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-telegrambot">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
     </div>
 
     <div class="md-section" id="md-sec-rumus">
@@ -1724,7 +1745,9 @@
     <div style="margin-top:8px;opacity:.6;">
       <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.9.2</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
+      <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
     </div>
+    <div class="telegram-bot-ui" style="margin-top:2px;opacity:.6;font-size:11px;" id="footer-tgid-sub"></div>
   </footer>
 
   <!-- ================= POPUP KONFIRMASI RESET ================= -->
@@ -1741,6 +1764,50 @@
       <div class="confirm-actionrow">
         <button id="reset-confirm-cancel" class="calc-actbtn calc-clearbtn">Batal</button>
         <button id="reset-confirm-ok" class="calc-actbtn confirm-okbtn">Ya, Kosongkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= POPUP ATUR ID TELEGRAM (per-device, lokal) ================= -->
+  <div id="tgid-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup confirm-popup" role="dialog" aria-label="Atur ID Telegram">
+      <div class="calc-head">
+        <span>ID Telegram Saya</span>
+        <button id="tgid-close" class="calc-close" aria-label="Tutup">✕</button>
+      </div>
+      <div class="confirm-body">
+        <p>Diisi sekali per HP/browser. Dipakai sebagai label "dikirim oleh" saat bukti nota dikirim ke grup Telegram — bukan diambil otomatis dari akun Telegram kamu.</p>
+        <label for="tgid-input" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama / Username / ID Telegram</label>
+        <input type="text" id="tgid-input" class="kt-input" placeholder="mis. Sinta (@sintahalawa)" autocomplete="off">
+        <label for="tgid-topic-input" style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-top:10px;display:block;">ID Topik / Sub-menu Chat (opsional)</label>
+        <input type="text" id="tgid-topic-input" class="kt-input" placeholder="Kosongkan kalau grup tidak pakai Topics" autocomplete="off" inputmode="numeric">
+        <p class="kt-hint">Isi kalau grup Telegram-mu pakai fitur Topics dan bukti mau otomatis masuk ke sub-menu tertentu.</p>
+        <p class="kt-hint" id="tgid-status"></p>
+      </div>
+      <div class="confirm-actionrow">
+        <button id="tgid-cancel" class="calc-actbtn calc-clearbtn">Tutup</button>
+        <button id="tgid-save" class="calc-actbtn confirm-okbtn kt-okbtn">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= POPUP KIRIM BUKTI KE GRUP TELEGRAM ================= -->
+  <div id="kt-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup confirm-popup" role="dialog" aria-label="Kirim bukti ke grup Telegram">
+      <div class="calc-head">
+        <span>Kirim ke Grup Telegram</span>
+        <button id="kt-close" class="calc-close" aria-label="Batal">✕</button>
+      </div>
+      <div class="confirm-body">
+        <p>Nota akan dikirim sebagai gambar ke grup Telegram pembayaran.</p>
+        <label for="kt-customer-name" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Customer</label>
+        <input type="text" id="kt-customer-name" class="kt-input" placeholder="Isi nama customer" autocomplete="off">
+        <p class="kt-hint" style="margin-top:10px;">Dikirim sebagai: <b id="kt-sender-preview">—</b> · <button type="button" id="kt-edit-sender" style="background:none;border:none;padding:0;color:var(--primary-green);font-weight:700;text-decoration:underline;cursor:pointer;font-size:11px;">Ubah</button></p>
+        <p class="kt-hint" id="kt-status"></p>
+      </div>
+      <div class="confirm-actionrow">
+        <button id="kt-cancel" class="calc-actbtn calc-clearbtn">Batal</button>
+        <button id="kt-send" class="calc-actbtn confirm-okbtn kt-okbtn">Kirim</button>
       </div>
     </div>
   </div>
@@ -2288,8 +2355,33 @@ const EKSPEDISI = ["313 Express","APM Logistics","Baraka Express","Buton Express
 /* Pengaturan aktif/nonaktifkan autocomplete (combobox cari-ketik) per
    field — kalau nonaktif, field kembali jadi <select> biasa. Diatur dari
    Master Data, dipakai di step Input Penjualan & Pengiriman (mobile). */
+/* ============================================================
+   ID PENGIRIM & TOPIK TELEGRAM — disimpan LOKAL per HP/browser
+   (localStorage), diisi user sendiri lewat menu "ID Telegram Saya"
+   di footer. Ini BUKAN dibaca otomatis dari akun Telegram siapa pun
+   — cuma label bebas yang dipakai sebagai penanda "dikirim oleh"
+   saat bukti nota dikirim ke grup. TIDAK ikut disinkron ke master
+   data server, supaya tiap device tetap punya identitasnya sendiri.
+   Didefinisikan SEBELUM blok SETTINGS karena applySettingsToDom()
+   di bawah memanggil getTelegramSenderId().
+   ============================================================ */
+const TELEGRAM_SENDER_ID_KEY = "habit_telegram_sender_id";
+function getTelegramSenderId(){
+  try{ return (localStorage.getItem(TELEGRAM_SENDER_ID_KEY) || "").trim(); }catch(e){ return ""; }
+}
+function setTelegramSenderId(val){
+  try{ localStorage.setItem(TELEGRAM_SENDER_ID_KEY, (val || "").trim()); }catch(e){}
+}
+const TELEGRAM_TOPIC_ID_KEY = "habit_telegram_topic_id";
+function getTelegramTopicId(){
+  try{ return (localStorage.getItem(TELEGRAM_TOPIC_ID_KEY) || "").trim(); }catch(e){ return ""; }
+}
+function setTelegramTopicId(val){
+  try{ localStorage.setItem(TELEGRAM_TOPIC_ID_KEY, (val || "").trim()); }catch(e){}
+}
+
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -2300,6 +2392,7 @@ function loadSettings(){
     if(typeof s.bantuanLink === "string" && s.bantuanLink.trim()) SETTINGS.bantuanLink = s.bantuanLink.trim();
     if(typeof s.tierBatas1 === "number" && s.tierBatas1 > 0) SETTINGS.tierBatas1 = s.tierBatas1;
     if(typeof s.tierBatas2 === "number" && s.tierBatas2 > SETTINGS.tierBatas1) SETTINGS.tierBatas2 = s.tierBatas2;
+    if(typeof s.telegramBotEnabled === "boolean") SETTINGS.telegramBotEnabled = s.telegramBotEnabled;
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
 function saveSettings(){
@@ -2308,6 +2401,13 @@ function saveSettings(){
 function applySettingsToDom(){
   const helpBtn = document.getElementById("home-help-btn");
   if(helpBtn) helpBtn.href = SETTINGS.bantuanLink;
+  document.querySelectorAll(".telegram-bot-ui").forEach(el=>{
+    el.hidden = !SETTINGS.telegramBotEnabled;
+  });
+  const canSend = SETTINGS.telegramBotEnabled && !!getTelegramSenderId();
+  document.querySelectorAll(".telegram-send-ui").forEach(el=>{
+    el.hidden = !canSend;
+  });
 }
 loadSettings();
 applySettingsToDom();
@@ -3142,6 +3242,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       showMsg("Gagal membuat gambar: "+e.message, true);
     }finally{
       btn.disabled = false;
+      if(SETTINGS.telegramBotEnabled && getTelegramSenderId() && window.__openKirimTelegramModal) window.__openKirimTelegramModal();
     }
     return;
   }
@@ -3155,6 +3256,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       showMsg("Gagal membuat gambar: "+e.message, true);
     }finally{
       btn.disabled = false;
+      if(SETTINGS.telegramBotEnabled && getTelegramSenderId() && window.__openKirimTelegramModal) window.__openKirimTelegramModal();
     }
     return;
   }
@@ -3191,8 +3293,147 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     }
   }finally{
     btn.disabled = false;
+    if(SETTINGS.telegramBotEnabled && getTelegramSenderId() && window.__openKirimTelegramModal) window.__openKirimTelegramModal();
   }
 });
+
+/* ============ menu "ID Telegram Saya" (disimpan lokal per device) ============ */
+(function(){
+  const overlay = document.getElementById("tgid-overlay");
+  const input = document.getElementById("tgid-input");
+  const topicInput = document.getElementById("tgid-topic-input");
+  const statusEl = document.getElementById("tgid-status");
+  const subEl = document.getElementById("footer-tgid-sub");
+  const btnOpen = document.getElementById("home-link-tgid");
+  const btnClose = document.getElementById("tgid-close");
+  const btnCancel = document.getElementById("tgid-cancel");
+  const btnSave = document.getElementById("tgid-save");
+
+  function refreshSub(){
+    const val = getTelegramSenderId();
+    subEl.textContent = val ? val : "Belum diatur — ketuk untuk isi";
+  }
+  function openModal(){
+    input.value = getTelegramSenderId();
+    topicInput.value = getTelegramTopicId();
+    statusEl.textContent = "";
+    overlay.hidden = false;
+    setTimeout(()=> input.focus(), 50);
+  }
+  function closeModal(){ overlay.hidden = true; }
+
+  btnOpen.addEventListener("click", openModal);
+  btnClose.addEventListener("click", closeModal);
+  btnCancel.addEventListener("click", closeModal);
+  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
+  btnSave.addEventListener("click", ()=>{
+    setTelegramSenderId(input.value);
+    setTelegramTopicId(topicInput.value.replace(/[^0-9]/g, ""));
+    refreshSub();
+    applySettingsToDom();
+    statusEl.textContent = "Tersimpan di HP ini.";
+    statusEl.style.color = "var(--primary-green)";
+    setTimeout(closeModal, 700);
+  });
+
+  refreshSub();
+  window.__refreshTelegramSenderSub = refreshSub;
+  window.__openTelegramSenderModal = openModal;
+})();
+
+/* ============ kirim bukti nota ke grup Telegram (via Worker) ============ */
+(function(){
+  const overlay = document.getElementById("kt-overlay");
+  const nameInput = document.getElementById("kt-customer-name");
+  const statusEl = document.getElementById("kt-status");
+  const senderPreview = document.getElementById("kt-sender-preview");
+  const btnEditSender = document.getElementById("kt-edit-sender");
+  const btnOpen = document.getElementById("btn-kirim-telegram");
+  const btnClose = document.getElementById("kt-close");
+  const btnCancel = document.getElementById("kt-cancel");
+  const btnSend = document.getElementById("kt-send");
+
+  function refreshSenderPreview(){
+    const val = getTelegramSenderId();
+    senderPreview.textContent = val ? val : "(belum diatur)";
+  }
+
+  function openModal(){
+    statusEl.textContent = "";
+    statusEl.style.color = "";
+    refreshSenderPreview();
+    overlay.hidden = false;
+    setTimeout(()=> nameInput.focus(), 50);
+  }
+  function closeModal(){
+    if(btnSend.disabled) return; // sedang proses kirim, jangan bisa ditutup
+    overlay.hidden = true;
+  }
+
+  btnOpen.addEventListener("click", openModal);
+  btnClose.addEventListener("click", closeModal);
+  btnCancel.addEventListener("click", closeModal);
+  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
+  btnEditSender.addEventListener("click", ()=> document.getElementById("home-link-tgid").click());
+  window.__openKirimTelegramModal = openModal;
+
+  btnSend.addEventListener("click", async ()=>{
+    const customerName = nameInput.value.trim();
+    const senderId = getTelegramSenderId();
+    if(!customerName){
+      statusEl.textContent = "Nama customer wajib diisi.";
+      statusEl.style.color = "var(--danger-red)";
+      nameInput.focus();
+      return;
+    }
+    if(!senderId){
+      statusEl.textContent = "ID Telegram kamu belum diatur — ketuk \"Ubah\" untuk isi dulu.";
+      statusEl.style.color = "var(--danger-red)";
+      return;
+    }
+    if(!MASTER_DATA_WORKER_URL){
+      statusEl.textContent = "URL worker belum diatur di kode (MASTER_DATA_WORKER_URL).";
+      statusEl.style.color = "var(--danger-red)";
+      return;
+    }
+
+    btnSend.disabled = true; btnCancel.disabled = true;
+    statusEl.style.color = "";
+    statusEl.textContent = "Menyiapkan gambar nota…";
+
+    try{
+      const tab = document.querySelector(".tab-btn.active").dataset.tab;
+      const tabLabel = tab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
+      const canvas = await renderCanvas();
+      const imageDataUrl = canvas.toDataURL("image/png");
+
+      statusEl.textContent = "Mengirim ke grup Telegram…";
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image: imageDataUrl,
+          customerName,
+          senderId,
+          tabLabel,
+          topicId: getTelegramTopicId(),
+        }),
+      });
+      const body = await res.json().catch(()=>({}));
+      if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
+
+      statusEl.textContent = "Berhasil dikirim ke grup Telegram.";
+      statusEl.style.color = "var(--primary-green)";
+      showMsg("Bukti untuk \"" + customerName + "\" terkirim ke grup Telegram.");
+      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; }, 900);
+    }catch(e){
+      statusEl.textContent = "Gagal mengirim: " + (e.message || e);
+      statusEl.style.color = "var(--danger-red)";
+    }finally{
+      btnSend.disabled = false; btnCancel.disabled = false;
+    }
+  });
+})();
 
 /* ============ init ============ */
 buildRows("penjualan"); buildRows("custom");
@@ -4556,6 +4797,7 @@ if ("serviceWorker" in navigator) {
           <button class="primary" id="wr-download-${sheet}">⬇ Unduh</button>
           <button id="wr-share-${sheet}">↗ Bagikan</button>
           <button id="wr-copy-${sheet}">⧉ Salin</button>
+          <button id="wr-kirim-telegram-${sheet}" class="telegram-bot-ui telegram-send-ui" ${(SETTINGS.telegramBotEnabled && getTelegramSenderId()) ? "" : "hidden"}>📨 Kirim Telegram</button>
         </div>
       </div>
       <button class="wiz-btn-ghost accent" id="wr-back-${sheet}">
@@ -4573,6 +4815,7 @@ if ("serviceWorker" in navigator) {
     document.getElementById("wr-download-"+sheet).addEventListener("click", ()=> document.getElementById("btn-download").click());
     document.getElementById("wr-share-"+sheet).addEventListener("click", ()=> document.getElementById("btn-share").click());
     document.getElementById("wr-copy-"+sheet).addEventListener("click", ()=> document.getElementById("btn-copy").click());
+    document.getElementById("wr-kirim-telegram-"+sheet).addEventListener("click", ()=> document.getElementById("btn-kirim-telegram").click());
   }
 
   /* ---------- hook dipanggil dari akhir calc() di atas: refresh step aktif kalau perlu ---------- */
@@ -4776,6 +5019,17 @@ if ("serviceWorker" in navigator) {
     saveSettings();
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
     showToast(SETTINGS.autocompleteEkspedisi ? "Autocomplete Ekspedisi diaktifkan." : "Autocomplete Ekspedisi dinonaktifkan.");
+    pushMasterDataToServer();
+  });
+
+  /* ---------- toggle Bot Telegram (Tampilan) ---------- */
+  const toggleTelegramBot = document.getElementById("md-toggle-telegrambot");
+  toggleTelegramBot.checked = SETTINGS.telegramBotEnabled;
+  toggleTelegramBot.addEventListener("change", ()=>{
+    SETTINGS.telegramBotEnabled = toggleTelegramBot.checked;
+    saveSettings();
+    applySettingsToDom();
+    showToast(SETTINGS.telegramBotEnabled ? "Bot Telegram diaktifkan." : "Bot Telegram dinonaktifkan.");
     pushMasterDataToServer();
   });
 
