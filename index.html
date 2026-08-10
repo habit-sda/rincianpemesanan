@@ -4710,7 +4710,8 @@ if ("serviceWorker" in navigator) {
       ${cardsHtml}
       ${formHtml}
       <div class="wiz-cta-bar">
-        ${!showForm ? `<button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button><button class="wiz-btn-dash" id="wl-paste-${sheet}">📋 Tempel Pesanan</button>` : ``}
+        ${!showForm ? `<button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button>` : ``}
+        <button class="wiz-btn-dash" id="wl-paste-${sheet}">📋 Tempel Pesanan</button>
         <button class="wiz-btn-primary" id="wl-next-${sheet}" ${filled.length? "" : "disabled style=\"opacity:.5;\""}>Lanjut ke pengiriman</button>
       </div>
     `;
