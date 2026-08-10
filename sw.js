@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v92";
+const CACHE_VERSION = "v93";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
 const CORE_ASSETS = [
