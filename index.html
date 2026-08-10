@@ -1497,6 +1497,7 @@
       <div class="md-card">
         <h3>Daftar ekspedisi</h3>
         <div class="md-note" style="margin-bottom:10px;">Ketuk ikon 🧮 di tiap baris untuk atur rumus pembulatan berat, minimum charge &amp; skema subsidi ongkir khusus ekspedisi itu.</div>
+        <input type="text" id="md-ekspedisi-search" class="kt-input" placeholder="🔍 Cari nama ekspedisi..." autocomplete="off" style="margin-bottom:10px;">
         <div id="md-ekspedisi-list"></div>
         <button class="md-addrow" id="md-ekspedisi-add">+ Tambah ekspedisi</button>
       </div>
@@ -1817,7 +1818,7 @@
   </div>
 
   <!-- ================= POPUP TAMBAH EKSPEDISI BARU ================= -->
-  <div id="md-ekspedisi-add-overlay" class="calc-overlay" hidden>
+  <div id="md-ekspedisi-add-overlay" class="md-overlay" hidden>
     <div class="calc-popup confirm-popup" role="dialog" aria-label="Tambah ekspedisi baru">
       <div class="calc-head">
         <span>Tambah Ekspedisi Baru</span>
@@ -5481,18 +5482,28 @@ if ("serviceWorker" in navigator) {
   // hanya lewat tab "Hapus Data" pakai kodenya (mis. E01).
   function renderEkspedisiList(){
     const list = document.getElementById("md-ekspedisi-list");
-    list.innerHTML = EKSPEDISI.map((e,i)=>`
-      <div class="md-eksrow" data-idx="${i}">
-        <div class="md-e-namewrap">
-          <span class="md-kode-badge" data-copy-kode="${e.kode}" title="Klik untuk salin kode">${e.kode}</span>
-          <input type="text" class="md-e-name" value="${e.name}">
-          <button class="md-row-detail" data-eksp-detail="${i}" title="Atur rumus: pembulatan berat, minimum charge & subsidi ongkir" aria-label="Rumus ekspedisi">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h5M8 17h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </button>
+    const searchInput = document.getElementById("md-ekspedisi-search");
+    const q = (searchInput && searchInput.value || "").trim().toLowerCase();
+    const entries = EKSPEDISI
+      .map((e,i)=> ({e,i}))
+      .filter(({e})=> !q || (e.name||"").toLowerCase().includes(q));
+    if(!entries.length){
+      list.innerHTML = `<div class="md-note" style="padding:10px 0;">${q ? "Tidak ada ekspedisi yang cocok dengan pencarian." : "Belum ada ekspedisi."}</div>`;
+    } else {
+      list.innerHTML = entries.map(({e,i})=>`
+        <div class="md-eksrow" data-idx="${i}">
+          <div class="md-e-namewrap">
+            <span class="md-kode-badge" data-copy-kode="${e.kode}" title="Klik untuk salin kode">${e.kode}</span>
+            <input type="text" class="md-e-name" data-idx="${i}" value="${e.name}">
+            <button class="md-row-detail" data-eksp-detail="${i}" title="Atur rumus: pembulatan berat, minimum charge & subsidi ongkir" aria-label="Rumus ekspedisi">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h5M8 17h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
         </div>
-      </div>
-    `).join("");
-    list.querySelectorAll(".md-e-name").forEach((inp,i)=>{
+      `).join("");
+    }
+    list.querySelectorAll(".md-e-name").forEach((inp)=>{
+      const i = +inp.dataset.idx;
       bindAutoSelect(inp);
       inp.addEventListener("change", ()=>{
         EKSPEDISI[i].name = inp.value.trim() || EKSPEDISI[i].name;
@@ -5505,6 +5516,8 @@ if ("serviceWorker" in navigator) {
     });
     bindKodeBadgeCopy(list);
   }
+  const ekspedisiSearchInput = document.getElementById("md-ekspedisi-search");
+  if(ekspedisiSearchInput) ekspedisiSearchInput.addEventListener("input", renderEkspedisiList);
   document.getElementById("md-ekspedisi-add").addEventListener("click", ()=>{
     const overlay = document.getElementById("md-ekspedisi-add-overlay");
     const nameInput = document.getElementById("md-ekspedisi-add-name");
@@ -5542,6 +5555,7 @@ if ("serviceWorker" in navigator) {
       }
       EKSPEDISI.push({kode: nextKode("E"), name, pembulatanLonggar:false, minBeratKg:0, minBeratCustom:false, subsidiKhusus:false, subsidiPersenOngkir:20, subsidiPersenBatas:80});
       refreshAfterDataChange();
+      if(ekspedisiSearchInput) ekspedisiSearchInput.value = "";
       renderEkspedisiList();
       showToast(`Ekspedisi "${name}" ditambahkan.`);
       close();
