@@ -963,6 +963,25 @@
     body.nota-confirmed .wiz-dots{display:none;}
   }
 
+  /* ---------- Footer (info toko/bank/berlaku sampai) di-CENTER khusus HP —
+     blok di atas (baris ~522, sengaja digabung utk mobile+desktop lebar)
+     men-set text-align:left utk footer supaya seragam dgn desktop. Media
+     query di bawah ini KHUSUS mobile (TIDAK match min-width:901px), jadi
+     desktop tetap left seperti sebelumnya — cuma HP yang di-center. ---- */
+  @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
+    footer{text-align:center;}
+    footer .footer-datebox{justify-content:center;}
+    /* "BCA ... · BSI ... · Muamalat ..." dipaksa 1 baris (bukan wrap 2 baris
+       yang keliatan berantakan) — font dikecilkan dikit & jarak antar titik
+       dirapatkan supaya muat. Kalau HP-nya sempit banget & tetap kepanjangan,
+       overflow-x:auto jadi fallback (scroll geser halus, bukan wrap paksa). */
+    footer .footer-bank-line{
+      font-size:10px;white-space:nowrap;overflow-x:auto;
+      -webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;
+    }
+    footer .footer-bank-line::-webkit-scrollbar{display:none;}
+  }
+
   /* ================================================================
      MASTER DATA — trigger PIN tersembunyi (gestur 5x ketuk, tanpa
      elemen visual apa pun) + modal PIN + panel pengaturan.
@@ -1129,6 +1148,12 @@
   .md-btn.primary{background:var(--primary-green);color:#fff;border:none;}
   .md-btn.danger{color:var(--danger-red);border-color:#f3b7ac;}
   .md-note{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
+  .md-radio-chip{
+    flex:1;display:flex;align-items:center;gap:7px;padding:10px 12px;border:1px solid var(--line);
+    border-radius:9px;font-size:12px;color:var(--ink-soft);cursor:pointer;background:var(--card);
+  }
+  .md-radio-chip input{margin:0;accent-color:var(--primary-green);flex-shrink:0;}
+  .md-radio-chip:has(input:checked){border-color:var(--primary-green);color:var(--ink);font-weight:700;background:#e3f0fa;}
   /* ---------- Kartu "Kuota AI Hari Ini" ---------- */
   .md-quota-result{margin-top:16px;display:flex;flex-direction:column;gap:14px;}
   .md-quota-updated{font-size:11px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;}
@@ -3439,6 +3464,40 @@
             <span class="md-switch-track"><span class="md-switch-knob"></span></span>
           </label>
         </div>
+        <div class="md-note" style="margin:14px 0 8px;">Tombolnya sekarang cuma tampil 1 (⚡), Finance ketuk dulu baru muncul pilihan reaksi di bawah — grup jadi tidak berantakan. Atur reaksi mana yang mau dipakai:</div>
+        <div class="md-togglerow" style="padding:8px 0;">
+          <div class="md-togglerow-text"><div class="md-togglerow-label" style="font-size:12.5px;">✅ Konfirmasi</div></div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-stk-konfirmasi">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+        <div class="md-togglerow" style="padding:8px 0;">
+          <div class="md-togglerow-text"><div class="md-togglerow-label" style="font-size:12.5px;">🚫 Hoax</div></div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-stk-hoax">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+        <div class="md-togglerow" style="padding:8px 0;">
+          <div class="md-togglerow-text"><div class="md-togglerow-label" style="font-size:12.5px;">💰 Deposit</div></div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-stk-deposit">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+        <div class="md-togglerow" style="padding:8px 0;">
+          <div class="md-togglerow-text"><div class="md-togglerow-label" style="font-size:12.5px;">🗑️ Void</div></div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-stk-void">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+        <div class="md-note" style="margin:14px 0 8px;">Label tombol sebelum dibuka:</div>
+        <div style="display:flex;gap:8px;">
+          <label class="md-radio-chip"><input type="radio" name="md-stk-labelstyle" id="md-stk-labelstyle-text" value="text"> Teks + emoji (⚡ Aksi Finance)</label>
+          <label class="md-radio-chip"><input type="radio" name="md-stk-labelstyle" id="md-stk-labelstyle-icon" value="icon"> Emoji saja (⚡)</label>
+        </div>
       </div>
       <div class="md-card" id="md-finance-card">
         <h3>Daftar Finance</h3>
@@ -3629,7 +3688,7 @@
 
   <footer>
     <div><b>PT. Halawa Bintang Utama</b></div>
-    <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
+    <div class="footer-bank-line">BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
       <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.15.1</span>
@@ -4363,7 +4422,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, financeList:[]};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", financeList:[]};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -4378,6 +4437,12 @@ function loadSettings(){
     if(typeof s.pasteOrderEnabled === "boolean") SETTINGS.pasteOrderEnabled = s.pasteOrderEnabled;
     if(typeof s.dmAutoMatchEnabled === "boolean") SETTINGS.dmAutoMatchEnabled = s.dmAutoMatchEnabled;
     if(typeof s.stickerButtonsEnabled === "boolean") SETTINGS.stickerButtonsEnabled = s.stickerButtonsEnabled;
+    if(s.stickerReactionsEnabled && typeof s.stickerReactionsEnabled === "object"){
+      ["konfirmasi","hoax","deposit","void"].forEach(k=>{
+        if(typeof s.stickerReactionsEnabled[k] === "boolean") SETTINGS.stickerReactionsEnabled[k] = s.stickerReactionsEnabled[k];
+      });
+    }
+    if(s.stickerCollapsedLabelStyle === "text" || s.stickerCollapsedLabelStyle === "icon") SETTINGS.stickerCollapsedLabelStyle = s.stickerCollapsedLabelStyle;
     if(Array.isArray(s.financeList)) SETTINGS.financeList = s.financeList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
@@ -7767,6 +7832,34 @@ if ("serviceWorker" in navigator) {
     saveSettings();
     showToast(SETTINGS.stickerButtonsEnabled ? "Tombol Cepat Finance diaktifkan." : "Tombol Cepat Finance dinonaktifkan.");
     pushMasterDataToServer();
+  });
+
+  /* ---------- 4 saklar per-reaksi (Konfirmasi/Hoax/Deposit/Void) ----------
+     Dibaca worker.js buat mutusin reaksi mana yang muncul waktu tombol "⚡
+     Aksi Finance" diketuk. Default aktif semua (migrasi mundur aman). ---- */
+  ["konfirmasi","hoax","deposit","void"].forEach(kind=>{
+    const el = document.getElementById("md-toggle-stk-"+kind);
+    if(!el) return;
+    el.checked = SETTINGS.stickerReactionsEnabled[kind] !== false;
+    el.addEventListener("change", ()=>{
+      SETTINGS.stickerReactionsEnabled[kind] = el.checked;
+      saveSettings();
+      showToast(el.checked ? "Reaksi diaktifkan." : "Reaksi dinonaktifkan.");
+      pushMasterDataToServer();
+    });
+  });
+
+  /* ---------- Gaya label tombol tertutup: teks+emoji vs emoji doang ---------- */
+  const stkLabelRadios = document.querySelectorAll('input[name="md-stk-labelstyle"]');
+  stkLabelRadios.forEach(r=>{
+    r.checked = (r.value === SETTINGS.stickerCollapsedLabelStyle);
+    r.addEventListener("change", ()=>{
+      if(!r.checked) return;
+      SETTINGS.stickerCollapsedLabelStyle = r.value;
+      saveSettings();
+      showToast("Gaya label tombol diperbarui.");
+      pushMasterDataToServer();
+    });
   });
 
   /* ---------- Kuota AI Hari Ini (Tampilan) ----------
