@@ -6959,12 +6959,13 @@ if ("serviceWorker" in navigator) {
       ${filled.length ? `<div class="wiz-subtle">${filled.length} produk tersimpan</div>` : ``}
       ${cardsHtml}
       ${formHtml}
+      ${(!showForm || isDesktopWiz()) ? `
       <div class="wiz-cta-bar">
         ${!showForm ? `<button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button>` : ``}
         ${SETTINGS.pasteOrderEnabled && (isDesktopWiz() || (!showForm && filled.length===0)) ? `<button class="wiz-btn-dash paste-order-ui" id="wl-paste-${sheet}">📋 Tempel Pesanan</button>` : ``}
         <button class="wiz-btn-ghost wiz-reset-proxy" id="wl-reset-${sheet}">↻ Reset</button>
         <button class="wiz-btn-primary" id="wl-next-${sheet}" ${filled.length? "" : "disabled style=\"opacity:.5;\""}>Lanjut ke pengiriman</button>
-      </div>
+      </div>` : ``}
     `;
     host.querySelectorAll("[data-editrow]").forEach(el=>{
       el.addEventListener("click", (e)=>{
@@ -7016,7 +7017,7 @@ if ("serviceWorker" in navigator) {
       if(el) el.click();
     });
     const nextBtn = document.getElementById("wl-next-"+sheet);
-    if(filled.length) nextBtn.addEventListener("click", ()=> wizGo(sheet, "ship"));
+    if(nextBtn && filled.length) nextBtn.addEventListener("click", ()=> wizGo(sheet, "ship"));
 
     if(!showForm) return;
 
@@ -7111,7 +7112,16 @@ if ("serviceWorker" in navigator) {
     }
     bindAutoSelect(qtyEl);
     qtyEl.addEventListener("input", updHint);
-    prodEl.addEventListener("change", updHint);
+    prodEl.addEventListener("change", ()=>{
+      // Begitu produk dipilih & qty masih kosong, langsung isi 1 — CS tinggal
+      // ketuk qty (auto-select lewat bindAutoSelect) buat ganti kalau perlu,
+      // tidak perlu hapus manual dulu. Tidak menimpa qty yang sudah diisi
+      // (mis. ganti pilihan produk sambil qty-nya sudah sengaja diubah).
+      if(prodEl.value && !qtyEl.value){
+        qtyEl.value = "1";
+      }
+      updHint();
+    });
     updHint();
 
     const qtyMinusBtn = document.getElementById("wa-qtyminus-"+sheet);
@@ -7313,8 +7323,20 @@ if ("serviceWorker" in navigator) {
     if(kelebihanInp.value && kelebihanInp.value!=="0") openDisclose(sheet, "kelebihan");
 
     wEksp.addEventListener("change", ()=>{ ekspSel.value = wEksp.value; ekspSel.dispatchEvent(new Event("change",{bubbles:true})); });
-    wRate.addEventListener("input", ()=>{ rateInp.value = wRate.value; rateInp.dispatchEvent(new Event("input",{bubbles:true})); });
-    wManualVal.addEventListener("input", ()=>{ manualInp.value = wManualVal.value; manualInp.dispatchEvent(new Event("input",{bubbles:true})); });
+    wRate.addEventListener("input", ()=>{
+      rateInp.value = wRate.value;
+      rateInp.dispatchEvent(new Event("input",{bubbles:true}));
+      // setupOngkirExclusive (dipasang ke field ASLI pj-/cs- rate & ongkir-manual)
+      // barusan bisa saja langsung menolkan manualInp secara internal — proxy
+      // wManualVal yang tampil di layar HP ini perlu disinkron ULANG supaya
+      // ikut kelihatan kosong, bukan cuma field asli yang tersembunyi.
+      wManualVal.value = (manualInp.value==="0" || manualInp.value==="") ? "" : manualInp.value;
+    });
+    wManualVal.addEventListener("input", ()=>{
+      manualInp.value = wManualVal.value;
+      manualInp.dispatchEvent(new Event("input",{bubbles:true}));
+      wRate.value = (rateInp.value==="0" || rateInp.value==="") ? "" : rateInp.value;
+    });
     wKelebihanVal.addEventListener("input", ()=>{ kelebihanInp.value = wKelebihanVal.value || "0"; kelebihanInp.dispatchEvent(new Event("input",{bubbles:true})); });
 
     document.getElementById("ws-manual-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"manual"));
