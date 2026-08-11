@@ -5869,21 +5869,35 @@ calc("penjualan"); calc("custom");
     }
 
     calc(activeTab);
-    showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan — me-refresh halaman…`);
 
     // Simpan ulang draft (sekarang sudah kosong untuk tab ini) supaya
-    // reload di bawah tidak "menghidupkan lagi" data yang baru dihapus,
-    // dan izinkan reload ini lewat tanpa memicu peringatan keluar-halaman
-    // (karena sudah dikonfirmasi lewat popup RESET-nya sendiri).
+    // reload di bawah (kalau dipakai) tidak "menghidupkan lagi" data yang
+    // baru dihapus, dan izinkan reload ini lewat tanpa memicu peringatan
+    // keluar-halaman (karena sudah dikonfirmasi lewat popup RESET-nya sendiri).
     if(window.__notaHalawaDraft){
       window.__notaHalawaDraft.save();
       window.__notaHalawaDraft.allowNextUnload();
     }
 
-    // RESET juga berfungsi sebagai refresh sungguhan: reload penuh halaman
-    // (bukan cuma reset tampilan), sekaligus jadi kesempatan tambahan untuk
-    // langsung ambil versi terbaru dari server kalau ada update pending.
-    // Jeda singkat supaya pesan di atas sempat kelihatan sebelum reload.
+    // Di tampilan DESKTOP (≥901px): cukup kosongkan di tempat, JANGAN
+    // reload halaman — reload selalu jatuh ke Beranda dulu (lihat init
+    // wizard: body mulai dengan class "showing-home"), jadi user yang
+    // sedang di layar Input Penjualan/Pengiriman/Preview "terlempar" balik
+    // ke Beranda tiap RESET. Wizard di-refresh manual (window.wizRefresh)
+    // supaya kartu produk & preview ikut menunjukkan versi kosong.
+    const isDesktopView = !!(window.matchMedia && window.matchMedia("(min-width:901px)").matches);
+    if(isDesktopView){
+      showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan.`);
+      if(window.wizRefresh) window.wizRefresh(activeTab);
+      return;
+    }
+
+    showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan — me-refresh halaman…`);
+
+    // Di HP: RESET tetap berfungsi sebagai refresh sungguhan (reload penuh
+    // halaman), sekaligus jadi kesempatan tambahan untuk langsung ambil
+    // versi terbaru dari server kalau ada update pending. Jeda singkat
+    // supaya pesan di atas sempat kelihatan sebelum reload.
     setTimeout(()=>{ location.reload(); }, 400);
   }
 
@@ -6394,6 +6408,16 @@ if ("serviceWorker" in navigator) {
     custom:    {step:"list", editingRow:null, formOpen:false},
   };
   window.wizState = wizState; // dibaca dari IIFE lain (mis. collectNotaPayload) buat ambil deliveryDate
+  // Dipakai IIFE tombol RESET (di luar modul ini) supaya setelah field
+  // tabel dikosongkan langsung, kartu wizard ikut menampilkan versi
+  // kosong tanpa perlu reload halaman penuh — lihat pemakaian di doReset().
+  window.wizRefresh = function(sheet){
+    const st = wizState[sheet];
+    if(!st) return;
+    st.editingRow = null;
+    st.formOpen = false;
+    renderStep(sheet, st.step);
+  };
 
   /* ---------- navigasi Beranda <-> panel, terhubung ke tombol/gesture
      Kembali di HP. Setiap pindah layar (Beranda <-> Input/Pengiriman/
