@@ -6913,7 +6913,7 @@ if ("serviceWorker" in navigator) {
     const formHtml = (showForm && !inlineCardEdit) ? `
       <div class="wiz-inline-form" id="wa-form-${sheet}">
         <div class="wiz-title">${editing ? "Edit produk" : "Tambah produk"}</div>
-        <div class="wiz-preview-strip" id="wa-preview-${sheet}">Pilih produk & isi jumlah untuk lihat estimasi harga</div>
+        <div class="wiz-preview-strip" id="wa-preview-${sheet}" style="display:none;"></div>
         <div class="wiz-section">
           <div class="wiz-section-label"><span class="wiz-section-ic">📦</span> Produk</div>
           <select id="wa-prod-${sheet}"><option value="">— pilih produk —</option>${options}</select>
@@ -7100,9 +7100,13 @@ if ("serviceWorker" in navigator) {
             </div>
           </div>`;
         previewEl.classList.add("filled");
+        previewEl.style.display = "";
       } else {
-        previewEl.textContent = sheet==="penjualan" ? "Pilih produk & isi jumlah untuk lihat estimasi diskon" : "Pilih produk & isi jumlah untuk lihat estimasi harga";
+        // Belum pilih produk -> sembunyikan strip sepenuhnya (bukan lagi
+        // tampilkan teks "Pilih produk & isi jumlah...").
+        previewEl.innerHTML = "";
         previewEl.classList.remove("filled");
+        previewEl.style.display = "none";
       }
     }
     bindAutoSelect(qtyEl);
