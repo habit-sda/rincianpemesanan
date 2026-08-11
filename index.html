@@ -3546,7 +3546,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.10.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.11.0</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
     </div>
@@ -3657,7 +3657,13 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.10.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.11.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug PENTING (desktop):</b> field "Rate Ongkir" (dan field lain di langkah Pengiriman: Ongkir Manual, Kelebihan Bayar, Diskon Ongkir) di tampilan desktop cuma bisa diketik 1 karakter — setiap ketikan berikutnya menimpa yang sebelumnya. Penyebabnya: setiap kali ada perubahan angka, seluruh layar "Pengiriman" ikut dibangun ulang dari nol di tengah-tengah proses mengetik (field yang lagi difokus sampai ikut hancur & dibuat ulang tiap keystroke). Sekarang sudah diperbaiki — layar itu tidak lagi dibangun ulang paksa selama masih di langkah Pengiriman.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.10.0</div>
           <ul>
             <li><b>Perbaikan bug PENTING (pelacakan pembayaran):</b> Grand Total gagal terbaca sistem sejak lama karena kesalahan baca tulisan "Rp" — akibatnya reaksi ✅/⚠️ otomatis dan pencatatan status bayar TIDAK PERNAH berjalan sama sekali. Sekarang sudah diperbaiki; pesanan yang dikirim SETELAH update ini akan mulai terlacak dengan benar (pesanan lama sebelum perbaikan tidak bisa ditarik ulang).</li>
             <li><b>Perbaikan bug:</b> field "Rate Ongkir" di desktop cuma bisa diketik 1 angka (angka kedua menimpa yang pertama) — ada 2 sistem format angka yang saling tabrakan, sudah dibereskan.</li>
@@ -7182,7 +7188,14 @@ if ("serviceWorker" in navigator) {
   /* ---------- hook dipanggil dari akhir calc() di atas: refresh step aktif kalau perlu ---------- */
   window.__renderMobileCards = function(sheet){
     const st = wizState[sheet];
-    if(isDesktopWiz()){ renderStep(sheet, st.step); return; }
+    // PENTING: JANGAN render ulang langkah "ship" (Pengiriman) di sini —
+    // fungsi ini dipanggil dari calc(), yang jalan di SETIAP ketikan
+    // (termasuk sedang ngetik di field Rate Ongkir/Ongkir Manual/dst).
+    // Render ulang paksa (innerHTML) di tengah ketikan akan menghancurkan
+    // & membuat ulang field yang lagi difokus itu sendiri, bikin fokus &
+    // isian yang baru diketik hilang tiap keystroke (bug: field cuma
+    // bisa nampung 1 karakter). Langkah "list"/"review" aman di-refresh
+    // karena tidak ada input teks yang sedang aktif diketik di situ.
     if(st.step==="list" || st.step==="review") renderStep(sheet, st.step);
   };
   /* ---------- hook dipanggil dari Master Data saat toggle Autocomplete diubah:
