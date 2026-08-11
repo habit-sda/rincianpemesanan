@@ -6384,16 +6384,14 @@ if ("serviceWorker" in navigator) {
     return !!(window.matchMedia && window.matchMedia("(min-width:901px)").matches);
   }
   const STEP_ORDER = ["list","ship","review"];
-  // formOpen awal SENGAJA beda per perangkat: di desktop form "Tambah
-  // produk" memang didesain selalu tampil (layout satu-halaman-panjang,
-  // lihat @media min-width:901px), tapi di HP ini bikin layar pertama kali
-  // dibuka langsung penuh form -> berantakan. Jadi di HP form dimulai
-  // TERTUTUP (formOpen:false) supaya tampilan awal bersih (cuma daftar
+  // formOpen SEKARANG mulai tertutup di semua perangkat (dulu di desktop
+  // sengaja selalu true, form "Tambah produk" langsung tampil begitu tab
+  // Grosir/Custom dibuka) — supaya tampilan awal bersih (cuma daftar
   // kosong + tombol "+ Tambah produk"/"Tempel Pesanan"/"Lanjut"), baru
   // terbuka saat user memang menekan "+ Tambah produk"/"Edit".
   const wizState = {
-    penjualan: {step:"list", editingRow:null, formOpen:isDesktopWiz()},
-    custom:    {step:"list", editingRow:null, formOpen:isDesktopWiz()},
+    penjualan: {step:"list", editingRow:null, formOpen:false},
+    custom:    {step:"list", editingRow:null, formOpen:false},
   };
   window.wizState = wizState; // dibaca dari IIFE lain (mis. collectNotaPayload) buat ambil deliveryDate
 
@@ -6779,8 +6777,9 @@ if ("serviceWorker" in navigator) {
     // supaya baris ITU SENDIRI yang berubah jadi kartu edit — bukan form
     // terpisah yang nongol di bawah semua kartu (dulu bikin harus scroll
     // jauh & tombol Simpan "lari" kalau kartu yang diedit ada di atas).
-    // Cuma berlaku di HP (isDesktopWiz() false) — desktop TIDAK disentuh,
-    // form desktop tetap seperti semula (selalu tampil, tanpa mode ini).
+    // Sekarang berlaku di HP MAUPUN desktop — kartu yang sedang diedit
+    // berubah jadi kartu edit inline di tempatnya sendiri, bukan lagi form
+    // terpisah yang selalu tampil di bawah semua kartu (khusus desktop).
     const editing = st.editingRow !== null;
     const cardsHtml = filled.length ? filled.map(({tr,i})=>{
       const prod = tr.querySelector("select.prod").value;
@@ -6788,7 +6787,7 @@ if ("serviceWorker" in navigator) {
       const p = findProduct(prod);
       const satuan = p ? p.satuan : "";
       const hargaSatuanTxt = tr.querySelector('[data-f="satuan"]').textContent;
-      if(editing && st.editingRow===i && !isDesktopWiz()){
+      if(editing && st.editingRow===i){
         const dEl0 = tr.querySelector("input.diskon");
         const imgSrcEdit = (p && p.gambar) ? p.gambar : PRODUCT_IMG_PLACEHOLDER;
         return `<div class="wiz-pcard-wrap">
@@ -6873,9 +6872,9 @@ if ("serviceWorker" in navigator) {
 
     const showForm = st.formOpen;
     // catatan: "editing" sudah dihitung di atas (dipakai cardsHtml). Kalau
-    // lagi edit di HP, form bawah ini TIDAK dipakai sama sekali (kartu edit
-    // inline di atas yang jalan) — cukup dilewati di sini.
-    const inlineCardEdit = editing && !isDesktopWiz();
+    // lagi edit (HP maupun desktop), form bawah ini TIDAK dipakai sama
+    // sekali (kartu edit inline di atas yang jalan) — cukup dilewati di sini.
+    const inlineCardEdit = editing;
     let prodVal = "", qtyVal = "", diskonVal = "";
     if(editing){
       const tr = trsOf(sheet)[st.editingRow];
@@ -7048,14 +7047,24 @@ if ("serviceWorker" in navigator) {
       const p = findProduct(prodEl.value);
       const q = parseFloat(qtyEl.value)||0;
       hintEl.textContent = (p && q>0) ? `${q} ${p.satuan}` : "";
-      if(p && q>0){
-        let badge2;
-        if(sheet==="penjualan"){
-          const dv = estimateGrosirDiskon(sheet, p.name, q, st.editingRow);
-          const dtxt = dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv);
-          badge2 = `<span class="wiz-preview-badge badge-est">Diskon ${dtxt}/${p.satuan}</span>`;
-        } else {
-          badge2 = `<span class="wiz-preview-badge badge-est">≈ ${rupiah(p.harga*q)}</span>`;
+      if(p){
+        // Foto & nama produk langsung muncul begitu produk dipilih — badge
+        // qty & estimasi diskon/harga baru menyusul setelah jumlah diisi
+        // (>0), tidak lagi menunggu keduanya terisi sebelum foto tampil.
+        let badgesHtml = "";
+        if(q>0){
+          let badge2;
+          if(sheet==="penjualan"){
+            const dv = estimateGrosirDiskon(sheet, p.name, q, st.editingRow);
+            const dtxt = dv<1 ? (dv*100).toFixed(0)+" %" : rupiah(dv);
+            badge2 = `<span class="wiz-preview-badge badge-est">Diskon ${dtxt}/${p.satuan}</span>`;
+          } else {
+            badge2 = `<span class="wiz-preview-badge badge-est">≈ ${rupiah(p.harga*q)}</span>`;
+          }
+          badgesHtml = `<div class="wiz-preview-badges">
+                <span class="wiz-preview-badge badge-qty">${q} ${p.satuan}</span>
+                ${badge2}
+              </div>`;
         }
         const previewImgSrc = p.gambar || PRODUCT_IMG_PLACEHOLDER;
         previewEl.innerHTML = `
@@ -7063,10 +7072,7 @@ if ("serviceWorker" in navigator) {
             <img class="wiz-preview-img" src="${previewImgSrc}" alt="" onerror="this.onerror=null;this.src='${PRODUCT_IMG_PLACEHOLDER}';">
             <div>
               <div class="wiz-preview-name">${p.name}</div>
-              <div class="wiz-preview-badges">
-                <span class="wiz-preview-badge badge-qty">${q} ${p.satuan}</span>
-                ${badge2}
-              </div>
+              ${badgesHtml}
             </div>
           </div>`;
         previewEl.classList.add("filled");
