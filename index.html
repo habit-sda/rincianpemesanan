@@ -5266,6 +5266,53 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     const val = getTelegramSenderId();
     senderPreview.textContent = val ? val : "(belum diatur)";
   }
+
+  /* ---------- Kumpulkan data nota (dipakai bareng oleh kirim final MAUPUN
+     autosave draft) — render canvas SEKALI, dipakai untuk keduanya. ---------- */
+  async function collectNotaPayload(){
+    const tab = document.querySelector(".tab-btn.active").dataset.tab;
+    const tabLabel = tab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
+    const pfx = tab === "penjualan" ? "pj" : "cs";
+    // Grand Total numerik diambil dari DOM (bukan dihitung ulang) supaya
+    // dijamin PERSIS sama dengan yang tampil di gambar nota.
+    const grandTotalNum = parseRp(document.getElementById(pfx+"-grandtotal").textContent);
+    const canvas = await renderCanvas();
+    const imageDataUrl = canvas.toDataURL("image/png");
+    return { tabLabel, grandTotalNum, imageDataUrl };
+  }
+
+  /* ---------- Autosave draft ke server ----------
+     Sambil CS ngetik nama customer, draft (gambar nota + nama) otomatis
+     tersimpan di server (di-debounce, jangan tiap huruf). Tujuannya:
+     kalau CS lupa/belum sempat pencet "Kirim", dia masih bisa selesaikan
+     lewat command /kirim di DM bot tanpa perlu balik buka app lagi. */
+  let draftTimer = null;
+  let isSavingDraft = false;
+  async function autosaveDraft(){
+    const senderId = getTelegramSenderId();
+    const customerName = nameInput.value.trim();
+    if(!senderId || !customerName || !MASTER_DATA_WORKER_URL || isSavingDraft) return;
+    isSavingDraft = true;
+    try{
+      const { tabLabel, grandTotalNum, imageDataUrl } = await collectNotaPayload();
+      await fetch(MASTER_DATA_WORKER_URL + "/save-draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          senderId, customerName, tabLabel,
+          topicId: getTelegramTopicId(),
+          grandTotal: grandTotalNum,
+          image: imageDataUrl,
+        }),
+      });
+    }catch(e){ console.log("Autosave draft gagal:", e); }
+    finally{ isSavingDraft = false; }
+  }
+  function scheduleAutosave(){
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(autosaveDraft, 1200);
+  }
+
   // Nama customer selalu dipaksa HURUF BESAR — baik tampilan (CSS
   // text-transform di HTML) maupun nilai asli yang dikirim ke Telegram,
   // supaya konsisten. Simpan posisi kursor supaya tidak "loncat" ke
@@ -5275,8 +5322,13 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     nameInput.value = nameInput.value.toUpperCase();
     nameInput.setSelectionRange(pos, pos);
     renderSuggestions(nameInput.value);
+    scheduleAutosave();
   });
-  nameInput.addEventListener("blur", ()=> setTimeout(hideSuggestions, 120));
+  nameInput.addEventListener("blur", ()=>{
+    setTimeout(hideSuggestions, 120);
+    clearTimeout(draftTimer);
+    autosaveDraft();
+  });
   nameInput.addEventListener("focus", ()=> renderSuggestions(nameInput.value));
 
   let isSending = false;
@@ -5333,15 +5385,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     statusEl.textContent = "Menyiapkan gambar nota…";
 
     try{
-      const tab = document.querySelector(".tab-btn.active").dataset.tab;
-      const tabLabel = tab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
-      const pfx = tab === "penjualan" ? "pj" : "cs";
-      // Grand Total numerik diambil dari DOM (bukan dihitung ulang) supaya
-      // dijamin PERSIS sama dengan yang tampil di gambar nota — dikirim
-      // sebagai teks di caption supaya worker/bot bisa baca tanpa AI vision.
-      const grandTotalNum = parseRp(document.getElementById(pfx+"-grandtotal").textContent);
-      const canvas = await renderCanvas();
-      const imageDataUrl = canvas.toDataURL("image/png");
+      const { tabLabel, grandTotalNum, imageDataUrl } = await collectNotaPayload();
 
       statusEl.textContent = "Mengirim ke grup Telegram…";
       const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
@@ -5362,6 +5406,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       statusEl.textContent = "Berhasil dikirim ke grup Telegram.";
       statusEl.style.color = "var(--primary-green)";
       showMsg("Bukti untuk \"" + customerName + "\" terkirim ke grup Telegram.");
+      clearTimeout(draftTimer);
       setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); }, 900);
     }catch(e){
       statusEl.textContent = "Gagal mengirim: " + (e.message || e);
