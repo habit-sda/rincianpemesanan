@@ -3029,8 +3029,7 @@
     <button class="action-btn paste-order-ui" id="btn-paste-order">📋 Tempel Pesanan</button>
     <button class="action-btn" id="btn-download">⬇ Unduh sebagai Gambar</button>
     <button class="action-btn" id="btn-share">⇪ Bagikan</button>
-    <button class="action-btn" id="btn-copy">⧉ Salin ke Clipboard</button>
-    <button class="action-btn telegram-bot-ui telegram-send-ui" id="btn-kirim-telegram">📨 Kirim ke Grup Telegram</button>
+    <button class="action-btn" id="btn-copy">⧉ Salin & Kirim</button>
     <button class="action-btn" id="btn-calc-toggle">🧮 Kalkulator</button>
     <span class="toolbar-msg" id="toolbar-msg"></span>
   </div>
@@ -3428,7 +3427,7 @@
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17.7 7.3l-2.1 10.1c-.16.7-.58.87-1.17.54l-3.24-2.39-1.56 1.5c-.17.17-.32.32-.65.32l.23-3.3 5.98-5.4c.26-.23-.06-.36-.4-.13l-7.4 4.66-3.18-1c-.69-.21-.7-.69.14-1.02l12.44-4.8c.58-.21 1.08.14.9 1.02z" fill="var(--primary-green)"/></svg></div>
           <div class="md-togglerow-text">
             <div class="md-togglerow-label">Aktifkan Bot Telegram</div>
-            <div class="md-togglerow-sub">Tombol "Kirim ke Grup Telegram" di toolbar, popup Salin, & Review — matikan untuk sembunyikan semuanya</div>
+            <div class="md-togglerow-sub">Bagian "& Kirim" di tombol Salin (toolbar & Review) — matikan untuk sembunyikan, tombol tetap ada tapi cuma "Salin"</div>
           </div>
           <label class="md-switch">
             <input type="checkbox" id="md-toggle-telegrambot">
@@ -4473,6 +4472,13 @@ function applySettingsToDom(){
   document.querySelectorAll(".telegram-send-ui").forEach(el=>{
     el.hidden = !canSend;
   });
+  // Tombol "Salin & Kirim" (btn-copy) SELALU tampil (nyalin gambar tetap
+  // berguna walau bot Telegram mati/ID belum diisi) — cuma LABEL-nya yang
+  // menyesuaikan, supaya jujur soal apa yang bakal terjadi begitu diklik
+  // (kalau canSend false, modal Kirim tidak akan ikut kebuka — lihat
+  // pengecekan getTelegramSenderId() di listener btn-copy).
+  const btnCopyEl = document.getElementById("btn-copy");
+  if(btnCopyEl) btnCopyEl.textContent = canSend ? "⧉ Salin & Kirim" : "⧉ Salin";
   document.querySelectorAll(".paste-order-ui").forEach(el=>{
     el.hidden = !SETTINGS.pasteOrderEnabled;
   });
@@ -5636,7 +5642,14 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     overlay.hidden = true;
   }
 
-  btnOpen.addEventListener("click", openModal);
+  // btnOpen (#btn-kirim-telegram) SUDAH DIHAPUS dari toolbar — dulu tombol
+  // "Kirim ke Grup Telegram" terpisah, sekarang digabung ke tombol "Salin &
+  // Kirim" (btn-copy). Guard null di sini SUPAYA IIFE ini tetap jalan sampai
+  // habis — kalau tidak, window.__openKirimTelegramModal di bawah nggak
+  // pernah ke-set, dan tombol "Salin & Kirim" jadi ikut rusak (nggak bisa
+  // buka modal kirim sama sekali). Modal ini sekarang MURNI dibuka lewat
+  // btn-copy (lihat listener-nya) — tidak ada tombol langsung ke modal ini lagi.
+  if(btnOpen) btnOpen.addEventListener("click", openModal);
   btnClose.addEventListener("click", closeModal);
   btnCancel.addEventListener("click", closeModal);
   overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
@@ -7586,8 +7599,7 @@ if ("serviceWorker" in navigator) {
         <div class="wiz-actionbtns">
           <button class="primary" id="wr-download-${sheet}">⬇ Unduh</button>
           <button id="wr-share-${sheet}">↗ Bagikan</button>
-          <button id="wr-copy-${sheet}">⧉ Salin</button>
-          <button id="wr-kirim-telegram-${sheet}" class="telegram-bot-ui telegram-send-ui" ${(SETTINGS.telegramBotEnabled && getTelegramSenderId()) ? "" : "hidden"}>📨 Kirim Telegram</button>
+          <button id="wr-copy-${sheet}">⧉ ${(SETTINGS.telegramBotEnabled && getTelegramSenderId()) ? "Salin & Kirim" : "Salin"}</button>
         </div>
       </div>
       <button class="wiz-btn-ghost accent" id="wr-back-${sheet}">
@@ -7614,7 +7626,6 @@ if ("serviceWorker" in navigator) {
     document.getElementById("wr-download-"+sheet).addEventListener("click", ()=> document.getElementById("btn-download").click());
     document.getElementById("wr-share-"+sheet).addEventListener("click", ()=> document.getElementById("btn-share").click());
     document.getElementById("wr-copy-"+sheet).addEventListener("click", ()=> document.getElementById("btn-copy").click());
-    document.getElementById("wr-kirim-telegram-"+sheet).addEventListener("click", ()=> document.getElementById("btn-kirim-telegram").click());
   }
 
   /* ---------- hook dipanggil dari akhir calc() di atas: refresh step aktif kalau perlu ---------- */
