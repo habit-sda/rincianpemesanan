@@ -2811,6 +2811,7 @@
       <div class="sub">Halawa Bintang Utama</div>
     </div>
     <div class="datebox">
+      <div class="home-hero-greet" id="home-hero-greet" hidden style="margin-bottom:4px;font-family:'Roboto',sans-serif;text-align:right;"></div>
       <div><b id="hariNow">–</b></div>
       <div id="tglNow">–</div>
     </div>
@@ -2833,7 +2834,6 @@
       <div class="home-main">
         <div class="home-hero">
           <div class="home-hero-text">
-            <div class="home-hero-greet" id="home-hero-greet" hidden>Selamat datang 👋</div>
             <h1>Mau buat nota <span class="accent">apa hari ini?</span></h1>
             <div class="sub">Pilih jenis pesanan untuk mulai mengisi.</div>
           </div>
@@ -5276,9 +5276,15 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // Grand Total numerik diambil dari DOM (bukan dihitung ulang) supaya
     // dijamin PERSIS sama dengan yang tampil di gambar nota.
     const grandTotalNum = parseRp(document.getElementById(pfx+"-grandtotal").textContent);
+    // Rate ongkir per kg & nama ekspedisi — dikirim ke server SEKEDAR
+    // data referensi (riwayat ongkir per customer, dicek lewat /ongkir
+    // di DM bot), TIDAK dipakai buat hitung ulang apa pun. Kosong/0
+    // kalau CS pakai "Ongkir Manual" (bukan per-kg).
+    const ratePerKgNum = parseRp(document.getElementById(pfx+"-rate").value) || 0;
+    const ekspedisiName = document.getElementById(pfx+"-ekspedisi").value || "";
     const canvas = await renderCanvas();
     const imageDataUrl = canvas.toDataURL("image/png");
-    return { tabLabel, grandTotalNum, imageDataUrl };
+    return { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, imageDataUrl };
   }
 
   /* ---------- Autosave draft ke server ----------
@@ -5291,10 +5297,10 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   async function autosaveDraft(){
     const senderId = getTelegramSenderId();
     const customerName = nameInput.value.trim();
-    if(!senderId || !customerName || !MASTER_DATA_WORKER_URL || isSavingDraft) return;
+    if(!senderId || !MASTER_DATA_WORKER_URL || isSavingDraft) return;
     isSavingDraft = true;
     try{
-      const { tabLabel, grandTotalNum, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, imageDataUrl } = await collectNotaPayload();
       await fetch(MASTER_DATA_WORKER_URL + "/save-draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -5302,6 +5308,8 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           senderId, customerName, tabLabel,
           topicId: getTelegramTopicId(),
           grandTotal: grandTotalNum,
+          ratePerKg: ratePerKgNum,
+          ekspedisi: ekspedisiName,
           image: imageDataUrl,
         }),
       });
@@ -5347,6 +5355,11 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     overlay.hidden = false;
     setTimeout(()=> nameInput.focus(), 50);
     loadNameHistory();
+    // Simpan draft awal (nama boleh masih kosong) begitu popup dibuka —
+    // supaya kalau CS langsung tutup app tanpa ngetik apa-apa, draft
+    // (gambar nota) tetap ada dan bisa diselesaikan lewat DM bot (bot
+    // akan nanya nama-nya di situ kalau belum diisi).
+    scheduleAutosave();
   }
   function closeModal(){
     if(isSending) return; // sedang proses kirim, jangan bisa ditutup
@@ -5385,7 +5398,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     statusEl.textContent = "Menyiapkan gambar nota…";
 
     try{
-      const { tabLabel, grandTotalNum, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, imageDataUrl } = await collectNotaPayload();
 
       statusEl.textContent = "Mengirim ke grup Telegram…";
       const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
@@ -5398,6 +5411,8 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           tabLabel,
           topicId: getTelegramTopicId(),
           grandTotal: grandTotalNum,
+          ratePerKg: ratePerKgNum,
+          ekspedisi: ekspedisiName,
         }),
       });
       const body = await res.json().catch(()=>({}));
