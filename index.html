@@ -3546,7 +3546,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.9.3</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.10.0</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
     </div>
@@ -3657,7 +3657,21 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.9.3 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.10.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug PENTING (pelacakan pembayaran):</b> Grand Total gagal terbaca sistem sejak lama karena kesalahan baca tulisan "Rp" — akibatnya reaksi ✅/⚠️ otomatis dan pencatatan status bayar TIDAK PERNAH berjalan sama sekali. Sekarang sudah diperbaiki; pesanan yang dikirim SETELAH update ini akan mulai terlacak dengan benar (pesanan lama sebelum perbaikan tidak bisa ditarik ulang).</li>
+            <li><b>Perbaikan bug:</b> field "Rate Ongkir" di desktop cuma bisa diketik 1 angka (angka kedua menimpa yang pertama) — ada 2 sistem format angka yang saling tabrakan, sudah dibereskan.</li>
+            <li><b>Perbaikan bug:</b> pengaturan Master Data (mis. batas tier grosir) kadang "berubah sendiri" kalau ada staff lain yang mengubah pengaturan lain di device berbeda pada waktu berdekatan — sekarang sistem sinkronisasi digabung lebih pintar, tidak saling menimpa lagi.</li>
+            <li>Sambutan "Selamat datang, [nama]" di header sekarang di <b>samping tanggal</b> (bukan di atasnya), dan tanda "@" di depan nama dihilangkan.</li>
+            <li>Field "Nama Customer" (popup Kirim ke Grup Telegram) sekarang punya <b>rekomendasi otomatis</b> dari riwayat nama yang pernah dipakai — muncul setelah ketik minimal 3 huruf, kata "NEW" di akhir nama otomatis dibuang dari saran.</li>
+            <li><b>Bot Telegram sekarang punya menu DM pribadi</b> (chat langsung ke bot, bukan grup): <code>/kirim</code> (kirim draft nota yang belum sempat disubmit dari app — kalau lupa isi nama, bot akan tanya balik), <code>/cek</code> (ringkasan semua invoice yang masih perlu perhatian & kurang bayar berapa), <code>/ulang &lt;nama&gt;</code> (kirim ulang nota customer yang sudah pernah terkirim), <code>/ongkir &lt;nama&gt;</code> (riwayat ongkir/kg yang pernah dipakai customer itu, sekedar referensi). Semua perintah ini juga bisa dipakai lewat <b>bahasa bebas maupun pesan suara</b> (tidak wajib ketik command persis), mis. cukup rekam "tolong kirim dong".</li>
+            <li>Bukti transfer sekarang bisa dikirim langsung ke <b>chat pribadi bot</b> (tanpa reply manual di grup) — bot otomatis mencocokkan ke pesanan yang masih pending berdasarkan nominal, lalu memposting ke grup dengan caption nama customer terisi otomatis. Ada toggle aktif/nonaktif di Master Data → Tampilan.</li>
+            <li>AI "Tempel Pesanan" sekarang lebih pintar baca pola tulisan customer yang tidak rapi (header produk + baris varian di bawahnya tanpa diulang, header 2 tingkat, baris nama/lokasi customer, dll), dan <b>belajar dari koreksi manual</b> — kalau AI salah tebak lalu dibetulkan manual, teks yang sama persis akan langsung dikenali benar di kesempatan berikutnya tanpa AI perlu menebak lagi.</li>
+            <li>Kalau teks pesanan menyebut jadwal kirim (mis. "dikirim Kamis depan"), sistem otomatis mencatatnya diam-diam dan mengirim <b>1x pengingat ke DM</b> sehari sebelum tanggal itu (jam 08.00 WIB).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.9.3</div>
           <ul>
             <li><b>Perbaikan tampilan khusus desktop</b> (tidak ada yang berubah di tampilan/fungsi HP): tombol Unduh/Bagikan/Salin di preview nota dilebarkan penuh & teksnya diperbesar supaya lebih mudah dibaca; kartu produk yang sudah diinput kini punya <b>ikon hapus (🗑️)</b> di sebelah ikon edit, jadi tidak perlu gestur swipe lagi khusus di desktop; dan tata letak Beranda dirapikan (ditengahkan, jarak & ukuran kartu/"Aksi cepat" diperbesar) supaya tidak lagi terasa kecil dan berantakan di layar lebar.</li>
           </ul>
