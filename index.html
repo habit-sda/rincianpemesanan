@@ -756,6 +756,18 @@
     }
     .wiz-cta-bar .wiz-btn-primary, .wiz-cta-bar .wiz-btn-dash{margin-top:0;}
     .wiz-cta-bar .wiz-actionbtns{margin-top:0;}
+    /* Tombol Simpan/Batal di form Tambah/Edit produk — sengaja dibuat
+       STICKY juga (menempel di bawah layar), supaya kalau produk yang
+       sudah tersimpan di atasnya banyak (form jadi terdorong jauh ke
+       bawah), tombol ini tetap langsung terjangkau tanpa scroll cari-cari
+       dulu. Kartu produk yang sudah tersimpan di atas SAMA SEKALI tidak
+       ikut bergeser — cuma tombol ini yang "mengambang" di posisinya. */
+    .wiz-inline-form-btns{
+      position:sticky;bottom:64px;left:0;right:0;
+      background:#eef7f1;
+      padding:12px 0 10px;margin-top:12px;
+      box-shadow:0 -8px 14px -10px rgba(0,0,0,.2);z-index:5;
+    }
     .wiz-empty{
       text-align:center;padding:30px 16px;color:var(--ink-soft);font-size:12.5px;
       border:1.5px dashed var(--line);border-radius:12px;
@@ -1157,6 +1169,17 @@
   .md-btn.primary{background:var(--primary-green);color:#fff;border:none;}
   .md-btn.danger{color:var(--danger-red);border-color:#f3b7ac;}
   .md-note{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
+  /* Toggle "Tombol mengambang" di Master Data → Tampilan — kalau
+     dimatikan, tombol Simpan/Batal balik ke perilaku lama (statis, ikut
+     kescroll bersama form). Ditulis di luar media query manapun supaya
+     spesifisitasnya (body.class + class) menang di HP MAUPUN desktop
+     tanpa perlu !important. */
+  body.sticky-form-btns-off .wiz-inline-form-btns{
+    position:static;
+    bottom:auto;
+    box-shadow:none;
+    background:transparent;
+  }
   .md-radio-chip{
     flex:1;display:flex;align-items:center;gap:7px;padding:10px 12px;border:1px solid var(--line);
     border-radius:9px;font-size:12px;color:var(--ink-soft);cursor:pointer;background:var(--card);
@@ -2800,6 +2823,16 @@
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 4px;
+    /* Sticky juga di desktop — sama alasannya kayak mobile (form bisa
+       terdorong jauh ke bawah kalau produk yang sudah tersimpan banyak),
+       cuma offset-nya beda karena desktop tidak punya bottom-nav-bar
+       (wiz-dots) yang perlu dihindari seperti di HP. */
+    position: sticky;
+    bottom: 0;
+    background: var(--habit-green-pale, #eef7f1);
+    padding-bottom: 10px;
+    box-shadow: 0 -6px 14px -10px rgba(0,0,0,.15);
+    z-index: 5;
   }
   .wiz-inline-form-btns > *{
     width: auto;
@@ -3381,6 +3414,20 @@
     </div>
 
     <div class="md-section" id="md-sec-tampilan">
+      <div class="md-card">
+        <h3>Tombol Simpan/Batal (form Tambah/Edit produk)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M4 15h16" stroke="var(--primary-green)" stroke-width="1.6"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Tombol mengambang (sticky)</div>
+            <div class="md-togglerow-sub">Aktif = tombol Simpan/Batal selalu terlihat di bawah layar, tidak perlu scroll cari-cari. Nonaktif = kembali ke perilaku lama, tombol diam di tempat ikut kescroll bersama form.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-stickyformbtns">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
       <div class="md-card" id="md-quota-card">
         <h3>Kuota AI Hari Ini</h3>
         <div class="md-note" style="margin-bottom:12px;">Sisa jatah gratis Groq &amp; Cloudflare Workers AI untuk tanggal berjalan (reset otomatis tiap hari) — sekedar info, tidak mengubah apa pun.</div>
@@ -4435,7 +4482,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", financeList:[]};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, financeList:[]};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -4450,6 +4497,7 @@ function loadSettings(){
     if(typeof s.pasteOrderEnabled === "boolean") SETTINGS.pasteOrderEnabled = s.pasteOrderEnabled;
     if(typeof s.dmAutoMatchEnabled === "boolean") SETTINGS.dmAutoMatchEnabled = s.dmAutoMatchEnabled;
     if(typeof s.stickerButtonsEnabled === "boolean") SETTINGS.stickerButtonsEnabled = s.stickerButtonsEnabled;
+    if(typeof s.stickyFormButtonsEnabled === "boolean") SETTINGS.stickyFormButtonsEnabled = s.stickyFormButtonsEnabled;
     if(s.stickerReactionsEnabled && typeof s.stickerReactionsEnabled === "object"){
       ["konfirmasi","hoax","deposit","void"].forEach(k=>{
         if(typeof s.stickerReactionsEnabled[k] === "boolean") SETTINGS.stickerReactionsEnabled[k] = s.stickerReactionsEnabled[k];
@@ -4465,6 +4513,7 @@ function saveSettings(){
 function applySettingsToDom(){
   const helpBtn = document.getElementById("home-help-btn");
   if(helpBtn) helpBtn.href = SETTINGS.bantuanLink;
+  document.body.classList.toggle("sticky-form-btns-off", !SETTINGS.stickyFormButtonsEnabled);
   document.querySelectorAll(".telegram-bot-ui").forEach(el=>{
     el.hidden = !SETTINGS.telegramBotEnabled;
   });
@@ -7919,6 +7968,17 @@ if ("serviceWorker" in navigator) {
 
   /* ---------- toggle Tombol Cepat Finance / stiker (Tampilan) ----------
      Murni dibaca oleh worker.js (backend) — sama seperti toggle DM Bot. */
+  const toggleStickyFormBtns = document.getElementById("md-toggle-stickyformbtns");
+  if(toggleStickyFormBtns){
+    toggleStickyFormBtns.checked = SETTINGS.stickyFormButtonsEnabled;
+    toggleStickyFormBtns.addEventListener("change", async ()=>{
+      SETTINGS.stickyFormButtonsEnabled = toggleStickyFormBtns.checked;
+      saveSettings();
+      applySettingsToDom();
+      await confirmMasterDataSave(SETTINGS.stickyFormButtonsEnabled ? "Tombol Simpan/Batal jadi mengambang." : "Tombol Simpan/Batal kembali ke perilaku lama (statis).");
+    });
+  }
+
   const toggleStickerButtons = document.getElementById("md-toggle-stickerbuttons");
   toggleStickerButtons.checked = SETTINGS.stickerButtonsEnabled;
   toggleStickerButtons.addEventListener("change", async ()=>{
