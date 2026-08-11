@@ -813,6 +813,50 @@
       background:none;border:none;font-size:15px;cursor:pointer;padding:2px 4px;line-height:1;
       opacity:.7;
     }
+    /* --- Kartu edit inline (HP): kartu produk yang sedang diedit berubah
+       jadi mode ini di TEMPATNYA SENDIRI, bukan pindah ke form terpisah
+       di bawah — supaya tombol Simpan selalu di posisi kartu itu, tidak
+       perlu scroll. Field Jumlah & Diskon SENGAJA ditumpuk vertikal
+       (bukan sebaris) dengan jarak (gap) cukup lebar supaya jempol tidak
+       gampang salah pencet antara keduanya. --- */
+    .wiz-pcard-editcard{
+      position:relative;background:#eef7f1;border:2px solid var(--primary-green);
+      border-radius:12px;padding:14px 16px;
+    }
+    .wiz-pcard-edittop{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+    .wiz-pcard-editname{
+      flex:1;min-width:0;font-weight:700;font-size:14.5px;color:var(--ink);
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+    .wiz-pcard-editactions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .wiz-pcard-editok{
+      width:38px;height:38px;border-radius:10px;background:var(--primary-green);border:none;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+    }
+    .wiz-pcard-editok svg{width:18px;height:18px;}
+    .wiz-pcard-editcancel{
+      width:38px;height:38px;border-radius:10px;background:var(--card);border:1px solid var(--line);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+    }
+    .wiz-pcard-editcancel svg{width:16px;height:16px;}
+    /* Jarak antar blok field (Jumlah vs Diskon) — angka ini yang bikin
+       area sentuh keduanya tidak berdempetan / rawan salah tap. */
+    .wiz-pcard-editfields{display:flex;flex-direction:column;gap:20px;}
+    .wiz-pcard-editfield-label{font-size:11.5px;color:var(--ink-soft);margin-bottom:8px;font-weight:600;}
+    .wiz-pcard-editfields input.wiz-qty-big{
+      height:52px;font-size:22px;font-weight:700;text-align:center;
+      border-width:1.5px;border-color:var(--primary-green);
+    }
+    .wiz-pcard-editdiskon-row{display:flex;gap:10px;}
+    .wiz-pcard-editdiskon-row select{width:76px;flex-shrink:0;height:42px;}
+    /* Input diskon dilebarkan (flex:1) & font cukup besar supaya nominal
+       Rupiah sampai jutaan (mis. "1.500.000") tetap terbaca penuh tanpa
+       terpotong — pemformatan ribuan/tanpa batas atas sudah ditangani
+       oleh wireDiskonModeInput()/formatRibuan() yang dipakai ulang di sini. */
+    .wiz-pcard-editdiskon-row input{
+      flex:1;min-width:0;height:42px;font-size:15px;padding:0 12px;
+    }
+    .wiz-pcard-editerr{color:var(--danger-red);font-size:12px;min-height:14px;margin-top:10px;}
     /* --- Header ikon + judul + subjudul, dipakai di step Kirim & Review --- */
     .wiz-stephead{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
     .wiz-stephead-icon{
@@ -3354,6 +3398,20 @@
           </label>
         </div>
       </div>
+      <div class="md-card">
+        <h3>Tombol Cepat Finance (Konfirmasi/Hoax/Deposit/Void)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M7 12h2M13 12h4M7 15h10" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Tampilkan tombol stiker cepat</div>
+            <div class="md-togglerow-sub">Muncul otomatis di bawah tiap bukti transfer di grup — Finance tap, bot balas stiker. Nonaktif = pesan tombol ini tidak dikirim sama sekali (proses pelacakan pembayaran tetap jalan normal).</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-stickerbuttons">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
       <div class="md-card" id="md-finance-card">
         <h3>Daftar Finance</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -3546,7 +3604,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.12.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.15.1</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
     </div>
@@ -3657,7 +3715,35 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.12.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.15.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>(HP)</b> Perbaikan: tombol "📋 Tempel Pesanan" sebelumnya muncul lagi begitu form ditutup, walau sudah ada produk tersimpan. Sekarang tombol itu <b>disembunyikan begitu minimal 1 produk sudah ditambahkan</b> — hanya tampil di kondisi benar-benar awal (belum ada produk sama sekali & form sedang tertutup). Tampilan desktop tidak berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.15.0</div>
+          <ul>
+            <li><b>(HP)</b> Edit produk di kartu "Input Penjualan" (Grosir & Custom) sekarang <b>langsung di kartunya sendiri</b>, tidak lagi lompat ke form terpisah di bawah semua kartu (dulu bikin tombol Simpan "lari" & harus scroll kalau kartu yang diedit ada di atas). Kartu yang diedit berubah warna hijau muda dengan field Jumlah & Diskon langsung di dalamnya, ditutup dengan tombol centang (simpan) / silang (batal) — field Jumlah dan Diskon dikasih jarak cukup lebar supaya tidak rawan salah pencet, dan field Diskon (mode Rupiah) tetap bisa menampung nominal sampai jutaan. Tampilan desktop tidak berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.14.0</div>
+          <ul>
+            <li><b>(HP)</b> Layar "Input Penjualan" (Grosir & Custom) sekarang <b>tampil bersih saat pertama dibuka</b> — form "Tambah produk" tidak lagi otomatis terbuka, cukup daftar kosong + tombol "+ Tambah produk", "Tempel Pesanan", dan "Lanjut ke pengiriman". Tampilan desktop tidak berubah (form tetap selalu tampil seperti biasa).</li>
+            <li><b>(HP)</b> Perbaikan bug: tombol "📋 Tempel Pesanan" ikut menempel/melayang di atas tombol "Simpan produk" begitu form "Tambah/Edit produk" dibuka manual, sampai menutupi tombol simpan dan perlu di-scroll. Sekarang tombol itu otomatis disembunyikan selama form manual masih terbuka, dan muncul lagi begitu form ditutup.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.13.0</div>
+          <ul>
+            <li>Perbaikan reaksi ✅/⚠️ yang sempat tidak pernah muncul: ternyata emoji itu ditolak Telegram (tidak masuk daftar reaction resminya) — diganti ke 👍/👀 yang sudah terverifikasi valid.</li>
+            <li>Bukti transfer yang di-reply CS di grup TANPA nama sekarang otomatis <b>dihapus & dikirim ulang</b> oleh bot dengan caption nama customer terisi (Telegram tidak izinkan bot edit caption punya orang lain, jadi ini caranya).</li>
+            <li>Fitur baru: <b>Tombol Cepat Finance</b> (Konfirmasi/Hoax/Deposit/Void) — muncul otomatis di bawah tiap bukti transfer di grup, Finance tinggal tap, bot balas stiker terkait. Cuma Daftar Finance yang bisa benar-benar memakainya. Ada toggle aktif/nonaktif di Master Data → Tampilan.</li>
+            <li>Perbaikan log error Groq vision (sekarang tampil pesan error asli, bukan cuma kode angka) — bantu diagnosa kalau vision gagal baca nominal.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.12.0</div>
           <ul>
             <li><b>Perbaikan bug PENTING lanjutan (desktop):</b> perbaikan v2.11.0 kemarin ternyata belum tuntas — akar masalah sebenarnya ada di fungsi <code>renderStep()</code> sendiri, yang di mode desktop SELALU membangun ulang ketiga langkah (Input, Pengiriman, Preview) sekaligus setiap dipanggil, apa pun yang diminta. Sekarang ditambah pengecualian: kalau sedang fokus/aktif mengetik di dalam langkah Pengiriman, langkah itu TIDAK ikut dibangun ulang — jadi field Rate Ongkir dan sejenisnya sekarang bisa diketik normal berapa digit pun.</li>
           </ul>
@@ -4249,7 +4335,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, financeList:[]};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, financeList:[]};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -4263,6 +4349,7 @@ function loadSettings(){
     if(typeof s.telegramBotEnabled === "boolean") SETTINGS.telegramBotEnabled = s.telegramBotEnabled;
     if(typeof s.pasteOrderEnabled === "boolean") SETTINGS.pasteOrderEnabled = s.pasteOrderEnabled;
     if(typeof s.dmAutoMatchEnabled === "boolean") SETTINGS.dmAutoMatchEnabled = s.dmAutoMatchEnabled;
+    if(typeof s.stickerButtonsEnabled === "boolean") SETTINGS.stickerButtonsEnabled = s.stickerButtonsEnabled;
     if(Array.isArray(s.financeList)) SETTINGS.financeList = s.financeList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
@@ -6297,9 +6384,16 @@ if ("serviceWorker" in navigator) {
     return !!(window.matchMedia && window.matchMedia("(min-width:901px)").matches);
   }
   const STEP_ORDER = ["list","ship","review"];
+  // formOpen awal SENGAJA beda per perangkat: di desktop form "Tambah
+  // produk" memang didesain selalu tampil (layout satu-halaman-panjang,
+  // lihat @media min-width:901px), tapi di HP ini bikin layar pertama kali
+  // dibuka langsung penuh form -> berantakan. Jadi di HP form dimulai
+  // TERTUTUP (formOpen:false) supaya tampilan awal bersih (cuma daftar
+  // kosong + tombol "+ Tambah produk"/"Tempel Pesanan"/"Lanjut"), baru
+  // terbuka saat user memang menekan "+ Tambah produk"/"Edit".
   const wizState = {
-    penjualan: {step:"list", editingRow:null, formOpen:true},
-    custom:    {step:"list", editingRow:null, formOpen:true},
+    penjualan: {step:"list", editingRow:null, formOpen:isDesktopWiz()},
+    custom:    {step:"list", editingRow:null, formOpen:isDesktopWiz()},
   };
   window.wizState = wizState; // dibaca dari IIFE lain (mis. collectNotaPayload) buat ambil deliveryDate
 
@@ -6680,12 +6774,59 @@ if ("serviceWorker" in navigator) {
     const st = wizState[sheet];
     const trs = trsOf(sheet);
     const filled = trs.map((tr,i)=>({tr,i})).filter(o=> o.tr.querySelector("select.prod").value);
+    // editing dihitung DI SINI (bukan di bawah cardsHtml seperti sebelumnya)
+    // karena cardsHtml sekarang perlu tahu baris mana yang sedang diedit,
+    // supaya baris ITU SENDIRI yang berubah jadi kartu edit — bukan form
+    // terpisah yang nongol di bawah semua kartu (dulu bikin harus scroll
+    // jauh & tombol Simpan "lari" kalau kartu yang diedit ada di atas).
+    // Cuma berlaku di HP (isDesktopWiz() false) — desktop TIDAK disentuh,
+    // form desktop tetap seperti semula (selalu tampil, tanpa mode ini).
+    const editing = st.editingRow !== null;
     const cardsHtml = filled.length ? filled.map(({tr,i})=>{
       const prod = tr.querySelector("select.prod").value;
       const qty = tr.querySelector("input.qty").value || 0;
       const p = findProduct(prod);
       const satuan = p ? p.satuan : "";
       const hargaSatuanTxt = tr.querySelector('[data-f="satuan"]').textContent;
+      if(editing && st.editingRow===i && !isDesktopWiz()){
+        const dEl0 = tr.querySelector("input.diskon");
+        const imgSrcEdit = (p && p.gambar) ? p.gambar : PRODUCT_IMG_PLACEHOLDER;
+        return `<div class="wiz-pcard-wrap">
+          <div class="wiz-pcard-editcard" data-editcard="${i}">
+            <div class="wiz-pcard-edittop">
+              <img class="wiz-pcard-img" src="${imgSrcEdit}" alt="" onerror="this.onerror=null;this.src='${PRODUCT_IMG_PLACEHOLDER}';">
+              <div class="wiz-pcard-editname">${prod}</div>
+              <div class="wiz-pcard-editactions">
+                <button type="button" class="wiz-pcard-editok" id="wq-save-${sheet}" aria-label="Simpan perubahan">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button type="button" class="wiz-pcard-editcancel" id="wq-cancel-${sheet}" aria-label="Batal, jangan simpan">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" stroke="var(--ink-soft)" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="wiz-pcard-editfields">
+              <div>
+                <div class="wiz-pcard-editfield-label">Jumlah</div>
+                <div class="wiz-stepper">
+                  <button type="button" class="wiz-stepper-btn" id="wq-qtyminus-${sheet}" aria-label="Kurangi jumlah">−</button>
+                  <input type="number" class="wiz-qty-big" id="wq-qty-${sheet}" min="0" max="1000" inputmode="numeric" value="${qty}">
+                  <button type="button" class="wiz-stepper-btn" id="wq-qtyplus-${sheet}" aria-label="Tambah jumlah">+</button>
+                </div>
+              </div>
+              ${sheet==="custom" ? `
+              <div>
+                <div class="wiz-pcard-editfield-label">Diskon</div>
+                <div class="wiz-pcard-editdiskon-row">
+                  <select id="wq-diskonmode-${sheet}"><option value="persen">%</option><option value="rupiah">Rp</option></select>
+                  <input type="text" inputmode="numeric" id="wq-diskon-${sheet}" placeholder="0">
+                </div>
+              </div>` : ``}
+            </div>
+            <div class="wiz-pcard-editerr" id="wq-err-${sheet}"></div>
+          </div>
+        </div>`;
+      }
       let detailTxt;
       if(sheet==="penjualan"){
         const dv = estimateGrosirDiskon(sheet, prod, parseFloat(qty)||0, i);
@@ -6731,7 +6872,10 @@ if ("serviceWorker" in navigator) {
     }).join("") : `<div class="wiz-empty">Belum ada produk. Ketuk "+ Tambah produk" untuk mulai.</div>`;
 
     const showForm = st.formOpen;
-    const editing = st.editingRow !== null;
+    // catatan: "editing" sudah dihitung di atas (dipakai cardsHtml). Kalau
+    // lagi edit di HP, form bawah ini TIDAK dipakai sama sekali (kartu edit
+    // inline di atas yang jalan) — cukup dilewati di sini.
+    const inlineCardEdit = editing && !isDesktopWiz();
     let prodVal = "", qtyVal = "", diskonVal = "";
     if(editing){
       const tr = trsOf(sheet)[st.editingRow];
@@ -6743,7 +6887,7 @@ if ("serviceWorker" in navigator) {
     const options = prodListOf(sheet).map(p=>
       `<option value="${p.name}" ${p.name===prodVal?"selected":""}>${p.name}</option>`).join("");
 
-    const formHtml = showForm ? `
+    const formHtml = (showForm && !inlineCardEdit) ? `
       <div class="wiz-inline-form" id="wa-form-${sheet}">
         <div class="wiz-title">${editing ? "Edit produk" : "Tambah produk"}</div>
         <div class="wiz-preview-strip" id="wa-preview-${sheet}">Pilih produk & isi jumlah untuk lihat estimasi harga</div>
@@ -6794,7 +6938,7 @@ if ("serviceWorker" in navigator) {
       ${formHtml}
       <div class="wiz-cta-bar">
         ${!showForm ? `<button class="wiz-btn-dash" id="wl-add-${sheet}">+ Tambah produk</button>` : ``}
-        ${SETTINGS.pasteOrderEnabled ? `<button class="wiz-btn-dash paste-order-ui" id="wl-paste-${sheet}">📋 Tempel Pesanan</button>` : ``}
+        ${SETTINGS.pasteOrderEnabled && (isDesktopWiz() || (!showForm && filled.length===0)) ? `<button class="wiz-btn-dash paste-order-ui" id="wl-paste-${sheet}">📋 Tempel Pesanan</button>` : ``}
         <button class="wiz-btn-ghost wiz-reset-proxy" id="wl-reset-${sheet}">↻ Reset</button>
         <button class="wiz-btn-primary" id="wl-next-${sheet}" ${filled.length? "" : "disabled style=\"opacity:.5;\""}>Lanjut ke pengiriman</button>
       </div>
@@ -6852,6 +6996,47 @@ if ("serviceWorker" in navigator) {
     if(filled.length) nextBtn.addEventListener("click", ()=> wizGo(sheet, "ship"));
 
     if(!showForm) return;
+
+    if(inlineCardEdit){
+      /* ---------- wiring kartu edit inline (HP, edit produk existing) ----------
+         Field jumlah & diskon langsung dipasang di dalam kartu produk yang
+         sedang diedit (lihat cardsHtml di atas) — bukan di form terpisah.
+         Simpan cuma menulis ulang qty/diskon baris yang sama (produk & baris
+         tidak pernah berpindah di jalur ini), jadi tidak perlu logika
+         "produk sudah ada di baris lain / maks 7 produk" seperti form Tambah. */
+      const qtyElInline = document.getElementById("wq-qty-"+sheet);
+      const qtyMinusInline = document.getElementById("wq-qtyminus-"+sheet);
+      const qtyPlusInline = document.getElementById("wq-qtyplus-"+sheet);
+      function stepQtyInline(delta){
+        const cur = parseFloat(qtyElInline.value) || 0;
+        const next = Math.min(1000, Math.max(0, cur + delta));
+        qtyElInline.value = next;
+      }
+      qtyMinusInline.addEventListener("click", ()=> stepQtyInline(-1));
+      qtyPlusInline.addEventListener("click", ()=> stepQtyInline(1));
+      bindAutoSelect(qtyElInline);
+
+      if(sheet==="custom"){
+        const trInline = trsOf(sheet)[st.editingRow];
+        const dElInline = trInline.querySelector("input.diskon");
+        wireDiskonModeInput("wq-diskonmode-"+sheet, "wq-diskon-"+sheet, dElInline ? dElInline.value : "");
+      }
+
+      const errElInline = document.getElementById("wq-err-"+sheet);
+      document.getElementById("wq-save-"+sheet).addEventListener("click", ()=>{
+        errElInline.textContent = "";
+        const qtyInline = parseFloat(qtyElInline.value)||0;
+        if(qtyInline<=0){ errElInline.textContent = "Isi jumlah lebih dari 0."; return; }
+        const trSave = trsOf(sheet)[st.editingRow];
+        trSave.querySelector("input.qty").value = Math.min(1000, qtyInline);
+        if(sheet==="custom") trSave.querySelector("input.diskon").value = readDiskonModeValue("wq-diskonmode-"+sheet, "wq-diskon-"+sheet);
+        trSave.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
+        trSave.querySelector("input.qty").dispatchEvent(new Event("input", {bubbles:true}));
+        closeForm(sheet);
+      });
+      document.getElementById("wq-cancel-"+sheet).addEventListener("click", ()=> closeForm(sheet));
+      return;
+    }
 
     /* ---------- wiring form tambah/edit (cuma dipasang kalau form lagi tampil) ---------- */
     const qtyEl = document.getElementById("wa-qty-"+sheet);
@@ -7486,6 +7671,17 @@ if ("serviceWorker" in navigator) {
     SETTINGS.dmAutoMatchEnabled = toggleDmAutoMatch.checked;
     saveSettings();
     showToast(SETTINGS.dmAutoMatchEnabled ? "Cocok Otomatis Bukti Transfer (DM Bot) diaktifkan." : "Cocok Otomatis Bukti Transfer (DM Bot) dinonaktifkan.");
+    pushMasterDataToServer();
+  });
+
+  /* ---------- toggle Tombol Cepat Finance / stiker (Tampilan) ----------
+     Murni dibaca oleh worker.js (backend) — sama seperti toggle DM Bot. */
+  const toggleStickerButtons = document.getElementById("md-toggle-stickerbuttons");
+  toggleStickerButtons.checked = SETTINGS.stickerButtonsEnabled;
+  toggleStickerButtons.addEventListener("change", ()=>{
+    SETTINGS.stickerButtonsEnabled = toggleStickerButtons.checked;
+    saveSettings();
+    showToast(SETTINGS.stickerButtonsEnabled ? "Tombol Cepat Finance diaktifkan." : "Tombol Cepat Finance dinonaktifkan.");
     pushMasterDataToServer();
   });
 
