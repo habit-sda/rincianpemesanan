@@ -6796,7 +6796,12 @@ if ("serviceWorker" in navigator) {
     wizState[sheet].formOpen = true;
     renderListStep(sheet);
     const formEl = document.getElementById("wa-form-"+sheet);
-    if(formEl) formEl.scrollIntoView({behavior:"smooth", block:"start"});
+    // block:"nearest" (BUKAN "start") — cuma scroll seperlunya biar form
+    // kelihatan, tanpa maksa produk yang sudah tersimpan di atasnya ikut
+    // ter-scroll keluar layar. "start" dulu bikin bagian ATAS form nempel
+    // ke atas layar, efeknya semua kartu produk sebelumnya kesorong hilang
+    // dari pandangan — kebalikan dari maksud form ditaruh di bawah daftar.
+    if(formEl) formEl.scrollIntoView({behavior:"smooth", block:"nearest"});
   }
   function closeForm(sheet){
     wizState[sheet].editingRow = null;
