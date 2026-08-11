@@ -575,6 +575,8 @@
     /* --- hero: sapaan + judul + ilustrasi --- */
     .home-hero{display:flex;align-items:center;gap:14px;}
     .home-hero-text{flex:1;min-width:0;}
+    .home-hero-greet-mobile{font-size:13px;color:var(--ink-soft);margin-bottom:4px;}
+    .home-hero-greet-mobile b{color:var(--primary-green);}
     .home-hero-greet{font-size:14px;color:var(--ink-soft);margin-bottom:6px;}
     .home-hero h1{font-size:25px;line-height:1.2;margin:0 0 8px;font-weight:700;letter-spacing:-.01em;color:var(--ink);}
     .home-hero h1 .accent{color:var(--primary-green);}
@@ -740,6 +742,8 @@
     }
     .wiz-btn-ghost svg{width:15px;height:15px;flex-shrink:0;}
     .wiz-btn-ghost.accent{color:var(--primary-green);border-color:#bfe0c7;}
+    .wiz-btn-ghost.danger{color:var(--danger-red);border-color:#f3b7ac;}
+    .wr-reset-mobile{display:none;}
     .wiz-reset-proxy{display:none;}
     /* --- CTA sticky di bawah layar: bungkus tombol aksi utama tiap langkah
        wizard supaya selalu terjangkau ibu jari, tidak perlu scroll ke bawah
@@ -980,6 +984,11 @@
       -webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;
     }
     footer .footer-bank-line::-webkit-scrollbar{display:none;}
+    /* Tombol Reset khusus di step Review (Grosir & Custom) — cuma di HP,
+       ditaruh persis di bawah tombol "‹ Kembali ke pengiriman". Desktop
+       sengaja tidak dapat tombol ini (RESET desktop sudah gampang dijangkau
+       lewat tombol RESET di toolbar atas, tidak perlu duplikat di sini). */
+    .wr-reset-mobile{display:flex;}
   }
 
   /* ================================================================
@@ -1165,9 +1174,12 @@
   .md-quota-row-pct{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;}
   .md-quota-bar{height:7px;border-radius:99px;background:#e3e6ea;overflow:hidden;}
   .md-quota-bar-fill{height:100%;border-radius:99px;transition:width .4s ease;background:var(--primary-green);}
-  .md-quota-row-pct.level-ok, .md-quota-bar-fill.level-ok{color:var(--primary-green);background:var(--primary-green);}
-  .md-quota-row-pct.level-warn, .md-quota-bar-fill.level-warn{color:#a15c00;background:#f2a900;}
-  .md-quota-row-pct.level-danger, .md-quota-bar-fill.level-danger{color:var(--danger-red);background:var(--danger-red);}
+  .md-quota-row-pct.level-ok{color:var(--primary-green);}
+  .md-quota-row-pct.level-warn{color:#a15c00;}
+  .md-quota-row-pct.level-danger{color:var(--danger-red);}
+  .md-quota-bar-fill.level-ok{background:var(--primary-green);}
+  .md-quota-bar-fill.level-warn{background:#f2a900;}
+  .md-quota-bar-fill.level-danger{background:var(--danger-red);}
   .md-quota-row-sub{margin-top:7px;font-size:11px;color:var(--ink-soft);}
   .md-quota-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;}
   .md-quota-badge.ok{background:#e3f3ec;color:var(--primary-green);}
@@ -2927,6 +2939,7 @@
       <div class="home-main">
         <div class="home-hero">
           <div class="home-hero-text">
+            <div class="home-hero-greet-mobile" id="home-hero-greet-mobile" hidden></div>
             <h1>Mau buat nota <span class="accent">apa hari ini?</span></h1>
             <div class="sub">Pilih jenis pesanan untuk mulai mengisi.</div>
           </div>
@@ -3693,6 +3706,7 @@
     <div style="margin-top:8px;opacity:.6;">
       <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.15.1</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
+      <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
     </div>
     <div class="telegram-bot-ui" style="margin-top:2px;opacity:.6;font-size:11px;cursor:pointer;text-decoration:underline;" id="footer-tgid-sub"></div>
@@ -4535,16 +4549,28 @@ async function pushMasterDataToServer(){
       body: JSON.stringify(body),
     });
     if(!res.ok){
-      showToast("Gagal sinkron ke server (perubahan tetap tersimpan di HP ini).");
+      showMsg("Gagal menyimpan ke server (perubahan tetap tersimpan di HP ini).", true);
+      return false;
     }else{
       window.__lastServerSnapshot = JSON.parse(JSON.stringify({ products: PRODUCTS, ekspedisi: EKSPEDISI, settings: settingsToSend }));
+      return true;
     }
   }catch(e){
     console.log("Master data online gagal dikirim:", e);
-    showToast("Gagal sinkron ke server (offline? perubahan tetap tersimpan di HP ini).");
+    showMsg("Gagal menyimpan ke server (offline? perubahan tetap tersimpan di HP ini).", true);
+    return false;
   }finally{
     window.__pushingMasterData = false;
   }
+}
+/* ---- Dipakai SETIAP kali ada perubahan pengaturan/produk/ekspedisi/PIN di
+   Master Data — nunggu hasil ASLI dari server (bukan tembak duluan), baru
+   tampilkan popup "berhasil" atau "gagal" yang cerminan sungguhan. Pakai
+   showMsg (bukan showToast) supaya muncul di desktop MAUPUN HP. ---- */
+async function confirmMasterDataSave(successMsg){
+  const ok = await pushMasterDataToServer();
+  showMsg(ok ? ("✅ " + successMsg) : "Gagal menyimpan ke server (perubahan tetap tersimpan di HP ini, coba lagi kalau sudah online).", !ok);
+  return ok;
 }
 const REGIONS = [
   ["JAWA TIMUR",3500],["JAWA TENGAH",4250],["JAWA BARAT",5000],["JAKARTA",null],
@@ -5688,20 +5714,34 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
    ke teks generik. */
 async function initHomeGreeting(){
   const greetEl = document.getElementById("home-hero-greet");
-  if(!greetEl) return;
-  greetEl.hidden = true; // default sembunyi sampai ada nama yang bisa ditampilkan
+  const greetElMobile = document.getElementById("home-hero-greet-mobile");
+  if(!greetEl && !greetElMobile) return;
+  if(greetEl) greetEl.hidden = true; // default sembunyi sampai ada nama yang bisa ditampilkan
+  if(greetElMobile) greetElMobile.hidden = true;
   const senderId = getTelegramSenderId().trim();
   if(!senderId) return;
 
   function renderGreeting(label){
-    greetEl.textContent = "";
-    greetEl.appendChild(document.createTextNode("Selamat datang, "));
-    const b = document.createElement("b");
-    b.style.color = "var(--primary-green)";
-    b.textContent = label.replace(/^@/, ""); // buang tanda "@" di depan, cukup nama/username-nya saja
-    greetEl.appendChild(b);
-    greetEl.appendChild(document.createTextNode(" 👋"));
-    greetEl.hidden = false;
+    const nama = label.replace(/^@/, ""); // buang tanda "@" di depan, cukup nama/username-nya saja
+    if(greetEl){
+      greetEl.textContent = "";
+      greetEl.appendChild(document.createTextNode("Selamat datang, "));
+      const b = document.createElement("b");
+      b.style.color = "var(--primary-green)";
+      b.textContent = nama;
+      greetEl.appendChild(b);
+      greetEl.appendChild(document.createTextNode(" 👋"));
+      greetEl.hidden = false;
+    }
+    if(greetElMobile){
+      greetElMobile.textContent = "";
+      greetElMobile.appendChild(document.createTextNode("Selamat datang, "));
+      const b2 = document.createElement("b");
+      b2.textContent = nama;
+      greetElMobile.appendChild(b2);
+      greetElMobile.appendChild(document.createTextNode(" 👋"));
+      greetElMobile.hidden = false;
+    }
   }
 
   if(!/^\d+$/.test(senderId)){
@@ -5940,7 +5980,7 @@ calc("penjualan"); calc("custom");
   function openConfirm(tab){
     targetTab = tab;
     const namaTab = tab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
-    textEl.textContent = `Kosongkan semua isian di tab "${namaTab}" dan refresh halaman?`;
+    textEl.textContent = `Kosongkan semua isian di tab "${namaTab}"?`;
     overlay.hidden = false;
   }
   function closeConfirm(){ overlay.hidden = true; targetTab = null; }
@@ -5964,34 +6004,22 @@ calc("penjualan"); calc("custom");
     calc(activeTab);
 
     // Simpan ulang draft (sekarang sudah kosong untuk tab ini) supaya
-    // reload di bawah (kalau dipakai) tidak "menghidupkan lagi" data yang
-    // baru dihapus, dan izinkan reload ini lewat tanpa memicu peringatan
-    // keluar-halaman (karena sudah dikonfirmasi lewat popup RESET-nya sendiri).
+    // kalau nanti halaman di-reload/dibuka lagi, tidak "menghidupkan lagi"
+    // data yang baru dihapus.
     if(window.__notaHalawaDraft){
       window.__notaHalawaDraft.save();
       window.__notaHalawaDraft.allowNextUnload();
     }
 
-    // Di tampilan DESKTOP (≥901px): cukup kosongkan di tempat, JANGAN
-    // reload halaman — reload selalu jatuh ke Beranda dulu (lihat init
-    // wizard: body mulai dengan class "showing-home"), jadi user yang
-    // sedang di layar Input Penjualan/Pengiriman/Preview "terlempar" balik
-    // ke Beranda tiap RESET. Wizard di-refresh manual (window.wizRefresh)
-    // supaya kartu produk & preview ikut menunjukkan versi kosong.
-    const isDesktopView = !!(window.matchMedia && window.matchMedia("(min-width:901px)").matches);
-    if(isDesktopView){
-      showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan.`);
-      if(window.wizRefresh) window.wizRefresh(activeTab);
-      return;
-    }
-
-    showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan — me-refresh halaman…`);
-
-    // Di HP: RESET tetap berfungsi sebagai refresh sungguhan (reload penuh
-    // halaman), sekaligus jadi kesempatan tambahan untuk langsung ambil
-    // versi terbaru dari server kalau ada update pending. Jeda singkat
-    // supaya pesan di atas sempat kelihatan sebelum reload.
-    setTimeout(()=>{ location.reload(); }, 400);
+    // RESET (HP maupun desktop): cukup kosongkan di tempat, JANGAN reload
+    // halaman — reload selalu jatuh ke Beranda dulu (lihat init wizard: body
+    // mulai dengan class "showing-home"), jadi user yang sedang di layar
+    // Input Penjualan/Pengiriman/Review "terlempar" balik ke Beranda tiap
+    // RESET, padahal maksudnya cuma mau kosongkan data produk saja. Wizard
+    // di-refresh manual (window.wizRefresh) supaya kartu produk & preview
+    // ikut menunjukkan versi kosong, TANPA pindah layar sama sekali.
+    showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan.`);
+    if(window.wizRefresh) window.wizRefresh(activeTab);
   }
 
   document.getElementById("btn-reset").addEventListener("click", ()=>{
@@ -6429,8 +6457,54 @@ if ("serviceWorker" in navigator) {
   }
   checkStartupVersionChange();
 
+  // ============ Tombol "Cek Pembaruan" manual di footer ============
+  // Beda dari pengecekan otomatis (tiap 5 menit / tiap balik ke tab) yang
+  // diam-diam di belakang layar — ini DIPICU USER, jadi WAJIB kasih hasil
+  // yang kelihatan: entah popup update beneran muncul, atau pesan "sudah
+  // versi terbaru". Ambil info langsung dari server (getUpdateInfo, bypass
+  // cache SW) supaya perbandingan versinya akurat & instan, sambil tetap
+  // panggil reg.update() supaya proses install SW baru (kalau ada) mulai
+  // jalan di belakang layar lewat jalur updatefound yang sudah ada.
+  async function checkForUpdateManual(){
+    const btn = document.getElementById("btn-check-update");
+    if(btn){ btn.disabled = true; btn.textContent = "Mengecek…"; }
+    try{
+      const info = await getUpdateInfo();
+      const currentVersion = getCurrentAppVersion();
+      if(window.__swRegistration) window.__swRegistration.update().catch(()=>{});
+
+      if(!info || !info.version){
+        showMsg("Gagal mengecek pembaruan (coba lagi nanti).", true);
+        return;
+      }
+      if(info.version === currentVersion){
+        showMsg(`Sudah pakai versi terbaru (v${currentVersion}).`);
+        return;
+      }
+      // Versi di server beda dari yang lagi dibuka. Kalau kebetulan SW
+      // barunya sudah selesai ter-install & tinggal nunggu (reg.waiting),
+      // langsung pakai jalur popup AKSI NYATA (tombol "Perbarui Sekarang"
+      // beneran bisa diklik) — kalau belum, tampilkan versi informational
+      // dulu; begitu SW-nya benar-benar siap, jalur updatefound yang sudah
+      // ada otomatis menimpa popup ini jadi versi aksi nyata juga.
+      if(window.__swRegistration && window.__swRegistration.waiting){
+        await handleNewWorkerInstalled(window.__swRegistration.waiting);
+      }else{
+        openPopupInformational(info.version, info.items);
+      }
+    }catch(e){
+      showMsg("Gagal mengecek pembaruan (coba lagi nanti).", true);
+    }finally{
+      if(btn){ btn.disabled = false; btn.textContent = "Cek Pembaruan"; }
+    }
+  }
+  window.__checkForUpdateManual = checkForUpdateManual;
+  const btnCheckUpdate = document.getElementById("btn-check-update");
+  if(btnCheckUpdate) btnCheckUpdate.addEventListener("click", checkForUpdateManual);
+
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").then((reg) => {
+      window.__swRegistration = reg; // dipakai tombol "Cek Pembaruan" manual di footer
 
       const checkForUpdate = () => { reg.update().catch(()=>{}); };
 
@@ -7520,6 +7594,10 @@ if ("serviceWorker" in navigator) {
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7" stroke="var(--primary-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Kembali ke pengiriman
       </button>
+      <button class="wiz-btn-ghost danger wr-reset-mobile" id="wr-reset-${sheet}">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4v5h5M20 20v-5h-5" stroke="var(--danger-red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 15a7 7 0 0 0 12.6 2.5M18.5 9a7 7 0 0 0-12.6-2.5" stroke="var(--danger-red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Reset
+      </button>
     `;
     document.getElementById("wr-grandtotal-"+sheet).addEventListener("click", (e)=>{
       // Salin ANGKA MURNI (tanpa "Rp" & tanpa titik pemisah ribuan) —
@@ -7528,6 +7606,11 @@ if ("serviceWorker" in navigator) {
       copyPlainNumber(rawDigits, "Grand total");
     });
     document.getElementById("wr-back-"+sheet).addEventListener("click", ()=> wizGo(sheet, "ship"));
+    const resetBtnReview = document.getElementById("wr-reset-"+sheet);
+    if(resetBtnReview) resetBtnReview.addEventListener("click", ()=>{
+      const el = document.getElementById("btn-reset");
+      if(el) el.click();
+    });
     document.getElementById("wr-download-"+sheet).addEventListener("click", ()=> document.getElementById("btn-download").click());
     document.getElementById("wr-share-"+sheet).addEventListener("click", ()=> document.getElementById("btn-share").click());
     document.getElementById("wr-copy-"+sheet).addEventListener("click", ()=> document.getElementById("btn-copy").click());
@@ -7723,14 +7806,14 @@ if ("serviceWorker" in navigator) {
     return changed;
   }
 
-  function refreshAfterDataChange(){
+  async function refreshAfterDataChange(customMsg){
     sortEkspedisi();
     syncPenjualanSlice();
     saveMasterData();
     buildRows("penjualan"); buildRows("custom");
     buildEkspedisi("penjualan"); buildEkspedisi("custom");
     calc("penjualan"); calc("custom");
-    pushMasterDataToServer();
+    await confirmMasterDataSave(customMsg || "Perubahan produk/ekspedisi tersimpan.");
   }
   loadMasterData();
   if(migrateMasterData()) saveMasterData();
@@ -7773,42 +7856,38 @@ if ("serviceWorker" in navigator) {
   const toggleAutoEksp = document.getElementById("md-toggle-autoeksp");
   toggleAutoProd.checked = SETTINGS.autocompleteProduk;
   toggleAutoEksp.checked = SETTINGS.autocompleteEkspedisi;
-  toggleAutoProd.addEventListener("change", ()=>{
+  toggleAutoProd.addEventListener("change", async ()=>{
     SETTINGS.autocompleteProduk = toggleAutoProd.checked;
     saveSettings();
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
-    showToast(SETTINGS.autocompleteProduk ? "Autocomplete Produk diaktifkan." : "Autocomplete Produk dinonaktifkan.");
-    pushMasterDataToServer();
+    await confirmMasterDataSave(SETTINGS.autocompleteProduk ? "Autocomplete Produk diaktifkan." : "Autocomplete Produk dinonaktifkan.");
   });
-  toggleAutoEksp.addEventListener("change", ()=>{
+  toggleAutoEksp.addEventListener("change", async ()=>{
     SETTINGS.autocompleteEkspedisi = toggleAutoEksp.checked;
     saveSettings();
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
-    showToast(SETTINGS.autocompleteEkspedisi ? "Autocomplete Ekspedisi diaktifkan." : "Autocomplete Ekspedisi dinonaktifkan.");
-    pushMasterDataToServer();
+    await confirmMasterDataSave(SETTINGS.autocompleteEkspedisi ? "Autocomplete Ekspedisi diaktifkan." : "Autocomplete Ekspedisi dinonaktifkan.");
   });
 
   /* ---------- toggle Bot Telegram (Tampilan) ---------- */
   const toggleTelegramBot = document.getElementById("md-toggle-telegrambot");
   toggleTelegramBot.checked = SETTINGS.telegramBotEnabled;
-  toggleTelegramBot.addEventListener("change", ()=>{
+  toggleTelegramBot.addEventListener("change", async ()=>{
     SETTINGS.telegramBotEnabled = toggleTelegramBot.checked;
     saveSettings();
     applySettingsToDom();
-    showToast(SETTINGS.telegramBotEnabled ? "Bot Telegram diaktifkan." : "Bot Telegram dinonaktifkan.");
-    pushMasterDataToServer();
+    await confirmMasterDataSave(SETTINGS.telegramBotEnabled ? "Bot Telegram diaktifkan." : "Bot Telegram dinonaktifkan.");
   });
 
   /* ---------- toggle Tempel Pesanan / AI (Tampilan) ---------- */
   const togglePasteOrder = document.getElementById("md-toggle-pasteorder");
   togglePasteOrder.checked = SETTINGS.pasteOrderEnabled;
-  togglePasteOrder.addEventListener("change", ()=>{
+  togglePasteOrder.addEventListener("change", async ()=>{
     SETTINGS.pasteOrderEnabled = togglePasteOrder.checked;
     saveSettings();
     applySettingsToDom();
     if(window.__refreshPasteOrderUI) window.__refreshPasteOrderUI();
-    showToast(SETTINGS.pasteOrderEnabled ? "Tempel Pesanan (AI) diaktifkan." : "Tempel Pesanan (AI) dinonaktifkan.");
-    pushMasterDataToServer();
+    await confirmMasterDataSave(SETTINGS.pasteOrderEnabled ? "Tempel Pesanan (AI) diaktifkan." : "Tempel Pesanan (AI) dinonaktifkan.");
   });
 
   /* ---------- toggle Cocok Otomatis Bukti Transfer / DM Bot (Tampilan) ----------
@@ -7816,22 +7895,20 @@ if ("serviceWorker" in navigator) {
      perlu disembunyikan/dimunculkan, cuma perlu tersimpan & sinkron ke server. */
   const toggleDmAutoMatch = document.getElementById("md-toggle-dmautomatch");
   toggleDmAutoMatch.checked = SETTINGS.dmAutoMatchEnabled;
-  toggleDmAutoMatch.addEventListener("change", ()=>{
+  toggleDmAutoMatch.addEventListener("change", async ()=>{
     SETTINGS.dmAutoMatchEnabled = toggleDmAutoMatch.checked;
     saveSettings();
-    showToast(SETTINGS.dmAutoMatchEnabled ? "Cocok Otomatis Bukti Transfer (DM Bot) diaktifkan." : "Cocok Otomatis Bukti Transfer (DM Bot) dinonaktifkan.");
-    pushMasterDataToServer();
+    await confirmMasterDataSave(SETTINGS.dmAutoMatchEnabled ? "Cocok Otomatis Bukti Transfer (DM Bot) diaktifkan." : "Cocok Otomatis Bukti Transfer (DM Bot) dinonaktifkan.");
   });
 
   /* ---------- toggle Tombol Cepat Finance / stiker (Tampilan) ----------
      Murni dibaca oleh worker.js (backend) — sama seperti toggle DM Bot. */
   const toggleStickerButtons = document.getElementById("md-toggle-stickerbuttons");
   toggleStickerButtons.checked = SETTINGS.stickerButtonsEnabled;
-  toggleStickerButtons.addEventListener("change", ()=>{
+  toggleStickerButtons.addEventListener("change", async ()=>{
     SETTINGS.stickerButtonsEnabled = toggleStickerButtons.checked;
     saveSettings();
-    showToast(SETTINGS.stickerButtonsEnabled ? "Tombol Cepat Finance diaktifkan." : "Tombol Cepat Finance dinonaktifkan.");
-    pushMasterDataToServer();
+    await confirmMasterDataSave(SETTINGS.stickerButtonsEnabled ? "Tombol Cepat Finance diaktifkan." : "Tombol Cepat Finance dinonaktifkan.");
   });
 
   /* ---------- 4 saklar per-reaksi (Konfirmasi/Hoax/Deposit/Void) ----------
@@ -7841,11 +7918,10 @@ if ("serviceWorker" in navigator) {
     const el = document.getElementById("md-toggle-stk-"+kind);
     if(!el) return;
     el.checked = SETTINGS.stickerReactionsEnabled[kind] !== false;
-    el.addEventListener("change", ()=>{
+    el.addEventListener("change", async ()=>{
       SETTINGS.stickerReactionsEnabled[kind] = el.checked;
       saveSettings();
-      showToast(el.checked ? "Reaksi diaktifkan." : "Reaksi dinonaktifkan.");
-      pushMasterDataToServer();
+      await confirmMasterDataSave(el.checked ? "Reaksi diaktifkan." : "Reaksi dinonaktifkan.");
     });
   });
 
@@ -7853,12 +7929,11 @@ if ("serviceWorker" in navigator) {
   const stkLabelRadios = document.querySelectorAll('input[name="md-stk-labelstyle"]');
   stkLabelRadios.forEach(r=>{
     r.checked = (r.value === SETTINGS.stickerCollapsedLabelStyle);
-    r.addEventListener("change", ()=>{
+    r.addEventListener("change", async ()=>{
       if(!r.checked) return;
       SETTINGS.stickerCollapsedLabelStyle = r.value;
       saveSettings();
-      showToast("Gaya label tombol diperbarui.");
-      pushMasterDataToServer();
+      await confirmMasterDataSave("Gaya label tombol diperbarui.");
     });
   });
 
@@ -7966,18 +8041,17 @@ if ("serviceWorker" in navigator) {
         </div>
       `).join("");
       listEl.querySelectorAll("button[data-idx]").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
+        btn.addEventListener("click", async ()=>{
           const idx = parseInt(btn.dataset.idx, 10);
           SETTINGS.financeList.splice(idx, 1);
           saveSettings();
           renderFinanceList();
-          showToast("Finance dihapus dari daftar.");
-          pushMasterDataToServer();
+          await confirmMasterDataSave("Finance dihapus dari daftar.");
         });
       });
     }
 
-    btnAdd.addEventListener("click", ()=>{
+    btnAdd.addEventListener("click", async ()=>{
       const name = nameInput.value.trim();
       const telegramId = idInput.value.trim();
       errEl.textContent = "";
@@ -7989,8 +8063,7 @@ if ("serviceWorker" in navigator) {
       saveSettings();
       nameInput.value = ""; idInput.value = "";
       renderFinanceList();
-      showToast("Finance \"" + name + "\" ditambahkan.");
-      pushMasterDataToServer();
+      await confirmMasterDataSave("Finance \"" + name + "\" ditambahkan.");
     });
 
     renderFinanceList();
@@ -8001,7 +8074,7 @@ if ("serviceWorker" in navigator) {
   const bantuanLinkInput = document.getElementById("md-bantuan-link");
   const bantuanErr = document.getElementById("md-bantuan-err");
   bantuanLinkInput.value = SETTINGS.bantuanLink;
-  document.getElementById("md-bantuan-save").addEventListener("click", ()=>{
+  document.getElementById("md-bantuan-save").addEventListener("click", async ()=>{
     const val = bantuanLinkInput.value.trim();
     bantuanErr.textContent = "";
     bantuanErr.style.color = "";
@@ -8013,8 +8086,7 @@ if ("serviceWorker" in navigator) {
     bantuanLinkInput.value = SETTINGS.bantuanLink;
     bantuanErr.style.color = "var(--primary-green)";
     bantuanErr.textContent = "✓ Tersimpan — tombol Bantuan sudah diarahkan ke link ini.";
-    showToast("Link Bantuan disimpan.");
-    pushMasterDataToServer();
+    await confirmMasterDataSave("Link Bantuan disimpan.");
   });
 
   /* ---------- batas tier diskon Grosir (Rumus) ---------- */
@@ -8032,7 +8104,7 @@ if ("serviceWorker" in navigator) {
   updateTierPreview();
   tierBatas1Input.addEventListener("input", updateTierPreview);
   tierBatas2Input.addEventListener("input", updateTierPreview);
-  document.getElementById("md-tier-save").addEventListener("click", ()=>{
+  document.getElementById("md-tier-save").addEventListener("click", async ()=>{
     const b1 = parseInt(tierBatas1Input.value, 10);
     const b2 = parseInt(tierBatas2Input.value, 10);
     tierErr.textContent = "";
@@ -8042,8 +8114,7 @@ if ("serviceWorker" in navigator) {
     SETTINGS.tierBatas2 = b2;
     saveSettings();
     calc("penjualan"); calc("custom");
-    showToast("Batas tier disimpan — perhitungan sudah diperbarui.");
-    pushMasterDataToServer();
+    await confirmMasterDataSave("Batas tier disimpan — perhitungan sudah diperbarui.");
   });
 
   /* ---------- buka/tutup ---------- */
@@ -8107,12 +8178,12 @@ if ("serviceWorker" in navigator) {
     }
   });
   document.getElementById("md-pin-cancel").addEventListener("click", ()=>{ pinOverlay.hidden = true; mdPendingTab = null; });
-  document.getElementById("md-pin-forgot").addEventListener("click", ()=>{
+  document.getElementById("md-pin-forgot").addEventListener("click", async ()=>{
     if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
       setPin(DEFAULT_PIN);
       pinErr.style.color = "var(--primary-green)";
       pinErr.textContent = "PIN sudah direset ke PIN bawaan.";
-      pushMasterDataToServer();
+      await confirmMasterDataSave("PIN sudah direset ke PIN bawaan.");
     }
   });
   document.getElementById("md-pin-submit").addEventListener("click", submitPin);
@@ -8385,7 +8456,7 @@ if ("serviceWorker" in navigator) {
     edOverlay.hidden = false;
   }
   document.getElementById("md-ed-cancel").addEventListener("click", ()=> edOverlay.hidden = true);
-  document.getElementById("md-ed-save").addEventListener("click", ()=>{
+  document.getElementById("md-ed-save").addEventListener("click", async ()=>{
     const e = EKSPEDISI[edEditIdx];
     e.pembulatanLonggar = document.getElementById("md-ed-longgar").checked;
     e.minBeratKg = parseFloat(document.getElementById("md-ed-minberat").value)||0;
@@ -8393,9 +8464,8 @@ if ("serviceWorker" in navigator) {
     e.subsidiKhusus = document.getElementById("md-ed-subsidikhusus").checked;
     e.subsidiPersenOngkir = parseFloat(document.getElementById("md-ed-subsidipersen").value)||0;
     e.subsidiPersenBatas = parseFloat(document.getElementById("md-ed-subsidibatas").value)||0;
-    refreshAfterDataChange();
     edOverlay.hidden = true;
-    showToast("Rumus ekspedisi \"" + e.name + "\" disimpan.");
+    await refreshAfterDataChange("Rumus ekspedisi \"" + e.name + "\" disimpan.");
   });
 
   /* ---------- Kelola Ekspedisi ---------- */
@@ -8460,7 +8530,7 @@ if ("serviceWorker" in navigator) {
     btnCancel.addEventListener("click", close);
     overlay.addEventListener("click", (e)=>{ if(e.target === overlay) close(); });
     nameInput.addEventListener("keydown", (e)=>{ if(e.key === "Enter") btnSave.click(); });
-    btnSave.addEventListener("click", ()=>{
+    btnSave.addEventListener("click", async ()=>{
       const name = nameInput.value.trim();
       if(!name){
         err.textContent = "Nama ekspedisi wajib diisi.";
@@ -8476,11 +8546,10 @@ if ("serviceWorker" in navigator) {
       }
       const newKode = nextKode("E");
       EKSPEDISI.push({kode: newKode, name, pembulatanLonggar:false, minBeratKg:0, minBeratCustom:false, subsidiKhusus:false, subsidiPersenOngkir:20, subsidiPersenBatas:80});
-      refreshAfterDataChange();
       if(ekspedisiSearchInput) ekspedisiSearchInput.value = "";
       renderEkspedisiList();
-      showToast(`Ekspedisi "${name}" ditambahkan.`);
       close();
+      await refreshAfterDataChange(`Ekspedisi "${name}" ditambahkan.`);
       const newIdx = EKSPEDISI.findIndex(e=> e.kode === newKode);
       if(newIdx >= 0){
         // beri jeda singkat supaya popup Tambah selesai tertutup dulu,
@@ -8546,7 +8615,7 @@ if ("serviceWorker" in navigator) {
     }
   });
   document.getElementById("md-hapus-cancel").addEventListener("click", resetHapusForm);
-  document.getElementById("md-hapus-confirm").addEventListener("click", ()=>{
+  document.getElementById("md-hapus-confirm").addEventListener("click", async ()=>{
     if(!__hapusFound) return;
     // cari ulang berdasar kode (bukan pakai idx lama) — jaga-jaga kalau
     // daftar produk/ekspedisi sempat berubah selagi preview ini terbuka.
@@ -8564,13 +8633,12 @@ if ("serviceWorker" in navigator) {
       EKSPEDISI.splice(fresh.idx, 1);
       renderEkspedisiList();
     }
-    refreshAfterDataChange();
+    await refreshAfterDataChange(`${fresh.tipe} "${fresh.nama}" dihapus.`);
     resetHapusForm();
-    showToast(`${fresh.tipe} "${fresh.nama}" dihapus.`);
   });
 
   /* ---------- Ubah / Reset PIN ---------- */
-  document.getElementById("md-pin-save").addEventListener("click", ()=>{
+  document.getElementById("md-pin-save").addEventListener("click", async ()=>{
     const errEl = document.getElementById("md-pin-change-err");
     errEl.style.color = "var(--danger-red)";
     const oldV = document.getElementById("md-pin-old").value;
@@ -8585,15 +8653,15 @@ if ("serviceWorker" in navigator) {
     document.getElementById("md-pin-old").value = "";
     document.getElementById("md-pin-new").value = "";
     document.getElementById("md-pin-new2").value = "";
-    pushMasterDataToServer();
+    await confirmMasterDataSave("PIN berhasil diganti.");
   });
-  document.getElementById("md-pin-reset-btn").addEventListener("click", ()=>{
+  document.getElementById("md-pin-reset-btn").addEventListener("click", async ()=>{
     if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
       setPin(DEFAULT_PIN);
       const errEl = document.getElementById("md-pin-change-err");
       errEl.style.color = "var(--primary-green)";
       errEl.textContent = "PIN sudah direset ke PIN bawaan.";
-      pushMasterDataToServer();
+      await confirmMasterDataSave("PIN sudah direset ke PIN bawaan.");
     }
   });
 })();
