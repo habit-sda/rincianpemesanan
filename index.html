@@ -3546,7 +3546,7 @@
     <div>BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.11.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.12.0</span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
     </div>
@@ -3657,7 +3657,13 @@
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.11.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.12.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug PENTING lanjutan (desktop):</b> perbaikan v2.11.0 kemarin ternyata belum tuntas — akar masalah sebenarnya ada di fungsi <code>renderStep()</code> sendiri, yang di mode desktop SELALU membangun ulang ketiga langkah (Input, Pengiriman, Preview) sekaligus setiap dipanggil, apa pun yang diminta. Sekarang ditambah pengecualian: kalau sedang fokus/aktif mengetik di dalam langkah Pengiriman, langkah itu TIDAK ikut dibangun ulang — jadi field Rate Ongkir dan sejenisnya sekarang bisa diketik normal berapa digit pun.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.11.0</div>
           <ul>
             <li><b>Perbaikan bug PENTING (desktop):</b> field "Rate Ongkir" (dan field lain di langkah Pengiriman: Ongkir Manual, Kelebihan Bayar, Diskon Ongkir) di tampilan desktop cuma bisa diketik 1 karakter — setiap ketikan berikutnya menimpa yang sebelumnya. Penyebabnya: setiap kali ada perubahan angka, seluruh layar "Pengiriman" ikut dibangun ulang dari nol di tengah-tengah proses mengetik (field yang lagi difokus sampai ikut hancur & dibuat ulang tiap keystroke). Sekarang sudah diperbaiki — layar itu tidak lagi dibangun ulang paksa selama masih di langkah Pengiriman.</li>
           </ul>
@@ -6463,10 +6469,19 @@ if ("serviceWorker" in navigator) {
        Pengiriman, dan Preview nota tampil SEKALIGUS dalam satu halaman
        (lihat CSS "WIZARD DESKTOP: satu halaman panjang"). Jadi apa pun
        "step" yang diminta, render KETIGANYA supaya selalu sinkron.
-       Di HP, perilaku lama tetap 100% sama: cuma render 1 step aktif. */
+       Di HP, perilaku lama tetap 100% sama: cuma render 1 step aktif.
+
+       PENGECUALIAN PENTING: kalau user SEDANG FOKUS/AKTIF NGETIK di
+       dalam step "ship" (Pengiriman) — mis. field Rate Ongkir — JANGAN
+       ikut re-render step itu. renderShipStep() pakai innerHTML, yang
+       menghancurkan & membuat ulang field yang lagi difokus itu sendiri
+       kalau dipanggil ulang di tengah ketikan (bug: field cuma bisa
+       nampung 1 karakter, karena fokus & isian hilang tiap keystroke). */
     if(isDesktopWiz()){
       renderListStep(sheet);
-      renderShipStep(sheet);
+      const shipHost = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="ship"]`);
+      const activeInsideShip = shipHost && document.activeElement && shipHost.contains(document.activeElement);
+      if(!activeInsideShip) renderShipStep(sheet);
       renderReviewStep(sheet);
       return;
     }
