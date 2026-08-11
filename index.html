@@ -1129,6 +1129,28 @@
   .md-btn.primary{background:var(--primary-green);color:#fff;border:none;}
   .md-btn.danger{color:var(--danger-red);border-color:#f3b7ac;}
   .md-note{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
+  /* ---------- Kartu "Kuota AI Hari Ini" ---------- */
+  .md-quota-result{margin-top:16px;display:flex;flex-direction:column;gap:14px;}
+  .md-quota-updated{font-size:11px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;}
+  .md-quota-updated::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--primary-green);flex-shrink:0;}
+  .md-quota-row{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper-dark);}
+  .md-quota-row.workers-ai{border-color:#bcd6f5;background:#eef5fd;}
+  .md-quota-row-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px;}
+  .md-quota-row-label{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .md-quota-row-pct{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .md-quota-bar{height:7px;border-radius:99px;background:#e3e6ea;overflow:hidden;}
+  .md-quota-bar-fill{height:100%;border-radius:99px;transition:width .4s ease;background:var(--primary-green);}
+  .md-quota-row-pct.level-ok, .md-quota-bar-fill.level-ok{color:var(--primary-green);background:var(--primary-green);}
+  .md-quota-row-pct.level-warn, .md-quota-bar-fill.level-warn{color:#a15c00;background:#f2a900;}
+  .md-quota-row-pct.level-danger, .md-quota-bar-fill.level-danger{color:var(--danger-red);background:var(--danger-red);}
+  .md-quota-row-sub{margin-top:7px;font-size:11px;color:var(--ink-soft);}
+  .md-quota-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;}
+  .md-quota-badge.ok{background:#e3f3ec;color:var(--primary-green);}
+  .md-quota-badge.cooldown{background:#fde8e6;color:var(--danger-red);}
+  .md-quota-error{font-size:12px;color:var(--danger-red);}
+  .md-quota-loading{font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:8px;}
+  .md-quota-spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--primary-green);animation:md-quota-spin-kf .7s linear infinite;flex-shrink:0;}
+  @keyframes md-quota-spin-kf{to{transform:rotate(360deg);}}
   @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
     .md-panel{padding:0;display:block;background:#ffffff;}
     .md-panel-sheet{border-radius:0;max-width:none;box-shadow:none;padding:16px 16px 40px;}
@@ -3322,6 +3344,12 @@
     </div>
 
     <div class="md-section" id="md-sec-tampilan">
+      <div class="md-card" id="md-quota-card">
+        <h3>Kuota AI Hari Ini</h3>
+        <div class="md-note" style="margin-bottom:12px;">Sisa jatah gratis Groq &amp; Cloudflare Workers AI untuk tanggal berjalan (reset otomatis tiap hari) — sekedar info, tidak mengubah apa pun.</div>
+        <button class="md-btn" id="md-quota-check" type="button">🔎 Cek Kuota AI Hari Ini</button>
+        <div id="md-quota-result" class="md-quota-result" hidden></div>
+      </div>
       <div class="md-card">
         <h3>Autocomplete (cari-ketik)</h3>
         <div class="md-note" style="margin-bottom:12px;">Aktif = field bisa diketik untuk mencari. Nonaktif = kembali jadi pilihan dropdown biasa.</div>
@@ -7740,6 +7768,86 @@ if ("serviceWorker" in navigator) {
     showToast(SETTINGS.stickerButtonsEnabled ? "Tombol Cepat Finance diaktifkan." : "Tombol Cepat Finance dinonaktifkan.");
     pushMasterDataToServer();
   });
+
+  /* ---------- Kuota AI Hari Ini (Tampilan) ----------
+     Murni baca (GET), tidak menyimpan apa pun ke SETTINGS/localStorage —
+     angkanya cuma berarti "sekarang", jadi selalu fetch ulang tiap diklik. */
+  (function(){
+    const btn = document.getElementById("md-quota-check");
+    const resultEl = document.getElementById("md-quota-result");
+    if(!btn || !resultEl) return;
+
+    function fmtRingkas(n){
+      if(n==null) return "–";
+      if(n>=1000000) return (n/1000000).toLocaleString("id-ID",{maximumFractionDigits:1})+"jt";
+      if(n>=1000) return (n/1000).toLocaleString("id-ID",{maximumFractionDigits:1})+"rb";
+      return String(n);
+    }
+    function levelOf(pct){
+      if(pct==null) return "ok";
+      if(pct>=85) return "danger";
+      if(pct>=60) return "warn";
+      return "ok";
+    }
+    function barRow(label, used, budget, pct){
+      const lvl = levelOf(pct);
+      const pctLabel = pct==null ? "—" : pct+"%";
+      return `
+        <div class="md-quota-row">
+          <div class="md-quota-row-head">
+            <span class="md-quota-row-label">${label}</span>
+            <span class="md-quota-row-pct level-${lvl}">${pctLabel}</span>
+          </div>
+          <div class="md-quota-bar"><div class="md-quota-bar-fill level-${lvl}" style="width:${pct==null?0:pct}%"></div></div>
+          <div class="md-quota-row-sub">${budget==null ? "Kuota dihitung per permintaan, bukan token" : `${fmtRingkas(used)} / ${fmtRingkas(budget)} token`}</div>
+        </div>`;
+    }
+    function cooldownBadgeRow(label, cooldown){
+      return `
+        <div class="md-quota-row">
+          <div class="md-quota-row-head">
+            <span class="md-quota-row-label">${label}</span>
+            <span class="md-quota-badge ${cooldown?"cooldown":"ok"}">${cooldown?"⚠️ Mendekati limit":"✓ Normal"}</span>
+          </div>
+          <div class="md-quota-row-sub">Groq menghitung kuota model ini per permintaan (bukan token) — status di atas dari sinyal limit asli Groq.</div>
+        </div>`;
+    }
+
+    async function checkQuota(){
+      btn.disabled = true;
+      resultEl.hidden = false;
+      resultEl.innerHTML = `<div class="md-quota-loading"><span class="md-quota-spin"></span> Memuat kuota AI hari ini...</div>`;
+      try{
+        const res = await fetch(MASTER_DATA_WORKER_URL + "/ai-quota-status");
+        const data = await res.json();
+        if(!res.ok || data.error) throw new Error(data.error || "Gagal ambil data.");
+
+        const rows = data.groq.map(g=>
+          g.budgetTokens==null ? cooldownBadgeRow(g.label, g.cooldown) : barRow(g.label, g.usedTokens, g.budgetTokens, g.percent)
+        ).join("");
+        const workersRow = `
+          <div class="md-quota-row workers-ai">
+            <div class="md-quota-row-head">
+              <span class="md-quota-row-label">☁️ Workers AI (cadangan)</span>
+              <span class="md-quota-row-pct level-${levelOf(data.workersAi.percent)}">${data.workersAi.percent}%</span>
+            </div>
+            <div class="md-quota-bar"><div class="md-quota-bar-fill level-${levelOf(data.workersAi.percent)}" style="width:${data.workersAi.percent}%"></div></div>
+            <div class="md-quota-row-sub">${fmtRingkas(data.workersAi.usedNeuron)} / ${fmtRingkas(data.workersAi.budgetNeuron)} Neuron — dipakai kalau Groq penuh</div>
+          </div>`;
+
+        resultEl.innerHTML = `
+          <div class="md-quota-updated">Diperbarui ${data.dateLabel} WIB</div>
+          ${rows}
+          ${workersRow}
+        `;
+      }catch(e){
+        resultEl.innerHTML = `<div class="md-quota-error">Gagal memuat kuota: ${String(e.message||e)}</div>`;
+      }finally{
+        btn.disabled = false;
+      }
+    }
+    btn.addEventListener("click", checkQuota);
+  })();
 
   /* ---------- Daftar Finance (dipakai worker untuk validasi reaction/konfirmasi) ---------- */
   (function(){
