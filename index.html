@@ -2810,10 +2810,12 @@
       <h1>Rincian Pemesanan (Rp)</h1>
       <div class="sub">Halawa Bintang Utama</div>
     </div>
-    <div class="datebox">
-      <div class="home-hero-greet" id="home-hero-greet" hidden style="margin-bottom:4px;font-family:'Roboto',sans-serif;text-align:right;"></div>
-      <div><b id="hariNow">–</b></div>
-      <div id="tglNow">–</div>
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <div class="home-hero-greet" id="home-hero-greet" hidden style="font-family:'Roboto',sans-serif;"></div>
+      <div class="datebox">
+        <div><b id="hariNow">–</b></div>
+        <div id="tglNow">–</div>
+      </div>
     </div>
   </header>
 
@@ -4283,16 +4285,42 @@ async function fetchMasterDataFromServer(){
 // mengirim seluruh dokumen (produk, ekspedisi, settings, pin) supaya
 // semua HP lain ambil versi terbaru ini juga. Gagal kirim (offline)
 // tidak membatalkan perubahan lokal, cuma ditandai lewat toast.
+//
+// PENTING (perbaikan bug "pengaturan berubah sendiri"): sebelum kirim,
+// tarik dulu versi TERBARU dari server, lalu untuk field di SETTINGS,
+// cuma pakai nilai LOKAL kalau field itu memang BENERAN diubah di device
+// ini (beda dari "snapshot terakhir yang kita tahu dari server") —
+// selain itu pakai nilai server apa adanya. Ini mencegah device yang
+// local-nya sudah ketinggalan (belum sempat pull perubahan device lain)
+// tidak sengaja menimpa balik perubahan orang lain cuma karena push
+// field yang sebenarnya tidak dia ubah sendiri.
+window.__lastServerSnapshot = null; // diisi tiap kali berhasil pull ATAU push
 window.__pushingMasterData = false;
 async function pushMasterDataToServer(){
   if(!MASTER_DATA_WORKER_URL) return;
   if(window.__pushingMasterData) return; // hindari kirim dobel bertumpuk
   window.__pushingMasterData = true;
   try{
+    let settingsToSend = SETTINGS;
+    const fresh = await fetchMasterDataFromServer();
+    if(fresh && fresh.settings && window.__lastServerSnapshot && window.__lastServerSnapshot.settings){
+      const merged = { ...fresh.settings };
+      const lastKnown = window.__lastServerSnapshot.settings;
+      Object.keys(SETTINGS).forEach(key=>{
+        // field ini beda dari terakhir kali kita tahu dari server -> BENERAN
+        // diubah di device ini, pakai punya kita. Selain itu, pakai punya
+        // server (supaya perubahan device lain yang belum sempat kita pull
+        // tidak ikut ketimpa).
+        if(JSON.stringify(SETTINGS[key]) !== JSON.stringify(lastKnown[key])) merged[key] = SETTINGS[key];
+      });
+      settingsToSend = merged;
+      Object.assign(SETTINGS, merged); // biar tampilan lokal juga ikut ter-update sinkron
+    }
+
     const body = {
       products: PRODUCTS,
       ekspedisi: EKSPEDISI,
-      settings: SETTINGS,
+      settings: settingsToSend,
       pin: (window.__getCurrentPin ? window.__getCurrentPin() : undefined),
     };
     const res = await fetch(MASTER_DATA_WORKER_URL + "/master-data", {
@@ -4302,6 +4330,8 @@ async function pushMasterDataToServer(){
     });
     if(!res.ok){
       showToast("Gagal sinkron ke server (perubahan tetap tersimpan di HP ini).");
+    }else{
+      window.__lastServerSnapshot = JSON.parse(JSON.stringify({ products: PRODUCTS, ekspedisi: EKSPEDISI, settings: settingsToSend }));
     }
   }catch(e){
     console.log("Master data online gagal dikirim:", e);
@@ -4328,7 +4358,11 @@ const rupiah = n => "Rp " + Math.round(n||0).toLocaleString("id-ID");
    field Diskon per baris (karena isinya campuran: "0.2" = 20% ATAU "55000"
    = potongan rupiah — auto-format akan merusak arti "0.2"-nya). */
 function parseRp(str){
-  return parseFloat(String(str||"").replace(/\./g,"").replace(/,/g,"."))||0;
+  // Buang semua selain digit/koma/titik/minus dulu (termasuk "Rp ", spasi,
+  // dll) — supaya aman dipakai baik untuk isi input polos ("55.000") MAUPUN
+  // teks tampilan yang ada awalan "Rp " (mis. dari elemen Grand Total).
+  const cleaned = String(str||"").replace(/[^\d,.-]/g, "");
+  return parseFloat(cleaned.replace(/\./g,"").replace(/,/g,"."))||0;
 }
 /* ============ Auto-select saat field manual disentuh ============
    Supaya proses edit gampang: begitu field diketuk, isi lama langsung
@@ -5282,9 +5316,12 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // kalau CS pakai "Ongkir Manual" (bukan per-kg).
     const ratePerKgNum = parseRp(document.getElementById(pfx+"-rate").value) || 0;
     const ekspedisiName = document.getElementById(pfx+"-ekspedisi").value || "";
+    // Tanggal jadwal kirim (kalau sempat kebaca AI dari "Tempel Pesanan") —
+    // dikirim diam-diam, dipakai server buat pengingat otomatis H-1.
+    const deliveryDate = (window.wizState && window.wizState[tab] && window.wizState[tab].deliveryDate) || null;
     const canvas = await renderCanvas();
     const imageDataUrl = canvas.toDataURL("image/png");
-    return { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, imageDataUrl };
+    return { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, imageDataUrl };
   }
 
   /* ---------- Autosave draft ke server ----------
@@ -5300,7 +5337,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     if(!senderId || !MASTER_DATA_WORKER_URL || isSavingDraft) return;
     isSavingDraft = true;
     try{
-      const { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, imageDataUrl } = await collectNotaPayload();
       await fetch(MASTER_DATA_WORKER_URL + "/save-draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -5310,6 +5347,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           grandTotal: grandTotalNum,
           ratePerKg: ratePerKgNum,
           ekspedisi: ekspedisiName,
+          deliveryDate,
           image: imageDataUrl,
         }),
       });
@@ -5398,7 +5436,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     statusEl.textContent = "Menyiapkan gambar nota…";
 
     try{
-      const { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, imageDataUrl } = await collectNotaPayload();
 
       statusEl.textContent = "Mengirim ke grup Telegram…";
       const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
@@ -5413,6 +5451,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           grandTotal: grandTotalNum,
           ratePerKg: ratePerKgNum,
           ekspedisi: ekspedisiName,
+          deliveryDate,
         }),
       });
       const body = await res.json().catch(()=>({}));
@@ -5453,7 +5492,7 @@ async function initHomeGreeting(){
     greetEl.appendChild(document.createTextNode("Selamat datang, "));
     const b = document.createElement("b");
     b.style.color = "var(--primary-green)";
-    b.textContent = label;
+    b.textContent = label.replace(/^@/, ""); // buang tanda "@" di depan, cukup nama/username-nya saja
     greetEl.appendChild(b);
     greetEl.appendChild(document.createTextNode(" 👋"));
     greetEl.hidden = false;
@@ -5483,18 +5522,6 @@ initDate();
 
 ["pj-kelebihan","cs-kelebihan","cs-diskonongkir"].forEach(id=>{
   document.getElementById(id).addEventListener("input", ()=>calc(id.startsWith("pj")?"penjualan":"custom"));
-});
-
-/* format titik ribuan otomatis untuk input Rate Ongkir */
-function formatRibuanInput(el){
-  const raw = el.value.replace(/\D/g, "");
-  el.value = raw ? parseInt(raw, 10).toLocaleString("id-ID") : "";
-}
-document.querySelectorAll(".rate-input").forEach(el=>{
-  el.addEventListener("input", ()=>{
-    formatRibuanInput(el);
-    calc(el.id.startsWith("pj") ? "penjualan" : "custom");
-  });
 });
 
 /* Rate Ongkir vs Ongkir Manual saling mengunci — cuma boleh isi salah satu.
@@ -6248,6 +6275,7 @@ if ("serviceWorker" in navigator) {
     penjualan: {step:"list", editingRow:null, formOpen:true},
     custom:    {step:"list", editingRow:null, formOpen:true},
   };
+  window.wizState = wizState; // dibaca dari IIFE lain (mis. collectNotaPayload) buat ambil deliveryDate
 
   /* ---------- navigasi Beranda <-> panel, terhubung ke tombol/gesture
      Kembali di HP. Setiap pindah layar (Beranda <-> Input/Pengiriman/
@@ -6507,7 +6535,11 @@ if ("serviceWorker" in navigator) {
         btn.disabled = false;
         return;
       }
-      poItems = data.items || [];
+      poItems = (data.items || []).map(it=> ({ ...it, aiMatchedProduct: it.matchedProduct })); // simpan snapshot tebakan AI awal, buat dibandingkan kalau CS betulkan manual
+      // Simpan tanggal jadwal kirim (kalau AI ketemu) DIAM-DIAM ke state wizard —
+      // tidak ada perubahan tampilan apa pun di sini, baru dipakai nanti pas
+      // kirim ke grup Telegram (buat pengingat H-1 otomatis lewat bot).
+      if(wizState[poSheet]) wizState[poSheet].deliveryDate = data.deliveryDate || null;
       renderPasteOrderReview(text);
     }catch(e){
       statusEl.textContent = "Gagal memproses: " + (e.message || e);
@@ -6564,6 +6596,22 @@ if ("serviceWorker" in navigator) {
       statusEl.style.color = "var(--danger-red)";
       return;
     }
+
+    // Kamus koreksi global — kalau CS ubah pilihan produk dari tebakan
+    // AI semula (raw text yang sama nanti bakal langsung dikenali tanpa
+    // AI perlu nebak lagi). Dikirim diam-diam, gagal pun tidak masalah
+    // (AI tetap jalan seperti biasa, cuma nggak dapat "kamus" tambahan).
+    const corrections = poItems
+      .filter(it=> it.matchedProduct !== it.aiMatchedProduct)
+      .map(it=> ({ raw: it.raw, product: it.matchedProduct }));
+    if(corrections.length && MASTER_DATA_WORKER_URL){
+      fetch(MASTER_DATA_WORKER_URL + "/save-correction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ corrections }),
+      }).catch(e=> console.log("Gagal simpan kamus koreksi:", e));
+    }
+
     const trs = trsOf(poSheet);
     let applied = 0, skipped = 0;
     toApply.forEach(it=>{
@@ -7338,6 +7386,9 @@ if ("serviceWorker" in navigator) {
     calc("penjualan"); calc("custom");
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
     if(window.__renderFinanceList) window.__renderFinanceList();
+    // Simpan snapshot versi server yang baru saja kita tahu — jadi acuan
+    // buat pushMasterDataToServer() nanti (lihat komentar di fungsi itu).
+    window.__lastServerSnapshot = JSON.parse(JSON.stringify({ products: PRODUCTS, ekspedisi: EKSPEDISI, settings: SETTINGS }));
     if(migratedAfterPull) pushMasterDataToServer();
   })();
 
