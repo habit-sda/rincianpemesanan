@@ -526,85 +526,104 @@
      toggle "Desain Nota Baru" di Master Data > Tampilan, per HP/browser.
      Dipakai bareng oleh unduh, salin, DAN kirim-ke-Telegram (renderCanvas
      satu-satunya sumber, lihat function renderCanvas()). ===== */
+  /* ===== template nota BARU (desain kartu hijau) — dipilih lewat
+     toggle "Desain Nota Baru" di Master Data > Tampilan, per HP/browser.
+     Dipakai bareng oleh unduh, salin, DAN kirim-ke-Telegram (renderCanvas
+     satu-satunya sumber, lihat function renderCanvas()).
+     CATATAN PENTING: html2canvas (versi yang dipakai di sini) TIDAK
+     merender radial-gradient/linear-gradient dengan benar — hasilnya
+     jadi abu-abu pudar rata, bukan gradasi warna. Makanya SEMUA warna
+     di template ini SENGAJA solid/flat, termasuk logo & dekorasi latar
+     (pakai warna rgba datar, bukan gradient), supaya hasil gambar akhir
+     konsisten dengan yang tampil di layar. Jangan ganti balik ke
+     gradient tanpa tes render dulu. ===== */
   .pnota2{
-    width:880px;height:auto;background:#ffffff;color:#1a1a1a;font-family:'Roboto',sans-serif;
-    padding:38px 34px 34px;
-    background-image:
-      radial-gradient(circle at 6% -4%, #e3f4e7 0%, rgba(227,244,231,0) 42%),
-      radial-gradient(circle at 100% 4%, #e3f4e7 0%, rgba(227,244,231,0) 38%);
+    width:1080px;height:auto;background:#ffffff;color:#1a1a1a;font-family:'Roboto',sans-serif;
+    padding:46px 40px 40px;position:relative;overflow:hidden;
   }
-  .pnota2 .order-header{ text-align:center; margin-bottom:28px; }
-  .pnota2 .order-logo{
-    width:88px;height:88px;border-radius:50%;margin:0 auto 14px;
-    display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(circle at 35% 30%, #2fa860, #1c7a45 70%);
-    border:5px solid #eaf6ee;box-shadow:0 0 0 1.5px #bfe3c9;
-    color:#ffffff;font-size:34px;font-weight:800;letter-spacing:-.02em;
-  }
+  .pnota2 .bg-blob{position:absolute;border-radius:50%;background:#e3f4e7;z-index:0;}
+  .pnota2 .bg-blob-1{width:260px;height:260px;top:-120px;left:-90px;}
+  .pnota2 .bg-blob-2{width:220px;height:220px;top:-100px;right:-80px;}
+  .pnota2 .order-header,.pnota2 .order-section,.pnota2 .grand-total,.pnota2 .pay-status{position:relative;z-index:1;}
+  .pnota2 .order-header{ text-align:center; margin-bottom:14px; }
+  .pnota2 .order-logo-img{display:block;margin:0 auto 6px;}
   .pnota2 .order-title{
-    font-size:27px;font-weight:800;color:#155a34;letter-spacing:.04em;margin:0 0 10px;
+    font-size:17px;font-weight:800;color:#155a34;letter-spacing:.03em;margin:0 0 6px;
   }
   .pnota2 .order-meta{
-    display:flex;align-items:center;justify-content:center;gap:12px;
-    font-size:15px;color:#5b6660;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    font-size:12.5px;color:#5b6660;
   }
-  .pnota2 .order-meta span{display:inline-flex;align-items:center;gap:6px;}
-  .pnota2 .order-meta svg{width:15px;height:15px;flex-shrink:0;color:#5b6660;}
-  .pnota2 .order-meta .divider{width:1px;height:14px;background:#c9d2cc;}
+  .pnota2 .order-meta span{display:inline-flex;align-items:center;gap:5px;}
+  .pnota2 .order-meta svg{width:12px;height:12px;flex-shrink:0;color:#5b6660;}
+  .pnota2 .order-meta .divider{width:1px;height:11px;background:#c9d2cc;}
   .pnota2 .order-section{
-    background:#ffffff;border:1px solid #e2e8e2;border-radius:16px;
-    padding:20px 22px;margin-bottom:16px;
-    box-shadow:0 1px 4px rgba(20,60,35,.05);
+    background:#ffffff;border:1.5px solid #d6e0d8;border-radius:18px;
+    padding:24px 26px;margin-bottom:18px;
   }
-  .pnota2 .section-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .pnota2 .section-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
   .pnota2 .section-icon{
-    width:32px;height:32px;border-radius:10px;background:#e6f6ea;
+    width:38px;height:38px;border-radius:11px;background:#e6f6ea;
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
-  .pnota2 .section-icon svg{width:17px;height:17px;color:#1c7a45;}
+  .pnota2 .section-icon svg{width:20px;height:20px;color:#1c7a45;}
   .pnota2 .section-title{
-    font-size:14.5px;font-weight:800;color:#1c7a45;letter-spacing:.05em;margin:0;
+    font-size:16.5px;font-weight:800;color:#1c7a45;letter-spacing:.04em;margin:0;
   }
   .pnota2 .product-list{display:flex;flex-direction:column;}
+  .pnota2 .product-cols{
+    display:flex;align-items:center;gap:14px;
+  }
+  .pnota2 .product-col-num{width:28px;flex-shrink:0;}
+  .pnota2 .product-col-thumb{width:56px;flex-shrink:0;}
+  .pnota2 .product-col-name{min-width:0;flex:1 1 0;}
+  .pnota2 .product-col-qty{width:78px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-harga{width:104px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-diskon{width:80px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-satuan{width:112px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-total{width:128px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-list-head{
+    padding:0 0 14px;border-bottom:2px solid #d6e0d8;margin-bottom:0;
+  }
+  .pnota2 .product-list-head span{
+    font-size:12px;font-weight:800;color:#7a8580;letter-spacing:.04em;text-transform:uppercase;
+  }
   .pnota2 .product-item{
-    display:grid;grid-template-columns:26px 52px 1fr auto auto;align-items:center;gap:14px;
-    padding:13px 0;border-bottom:1px solid #edf1ee;
+    padding:16px 0;border-bottom:1.5px solid #edf1ee;
   }
   .pnota2 .product-item:last-child{border-bottom:none;padding-bottom:0;}
-  .pnota2 .product-item:first-child{padding-top:0;}
   .pnota2 .product-number{
-    width:24px;height:24px;border-radius:50%;background:#1c7a45;color:#fff;
-    font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    width:28px;height:28px;border-radius:50%;background:#1c7a45;color:#fff;
+    font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;
   }
   .pnota2 .product-thumb{
-    width:52px;height:52px;border-radius:11px;object-fit:cover;background:#f2f6f2;border:1px solid #e6ebe6;
+    width:56px;height:56px;border-radius:12px;object-fit:cover;background:#f2f6f2;border:1.5px solid #e6ebe6;
   }
-  .pnota2 .product-info{ min-width:0; }
-  .pnota2 .product-name{font-size:15px;font-weight:700;color:#1a1a1a;margin:0 0 3px;}
-  .pnota2 .product-price{font-size:12.5px;color:#7a8580;}
-  .pnota2 .product-qty{font-size:14px;color:#3d453f;white-space:nowrap;text-align:right;}
-  .pnota2 .product-total{font-size:15px;font-weight:800;color:#1c7a45;white-space:nowrap;text-align:right;}
+  .pnota2 .product-name{font-size:16.5px;font-weight:700;color:#1a1a1a;}
+  .pnota2 .product-val{font-size:15.5px;font-weight:700;color:#1a1a1a;font-variant-numeric:tabular-nums;}
+  .pnota2 .product-val-muted{font-size:15px;color:#5b6660;font-variant-numeric:tabular-nums;}
+  .pnota2 .product-total{font-size:16.5px;font-weight:800;color:#1c7a45;font-variant-numeric:tabular-nums;}
   .pnota2 .shipping-content{display:flex;}
-  .pnota2 .shipping-item{flex:1;text-align:center;padding:0 8px;}
-  .pnota2 .shipping-item + .shipping-item{border-left:1px solid #edf1ee;}
-  .pnota2 .shipping-label{display:block;font-size:12px;color:#7a8580;margin-bottom:6px;}
-  .pnota2 .shipping-value{display:block;font-size:16px;font-weight:800;color:#1a1a1a;}
-  .pnota2 .cost-summary{display:flex;flex-direction:column;gap:9px;}
-  .pnota2 .cost-row{display:flex;justify-content:space-between;font-size:15px;}
+  .pnota2 .shipping-item{flex:1;text-align:center;padding:0 10px;}
+  .pnota2 .shipping-item + .shipping-item{border-left:1.5px solid #d6e0d8;}
+  .pnota2 .shipping-label{display:block;font-size:14px;color:#7a8580;margin-bottom:7px;}
+  .pnota2 .shipping-value{display:block;font-size:19px;font-weight:800;color:#1a1a1a;}
+  .pnota2 .cost-summary{display:flex;flex-direction:column;gap:11px;}
+  .pnota2 .cost-row{display:flex;justify-content:space-between;font-size:17px;}
   .pnota2 .cost-label{color:#5b6660;}
   .pnota2 .cost-value{font-weight:700;color:#1a1a1a;font-variant-numeric:tabular-nums;}
   .pnota2 .grand-total{
     display:flex;justify-content:space-between;align-items:center;
-    background:#e6f6ea;border:1.5px solid #bfe3c9;border-radius:16px;padding:22px 24px;margin-bottom:0;
+    background:#e6f6ea;border:2px solid #9fd4ae;border-radius:18px;padding:26px 28px;margin-bottom:0;
   }
-  .pnota2 .grand-total-label{font-size:14.5px;font-weight:800;color:#1c7a45;letter-spacing:.05em;}
-  .pnota2 .grand-total-value{font-size:26px;font-weight:800;color:#124a2c;font-variant-numeric:tabular-nums;}
+  .pnota2 .grand-total-label{font-size:16.5px;font-weight:800;color:#1c7a45;letter-spacing:.04em;}
+  .pnota2 .grand-total-value{font-size:32px;font-weight:800;color:#124a2c;font-variant-numeric:tabular-nums;}
   .pnota2 .pay-status{
     display:flex;justify-content:space-between;align-items:center;
-    background:#ffffff;border:1px solid #e2e8e2;border-radius:16px;padding:16px 22px;margin-top:16px;
+    background:#ffffff;border:1.5px solid #d6e0d8;border-radius:18px;padding:18px 26px;margin-top:18px;
   }
-  .pnota2 .pay-status .l{font-size:14px;font-weight:800;}
-  .pnota2 .pay-status .v{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .pnota2 .pay-status .l{font-size:16px;font-weight:800;}
+  .pnota2 .pay-status .v{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;}
 
   /* ===== responsive: HP / layar sempit =====
      Kondisi kedua (max-height + landscape + pointer:coarse) supaya HP yang
@@ -6024,6 +6043,27 @@ function buildPrintNota(tab){
   `;
 }
 
+/* Logo "Rp" untuk header nota BARU (pnota2) — SENGAJA dipasang lewat <img>
+   (bukan inline <svg> langsung di markup), supaya browser yang merender
+   efek shadow-nya dulu jadi gambar bitmap biasa SEBELUM di-screenshot
+   html2canvas — filter SVG seperti feDropShadow sering tidak didukung
+   baik kalau html2canvas yang harus mem-parsing SVG-nya sendiri (sama
+   kasusnya dengan masalah gradient yang pernah ditemukan sebelumnya). */
+const ORDER_LOGO_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
+  `<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#075F43" flood-opacity="0.25"></feDropShadow>
+      </filter>
+    </defs>
+    <circle cx="100" cy="100" r="88" fill="#087A55" filter="url(#shadow)"></circle>
+    <circle cx="100" cy="100" r="82" fill="none" stroke="#FFFFFF" stroke-width="4"></circle>
+    <circle cx="100" cy="100" r="72" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.95"></circle>
+    <text x="100" y="123" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800" letter-spacing="-4" fill="#FFFFFF">Rp</text>
+    <path d="M 61 128 L 91 128" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"></path>
+  </svg>`
+);
+
 /* ============ export gambar — TEMPLATE BARU (kartu hijau) ============
    Sumber data SAMA PERSIS dengan buildPrintNota (dibaca dari DOM tabel
    yang sedang aktif) — cuma tampilannya beda. Gambar produk diambil dari
@@ -6043,20 +6083,36 @@ function buildPrintNotaV2(tab){
     const prod = findProduct(name);
     const qty = tr.querySelector("input.qty").value || "0";
     const satuanLabel = prod ? prod.satuan : "";
+    const harga = tr.querySelector('[data-f="harga"]').textContent;
+    const diskonEl = tr.querySelector('[data-f="diskon"]');
+    const diskon = diskonEl ? diskonEl.textContent : "–";
     const hargaSatuan = tr.querySelector('[data-f="satuan"]').textContent;
     const total = tr.querySelector('[data-f="total"]').textContent;
     const imgSrc = (prod && prod.gambar) ? prod.gambar : PRODUCT_IMG_PLACEHOLDER;
     return `<div class="product-item">
-      <div class="product-number">${idx+1}</div>
-      <img class="product-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'">
-      <div class="product-info">
-        <p class="product-name">${name}</p>
-        <div class="product-price">${hargaSatuan} / ${satuanLabel}</div>
+      <div class="product-cols">
+        <div class="product-col-num"><div class="product-number">${idx+1}</div></div>
+        <div class="product-col-thumb"><img class="product-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'"></div>
+        <div class="product-col-name"><p class="product-name">${name}</p></div>
+        <div class="product-col-qty"><span class="product-val">${qty} ${satuanLabel}</span></div>
+        <div class="product-col-harga"><span class="product-val-muted">${harga}</span></div>
+        <div class="product-col-diskon"><span class="product-val-muted">${diskon}</span></div>
+        <div class="product-col-satuan"><span class="product-val">${hargaSatuan}</span></div>
+        <div class="product-col-total"><span class="product-total">${total}</span></div>
       </div>
-      <div class="product-qty">${qty} ${satuanLabel}</div>
-      <div class="product-total">${total}</div>
     </div>`;
   }).join("");
+
+  const headRow = `<div class="product-cols product-list-head">
+    <div class="product-col-num"></div>
+    <div class="product-col-thumb"></div>
+    <div class="product-col-name"><span>Produk</span></div>
+    <div class="product-col-qty"><span>Qty</span></div>
+    <div class="product-col-harga"><span>Harga</span></div>
+    <div class="product-col-diskon"><span>Diskon</span></div>
+    <div class="product-col-satuan"><span>Satuan</span></div>
+    <div class="product-col-total"><span>Total</span></div>
+  </div>`;
 
   const hari = document.getElementById("hariNow").textContent;
   const tgl = document.getElementById("tglNow").textContent;
@@ -6079,29 +6135,35 @@ function buildPrintNotaV2(tab){
   const signPrefix = isKurang ? "-" : "";
   const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#1c7a45");
 
+  const jamSekarang = new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+
   return `
     <div class="pnota2 order-summary">
+      <div class="bg-blob bg-blob-1"></div>
+      <div class="bg-blob bg-blob-2"></div>
       <div class="order-header">
-        <div class="order-logo">Rp</div>
+        <img class="order-logo-img" src="${ORDER_LOGO_IMG}" width="60" height="60" alt="">
         <h1 class="order-title">RINCIAN PEMESANAN</h1>
         <div class="order-meta">
-          <span><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v3.4M16 3v3.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${tgl}</span>
+          <span><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2" stroke="#5b6660" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v3.4M16 3v3.4" stroke="#5b6660" stroke-width="1.6" stroke-linecap="round"/></svg>${tgl}</span>
           <span class="divider"></span>
-          <span><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.3" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${hari}</span>
+          <span><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.3" stroke="#5b6660" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="#5b6660" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${jamSekarang} WIB</span>
+          <span class="divider"></span>
+          <span><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" stroke="#5b6660" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12h6M9 15.5h6" stroke="#5b6660" stroke-width="1.5" stroke-linecap="round"/></svg>–</span>
         </div>
       </div>
 
       <div class="order-section">
         <div class="section-header">
-          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8.5V7a6 6 0 0 1 12 0v1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="4" y="8.5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/></svg></div>
+          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8.5V7a6 6 0 0 1 12 0v1.5" stroke="#1c7a45" stroke-width="1.7" stroke-linecap="round"/><rect x="4" y="8.5" width="16" height="12" rx="2" stroke="#1c7a45" stroke-width="1.7"/></svg></div>
           <h2 class="section-title">PESANAN (${rows.length} ITEM)</h2>
         </div>
-        <div class="product-list">${itemsHtml}</div>
+        <div class="product-list">${headRow}${itemsHtml}</div>
       </div>
 
       <div class="order-section">
         <div class="section-header">
-          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.6" stroke="currentColor" stroke-width="1.3"/><circle cx="15.5" cy="15.5" r="1.6" stroke="currentColor" stroke-width="1.3"/></svg></div>
+          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/><circle cx="15.5" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/></svg></div>
           <h2 class="section-title">INFORMASI PENGIRIMAN</h2>
         </div>
         <div class="shipping-content">
