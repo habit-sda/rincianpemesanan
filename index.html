@@ -3438,6 +3438,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 12.7A6.5 6.5 0 1 1 11.3 6a5 5 0 0 0 6.7 6.7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
           <span>Tema</span>
         </button>
+        <button type="button" id="btn-notav2-toggle" class="theme-header-btn" aria-label="Ganti desain nota">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7.5 8h9M7.5 12h9M7.5 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span id="btn-notav2-toggle-label">Nota: Lama</span>
+        </button>
         <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-help-btn" id="home-help-btn">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/></svg>
           Bantuan
@@ -5132,6 +5136,26 @@ function getNotaDesignPref(){
 function setNotaDesignPref(val){
   try{ localStorage.setItem(NOTA_DESIGN_KEY, val === "baru" ? "baru" : "lama"); }catch(e){}
 }
+/* Tombol akses cepat di home-topbar (TIDAK butuh PIN, beda dengan toggle
+   yang sama di Master Data > Tampilan) — supaya siapa pun bisa pilih
+   desain nota sendiri, sama seperti tombol Tema. Dua tempat ini saling
+   sinkron: ubah dari salah satu, yang lain ikut update kalau lagi kebuka. */
+function refreshNotaV2Button(){
+  const btn = document.getElementById("btn-notav2-toggle-label");
+  if(btn) btn.textContent = getNotaDesignPref() === "baru" ? "Nota: Baru" : "Nota: Lama";
+  const checkbox = document.getElementById("md-toggle-notav2");
+  if(checkbox) checkbox.checked = getNotaDesignPref() === "baru";
+}
+(function(){
+  const btn = document.getElementById("btn-notav2-toggle");
+  if(!btn) return;
+  refreshNotaV2Button();
+  btn.addEventListener("click", ()=>{
+    setNotaDesignPref(getNotaDesignPref() === "baru" ? "lama" : "baru");
+    refreshNotaV2Button();
+    showMsg(getNotaDesignPref() === "baru" ? "Desain nota baru aktif di HP/browser ini." : "Kembali ke desain nota lama di HP/browser ini.");
+  });
+})();
 const THEME_KEY = "notaHalawa_theme"; // isi: "light" | "dark" | "system"
 function getThemePref(){
   // Default "light" (BUKAN "system") — supaya menyalakan saklar master
@@ -8835,6 +8859,7 @@ if ("serviceWorker" in navigator) {
     toggleNotaV2.checked = getNotaDesignPref() === "baru";
     toggleNotaV2.addEventListener("change", ()=>{
       setNotaDesignPref(toggleNotaV2.checked ? "baru" : "lama");
+      refreshNotaV2Button();
       showMsg(toggleNotaV2.checked ? "Desain nota baru aktif di HP/browser ini." : "Kembali ke desain nota lama di HP/browser ini.");
     });
   }
