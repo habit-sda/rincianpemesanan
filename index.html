@@ -5303,7 +5303,10 @@ async function pushMasterDataToServer(){
       body: JSON.stringify(body),
     });
     if(!res.ok){
-      showMsg("Gagal menyimpan ke server (perubahan tetap tersimpan di HP ini).", true);
+      const body = await res.json().catch(()=> ({}));
+      const detail = body.message || body.error || ("HTTP " + res.status);
+      console.log("Master data online gagal dikirim - detail server:", detail);
+      showMsg("Gagal menyimpan ke server: " + detail + " (perubahan tetap tersimpan di HP ini).", true);
       return false;
     }else{
       window.__lastServerSnapshot = JSON.parse(JSON.stringify({ products: PRODUCTS, ekspedisi: EKSPEDISI, settings: settingsToSend }));
@@ -6599,7 +6602,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         }),
       });
       const body = await res.json().catch(()=>({}));
-      if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
+      if(!res.ok || !body.ok) throw new Error(body.message || body.error || ("HTTP " + res.status));
 
       statusEl.textContent = "Berhasil dikirim ke grup Telegram.";
       statusEl.style.color = "var(--primary-green)";
@@ -9020,7 +9023,7 @@ if ("serviceWorker" in navigator) {
       try{
         const res = await fetch(MASTER_DATA_WORKER_URL + "/ai-quota-status", { headers: workerHeaders() });
         const data = await res.json();
-        if(!res.ok || data.error) throw new Error(data.error || "Gagal ambil data.");
+        if(!res.ok || data.error) throw new Error(data.message || data.error || "Gagal ambil data.");
 
         const rows = data.groq.map(g=>
           g.budgetTokens==null ? cooldownBadgeRow(g.label, g.cooldown) : barRow(g.label, g.usedTokens, g.budgetTokens, g.percent)
