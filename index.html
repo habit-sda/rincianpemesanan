@@ -985,7 +985,7 @@
     .wiz-sumcard{background:#f1f3f4;border-radius:14px;padding:6px 16px;margin:12px 0;}
     .wiz-sumcard .wiz-revrow{
       display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--ink-soft);
-      padding:12px 0;border-bottom:1px solid #e3e5e6;
+      padding:12px 0;border-bottom:1px solid var(--habit-border);
     }
     .wiz-sumcard .wiz-revrow:last-child{border-bottom:none;}
     .wiz-sumcard .wiz-revrow-icon{
@@ -1581,7 +1581,7 @@
     min-height: 34px;
     padding: 6px 0;
 
-    border-bottom: 1px solid #edf0ee;
+    border-bottom: 1px solid var(--habit-border);
 
     font-size: 12.5px;
   }
@@ -2206,9 +2206,9 @@
 
     background: #fff;
 
-    border-bottom: 1px solid #edf0ee;
+    border-bottom: 1px solid var(--habit-border);
 
-    border-right: 1px solid #edf0ee;
+    border-right: 1px solid var(--habit-border);
 
     font-family: 'Roboto Mono', monospace;
 
@@ -2283,7 +2283,7 @@
 
     border: 0;
 
-    border-bottom: 1px solid #edf0ee;
+    border-bottom: 1px solid var(--habit-border);
 
     color: var(--habit-ink);
 
@@ -2312,7 +2312,7 @@
 
     padding: 0 11px;
 
-    border: 1px solid #dce2df;
+    border: 1px solid var(--habit-border);
 
     border-radius: 9px;
 
@@ -2364,7 +2364,7 @@
 
     border-radius: 9px;
 
-    border-color: #dce2df;
+    border-color: var(--habit-border);
   }
 
   .combo-list {
@@ -2382,7 +2382,7 @@
   .combo-item {
     padding: 12px 14px;
 
-    border-bottom: 1px solid #edf0ee;
+    border-bottom: 1px solid var(--habit-border);
 
     font-size: 13px;
   }
@@ -2448,7 +2448,7 @@
 
     padding: 7px 0;
 
-    border-bottom: 1px solid #edf0ee;
+    border-bottom: 1px solid var(--habit-border);
 
     font-size: 12.5px;
   }
@@ -2559,7 +2559,7 @@
 
     padding: 11px 14px;
 
-    border: 1px solid #dcefe6;
+    border: 1px solid var(--habit-border);
 
     border-left: 3px solid var(--habit-green);
 
@@ -2996,6 +2996,10 @@ html[data-theme="dark"]{
   --white-ish: #1c2125;
   --habit-ink: #eef1f3;
   --habit-muted: #a7b0b8;
+  --habit-border: #2d3338;
+  --habit-bg: #0e1113;
+  --habit-card: #1c2125;
+  --habit-red-soft: #3a2020;
   --wiz-tint: #16241c;
   --wiz-form-bg: #171f1a;
   --wiz-form-border: #274031;
@@ -3076,6 +3080,75 @@ html[data-theme="dark"] .wiz-inline-form-btns,
 html[data-theme="dark"] .wiz-confirmed-actions{ background: var(--wiz-form-bg); }
 html[data-theme="dark"] ::-webkit-scrollbar-thumb{ background: #3a4147; }
 html[data-theme="dark"] .toast{ background: #2a3036; color: var(--ink); }
+
+/* =========================================================
+   MODE GELAP — putaran 2 (audit detail): puluhan background
+   putih/terang hardcode yang kelewat di putaran pertama. Semua
+   ditimpa pakai var(--card)/var(--paper-dark) yang sama supaya
+   konsisten satu sama lain, bukan warna gelap baru yang beda-beda.
+   Elemen "foto placeholder" (wiz-preview-img dkk, warna krem
+   #f5ede1) SENGAJA dibiarkan — itu ilustrasi produk, bukan
+   permukaan UI, tetap oke tampil di tema apa pun.
+   ========================================================= */
+html[data-theme="dark"] .wrap,
+html[data-theme="dark"] footer,
+html[data-theme="dark"] table,
+html[data-theme="dark"] .tab-btn,
+html[data-theme="dark"] .action-btn,
+html[data-theme="dark"] .home-help-btn,
+html[data-theme="dark"] .home-actionrow,
+html[data-theme="dark"] .wiz-dots,
+html[data-theme="dark"] .wiz-stepper-btn,
+html[data-theme="dark"] .wiz-summary-card,
+html[data-theme="dark"] .wiz-reset-proxy,
+html[data-theme="dark"] .wiz-steps-col .wiz-step,
+html[data-theme="dark"] .calc-key,
+html[data-theme="dark"] .calc-head,
+html[data-theme="dark"] .diskon-fmt,
+html[data-theme="dark"] .combo-list,
+html[data-theme="dark"] .region-item,
+html[data-theme="dark"] details.region summary,
+html[data-theme="dark"] .md-modal-secondary,
+html[data-theme="dark"] select,
+html[data-theme="dark"] input[type="number"],
+html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="date"]{
+  background: var(--card);
+  color: var(--ink);
+  border-color: var(--line);
+}
+html[data-theme="dark"] .wiz-preview-strip,
+html[data-theme="dark"] .wiz-sumcard{ background: var(--paper-dark); }
+html[data-theme="dark"] .wiz-preview-strip.filled,
+html[data-theme="dark"] .home-actionrow:active,
+html[data-theme="dark"] tbody tr:nth-child(even) td,
+html[data-theme="dark"] tbody tr:hover td{ background: var(--card); }
+html[data-theme="dark"] thead th{ background: var(--paper-dark); color: var(--ink); }
+/* Badge/indikator merah muda (peringatan) — dulu dasarnya merah muda
+   TERANG, di dark mode diganti merah gelap yang senada supaya teksnya
+   (var(--danger-red)) tetap kebaca kontras. */
+html[data-theme="dark"] .reset-btn:hover,
+html[data-theme="dark"] .calc-clearbtn,
+html[data-theme="dark"] .ongkir-indicator-red.is-filled,
+html[data-theme="dark"] .wiz-stamp,
+html[data-theme="dark"] .md-quota-badge.cooldown{
+  background: #3a2020;
+}
+html[data-theme="dark"] .combo-item:hover,
+html[data-theme="dark"] .combo-item.active{ background: var(--wiz-badge-est-bg); }
+html[data-theme="dark"] .combo-item{ border-bottom-color: var(--line); }
+/* Border pink/merah muda terang (danger accent) -> merah gelap senada,
+   supaya kontras di atas latar gelap (bukan pink neon menyala). */
+html[data-theme="dark"] .reset-btn:hover,
+html[data-theme="dark"] .home-actionrow.reset,
+html[data-theme="dark"] .wiz-btn-ghost.danger,
+html[data-theme="dark"] .wiz-pcard-trash,
+html[data-theme="dark"] .wiz-stamp,
+html[data-theme="dark"] .md-btn.danger,
+html[data-theme="dark"] .wiz-reset-proxy,
+html[data-theme="dark"] .wiz-reset-proxy:hover{
+  border-color: #6b3232;
+}
 </style>
 </head>
 <body>
