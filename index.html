@@ -3782,6 +3782,33 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div id="md-ekspedisi-list"></div>
         <button class="md-addrow" id="md-ekspedisi-add">+ Tambah ekspedisi</button>
       </div>
+      <div class="md-card md-pinform">
+        <h3>Ambang cross-check resi vs ongkir</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Saat foto resi masuk ke grup resi Telegram (atau dicek lewat <code>/ongkir</code>/<code>/resi</code> di DM),
+          bot membandingkan Grand Total Rincian Pemesanan terakhir customer itu dengan nominal resi ekspedisi yang sama.
+          Kalau selisihnya melewati persentase di bawah ini, bot memberi reaksi 👀 di foto resi tsb (👍 kalau masih wajar) —
+          sekedar indikator, tidak pernah mengubah/memblokir apa pun.
+        </div>
+        <label>Selisih dianggap perlu dicek kalau lebih dari (%)</label>
+        <input type="number" inputmode="numeric" id="md-resi-threshold" min="1" max="100" style="max-width:140px;">
+        <div class="md-pin-err" id="md-resi-threshold-err"></div>
+        <button class="md-btn primary" id="md-resi-threshold-save">Simpan ambang</button>
+      </div>
+      <div class="md-card">
+        <h3>Reaksi cross-check resi vs ongkir</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 10h.01M15 10h.01" stroke="var(--primary-green)" stroke-width="1.8" stroke-linecap="round"/><path d="M8 15c1.2 1 2.6 1.5 4 1.5s2.8-.5 4-1.5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="8.5" stroke="var(--primary-green)" stroke-width="1.6"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Aktifkan reaksi otomatis di foto resi</div>
+            <div class="md-togglerow-sub">Aktif = tiap foto resi yang masuk grup resi (dan sudah ketahuan nama customernya) otomatis dapat reaksi 👍/👀/🤔 sesuai hasil cross-check di atas. Nonaktif = bot balik ke perilaku lama, murni mencatat riwayat tanpa reaksi sama sekali — catatan riwayat resi & cross-check on-demand lewat <code>/ongkir</code>/<code>/resi</code> di DM tetap jalan seperti biasa.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-resireaction">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
     </div>
 
     <div class="md-section" id="md-sec-hapus">
@@ -4916,7 +4943,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[]};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -4941,6 +4968,8 @@ function loadSettings(){
     }
     if(s.stickerCollapsedLabelStyle === "text" || s.stickerCollapsedLabelStyle === "icon") SETTINGS.stickerCollapsedLabelStyle = s.stickerCollapsedLabelStyle;
     if(Array.isArray(s.financeList)) SETTINGS.financeList = s.financeList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
+    if(typeof s.resiCrossCheckThresholdPercent === "number" && s.resiCrossCheckThresholdPercent > 0) SETTINGS.resiCrossCheckThresholdPercent = s.resiCrossCheckThresholdPercent;
+    if(typeof s.resiCrossCheckReactionEnabled === "boolean") SETTINGS.resiCrossCheckReactionEnabled = s.resiCrossCheckReactionEnabled;
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
 function saveSettings(){
@@ -8801,6 +8830,27 @@ if ("serviceWorker" in navigator) {
     saveSettings();
     calc("penjualan"); calc("custom");
     await confirmMasterDataSave("Batas tier disimpan — perhitungan sudah diperbarui.");
+  });
+
+  /* ---------- ambang cross-check resi vs ongkir (Ekspedisi) ---------- */
+  const resiThresholdInput = document.getElementById("md-resi-threshold");
+  const resiThresholdErr = document.getElementById("md-resi-threshold-err");
+  resiThresholdInput.value = SETTINGS.resiCrossCheckThresholdPercent;
+  document.getElementById("md-resi-threshold-save").addEventListener("click", async ()=>{
+    const pct = parseInt(resiThresholdInput.value, 10);
+    resiThresholdErr.textContent = "";
+    if(!pct || pct < 1 || pct > 100){ resiThresholdErr.textContent = "Ambang harus angka antara 1–100."; return; }
+    SETTINGS.resiCrossCheckThresholdPercent = pct;
+    saveSettings();
+    await confirmMasterDataSave("Ambang cross-check resi disimpan (" + pct + "%).");
+  });
+
+  const toggleResiReaction = document.getElementById("md-toggle-resireaction");
+  toggleResiReaction.checked = SETTINGS.resiCrossCheckReactionEnabled;
+  toggleResiReaction.addEventListener("change", async ()=>{
+    SETTINGS.resiCrossCheckReactionEnabled = toggleResiReaction.checked;
+    saveSettings();
+    await confirmMasterDataSave(SETTINGS.resiCrossCheckReactionEnabled ? "Reaksi otomatis di foto resi diaktifkan." : "Reaksi otomatis di foto resi dinonaktifkan.");
   });
 
   /* ---------- buka/tutup ---------- */
