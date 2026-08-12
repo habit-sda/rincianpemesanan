@@ -522,6 +522,90 @@
   .pnota-payline.pnota-status .l{font-weight:800;}
   .pnota-payline.pnota-status .v{font-weight:800;font-size:27px;}
 
+  /* ===== template nota BARU (desain kartu hijau) — dipilih lewat
+     toggle "Desain Nota Baru" di Master Data > Tampilan, per HP/browser.
+     Dipakai bareng oleh unduh, salin, DAN kirim-ke-Telegram (renderCanvas
+     satu-satunya sumber, lihat function renderCanvas()). ===== */
+  .pnota2{
+    width:880px;height:auto;background:#ffffff;color:#1a1a1a;font-family:'Roboto',sans-serif;
+    padding:38px 34px 34px;
+    background-image:
+      radial-gradient(circle at 6% -4%, #e3f4e7 0%, rgba(227,244,231,0) 42%),
+      radial-gradient(circle at 100% 4%, #e3f4e7 0%, rgba(227,244,231,0) 38%);
+  }
+  .pnota2 .order-header{ text-align:center; margin-bottom:28px; }
+  .pnota2 .order-logo{
+    width:88px;height:88px;border-radius:50%;margin:0 auto 14px;
+    display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 35% 30%, #2fa860, #1c7a45 70%);
+    border:5px solid #eaf6ee;box-shadow:0 0 0 1.5px #bfe3c9;
+    color:#ffffff;font-size:34px;font-weight:800;letter-spacing:-.02em;
+  }
+  .pnota2 .order-title{
+    font-size:27px;font-weight:800;color:#155a34;letter-spacing:.04em;margin:0 0 10px;
+  }
+  .pnota2 .order-meta{
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    font-size:15px;color:#5b6660;
+  }
+  .pnota2 .order-meta span{display:inline-flex;align-items:center;gap:6px;}
+  .pnota2 .order-meta svg{width:15px;height:15px;flex-shrink:0;color:#5b6660;}
+  .pnota2 .order-meta .divider{width:1px;height:14px;background:#c9d2cc;}
+  .pnota2 .order-section{
+    background:#ffffff;border:1px solid #e2e8e2;border-radius:16px;
+    padding:20px 22px;margin-bottom:16px;
+    box-shadow:0 1px 4px rgba(20,60,35,.05);
+  }
+  .pnota2 .section-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .pnota2 .section-icon{
+    width:32px;height:32px;border-radius:10px;background:#e6f6ea;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .pnota2 .section-icon svg{width:17px;height:17px;color:#1c7a45;}
+  .pnota2 .section-title{
+    font-size:14.5px;font-weight:800;color:#1c7a45;letter-spacing:.05em;margin:0;
+  }
+  .pnota2 .product-list{display:flex;flex-direction:column;}
+  .pnota2 .product-item{
+    display:grid;grid-template-columns:26px 52px 1fr auto auto;align-items:center;gap:14px;
+    padding:13px 0;border-bottom:1px solid #edf1ee;
+  }
+  .pnota2 .product-item:last-child{border-bottom:none;padding-bottom:0;}
+  .pnota2 .product-item:first-child{padding-top:0;}
+  .pnota2 .product-number{
+    width:24px;height:24px;border-radius:50%;background:#1c7a45;color:#fff;
+    font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  }
+  .pnota2 .product-thumb{
+    width:52px;height:52px;border-radius:11px;object-fit:cover;background:#f2f6f2;border:1px solid #e6ebe6;
+  }
+  .pnota2 .product-info{ min-width:0; }
+  .pnota2 .product-name{font-size:15px;font-weight:700;color:#1a1a1a;margin:0 0 3px;}
+  .pnota2 .product-price{font-size:12.5px;color:#7a8580;}
+  .pnota2 .product-qty{font-size:14px;color:#3d453f;white-space:nowrap;text-align:right;}
+  .pnota2 .product-total{font-size:15px;font-weight:800;color:#1c7a45;white-space:nowrap;text-align:right;}
+  .pnota2 .shipping-content{display:flex;}
+  .pnota2 .shipping-item{flex:1;text-align:center;padding:0 8px;}
+  .pnota2 .shipping-item + .shipping-item{border-left:1px solid #edf1ee;}
+  .pnota2 .shipping-label{display:block;font-size:12px;color:#7a8580;margin-bottom:6px;}
+  .pnota2 .shipping-value{display:block;font-size:16px;font-weight:800;color:#1a1a1a;}
+  .pnota2 .cost-summary{display:flex;flex-direction:column;gap:9px;}
+  .pnota2 .cost-row{display:flex;justify-content:space-between;font-size:15px;}
+  .pnota2 .cost-label{color:#5b6660;}
+  .pnota2 .cost-value{font-weight:700;color:#1a1a1a;font-variant-numeric:tabular-nums;}
+  .pnota2 .grand-total{
+    display:flex;justify-content:space-between;align-items:center;
+    background:#e6f6ea;border:1.5px solid #bfe3c9;border-radius:16px;padding:22px 24px;margin-bottom:0;
+  }
+  .pnota2 .grand-total-label{font-size:14.5px;font-weight:800;color:#1c7a45;letter-spacing:.05em;}
+  .pnota2 .grand-total-value{font-size:26px;font-weight:800;color:#124a2c;font-variant-numeric:tabular-nums;}
+  .pnota2 .pay-status{
+    display:flex;justify-content:space-between;align-items:center;
+    background:#ffffff;border:1px solid #e2e8e2;border-radius:16px;padding:16px 22px;margin-top:16px;
+  }
+  .pnota2 .pay-status .l{font-size:14px;font-weight:800;}
+  .pnota2 .pay-status .v{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;}
+
   /* ===== responsive: HP / layar sempit =====
      Kondisi kedua (max-height + landscape + pointer:coarse) supaya HP yang
      diputar landscape (lebar >600px tapi tinggi pendek) TETAP dianggap
@@ -3849,6 +3933,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
       </div>
       <div class="md-card">
+        <h3>Desain Nota Rincian Pemesanan</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M7.5 8h9M7.5 12h9M7.5 16h5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Pakai desain nota baru (kartu hijau)</div>
+            <div class="md-togglerow-sub">Berlaku untuk unduh, salin, dan kirim ke grup Telegram — semuanya pakai gambar produk dari Master Data. Nonaktif = balik ke desain nota lama (tabel). Pengaturan ini cuma berlaku di HP/browser ini, tidak disamakan ke semua orang — tiap orang bisa pilih sendiri.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-notav2">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card">
         <h3>Tema Warna "Custom"</h3>
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="#1976d2" stroke-width="1.6"/><path d="M9 12l2 2 4-4" stroke="#1976d2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -5022,6 +5120,18 @@ function applySettingsToDom(){
    dipanggil di bawah — applySettingsToDom() sendiri manggil
    applyTheme(), jadi kalau urutannya kebalik, THEME_KEY (const) belum
    sempat ke-assign pas dibutuhkan (ReferenceError: temporal dead zone). */
+/* Pilihan desain nota (lama/baru) — SENGAJA disimpan LOKAL per HP/browser
+   (localStorage), sama seperti THEME_KEY di bawah ini — BUKAN lewat
+   SETTINGS/master-data yang disamakan ke semua orang. Default "lama"
+   supaya tidak ada yang berubah untuk siapa pun sampai mereka aktifkan
+   sendiri lewat toggle di Master Data > Tampilan. */
+const NOTA_DESIGN_KEY = "notaHalawa_desain_nota"; // isi: "lama" | "baru"
+function getNotaDesignPref(){
+  try{ return localStorage.getItem(NOTA_DESIGN_KEY) === "baru" ? "baru" : "lama"; }catch(e){ return "lama"; }
+}
+function setNotaDesignPref(val){
+  try{ localStorage.setItem(NOTA_DESIGN_KEY, val === "baru" ? "baru" : "lama"); }catch(e){}
+}
 const THEME_KEY = "notaHalawa_theme"; // isi: "light" | "dark" | "system"
 function getThemePref(){
   // Default "light" (BUKAN "system") — supaya menyalakan saklar master
@@ -5107,7 +5217,7 @@ const MASTER_DATA_WORKER_URL = "https://raspy-limit-ba21.rincian-pemesanan.worke
 // CATATAN: karena file ini statis & dibuka langsung di browser, nilai
 // ini tetap terlihat siapa saja yang buka "View Page Source" — ini
 // menutup akses acak/asal ketemu URL, BUKAN pengganti login sungguhan.
-const APP_SECRET = "281207767041cf19440c0b849f4d5027";
+const APP_SECRET = "GANTI_DENGAN_SECRET_YANG_SAMA_DENGAN_WORKER";
 // Helper: gabungkan header X-App-Secret ke setiap request ke worker,
 // supaya tidak perlu diketik ulang manual di tiap fetch().
 function workerHeaders(extra){
@@ -5890,12 +6000,120 @@ function buildPrintNota(tab){
   `;
 }
 
+/* ============ export gambar — TEMPLATE BARU (kartu hijau) ============
+   Sumber data SAMA PERSIS dengan buildPrintNota (dibaca dari DOM tabel
+   yang sedang aktif) — cuma tampilannya beda. Gambar produk diambil dari
+   findProduct(name).gambar (Link Gambar di Master Data), fallback ke
+   PRODUCT_IMG_PLACEHOLDER kalau belum diisi — sama seperti kartu produk
+   di tempat lain di app ini. */
+function buildPrintNotaV2(tab){
+  const pfx = tab==="penjualan" ? "pj" : "cs";
+  const tbody = document.getElementById(tab==="penjualan" ? "rows-penjualan" : "rows-custom");
+  const rows = [...tbody.querySelectorAll("tr")].filter(tr=>{
+    const sel = tr.querySelector("select.prod");
+    return sel && sel.value !== "";
+  });
+
+  const itemsHtml = rows.map((tr,idx)=>{
+    const name = tr.querySelector("select.prod").value;
+    const prod = findProduct(name);
+    const qty = tr.querySelector("input.qty").value || "0";
+    const satuanLabel = prod ? prod.satuan : "";
+    const hargaSatuan = tr.querySelector('[data-f="satuan"]').textContent;
+    const total = tr.querySelector('[data-f="total"]').textContent;
+    const imgSrc = (prod && prod.gambar) ? prod.gambar : PRODUCT_IMG_PLACEHOLDER;
+    return `<div class="product-item">
+      <div class="product-number">${idx+1}</div>
+      <img class="product-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'">
+      <div class="product-info">
+        <p class="product-name">${name}</p>
+        <div class="product-price">${hargaSatuan} / ${satuanLabel}</div>
+      </div>
+      <div class="product-qty">${qty} ${satuanLabel}</div>
+      <div class="product-total">${total}</div>
+    </div>`;
+  }).join("");
+
+  const hari = document.getElementById("hariNow").textContent;
+  const tgl = document.getElementById("tglNow").textContent;
+  const ekspedisi = document.getElementById(pfx+"-ekspedisi").value || "–";
+  const totalqty = document.getElementById(pfx+"-totalqty").textContent;
+  const totalberat = document.getElementById(pfx+"-totalberat").textContent;
+  const subtotal = document.getElementById(pfx+"-subtotal").textContent;
+  const ongkir = document.getElementById(pfx+"-ongkir").textContent.replace(/\s*\(manual\)\s*$/i, "");
+  const diskonongkir = tab==="penjualan"
+    ? document.getElementById("pj-diskonongkir").textContent
+    : (document.getElementById("cs-diskonongkir").value ? rupiah(parseRp(document.getElementById("cs-diskonongkir").value)) : "Rp 0");
+  const grandtotal = document.getElementById(pfx+"-grandtotal").textContent;
+
+  const kelebihan = parseRp(document.getElementById(pfx+"-kelebihan").value);
+  const kelebihanFmt = rupiah(kelebihan);
+  const statusLabel = document.getElementById(pfx+"-statuslabel").textContent;
+  const selisihFmt = document.getElementById(pfx+"-selisih").textContent;
+  const isKurang = statusLabel === "Kurang bayar";
+  const isKembalian = statusLabel === "Kembalian";
+  const signPrefix = isKurang ? "-" : "";
+  const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#1c7a45");
+
+  return `
+    <div class="pnota2 order-summary">
+      <div class="order-header">
+        <div class="order-logo">Rp</div>
+        <h1 class="order-title">RINCIAN PEMESANAN</h1>
+        <div class="order-meta">
+          <span><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v3.4M16 3v3.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${tgl}</span>
+          <span class="divider"></span>
+          <span><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.3" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${hari}</span>
+        </div>
+      </div>
+
+      <div class="order-section">
+        <div class="section-header">
+          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8.5V7a6 6 0 0 1 12 0v1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="4" y="8.5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/></svg></div>
+          <h2 class="section-title">PESANAN (${rows.length} ITEM)</h2>
+        </div>
+        <div class="product-list">${itemsHtml}</div>
+      </div>
+
+      <div class="order-section">
+        <div class="section-header">
+          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.6" stroke="currentColor" stroke-width="1.3"/><circle cx="15.5" cy="15.5" r="1.6" stroke="currentColor" stroke-width="1.3"/></svg></div>
+          <h2 class="section-title">INFORMASI PENGIRIMAN</h2>
+        </div>
+        <div class="shipping-content">
+          <div class="shipping-item"><span class="shipping-label">Total produk</span><strong class="shipping-value">${totalqty}</strong></div>
+          <div class="shipping-item"><span class="shipping-label">Total berat</span><strong class="shipping-value">${totalberat}</strong></div>
+          <div class="shipping-item"><span class="shipping-label">Ekspedisi</span><strong class="shipping-value">${ekspedisi}</strong></div>
+        </div>
+      </div>
+
+      <div class="order-section">
+        <div class="cost-summary">
+          <div class="cost-row"><span class="cost-label">Subtotal produk</span><strong class="cost-value">${subtotal}</strong></div>
+          <div class="cost-row"><span class="cost-label">Ongkir</span><strong class="cost-value">${ongkir}</strong></div>
+          <div class="cost-row"><span class="cost-label">Diskon ongkir</span><strong class="cost-value">${diskonongkir}</strong></div>
+        </div>
+      </div>
+
+      <div class="grand-total">
+        <span class="grand-total-label">TOTAL PEMBAYARAN</span>
+        <strong class="grand-total-value">${grandtotal}</strong>
+      </div>
+      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div class="pay-status" style="flex-direction:column;align-items:stretch;gap:10px;">
+        ${kelebihan!==0 ? `<div class="cost-row"><span class="cost-label">Kelebihan bayar sebelumnya</span><strong class="cost-value">${kelebihanFmt}</strong></div>` : ``}
+        <div class="cost-row"><span class="l" style="color:${statusColor}">${statusLabel}</span><span class="v" style="color:${statusColor}">${signPrefix}${selisihFmt}</span></div>
+      </div>` : ``}
+    </div>
+  `;
+}
+
 async function renderCanvas(){
   const tab = document.querySelector(".tab-btn.active").dataset.tab;
   const holder = document.getElementById("print-holder");
-  holder.innerHTML = buildPrintNota(tab);
+  const useV2 = getNotaDesignPref() === "baru";
+  holder.innerHTML = useV2 ? buildPrintNotaV2(tab) : buildPrintNota(tab);
   await new Promise(r=>setTimeout(r, 50)); // beri waktu render/layout
-  const target = holder.querySelector(".pnota");
+  const target = holder.querySelector(useV2 ? ".pnota2" : ".pnota");
   const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:1, useCORS:true});
   holder.innerHTML = "";
   return canvas;
@@ -8605,6 +8823,19 @@ if ("serviceWorker" in navigator) {
       saveSettings();
       applySettingsToDom();
       await confirmMasterDataSave(SETTINGS.darkModeFeatureEnabled ? "Mode Gelap diaktifkan — tombol pengaturannya muncul di pojok kanan atas." : "Mode Gelap dinonaktifkan, app kembali terang untuk semua.");
+    });
+  }
+
+  /* ---------- toggle Desain Nota Baru (Tampilan) ----------
+     MURNI LOKAL (localStorage per HP/browser) — beda dengan toggle lain
+     di tab ini yang disamakan ke semua orang lewat confirmMasterDataSave.
+     Makanya di sini TIDAK ada panggilan ke server sama sekali. */
+  const toggleNotaV2 = document.getElementById("md-toggle-notav2");
+  if(toggleNotaV2){
+    toggleNotaV2.checked = getNotaDesignPref() === "baru";
+    toggleNotaV2.addEventListener("change", ()=>{
+      setNotaDesignPref(toggleNotaV2.checked ? "baru" : "lama");
+      showMsg(toggleNotaV2.checked ? "Desain nota baru aktif di HP/browser ini." : "Kembali ke desain nota lama di HP/browser ini.");
     });
   }
 
