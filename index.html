@@ -1147,6 +1147,20 @@
     .wiz-totalcard .v{font-weight:800;font-size:19px;color:var(--primary-green);font-family:'Roboto Mono',monospace;}
     .wiz-copyable{cursor:pointer;border-bottom:1.5px dotted var(--primary-green);padding-bottom:1px;}
     .wiz-copyable:active{opacity:.6;}
+    .wiz-notatoggle{
+      background:var(--wiz-tint);border-radius:14px;padding:12px 14px;
+      display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;
+    }
+    .wiz-notatoggle-label{font-weight:700;font-size:13px;color:var(--ink);}
+    .wiz-notatoggle-sub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+    .wiz-notatoggle-seg{
+      display:flex;background:var(--card);border-radius:10px;padding:3px;flex-shrink:0;border:1px solid var(--line);
+    }
+    .wiz-notatoggle-btn{
+      border:none;background:transparent;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;
+      color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;
+    }
+    .wiz-notatoggle-btn.active{background:var(--primary-green);color:#fff;}
     .wiz-stamp{
       background:#fdece9;border:1px solid #f3b7ac;color:var(--danger-red);border-radius:10px;
       padding:10px 12px;font-size:12.5px;font-weight:700;text-align:center;margin-bottom:16px;
@@ -3457,10 +3471,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 12.7A6.5 6.5 0 1 1 11.3 6a5 5 0 0 0 6.7 6.7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
           <span>Tema</span>
         </button>
-        <button type="button" id="btn-notav2-toggle" class="theme-header-btn" aria-label="Ganti desain nota">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7.5 8h9M7.5 12h9M7.5 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          <span id="btn-notav2-toggle-label">Nota: Lama</span>
-        </button>
         <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-help-btn" id="home-help-btn">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/></svg>
           Bantuan
@@ -3951,20 +3961,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           </div>
           <label class="md-switch">
             <input type="checkbox" id="md-toggle-darkmode">
-            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
-          </label>
-        </div>
-      </div>
-      <div class="md-card">
-        <h3>Desain Nota Rincian Pemesanan</h3>
-        <div class="md-togglerow">
-          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M7.5 8h9M7.5 12h9M7.5 16h5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-          <div class="md-togglerow-text">
-            <div class="md-togglerow-label">Pakai desain nota baru (kartu hijau)</div>
-            <div class="md-togglerow-sub">Berlaku untuk unduh, salin, dan kirim ke grup Telegram — semuanya pakai gambar produk dari Master Data. Nonaktif = balik ke desain nota lama (tabel). Pengaturan ini cuma berlaku di HP/browser ini, tidak disamakan ke semua orang — tiap orang bisa pilih sendiri.</div>
-          </div>
-          <label class="md-switch">
-            <input type="checkbox" id="md-toggle-notav2">
             <span class="md-switch-track"><span class="md-switch-knob"></span></span>
           </label>
         </div>
@@ -5155,26 +5151,6 @@ function getNotaDesignPref(){
 function setNotaDesignPref(val){
   try{ localStorage.setItem(NOTA_DESIGN_KEY, val === "baru" ? "baru" : "lama"); }catch(e){}
 }
-/* Tombol akses cepat di home-topbar (TIDAK butuh PIN, beda dengan toggle
-   yang sama di Master Data > Tampilan) — supaya siapa pun bisa pilih
-   desain nota sendiri, sama seperti tombol Tema. Dua tempat ini saling
-   sinkron: ubah dari salah satu, yang lain ikut update kalau lagi kebuka. */
-function refreshNotaV2Button(){
-  const btn = document.getElementById("btn-notav2-toggle-label");
-  if(btn) btn.textContent = getNotaDesignPref() === "baru" ? "Nota: Baru" : "Nota: Lama";
-  const checkbox = document.getElementById("md-toggle-notav2");
-  if(checkbox) checkbox.checked = getNotaDesignPref() === "baru";
-}
-(function(){
-  const btn = document.getElementById("btn-notav2-toggle");
-  if(!btn) return;
-  refreshNotaV2Button();
-  btn.addEventListener("click", ()=>{
-    setNotaDesignPref(getNotaDesignPref() === "baru" ? "lama" : "baru");
-    refreshNotaV2Button();
-    showMsg(getNotaDesignPref() === "baru" ? "Desain nota baru aktif di HP/browser ini." : "Kembali ke desain nota lama di HP/browser ini.");
-  });
-})();
 const THEME_KEY = "notaHalawa_theme"; // isi: "light" | "dark" | "system"
 function getThemePref(){
   // Default "light" (BUKAN "system") — supaya menyalakan saklar master
@@ -8582,6 +8558,16 @@ if ("serviceWorker" in navigator) {
         <div class="wiz-revrow"><span class="wiz-revrow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 12a8 8 0 1 1-8-8" stroke="var(--primary-green)" stroke-width="1.4" stroke-linecap="round"/><path d="M12 4v4l3-1" stroke="var(--primary-green)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Diskon Ongkir</span><span>${sheet==="penjualan" ? document.getElementById("pj-diskonongkir").textContent : (document.getElementById("cs-diskonongkir").value ? rupiah(parseRp(document.getElementById("cs-diskonongkir").value)) : "Rp 0")}</span></div>
       </div>
       <div class="wiz-totalcard"><span class="l">Grand total</span><span class="v wiz-copyable" id="wr-grandtotal-${sheet}" title="Ketuk untuk salin angka">${document.getElementById(pfx+"-grandtotal").textContent}</span></div>
+      <div class="wiz-notatoggle">
+        <div>
+          <div class="wiz-notatoggle-label">Desain nota</div>
+          <div class="wiz-notatoggle-sub">Berlaku untuk Unduh, Bagikan &amp; Salin</div>
+        </div>
+        <div class="wiz-notatoggle-seg" role="group" aria-label="Pilih desain nota">
+          <button type="button" class="wiz-notatoggle-btn" data-nota-choice="lama" id="wr-nota-lama-${sheet}">Lama</button>
+          <button type="button" class="wiz-notatoggle-btn" data-nota-choice="baru" id="wr-nota-baru-${sheet}">Baru</button>
+        </div>
+      </div>
       <div class="wiz-cta-bar">
         <div class="wiz-actionbtns">
           <button class="primary" id="wr-download-${sheet}">⬇ Unduh</button>
@@ -8604,6 +8590,21 @@ if ("serviceWorker" in navigator) {
       const rawDigits = e.currentTarget.textContent.replace(/[^0-9]/g, "");
       copyPlainNumber(rawDigits, "Grand total");
     });
+    /* ---------- toggle desain nota (Lama/Baru) — MURNI LOKAL per HP/browser
+       (localStorage, lihat getNotaDesignPref/setNotaDesignPref), sama seperti
+       preferensi tema. Ditaruh di sini (bukan Master Data) karena inilah
+       layar tempat keputusan itu langsung berdampak — pas sebelum tombol
+       Unduh/Bagikan/Salin. ---------- */
+    const btnNotaLama = document.getElementById("wr-nota-lama-"+sheet);
+    const btnNotaBaru = document.getElementById("wr-nota-baru-"+sheet);
+    function refreshNotaToggleUI(){
+      const active = getNotaDesignPref();
+      if(btnNotaLama) btnNotaLama.classList.toggle("active", active === "lama");
+      if(btnNotaBaru) btnNotaBaru.classList.toggle("active", active === "baru");
+    }
+    refreshNotaToggleUI();
+    if(btnNotaLama) btnNotaLama.addEventListener("click", ()=>{ setNotaDesignPref("lama"); refreshNotaToggleUI(); });
+    if(btnNotaBaru) btnNotaBaru.addEventListener("click", ()=>{ setNotaDesignPref("baru"); refreshNotaToggleUI(); });
     document.getElementById("wr-back-"+sheet).addEventListener("click", ()=> wizGo(sheet, "ship"));
     const resetBtnReview = document.getElementById("wr-reset-"+sheet);
     if(resetBtnReview) resetBtnReview.addEventListener("click", ()=>{
@@ -8909,20 +8910,6 @@ if ("serviceWorker" in navigator) {
       saveSettings();
       applySettingsToDom();
       await confirmMasterDataSave(SETTINGS.darkModeFeatureEnabled ? "Mode Gelap diaktifkan — tombol pengaturannya muncul di pojok kanan atas." : "Mode Gelap dinonaktifkan, app kembali terang untuk semua.");
-    });
-  }
-
-  /* ---------- toggle Desain Nota Baru (Tampilan) ----------
-     MURNI LOKAL (localStorage per HP/browser) — beda dengan toggle lain
-     di tab ini yang disamakan ke semua orang lewat confirmMasterDataSave.
-     Makanya di sini TIDAK ada panggilan ke server sama sekali. */
-  const toggleNotaV2 = document.getElementById("md-toggle-notav2");
-  if(toggleNotaV2){
-    toggleNotaV2.checked = getNotaDesignPref() === "baru";
-    toggleNotaV2.addEventListener("change", ()=>{
-      setNotaDesignPref(toggleNotaV2.checked ? "baru" : "lama");
-      refreshNotaV2Button();
-      showMsg(toggleNotaV2.checked ? "Desain nota baru aktif di HP/browser ini." : "Kembali ke desain nota lama di HP/browser ini.");
     });
   }
 
