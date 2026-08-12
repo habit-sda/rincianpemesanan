@@ -5101,11 +5101,23 @@ if(window.matchMedia){
    (offline fallback) — tidak akan error.
    ============================================================ */
 const MASTER_DATA_WORKER_URL = "https://raspy-limit-ba21.rincian-pemesanan.workers.dev";
+// Harus SAMA PERSIS dengan APP_SECRET yang di-set di worker lewat
+// `wrangler secret put APP_SECRET`. Tanpa ini, semua panggilan ke
+// worker akan ditolak (401) begitu APP_SECRET diaktifkan di sana.
+// CATATAN: karena file ini statis & dibuka langsung di browser, nilai
+// ini tetap terlihat siapa saja yang buka "View Page Source" — ini
+// menutup akses acak/asal ketemu URL, BUKAN pengganti login sungguhan.
+const APP_SECRET = "281207767041cf19440c0b849f4d5027";
+// Helper: gabungkan header X-App-Secret ke setiap request ke worker,
+// supaya tidak perlu diketik ulang manual di tiap fetch().
+function workerHeaders(extra){
+  return Object.assign({ "X-App-Secret": APP_SECRET }, extra || {});
+}
 
 async function fetchMasterDataFromServer(){
   if(!MASTER_DATA_WORKER_URL) return null;
   try{
-    const res = await fetch(MASTER_DATA_WORKER_URL + "/master-data");
+    const res = await fetch(MASTER_DATA_WORKER_URL + "/master-data", { headers: workerHeaders() });
     if(!res.ok) return null;
     return await res.json();
   }catch(e){
@@ -5158,7 +5170,7 @@ async function pushMasterDataToServer(){
     };
     const res = await fetch(MASTER_DATA_WORKER_URL + "/master-data", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: workerHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify(body),
     });
     if(!res.ok){
@@ -6100,7 +6112,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   async function loadNameHistory(){
     if(!MASTER_DATA_WORKER_URL) return;
     try{
-      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names");
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
       const body = await res.json().catch(()=> ({}));
       if(Array.isArray(body.names)) nameHistory = body.names;
     }catch(e){ console.log("Gagal ambil riwayat nama customer:", e); }
@@ -6185,7 +6197,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       const { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, imageDataUrl } = await collectNotaPayload();
       await fetch(MASTER_DATA_WORKER_URL + "/save-draft", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: workerHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           senderId, customerName, tabLabel,
           topicId: getTelegramTopicId(),
@@ -6293,7 +6305,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       statusEl.textContent = "Mengirim ke grup Telegram…";
       const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: workerHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           image: imageDataUrl,
           customerName,
@@ -6371,7 +6383,7 @@ async function initHomeGreeting(){
   if(!MASTER_DATA_WORKER_URL) return; // tidak ada worker -> tetap sembunyi
 
   try{
-    const res = await fetch(MASTER_DATA_WORKER_URL + "/resolve-sender?senderId=" + encodeURIComponent(senderId));
+    const res = await fetch(MASTER_DATA_WORKER_URL + "/resolve-sender?senderId=" + encodeURIComponent(senderId), { headers: workerHeaders() });
     const body = await res.json().catch(()=> ({}));
     if(body && typeof body.label === "string" && body.label.trim()) renderGreeting(body.label.trim());
     // gagal / label kosong -> tetap hidden, tidak fallback ke teks generik
@@ -7468,7 +7480,7 @@ if ("serviceWorker" in navigator) {
       const productCatalog = prodListOf(poSheet).map(p=> ({ name: p.name, alias: p.alias || "" }));
       const res = await fetch(MASTER_DATA_WORKER_URL + "/parse-order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: workerHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ text, productCatalog }),
       });
       const data = await res.json().catch(()=> ({}));
@@ -7586,7 +7598,7 @@ if ("serviceWorker" in navigator) {
     if(corrections.length && MASTER_DATA_WORKER_URL){
       fetch(MASTER_DATA_WORKER_URL + "/save-correction", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: workerHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ corrections }),
       }).catch(e=> console.log("Gagal simpan kamus koreksi:", e));
     }
@@ -8701,7 +8713,7 @@ if ("serviceWorker" in navigator) {
       resultEl.hidden = false;
       resultEl.innerHTML = `<div class="md-quota-loading"><span class="md-quota-spin"></span> Memuat kuota AI hari ini...</div>`;
       try{
-        const res = await fetch(MASTER_DATA_WORKER_URL + "/ai-quota-status");
+        const res = await fetch(MASTER_DATA_WORKER_URL + "/ai-quota-status", { headers: workerHeaders() });
         const data = await res.json();
         if(!res.ok || data.error) throw new Error(data.error || "Gagal ambil data.");
 
