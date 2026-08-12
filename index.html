@@ -14,7 +14,7 @@
       const settings = settingsRaw ? JSON.parse(settingsRaw) : null;
       const featureOn = !settings || settings.darkModeFeatureEnabled !== false;
       if(!featureOn) return; // default terang, sudah sesuai atribut bawaan (tanpa data-theme)
-      const pref = localStorage.getItem("notaHalawa_theme") || "system";
+      const pref = localStorage.getItem("notaHalawa_theme") || "light";
       const resolved = (pref === "dark" || pref === "light") ? pref
         : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       document.documentElement.setAttribute("data-theme", resolved);
@@ -221,6 +221,41 @@
   .kt-input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;font-family:'Roboto',sans-serif;color:var(--ink);margin-top:8px;}
   .kt-input:focus{outline:none;border-color:var(--primary-green);}
   .kt-hint{font-size:11px;color:var(--ink-soft);margin-top:6px;}
+
+  /* ============ POPUP TEMPEL PESANAN — perbandingan "Pesanan Asli"
+     vs "Hasil Bacaan AI". Desktop: dua kolom berdampingan (lebar popup
+     dilebarkan lewat class .po-review-wide). Mobile/tablet sempit: satu
+     kolom dengan tab switcher (.po-tabs) supaya tidak perlu scroll jauh
+     atau buka chat lagi buat mengingat pesanan aslinya. ============ */
+  .po-popup{width:360px;max-width:100%;}
+  @media (min-width:901px){
+    .po-popup.po-review-wide{width:680px;max-width:92vw;}
+  }
+  .po-tabs{display:none;gap:4px;padding:3px;background:var(--paper-dark);border:1px solid var(--line);border-radius:9px;margin:0 0 12px;}
+  .po-tab{flex:1;border:none;background:none;padding:8px 0;font-size:12px;font-weight:700;color:var(--ink-soft);border-radius:7px;cursor:pointer;font-family:'Roboto',sans-serif;}
+  .po-tab.po-tab-active{color:var(--accent-green);background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .po-compare-grid{display:block;}
+  .po-panel{display:block;}
+  @media (max-width:900px){
+    .po-compare-grid.po-has-tabs .po-tabs{display:flex;}
+    .po-compare-grid.po-has-tabs .po-panel{display:none;}
+    .po-compare-grid.po-has-tabs .po-panel.po-panel-active{display:block;}
+  }
+  @media (min-width:901px){
+    .po-compare-grid.po-has-tabs{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+    .po-compare-grid.po-has-tabs .po-tabs{display:none;}
+  }
+  .po-panel-title{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.02em;margin:0 0 8px;}
+  .po-original-box{
+    background:var(--paper-dark);border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+    font-family:'Roboto Mono',monospace;font-size:12.5px;color:var(--ink);white-space:pre-wrap;
+    word-break:break-word;line-height:1.65;max-height:340px;overflow-y:auto;
+  }
+  .po-result-scroll{max-height:340px;overflow-y:auto;padding-right:2px;}
+  .po-row{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;background:var(--card);transition:background .15s,opacity .15s;}
+  .po-row.po-row-matched{background:#e6f4ea;border-color:#c8e6cf;}
+  .po-row.po-row-unmatched{opacity:.6;}
+  .po-row-raw{font-size:11px;color:var(--ink-soft);margin-bottom:6px;}
 
   .changelog-link{
     background:none;border:none;color:var(--accent-green);font-size:inherit;text-decoration:underline;
@@ -590,7 +625,14 @@
     header, .tabs, .toolbar, details.region{display:none;}
     footer{display:none;}
     body.showing-home footer{display:block;}
-    .footer-changelog-wrap{display:none;}
+    /* Cuma sembunyikan link "Riwayat Update" versi footer (ada duplikatnya
+       sendiri di Beranda lewat #home-link-changelog) — TIDAK boleh ikut
+       menyembunyikan "Cek Pembaruan" & "ID Telegram Saya" yang tidak
+       punya versi lain di mana pun. Sebelumnya salah sasaran: class
+       .footer-changelog-wrap dipakai bersama oleh KETIGA tombol, jadi
+       nyembunyikan satu class ini nge-hide semuanya sekaligus — bikin
+       tombol "Cek Pembaruan" tidak pernah kelihatan di HP maupun desktop. */
+    .footer-changelog-dup{display:none;}
     footer{
       margin:0 0 4px;padding:18px 18px 14px;line-height:1.6;text-align:left;
       background:#fff;border:1px solid #e7eaed;border-radius:18px;
@@ -1009,7 +1051,7 @@
     .wiz-actionbtns{display:flex;gap:8px;margin-top:16px;}
     .wiz-actionbtns button{
       flex:1;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
-      font-weight:700;font-size:12px;cursor:pointer;
+      font-weight:700;font-size:12px;cursor:pointer;color:var(--ink);
     }
     .wiz-actionbtns button.primary{background:var(--primary-green);color:#fff;border:none;}
 
@@ -1114,18 +1156,18 @@
   .md-panel-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
   .md-panel-head h2{margin:0;font-size:18px;flex:1;}
   .md-panel-close{
-    width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--bg);
-    font-size:16px;cursor:pointer;
+    width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--card);
+    font-size:16px;cursor:pointer;color:var(--ink);
   }
   .md-tabs{display:flex;gap:8px;margin:0 0 18px;flex-wrap:wrap;}
   .md-tab{
-    padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:var(--bg);
+    padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:var(--card);
     font-size:13px;font-weight:700;color:var(--ink-soft);cursor:pointer;
   }
   .md-tab.active{border-color:var(--primary-green);color:var(--primary-green);background:#e3f0fa;}
   .md-section{display:none;}
   .md-section.active{display:block;}
-  .md-card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+  .md-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
   /* --- Baris toggle pengaturan (mis. Autocomplete) --- */
   .md-togglerow{
     display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
@@ -1214,7 +1256,7 @@
   .md-pinform input{width:100%;max-width:220px;height:44px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:16px;background:var(--card);}
   .md-btn{
     height:42px;padding:0 18px;border-radius:9px;border:1px solid var(--line);background:var(--card);
-    font-weight:700;font-size:12.5px;cursor:pointer;margin-top:14px;margin-right:8px;
+    font-weight:700;font-size:12.5px;cursor:pointer;margin-top:14px;margin-right:8px;color:var(--ink);
   }
   .md-btn.primary{background:var(--primary-green);color:#fff;border:none;}
   .md-btn.danger{color:var(--danger-red);border-color:#f3b7ac;}
@@ -2994,24 +3036,69 @@ html[data-theme="dark"]{
   --card: #1c2125;
   --line: #2d3338;
   --white-ish: #1c2125;
+  /* Hijau standar (#00845f/#188038) terlalu redup di atas latar gelap
+     — apalagi di atas latar hijau-gelap (wiz-tint) sendiri, kontrasnya
+     bisa mepet banget. Dicerahkan KHUSUS dark mode supaya teks/ikon
+     hijau tetap jelas kebaca, bukan cuma "warna cocok tapi nggak kelihatan". */
+  --primary-green: #3ddc9a;
+  --accent-green: #3ddc9a;
+  --status-green: #3ddc9a;
   --habit-ink: #eef1f3;
   --habit-muted: #a7b0b8;
   --habit-border: #2d3338;
   --habit-bg: #0e1113;
   --habit-card: #1c2125;
   --habit-red-soft: #3a2020;
+  --habit-green: #3ddc9a;
+  --habit-green-dark: #2fb37d;
+  --habit-green-soft: #16241c;
+  --habit-green-pale: #171f1a;
   --wiz-tint: #16241c;
   --wiz-form-bg: #171f1a;
   --wiz-form-border: #274031;
   --wiz-ghost-border: #2c4535;
   --wiz-badge-est-bg: #17222c;
 }
+html[data-theme="dark"] .home-hero,
+html[data-theme="dark"] .home-side{
+  background: var(--card);
+  border-color: var(--line);
+}
+html[data-theme="dark"] .home-help-btn svg path,
+html[data-theme="dark"] .home-help-btn svg rect{ stroke: var(--ink); }
+/* <header> desktop (judul tab + tanggal) — ternyata belum pernah kena
+   override sama sekali, background:#fff hardcode-nya bikin strip putih
+   mencolok di paling atas layar walau semua di bawahnya sudah gelap. */
+html[data-theme="dark"] header{
+  background: var(--card);
+  border-color: var(--line);
+}
+/* Tombol "Bagikan" & "Salin" (mobile: .wiz-actionbtns button non-primary;
+   desktop: #btn-share/#btn-copy) -> putih tegas di dark mode, sesuai
+   diminta (bukan cuma "cukup kontras", tapi putih beneran). Tombol
+   "Unduh"/wr-download (.primary, background hijau) TIDAK disentuh —
+   teksnya sudah putih dari awal, tidak berubah. */
+html[data-theme="dark"] .wiz-actionbtns button:not(.primary),
+html[data-theme="dark"] #btn-share,
+html[data-theme="dark"] #btn-copy{
+  color: #ffffff;
+}
 html[data-theme="dark"] body.custom-blue-theme #panel-custom{
-  --wiz-tint: #142330;
+  /* Biru standar (#1976d2) yang tetap dipakai apa adanya di dark mode
+     kontrasnya mepet banget di atas wiz-tint gelap (badge ikon ringkasan
+     Review — Total qty/berat/Subtotal/Ongkir/Diskon Ongkir jadi nyaris
+     tak terlihat). Dicerahkan KHUSUS dark mode, sama alasan seperti
+     hijau standar di atas — supaya teks/ikon biru tetap jelas kebaca. */
+  --primary-green: #6ab5ff;
+  --accent-green: #6ab5ff;
+  --status-green: #6ab5ff;
+  --habit-green: #6ab5ff;
+  --habit-green-dark: #4a9aeb;
+  --wiz-tint: #1b3550;
   --wiz-form-bg: #131c26;
   --wiz-form-border: #223a4d;
   --wiz-ghost-border: #24435b;
-  --wiz-badge-est-bg: #142330;
+  --wiz-badge-est-bg: #1b3550;
 }
 html[data-theme="dark"] body{ background: var(--paper-dark); color: var(--ink); }
 /* Komponen bertraffic tinggi yang pakai warna HARDCODE (bukan var)
@@ -3256,10 +3343,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <img src="habit-logo.png" alt="">
         <span class="home-logo-text">Habit</span>
       </div>
-      <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-help-btn" id="home-help-btn">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/></svg>
-        Bantuan
-      </a>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button type="button" id="btn-theme-open-mobile" class="theme-header-btn theme-feature-ui" hidden aria-label="Ganti tema tampilan">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 12.7A6.5 6.5 0 1 1 11.3 6a5 5 0 0 0 6.7 6.7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          <span>Tema</span>
+        </button>
+        <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-help-btn" id="home-help-btn">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/></svg>
+          Bantuan
+        </a>
+      </div>
     </div>
 
     <div class="home-body">
@@ -4072,8 +4165,8 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="footer-bank-line">BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.15.1</span>
-      <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.16.1</span>
+      <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
     </div>
@@ -4166,7 +4259,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
 
   <!-- ================= POPUP TEMPEL PESANAN (AI) ================= -->
   <div id="paste-order-overlay" class="calc-overlay" hidden>
-    <div class="calc-popup confirm-popup" role="dialog" aria-label="Tempel pesanan" style="width:360px;max-height:82vh;overflow-y:auto;">
+    <div id="paste-order-popup" class="calc-popup confirm-popup po-popup" role="dialog" aria-label="Tempel pesanan" style="max-height:82vh;overflow-y:auto;">
       <div class="calc-head">
         <span>📋 Tempel Pesanan (AI)</span>
         <button id="paste-order-close" class="calc-close" aria-label="Tutup">✕</button>
@@ -4184,7 +4277,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.15.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.16.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug:</b> tombol "Cek Pembaruan" &amp; "ID Telegram Saya" di footer sebelumnya <b>tidak pernah muncul sama sekali</b> (baik di HP maupun desktop) — kena hide tidak sengaja oleh aturan CSS yang sebenarnya cuma ditujukan buat menyembunyikan link "Riwayat Update" versi footer (karena sudah ada duplikatnya di Beranda). Sekarang cuma "Riwayat Update" yang disembunyikan di footer, "Cek Pembaruan" &amp; "ID Telegram Saya" sudah kelihatan lagi.</li>
+            <li><b>Perbaikan kontras (dark mode + Tema Biru Custom):</b> ikon ringkasan di layar Review (Total qty/Total berat/Subtotal/Ongkir/Diskon Ongkir) nyaris tidak kelihatan karena warna birunya terlalu gelap di atas latar kartu yang juga gelap. Warna biru & latar kotak ikonnya dicerahkan khusus mode gelap supaya jelas kebaca, sama seperti perlakuan tema hijau standar.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.16.0</div>
+          <ul>
+            <li>Layar hasil bacaan AI di "📋 Tempel Pesanan" sekarang punya <b>tampilan pembanding "Pesanan Asli" vs "Hasil Bacaan AI"</b>, supaya bisa dicocokkan tanpa perlu buka chat lagi buat mengingat pesanan aslinya. <b>Desktop:</b> dua kolom berdampingan sekaligus. <b>HP:</b> ada dua tombol tab ("Pesanan asli" / "Hasil AI") untuk gantian, popup jadi lebih lebar di desktop supaya kedua kolom nyaman dibaca.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.15.1</div>
           <ul>
             <li><b>(HP)</b> Perbaikan: tombol "📋 Tempel Pesanan" sebelumnya muncul lagi begitu form ditutup, walau sudah ada produk tersimpan. Sekarang tombol itu <b>disembunyikan begitu minimal 1 produk sudah ditambahkan</b> — hanya tampil di kondisi benar-benar awal (belum ada produk sama sekali & form sedang tertutup). Tampilan desktop tidak berubah.</li>
           </ul>
@@ -4883,7 +4989,11 @@ function applySettingsToDom(){
    sempat ke-assign pas dibutuhkan (ReferenceError: temporal dead zone). */
 const THEME_KEY = "notaHalawa_theme"; // isi: "light" | "dark" | "system"
 function getThemePref(){
-  try{ return localStorage.getItem(THEME_KEY) || "system"; }catch(e){ return "system"; }
+  // Default "light" (BUKAN "system") — supaya menyalakan saklar master
+  // di Master Data tidak bikin app "loncat" ke gelap tak terduga cuma
+  // karena kebetulan HP-nya lagi mode malam. User harus PILIH sendiri
+  // lewat popup Tema kalau memang mau ikut mode perangkat.
+  try{ return localStorage.getItem(THEME_KEY) || "light"; }catch(e){ return "light"; }
 }
 function setThemePref(val){
   try{ localStorage.setItem(THEME_KEY, val); }catch(e){}
@@ -4927,9 +5037,13 @@ if(window.matchMedia){
       el.classList.toggle("active", el.dataset.themeChoice === getThemePref());
     });
   }
-  // Trigger tunggal: tombol "Tema" di dalam <header>, cuma tampil di Dashboard.
+  // Dua trigger: header desktop & topbar home-screen mobile (karena
+  // <header> klasik terbukti tidak pernah render di layar Beranda mobile
+  // — lihat catatan yang sama soal sambutan "Selamat datang" sebelumnya).
   const openBtnHeader = document.getElementById("btn-theme-open");
   if(openBtnHeader) openBtnHeader.addEventListener("click", openOverlay);
+  const openBtnMobile = document.getElementById("btn-theme-open-mobile");
+  if(openBtnMobile) openBtnMobile.addEventListener("click", openOverlay);
 
   const closeBtn = document.getElementById("theme-overlay-close");
   if(closeBtn) closeBtn.addEventListener("click", closeOverlay);
@@ -7272,14 +7386,18 @@ if ("serviceWorker" in navigator) {
      yang BISA DIKOREKSI sebelum diterapkan ke baris pesanan. ============ */
   const poOverlay = document.getElementById("paste-order-overlay");
   const poBody = document.getElementById("paste-order-body");
+  const poPopupEl = document.getElementById("paste-order-popup");
   let poSheet = null;
   let poItems = [];
 
-  function closePasteOrder(){ poOverlay.hidden = true; }
+  function closePasteOrder(){ poOverlay.hidden = true; poPopupEl.classList.remove("po-review-wide"); }
   document.getElementById("paste-order-close").addEventListener("click", closePasteOrder);
   poOverlay.addEventListener("click", (e)=>{ if(e.target === poOverlay) closePasteOrder(); });
 
+  function escHtml(s){ return String(s||"").replace(/[<>&]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c])); }
+
   function renderPasteOrderInput(prefill){
+    poPopupEl.classList.remove("po-review-wide");
     poBody.innerHTML = `
       <p class="md-note" style="margin:0 0 8px;">Tempel mentahan chat pesanan customer di sini. AI akan coba baca jadi daftar produk — hasilnya tetap bisa dikoreksi sebelum diterapkan, tidak langsung masuk otomatis.</p>
       <textarea id="po-textarea" rows="8" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;" placeholder="Contoh: Saset ayam 15 ds&#10;Saset sapi 5 ds&#10;Ayam 500g 1 ds">${prefill||""}</textarea>
@@ -7343,12 +7461,13 @@ if ("serviceWorker" in navigator) {
   }
 
   function renderPasteOrderReview(originalText){
+    poPopupEl.classList.add("po-review-wide");
     const catalog = prodListOf(poSheet);
     const optionsHtml = `<option value="">— abaikan (bukan produk) —</option>` +
       catalog.map(p=> `<option value="${p.name}">${p.name}</option>`).join("");
     const rowsHtml = poItems.length ? poItems.map((it,i)=> `
-      <div class="po-row" data-po-rowbox="${i}" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;${it.matchedProduct ? "" : "opacity:.55;"}">
-        <div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px;">"${String(it.raw||"").replace(/[<>&]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]))}"</div>
+      <div class="po-row ${it.matchedProduct ? "po-row-matched" : "po-row-unmatched"}" data-po-rowbox="${i}">
+        <div class="po-row-raw">"${escHtml(it.raw)}"</div>
         <div style="display:flex;gap:6px;align-items:center;">
           <select data-po-row="${i}" class="po-select" style="flex:1;min-width:0;padding:6px;border:1px solid var(--line);border-radius:6px;">${optionsHtml}</select>
           <input type="number" data-po-qty="${i}" class="po-qty" value="${it.qty||""}" min="0" placeholder="Qty" style="width:64px;padding:6px;border:1px solid var(--line);border-radius:6px;">
@@ -7356,22 +7475,53 @@ if ("serviceWorker" in navigator) {
       </div>
     `).join("") : `<p class="md-note">Tidak ada baris yang terbaca dari teks itu.</p>`;
 
+    // Panel kiri/tab 1: teks pesanan PERSIS seperti yang ditempel user —
+    // supaya bisa dicocokkan baris-per-baris dengan hasil bacaan AI di
+    // sebelah kanan/tab 2, tanpa perlu buka chat lagi buat lihat aslinya.
+    const panelOriginal = `
+      <div class="po-panel po-panel-active" data-po-panel="original">
+        <p class="po-panel-title">📋 Pesanan Asli</p>
+        <div class="po-original-box">${escHtml(originalText)}</div>
+      </div>`;
+    const panelResult = `
+      <div class="po-panel" data-po-panel="result">
+        <p class="po-panel-title">🤖 Hasil Bacaan AI</p>
+        <div class="po-result-scroll">${rowsHtml}</div>
+      </div>`;
+
     poBody.innerHTML = `
-      <p class="md-note" style="margin:0 0 8px;">Periksa hasil bacaan AI — baris pudar berarti AI menganggapnya BUKAN produk. Perbaiki dulu kalau ada yang salah, baru terapkan.</p>
-      ${rowsHtml}
+      <p class="md-note" style="margin:0 0 8px;">Bandingkan dengan pesanan aslinya — baris pudar berarti AI menganggapnya BUKAN produk. Perbaiki dulu kalau ada yang salah, baru terapkan.</p>
+      <div class="po-compare-grid po-has-tabs">
+        <div class="po-tabs">
+          <button type="button" class="po-tab po-tab-active" data-po-tab="original">Pesanan asli</button>
+          <button type="button" class="po-tab" data-po-tab="result">Hasil AI</button>
+        </div>
+        ${panelOriginal}
+        ${panelResult}
+      </div>
       <p class="kt-hint" id="po-status2" style="margin-top:4px;"></p>
       <div class="confirm-actionrow" style="padding:14px 0 0;">
         <button id="po-back" class="calc-actbtn calc-clearbtn">Kembali</button>
         <button id="po-apply" class="calc-actbtn confirm-okbtn kt-okbtn">Terapkan ke Pesanan</button>
       </div>
     `;
+    poBody.querySelectorAll(".po-tab").forEach(tabBtn=>{
+      tabBtn.addEventListener("click", ()=>{
+        const target = tabBtn.dataset.poTab;
+        poBody.querySelectorAll(".po-tab").forEach(b=> b.classList.toggle("po-tab-active", b===tabBtn));
+        poBody.querySelectorAll(".po-panel").forEach(p=> p.classList.toggle("po-panel-active", p.dataset.poPanel===target));
+      });
+    });
     poBody.querySelectorAll(".po-select").forEach(sel=>{
       const i = +sel.dataset.poRow;
       sel.value = poItems[i].matchedProduct || "";
       sel.addEventListener("change", ()=>{
         poItems[i].matchedProduct = sel.value || null;
         const box = poBody.querySelector(`[data-po-rowbox="${i}"]`);
-        if(box) box.style.opacity = sel.value ? "1" : ".55";
+        if(box){
+          box.classList.toggle("po-row-matched", !!sel.value);
+          box.classList.toggle("po-row-unmatched", !sel.value);
+        }
       });
     });
     poBody.querySelectorAll(".po-qty").forEach(inp=>{
