@@ -1105,6 +1105,11 @@
     display:flex;align-items:center;justify-content:center;padding:16px;
   }
   .md-overlay[hidden]{display:none;}
+  /* Kunci scroll halaman belakang selagi ada overlay/modal (md-overlay
+     ATAU calc-overlay) yang terbuka — dipasang/dilepas otomatis oleh
+     observer di script utama, bukan per-popup manual, supaya berlaku
+     konsisten ke SEMUA popup di app tanpa perlu ubah tiap tombol buka/tutup. */
+  body.has-open-overlay{overflow:hidden;position:fixed;inset:0;width:100%;}
   .md-pinbox{
     width:100%;max-width:320px;background:var(--card);border-radius:16px;padding:26px 22px;text-align:center;
     max-height:calc(100vh - 32px);overflow-y:auto;-webkit-overflow-scrolling:touch;
@@ -3326,10 +3331,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
     <div style="display:flex;align-items:center;gap:14px;">
       <div class="home-hero-greet" id="home-hero-greet" hidden style="font-family:'Roboto',sans-serif;"></div>
-      <button type="button" id="btn-theme-open" class="theme-header-btn theme-feature-ui" hidden aria-label="Ganti tema tampilan">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 12.7A6.5 6.5 0 1 1 11.3 6a5 5 0 0 0 6.7 6.7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        <span>Tema</span>
-      </button>
+      <!-- Tombol "Tema" di header klasik ini SENGAJA dihapus — dobel dengan
+           tombol Tema yang sudah ada di .home-topbar (dashboard Beranda),
+           yang juga tampil di desktop (lihat blok CSS "BERANDA DI DESKTOP").
+           Satu-satunya pemicu popup Tema sekarang cuma #btn-theme-open-mobile. -->
       <div class="datebox">
         <div><b id="hariNow">–</b></div>
         <div id="tglNow">–</div>
@@ -7940,20 +7945,34 @@ if ("serviceWorker" in navigator) {
        Pengecualian: kalau lagi mengetik di kotak cari produk (combobox)
        dan daftar saran masih terbuka, Enter yang pertama dipakai untuk
        memilih saran teratas dulu — supaya tidak salah pilih produk yang
-       belum sempat dikonfirmasi. */
+       belum sempat dikonfirmasi.
+       ---- Kenapa dicek 3 event, bukan cuma "keydown" ----
+       Field Diskon di tab Custom ("wa-diskon-custom") itu type="text"
+       inputmode="numeric" (bukan type="number", supaya bisa diformat
+       ribuan) — kombinasi ini di sebagian keyboard HP (terutama
+       Android/Gboard) kadang TIDAK mengirim keydown standar saat tombol
+       Enter/Go/Done disentuh (keyboard langsung kirim event lain).
+       Makanya selain "keydown" (jalur utama, jalan di keyboard fisik &
+       kebanyakan HP), ditambah jaring pengaman "keyup" (kalau ada HP yang
+       baru kirim key info di keyup, bukan keydown) dan "beforeinput" tipe
+       insertLineBreak (jalur yang dipakai sebagian besar IME Android saat
+       keydown-nya sendiri tidak muncul sama sekali). handledEnterAt dipakai
+       supaya 1 kali tekan Enter tidak memicu simpan 2x kalau kebetulan lebih
+       dari satu event di atas sama-sama terpicu untuk penekanan yang sama. */
     const formElForEnter = document.getElementById("wa-form-"+sheet);
     if(formElForEnter){
-      formElForEnter.addEventListener("keydown", (e)=>{
-        if(e.key !== "Enter") return;
-        const tgt = e.target;
-        if(tgt.tagName !== "INPUT" && tgt.tagName !== "SELECT") return;
+      let handledEnterAt = 0;
+      function tryHandleEnter(e, tgt){
+        if(Date.now() - handledEnterAt < 150) return; // sudah ditangani event lain barusan
+        if(!tgt || (tgt.tagName !== "INPUT" && tgt.tagName !== "SELECT")) return;
+        handledEnterAt = Date.now();
         if(tgt.classList.contains("prod-combo")){
           const wrapEl = tgt.closest(".combo-wrap");
           const listEl = wrapEl ? wrapEl.querySelector(".combo-list") : null;
           if(listEl && listEl.classList.contains("show")){
             const first = listEl.querySelector(".combo-item");
             if(first){
-              e.preventDefault();
+              if(e.cancelable) e.preventDefault();
               prodEl.value = first.dataset.val;
               prodEl.dispatchEvent(new Event("change", {bubbles:true}));
               if(prodEl._comboSync) prodEl._comboSync();
@@ -7962,8 +7981,17 @@ if ("serviceWorker" in navigator) {
             }
           }
         }
-        e.preventDefault();
+        if(e.cancelable) e.preventDefault();
         document.getElementById("wa-save-"+sheet).click();
+      }
+      formElForEnter.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter" || e.keyCode === 13) tryHandleEnter(e, e.target);
+      });
+      formElForEnter.addEventListener("keyup", (e)=>{
+        if(e.key === "Enter" || e.keyCode === 13) tryHandleEnter(e, e.target);
+      });
+      formElForEnter.addEventListener("beforeinput", (e)=>{
+        if(e.inputType === "insertLineBreak") tryHandleEnter(e, e.target);
       });
     }
 
@@ -9451,6 +9479,55 @@ if ("serviceWorker" in navigator) {
   document.addEventListener("click", ()=> setTimeout(syncAllDesktopSummaries, 30));
   document.addEventListener("input", ()=> setTimeout(syncAllDesktopSummaries, 30));
   syncAllDesktopSummaries();
+
+  /* ============================================================
+     KUNCI SCROLL HALAMAN BELAKANG SAAT ADA POPUP TERBUKA
+     Sebelumnya tiap overlay (.md-overlay / .calc-overlay) cuma
+     ditampilkan di atas halaman tanpa mengunci scroll body, jadi di
+     mobile jari yang harusnya geser ISI popup malah menggeser
+     halaman DI BELAKANGNYA (terutama kalau isi popup lebih pendek
+     dari layar, area kosongnya masih "tembus" ke background).
+     Solusi generik: pantau atribut "hidden" di SEMUA overlay lewat
+     MutationObserver, lalu toggle class body.has-open-overlay kalau
+     minimal satu overlay sedang terbuka. Otomatis berlaku untuk semua
+     popup yang ada (dan yang nanti ditambah) — tidak perlu ubah kode
+     buka/tutup di tiap popup satu-satu.
+     body.has-open-overlay pakai position:fixed (perlu utk iOS Safari,
+     overflow:hidden saja belum cukup mencegah body ikut geser di iOS)
+     — makanya scrollY disimpan sebelum dikunci & dikembalikan lagi
+     begitu popup terakhir ditutup, supaya posisi baca tidak reset ke atas.
+     ============================================================ */
+  (function setupOverlayScrollLock(){
+    const overlaySelectors = ".md-overlay, .calc-overlay";
+    let savedScrollY = 0;
+    let locked = false;
+    function anyOverlayOpen(){
+      return Array.from(document.querySelectorAll(overlaySelectors)).some((el) => !el.hidden);
+    }
+    function applyLockState(){
+      const shouldLock = anyOverlayOpen();
+      if(shouldLock && !locked){
+        savedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+        document.body.style.top = (-savedScrollY) + "px";
+        document.body.classList.add("has-open-overlay");
+        locked = true;
+      }else if(!shouldLock && locked){
+        document.body.classList.remove("has-open-overlay");
+        document.body.style.top = "";
+        window.scrollTo(0, savedScrollY);
+        locked = false;
+      }
+    }
+    const observer = new MutationObserver((mutations) => {
+      // Cukup peduli perubahan atribut "hidden" saja.
+      if(mutations.some((m) => m.attributeName === "hidden")) applyLockState();
+    });
+    document.querySelectorAll(overlaySelectors).forEach((el) => {
+      observer.observe(el, { attributes: true, attributeFilter: ["hidden"] });
+    });
+    // Cek sekali di awal kalau-kalau ada overlay yang sudah kebuka duluan.
+    applyLockState();
+  })();
 })();
 </script>
 </body>
