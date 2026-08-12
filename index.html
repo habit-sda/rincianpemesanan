@@ -3,6 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>
+  // Bootstrap tema SEDINI MUNGKIN (sebelum CSS/body sempat di-paint) —
+  // cegah "kedipan" tema salah sesaat pas halaman baru dibuka. Baca
+  // langsung dari localStorage, sengaja tidak nunggu script utama di
+  // bawah (yang baru jalan setelah seluruh body ke-parse).
+  (function(){
+    try{
+      const settingsRaw = localStorage.getItem("notaHalawa_settings");
+      const settings = settingsRaw ? JSON.parse(settingsRaw) : null;
+      const featureOn = !settings || settings.darkModeFeatureEnabled !== false;
+      if(!featureOn) return; // default terang, sudah sesuai atribut bawaan (tanpa data-theme)
+      const pref = localStorage.getItem("notaHalawa_theme") || "system";
+      const resolved = (pref === "dark" || pref === "light") ? pref
+        : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", resolved);
+    }catch(e){ /* biarkan default terang kalau ada masalah baca localStorage */ }
+  })();
+</script>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
@@ -33,6 +51,38 @@
     --line:#d3d6db;
     --card:#ffffff;
     --white-ish:#ffffff;
+    /* ---- Token warna KHUSUS wizard Input Penjualan/Custom. Default-nya
+       sama persis dengan warna hijau yang sudah ada (Penjualan/Grosir
+       TIDAK berubah) — cuma ekstraksi dari hex hardcode jadi variable,
+       supaya bisa di-override 1 tempat aja (lihat body.custom-blue-theme
+       #panel-custom di bawah) tanpa perlu ubah ratusan baris satu-satu. ---- */
+    --wiz-tint:#e6f4ea;
+    --wiz-form-bg:#eef7f1;
+    --wiz-form-border:#cfe8d8;
+    --wiz-ghost-border:#bfe0c7;
+    --wiz-badge-est-bg:#e3f0fa;
+  }
+  /* ---- Tema BIRU khusus alur "Custom" (senada warna ikon tombol Custom
+     di Beranda, #1976d2) — aktif kalau toggle "Tema Biru untuk Custom" di
+     Master Data → Tampilan dinyalakan. Di-scope ke #panel-custom (SELURUH
+     isi tab Custom: topbar, kartu produk, form, step Pengiriman & Review)
+     lewat CSS custom property cascade — semua elemen di dalamnya yang
+     pakai var(--primary-green) dkk OTOMATIS ikut biru, tanpa perlu ubah
+     satu-satu. Tab "Penjualan (Grosir)" (#panel-penjualan) sama sekali
+     tidak tersentuh, tetap hijau seperti biasa. ---- */
+  body.custom-blue-theme #panel-custom{
+    --primary-green:#1976d2;
+    --accent-green:#1976d2;
+    --status-green:#1976d2;
+    --habit-green:#1976d2;
+    --habit-green-dark:#125a9e;
+    --habit-green-soft:#e8f1fb;
+    --habit-green-pale:#f2f7fd;
+    --wiz-tint:#e3edfa;
+    --wiz-form-bg:#eef4fb;
+    --wiz-form-border:#c8ddf3;
+    --wiz-ghost-border:#b9d4ef;
+    --wiz-badge-est-bg:#dbe9f9;
   }
   html{-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;}
   *{box-sizing:border-box;}
@@ -654,7 +704,7 @@
     }
     .btn-back{
       display:flex;align-items:center;gap:5px;
-      background:#e6f4ea;border:1px solid var(--primary-green);border-radius:20px;
+      background:var(--wiz-tint);border:1px solid var(--primary-green);border-radius:20px;
       height:34px;padding:0 12px 0 10px;flex-shrink:0;
       font-size:12.5px;font-weight:700;color:var(--primary-green);cursor:pointer;
     }
@@ -684,7 +734,7 @@
       font-size:10.5px;color:var(--ink-soft);cursor:pointer;font-weight:600;
     }
     .wiz-dots button svg{width:21px;height:21px;}
-    .wiz-dots button.on{background:#e6f4ea;color:var(--primary-green);}
+    .wiz-dots button.on{background:var(--wiz-tint);color:var(--primary-green);}
     body.showing-wizdots-nav{padding-bottom:72px;}
     .wiz-title{font-weight:700;font-size:15px;margin-bottom:16px;}
     .wiz-field label{display:block;font-size:12.5px;color:var(--ink-soft);margin:16px 0 6px;}
@@ -708,8 +758,8 @@
     .wiz-preview-name{font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:7px;}
     .wiz-preview-badges{display:flex;gap:6px;flex-wrap:wrap;}
     .wiz-preview-badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:16px;font-family:'Roboto Mono',monospace;}
-    .wiz-preview-badge.badge-qty{background:#e6f4ea;color:var(--accent-green);}
-    .wiz-preview-badge.badge-est{background:#e3f0fa;color:var(--primary-green);}
+    .wiz-preview-badge.badge-qty{background:var(--wiz-tint);color:var(--accent-green);}
+    .wiz-preview-badge.badge-est{background:var(--wiz-badge-est-bg);color:var(--primary-green);}
     .wiz-field select, .wiz-field input, .wiz-section select, .wiz-section input{
       width:100%;height:52px;border-radius:10px;border:1px solid var(--line);font-size:16px;padding:0 14px;
     }
@@ -723,7 +773,7 @@
       flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;
       -webkit-tap-highlight-color:transparent;user-select:none;
     }
-    .wiz-stepper-btn:active{background:#e6f4ea;}
+    .wiz-stepper-btn:active{background:var(--wiz-tint);}
     .wiz-hint{font-size:12.5px;color:var(--ink-soft);margin:6px 2px 0;}
     .wiz-btn-primary{
       width:100%;height:52px;border:none;border-radius:10px;background:var(--primary-green);color:#fff;
@@ -733,7 +783,7 @@
     .wiz-btn-primary svg{width:18px;height:18px;flex-shrink:0;}
     .wiz-btn-dash{
       width:100%;height:52px;border-radius:10px;border:1.5px dashed var(--accent-green);
-      background:#e6f4ea;color:var(--accent-green);font-weight:700;font-size:14px;margin-top:8px;cursor:pointer;
+      background:var(--wiz-tint);color:var(--accent-green);font-weight:700;font-size:14px;margin-top:8px;cursor:pointer;
     }
     .wiz-btn-ghost{
       width:100%;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);
@@ -741,7 +791,7 @@
       display:flex;align-items:center;justify-content:center;gap:6px;
     }
     .wiz-btn-ghost svg{width:15px;height:15px;flex-shrink:0;}
-    .wiz-btn-ghost.accent{color:var(--primary-green);border-color:#bfe0c7;}
+    .wiz-btn-ghost.accent{color:var(--primary-green);border-color:var(--wiz-ghost-border);}
     .wiz-btn-ghost.danger{color:var(--danger-red);border-color:#f3b7ac;}
     .wr-reset-mobile{display:none;}
     .wiz-reset-proxy{display:none;}
@@ -764,7 +814,7 @@
        ikut bergeser — cuma tombol ini yang "mengambang" di posisinya. */
     .wiz-inline-form-btns{
       position:sticky;bottom:64px;left:0;right:0;
-      background:#eef7f1;
+      background:var(--wiz-form-bg);
       padding:12px 0 10px;margin-top:12px;
       box-shadow:0 -8px 14px -10px rgba(0,0,0,.2);z-index:5;
     }
@@ -777,7 +827,7 @@
     /* --- Form tambah/edit produk, sekarang tampil INLINE di bawah daftar
        produk tersimpan (bukan pindah ke layar terpisah) --- */
     .wiz-inline-form{
-      background:#eef7f1;border:1px solid #cfe8d8;border-radius:12px;
+      background:var(--wiz-form-bg);border:1px solid var(--wiz-form-border);border-radius:12px;
       padding:14px 14px 4px;margin:14px 0 4px;
     }
     .wiz-inline-form .wiz-title{font-size:13.5px;margin-bottom:12px;}
@@ -801,7 +851,7 @@
     .wiz-pcard-name{font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
     .wiz-qty-badge{
       display:inline-block;font-weight:700;font-size:13px;color:var(--accent-green);
-      background:#e6f4ea;padding:4px 12px;border-radius:20px;white-space:nowrap;
+      background:var(--wiz-tint);padding:4px 12px;border-radius:20px;white-space:nowrap;
     }
     .wiz-pcard-detail{
       max-height:0;overflow:hidden;opacity:0;transition:all .18s ease;
@@ -836,7 +886,7 @@
        (bukan sebaris) dengan jarak (gap) cukup lebar supaya jempol tidak
        gampang salah pencet antara keduanya. --- */
     .wiz-pcard-editcard{
-      position:relative;background:#eef7f1;border:2px solid var(--primary-green);
+      position:relative;background:var(--wiz-form-bg);border:2px solid var(--primary-green);
       border-radius:12px;padding:14px 16px;
     }
     .wiz-pcard-edittop{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
@@ -876,7 +926,7 @@
     /* --- Header ikon + judul + subjudul, dipakai di step Kirim & Review --- */
     .wiz-stephead{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
     .wiz-stephead-icon{
-      flex-shrink:0;width:48px;height:48px;border-radius:50%;background:#e6f4ea;
+      flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--wiz-tint);
       display:flex;align-items:center;justify-content:center;
     }
     .wiz-stephead-icon svg{width:24px;height:24px;}
@@ -891,7 +941,7 @@
     .wiz-fieldcard .wiz-section{padding:14px 0;}
     .wiz-fieldcard .wiz-section-label{color:var(--ink);font-weight:600;}
     .wiz-fieldcard .wiz-section-ic-badge{
-      width:22px;height:22px;border-radius:6px;background:#e6f4ea;
+      width:22px;height:22px;border-radius:6px;background:var(--wiz-tint);
       display:flex;align-items:center;justify-content:center;flex-shrink:0;
     }
     .wiz-fieldcard .wiz-section-ic-badge svg{width:13px;height:13px;}
@@ -899,7 +949,7 @@
     /* --- Baris toggle (dulu teks link biasa) sekarang jadi list-row hijau samar --- */
     .wiz-disclose{
       display:flex;align-items:center;gap:12px;margin-top:10px;padding:12px 14px;
-      background:#e6f4ea;border-radius:14px;cursor:pointer;
+      background:var(--wiz-tint);border-radius:14px;cursor:pointer;
     }
     .wiz-disclose-icon{
       flex-shrink:0;width:36px;height:36px;border-radius:10px;background:var(--primary-green);
@@ -929,7 +979,7 @@
     .wiz-pcard-rev-top span:last-child{flex-shrink:0;}
     .wiz-pcard-rev-disc{
       display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--primary-green);
-      background:#e6f4ea;padding:4px 11px;border-radius:20px;margin-top:7px;
+      background:var(--wiz-tint);padding:4px 11px;border-radius:20px;margin-top:7px;
     }
     .wiz-pcard-rev-disc svg{width:12px;height:12px;}
     .wiz-sumcard{background:#f1f3f4;border-radius:14px;padding:6px 16px;margin:12px 0;}
@@ -939,13 +989,13 @@
     }
     .wiz-sumcard .wiz-revrow:last-child{border-bottom:none;}
     .wiz-sumcard .wiz-revrow-icon{
-      width:28px;height:28px;border-radius:8px;background:#e6f4ea;flex-shrink:0;
+      width:28px;height:28px;border-radius:8px;background:var(--wiz-tint);flex-shrink:0;
       display:flex;align-items:center;justify-content:center;
     }
     .wiz-sumcard .wiz-revrow-icon svg{width:15px;height:15px;}
     .wiz-sumcard .wiz-revrow span:last-child{margin-left:auto;font-weight:700;color:var(--ink);font-family:'Roboto Mono',monospace;}
     .wiz-totalcard{
-      background:#e6f4ea;border-radius:14px;padding:16px;
+      background:var(--wiz-tint);border-radius:14px;padding:16px;
       display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;
     }
     .wiz-totalcard .l{font-weight:700;font-size:14.5px;color:var(--ink);}
@@ -1595,7 +1645,7 @@
   .wiz-pcard-trash:hover{ background: var(--habit-red-soft); border-color: var(--habit-red); }
   .wiz-inline-form{
     background: var(--habit-green-pale);
-    border-color: #d7ece2;
+    border-color: var(--wiz-form-border);
     border-radius: var(--habit-radius);
   }
   .wiz-fieldcard{
@@ -2890,9 +2940,176 @@
 @media (min-width: 901px) {
   .tabs, .toolbar{ display: none; }
 }
+
+/* =========================================================
+   POPUP TEMA TAMPILAN — modal terpusat (BUKAN elemen melayang),
+   dipicu dari link "Tema Tampilan" di footer/sidebar, dibungkus
+   .md-overlay/.md-pinbox yang sudah ada (konsisten dengan popup
+   PIN Master Data) supaya nggak nambah gaya baru yang beda sendiri.
+   ========================================================= */
+.theme-menu-item{
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--line); background: var(--card);
+  border-radius: 10px;
+  font-size: 13.5px; color: var(--ink);
+  cursor: pointer; text-align: left; width: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+.theme-menu-item:hover{ background: var(--paper-dark); }
+.theme-menu-item svg:first-child{ width: 18px; height: 18px; flex-shrink: 0; color: var(--ink-soft); }
+.theme-menu-item span{ flex: 1; }
+.theme-menu-check{ width: 17px; height: 17px; flex-shrink: 0; color: var(--primary-green); visibility: hidden; }
+.theme-menu-item.active{ border-color: var(--primary-green); font-weight: 700; }
+.theme-menu-item.active .theme-menu-check{ visibility: visible; }
+/* Trigger "Tema" di dalam <header> — elemen NORMAL (bukan position:fixed),
+   ikut alur layout header seperti elemen lain di sana. Sengaja cuma
+   tampil di layar Dashboard/Beranda (body.showing-home) — begitu masuk
+   ke Penjualan/Custom/Master Data, trigger ini hilang lagi. */
+.theme-header-btn{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 13px; border-radius: 20px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink-soft);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: 'Roboto', sans-serif; flex-shrink: 0;
+}
+.theme-header-btn:hover{ background: var(--paper-dark); }
+.theme-header-btn svg{ width: 15px; height: 15px; flex-shrink: 0; }
+.theme-header-btn[hidden]{ display: none !important; } /* master OFF (Master Data) selalu menang */
+body:not(.showing-home) .theme-header-btn{ display: none !important; } /* selain Dashboard, disembunyikan */
+
+/* =========================================================
+   MODE GELAP — token warna inti. Sebagian besar UI (teks, latar
+   kartu, border) sudah pakai variable ini di seluruh app, jadi
+   override di 1 tempat ini otomatis "menular" ke ratusan elemen
+   tanpa perlu ubah satu-satu (sama trik yang dipakai di tema biru
+   Custom). Elemen dengan warna hardcode (bukan var) ditangani
+   terpisah di bawah, khusus komponen ber-traffic tinggi.
+   ========================================================= */
+html[data-theme="dark"]{
+  --paper: #14181c;
+  --paper-dark: #0e1113;
+  --ink: #eef1f3;
+  --ink-soft: #a7b0b8;
+  --card: #1c2125;
+  --line: #2d3338;
+  --white-ish: #1c2125;
+  --habit-ink: #eef1f3;
+  --habit-muted: #a7b0b8;
+  --wiz-tint: #16241c;
+  --wiz-form-bg: #171f1a;
+  --wiz-form-border: #274031;
+  --wiz-ghost-border: #2c4535;
+  --wiz-badge-est-bg: #17222c;
+}
+html[data-theme="dark"] body.custom-blue-theme #panel-custom{
+  --wiz-tint: #142330;
+  --wiz-form-bg: #131c26;
+  --wiz-form-border: #223a4d;
+  --wiz-ghost-border: #24435b;
+  --wiz-badge-est-bg: #142330;
+}
+html[data-theme="dark"] body{ background: var(--paper-dark); color: var(--ink); }
+/* Komponen bertraffic tinggi yang pakai warna HARDCODE (bukan var)
+   — ditimpa manual di sini supaya tetap terbaca & profesional di
+   gelap, bukan kotak putih menyala di tengah tema gelap. */
+html[data-theme="dark"] .habit-sidebar,
+html[data-theme="dark"] .md-overlay .md-pinbox,
+html[data-theme="dark"] .md-panel,
+html[data-theme="dark"] .wiz-inline-form,
+html[data-theme="dark"] .wiz-pcard,
+html[data-theme="dark"] .wiz-pcard-editcard,
+html[data-theme="dark"] .wiz-summary-card,
+html[data-theme="dark"] .wiz-sumcard,
+html[data-theme="dark"] .wiz-totalcard,
+html[data-theme="dark"] .home-tile,
+html[data-theme="dark"] .footer-bank-line,
+html[data-theme="dark"] footer > div,
+html[data-theme="dark"] .calc-popup,
+html[data-theme="dark"] .theme-menu,
+html[data-theme="dark"] .md-quota-row{
+  background: var(--card);
+  border-color: var(--line);
+  color: var(--ink);
+}
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea{
+  background: var(--card);
+  color: var(--ink);
+  border-color: var(--line);
+}
+html[data-theme="dark"] input::placeholder{ color: var(--ink-soft); opacity: .8; }
+html[data-theme="dark"] .wiz-preview-img,
+html[data-theme="dark"] .wiz-pcard-img,
+html[data-theme="dark"] .wiz-pcard-rev-img{ background: #26221c; }
+html[data-theme="dark"] .wiz-summary-card .row,
+html[data-theme="dark"] .wiz-sumcard .wiz-revrow{ border-color: var(--line); }
+html[data-theme="dark"] .wiz-preview-strip{ background: #20262b; }
+html[data-theme="dark"] .wiz-preview-strip.filled{ background: var(--card); }
+html[data-theme="dark"] .home-tile:hover,
+html[data-theme="dark"] .home-actionrow:hover{ background: #22282d; }
+html[data-theme="dark"] .md-togglerow,
+html[data-theme="dark"] .md-quota-row.workers-ai,
+html[data-theme="dark"] .md-radio-chip{ background: var(--card); border-color: var(--line); }
+html[data-theme="dark"] .md-radio-chip:has(input:checked){ background: #17222c; }
+html[data-theme="dark"] .toolbar-msg,
+html[data-theme="dark"] .home-actionrow-sub,
+html[data-theme="dark"] .md-note,
+html[data-theme="dark"] .wiz-subtle{ color: var(--ink-soft); }
+html[data-theme="dark"] .datebox,
+html[data-theme="dark"] .home-tile-icon,
+html[data-theme="dark"] .wiz-stephead-icon,
+html[data-theme="dark"] .wiz-fieldcard .wiz-section-ic-badge,
+html[data-theme="dark"] .wiz-disclose,
+html[data-theme="dark"] .wiz-qty-badge,
+html[data-theme="dark"] .wiz-pcard-rev-disc,
+html[data-theme="dark"] .wiz-sumcard .wiz-revrow-icon,
+html[data-theme="dark"] .md-modal-icon,
+html[data-theme="dark"] .md-togglerow-icon{ background: var(--wiz-tint); }
+html[data-theme="dark"] .btn-back{ background: var(--wiz-tint); border-color: var(--primary-green); }
+html[data-theme="dark"] .wiz-btn-primary{ color: #fff; }
+html[data-theme="dark"] .wiz-btn-ghost{ background: var(--card); }
+html[data-theme="dark"] .wiz-stepper-btn{ background: var(--card); border-color: var(--line); color: var(--ink); }
+html[data-theme="dark"] .wiz-cta-bar,
+html[data-theme="dark"] .wiz-inline-form-btns,
+html[data-theme="dark"] .wiz-confirmed-actions{ background: var(--wiz-form-bg); }
+html[data-theme="dark"] ::-webkit-scrollbar-thumb{ background: #3a4147; }
+html[data-theme="dark"] .toast{ background: #2a3036; color: var(--ink); }
 </style>
 </head>
 <body>
+<!-- ================= Popup Tema Tampilan (Terang/Gelap/Sesuai perangkat) =================
+     Dipicu dari link "Tema Tampilan" di footer (mobile) & sidebar (desktop)
+     — BUKAN tombol melayang lagi, biar tidak menumpuk di atas konten.
+     Preferensi tersimpan PER PERANGKAT (localStorage), tiap user atur
+     sendiri. Cuma bisa dibuka kalau fitur ini aktif di Master Data →
+     Tampilan (elemen pemicu punya class theme-feature-ui, disembunyikan
+     kalau fitur mati). -->
+<div class="md-overlay" id="theme-overlay" hidden>
+  <div class="md-pinbox" style="max-width:320px;">
+    <button type="button" id="theme-overlay-close" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;line-height:1;">×</button>
+    <h3 style="margin:0 0 4px;font-size:16px;">Tema Tampilan</h3>
+    <div class="md-note" style="margin-bottom:16px;">Pengaturan ini cuma berlaku di HP/browser ini — nggak disamakan ke semua orang.</div>
+    <div id="theme-menu" role="menu" style="display:flex;flex-direction:column;gap:6px;">
+      <button type="button" class="theme-menu-item" data-theme-choice="light" role="menuitemradio">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span>Terang</span>
+        <svg class="theme-menu-check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="theme-menu-item" data-theme-choice="dark" role="menuitemradio">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 14.2A8.5 8.5 0 1 1 9.8 4a6.7 6.7 0 0 0 10.2 10.2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <span>Gelap</span>
+        <svg class="theme-menu-check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="theme-menu-item" data-theme-choice="system" role="menuitemradio">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12" rx="1.7" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 20h7M12 16.5V20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Sesuai perangkat</span>
+        <svg class="theme-menu-check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 <aside class="habit-sidebar" id="habit-sidebar" aria-label="Navigasi utama">
   <div class="habit-sidebar-logo">
     <img src="habit-logo.png" alt="" width="34" height="34">
@@ -2946,8 +3163,12 @@
       <h1>Rincian Pemesanan (Rp)</h1>
       <div class="sub">Halawa Bintang Utama</div>
     </div>
-    <div style="display:flex;align-items:baseline;gap:14px;">
+    <div style="display:flex;align-items:center;gap:14px;">
       <div class="home-hero-greet" id="home-hero-greet" hidden style="font-family:'Roboto',sans-serif;"></div>
+      <button type="button" id="btn-theme-open" class="theme-header-btn theme-feature-ui" hidden aria-label="Ganti tema tampilan">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 12.7A6.5 6.5 0 1 1 11.3 6a5 5 0 0 0 6.7 6.7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span>Tema</span>
+      </button>
       <div class="datebox">
         <div><b id="hariNow">–</b></div>
         <div id="tglNow">–</div>
@@ -3414,6 +3635,34 @@
     </div>
 
     <div class="md-section" id="md-sec-tampilan">
+      <div class="md-card">
+        <h3>Mode Gelap</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 12.7A6.5 6.5 0 1 1 11.3 6a5 5 0 0 0 6.7 6.7z" stroke="var(--primary-green)" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Aktifkan Mode Gelap</div>
+            <div class="md-togglerow-sub">Tiap user atur sendiri (Terang/Gelap/Sesuai perangkat) lewat tombol bulat di pojok kanan atas — pengaturannya tersimpan per HP/browser, tidak disamakan ke semua orang. Nonaktif = tombolnya disembunyikan, app selalu terang.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-darkmode">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card">
+        <h3>Tema Warna "Custom"</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="#1976d2" stroke-width="1.6"/><path d="M9 12l2 2 4-4" stroke="#1976d2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Tema biru untuk alur Custom</div>
+            <div class="md-togglerow-sub">Aktif = tombol, border, dan aksen di seluruh alur input Custom (Tambah produk, Pengiriman, Review) jadi biru — senada warna ikon tombol "Custom" di Beranda. Nonaktif = balik hijau, sama seperti Penjualan (Grosir). Tab Penjualan (Grosir) sendiri tidak pernah ikut berubah.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-customblue">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
       <div class="md-card">
         <h3>Tombol Simpan/Batal (form Tambah/Edit produk)</h3>
         <div class="md-togglerow">
@@ -4482,7 +4731,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, financeList:[]};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[]};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -4498,6 +4747,8 @@ function loadSettings(){
     if(typeof s.dmAutoMatchEnabled === "boolean") SETTINGS.dmAutoMatchEnabled = s.dmAutoMatchEnabled;
     if(typeof s.stickerButtonsEnabled === "boolean") SETTINGS.stickerButtonsEnabled = s.stickerButtonsEnabled;
     if(typeof s.stickyFormButtonsEnabled === "boolean") SETTINGS.stickyFormButtonsEnabled = s.stickyFormButtonsEnabled;
+    if(typeof s.customBlueThemeEnabled === "boolean") SETTINGS.customBlueThemeEnabled = s.customBlueThemeEnabled;
+    if(typeof s.darkModeFeatureEnabled === "boolean") SETTINGS.darkModeFeatureEnabled = s.darkModeFeatureEnabled;
     if(s.stickerReactionsEnabled && typeof s.stickerReactionsEnabled === "object"){
       ["konfirmasi","hoax","deposit","void"].forEach(k=>{
         if(typeof s.stickerReactionsEnabled[k] === "boolean") SETTINGS.stickerReactionsEnabled[k] = s.stickerReactionsEnabled[k];
@@ -4514,6 +4765,7 @@ function applySettingsToDom(){
   const helpBtn = document.getElementById("home-help-btn");
   if(helpBtn) helpBtn.href = SETTINGS.bantuanLink;
   document.body.classList.toggle("sticky-form-btns-off", !SETTINGS.stickyFormButtonsEnabled);
+  document.body.classList.toggle("custom-blue-theme", !!SETTINGS.customBlueThemeEnabled);
   document.querySelectorAll(".telegram-bot-ui").forEach(el=>{
     el.hidden = !SETTINGS.telegramBotEnabled;
   });
@@ -4531,9 +4783,93 @@ function applySettingsToDom(){
   document.querySelectorAll(".paste-order-ui").forEach(el=>{
     el.hidden = !SETTINGS.pasteOrderEnabled;
   });
+  const themeFeatureEls = document.querySelectorAll(".theme-feature-ui");
+  if(themeFeatureEls.length){
+    themeFeatureEls.forEach(el=> el.hidden = !SETTINGS.darkModeFeatureEnabled);
+    if(!SETTINGS.darkModeFeatureEnabled){
+      // Fitur dimatikan total dari Master Data -> paksa terang, jangan
+      // biarkan preferensi lokal lama (kalau pernah diaktifkan sebelumnya)
+      // bikin app kepaksa gelap padahal pemicunya sudah disembunyikan.
+      document.documentElement.setAttribute("data-theme", "light");
+      const overlayEl = document.getElementById("theme-overlay");
+      if(overlayEl) overlayEl.hidden = true;
+    }else{
+      applyTheme();
+    }
+  }
 }
+/* ============================================================
+   KONTROL TEMA — Terang / Gelap / Sesuai perangkat. Preferensi
+   PER PERANGKAT (localStorage), tidak disinkronkan lewat Master
+   Data (yang disinkron cuma ON/OFF fiturnya, lewat
+   darkModeFeatureEnabled). Diterapkan lewat atribut html[data-theme]
+   supaya CSS override-nya gampang (lihat CSS "MODE GELAP" di <style>).
+   SENGAJA didefinisikan SEBELUM loadSettings()/applySettingsToDom()
+   dipanggil di bawah — applySettingsToDom() sendiri manggil
+   applyTheme(), jadi kalau urutannya kebalik, THEME_KEY (const) belum
+   sempat ke-assign pas dibutuhkan (ReferenceError: temporal dead zone). */
+const THEME_KEY = "notaHalawa_theme"; // isi: "light" | "dark" | "system"
+function getThemePref(){
+  try{ return localStorage.getItem(THEME_KEY) || "system"; }catch(e){ return "system"; }
+}
+function setThemePref(val){
+  try{ localStorage.setItem(THEME_KEY, val); }catch(e){}
+}
+function resolveTheme(pref){
+  if(pref === "dark" || pref === "light") return pref;
+  // "system" -> ikut prefers-color-scheme OS/browser saat ini
+  return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+}
+function applyTheme(){
+  if(!SETTINGS.darkModeFeatureEnabled) return; // fitur dimatikan -> selalu terang, sudah ditangani applySettingsToDom
+  const pref = getThemePref();
+  const resolved = resolveTheme(pref);
+  document.documentElement.setAttribute("data-theme", resolved);
+  document.querySelectorAll(".theme-menu-item").forEach(el=>{
+    el.classList.toggle("active", el.dataset.themeChoice === pref);
+  });
+}
+
 loadSettings();
 applySettingsToDom();
+applyTheme(); // panggil sekali lagi eksplisit di sini (jaga-jaga kalau fitur baru diaktifkan tepat saat load)
+
+// Kalau user pilih "Sesuai perangkat" & OS/browser-nya ganti tema
+// (mis. HP masuk mode malam otomatis) SAAT APP LAGI TERBUKA, ikut
+// berubah otomatis tanpa perlu reload.
+if(window.matchMedia){
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>{
+    if(getThemePref() === "system") applyTheme();
+  });
+}
+
+(function(){
+  const overlay = document.getElementById("theme-overlay");
+  const menu = document.getElementById("theme-menu");
+  if(!overlay || !menu) return;
+  function closeOverlay(){ overlay.hidden = true; }
+  function openOverlay(){
+    overlay.hidden = false;
+    document.querySelectorAll(".theme-menu-item").forEach(el=>{
+      el.classList.toggle("active", el.dataset.themeChoice === getThemePref());
+    });
+  }
+  // Trigger tunggal: tombol "Tema" di dalam <header>, cuma tampil di Dashboard.
+  const openBtnHeader = document.getElementById("btn-theme-open");
+  if(openBtnHeader) openBtnHeader.addEventListener("click", openOverlay);
+
+  const closeBtn = document.getElementById("theme-overlay-close");
+  if(closeBtn) closeBtn.addEventListener("click", closeOverlay);
+  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeOverlay(); });
+
+  menu.querySelectorAll(".theme-menu-item").forEach(item=>{
+    item.addEventListener("click", ()=>{
+      setThemePref(item.dataset.themeChoice);
+      applyTheme();
+      closeOverlay();
+    });
+  });
+})();
 
 /* ============================================================
    MASTER DATA ONLINE — sinkron Produk/Ekspedisi/Tampilan/PIN
@@ -7968,6 +8304,28 @@ if ("serviceWorker" in navigator) {
 
   /* ---------- toggle Tombol Cepat Finance / stiker (Tampilan) ----------
      Murni dibaca oleh worker.js (backend) — sama seperti toggle DM Bot. */
+  const toggleDarkMode = document.getElementById("md-toggle-darkmode");
+  if(toggleDarkMode){
+    toggleDarkMode.checked = SETTINGS.darkModeFeatureEnabled;
+    toggleDarkMode.addEventListener("change", async ()=>{
+      SETTINGS.darkModeFeatureEnabled = toggleDarkMode.checked;
+      saveSettings();
+      applySettingsToDom();
+      await confirmMasterDataSave(SETTINGS.darkModeFeatureEnabled ? "Mode Gelap diaktifkan — tombol pengaturannya muncul di pojok kanan atas." : "Mode Gelap dinonaktifkan, app kembali terang untuk semua.");
+    });
+  }
+
+  const toggleCustomBlue = document.getElementById("md-toggle-customblue");
+  if(toggleCustomBlue){
+    toggleCustomBlue.checked = SETTINGS.customBlueThemeEnabled;
+    toggleCustomBlue.addEventListener("change", async ()=>{
+      SETTINGS.customBlueThemeEnabled = toggleCustomBlue.checked;
+      saveSettings();
+      applySettingsToDom();
+      await confirmMasterDataSave(SETTINGS.customBlueThemeEnabled ? "Tema biru untuk Custom diaktifkan." : "Tema Custom kembali hijau.");
+    });
+  }
+
   const toggleStickyFormBtns = document.getElementById("md-toggle-stickyformbtns");
   if(toggleStickyFormBtns){
     toggleStickyFormBtns.checked = SETTINGS.stickyFormButtonsEnabled;
