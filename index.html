@@ -577,9 +577,11 @@
   .pnota2 .product-col-num{width:28px;flex-shrink:0;}
   .pnota2 .product-col-thumb{width:56px;flex-shrink:0;}
   .pnota2 .product-col-name{min-width:0;flex:1 1 0;}
-  .pnota2 .product-col-harga{width:120px;flex-shrink:0;text-align:right;}
-  .pnota2 .product-col-diskon{width:96px;flex-shrink:0;text-align:right;}
-  .pnota2 .product-col-total{width:150px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-qty{width:78px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-harga{width:104px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-diskon{width:80px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-satuan{width:112px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-total{width:128px;flex-shrink:0;text-align:right;}
   .pnota2 .product-list-head{
     padding:0 0 14px;border-bottom:2px solid #d6e0d8;margin-bottom:0;
   }
@@ -597,16 +599,13 @@
   .pnota2 .product-thumb{
     width:56px;height:56px;border-radius:12px;object-fit:cover;background:#f2f6f2;border:1.5px solid #e6ebe6;
   }
-  .pnota2 .product-name{font-size:16.5px;font-weight:700;color:#1a1a1a;margin:0 0 3px;}
-  .pnota2 .product-qty-sub{font-size:14px;font-weight:400;color:#7a8580;margin:0;font-variant-numeric:tabular-nums;}
+  .pnota2 .product-name{font-size:16.5px;font-weight:700;color:#1a1a1a;}
   .pnota2 .product-val{font-size:15.5px;font-weight:700;color:#1a1a1a;font-variant-numeric:tabular-nums;}
   .pnota2 .product-val-muted{font-size:15px;color:#5b6660;font-variant-numeric:tabular-nums;}
   .pnota2 .product-total{font-size:16.5px;font-weight:800;color:#1c7a45;font-variant-numeric:tabular-nums;}
   .pnota2 .shipping-content{display:flex;}
   .pnota2 .shipping-item{flex:1;text-align:center;padding:0 10px;}
   .pnota2 .shipping-item + .shipping-item{border-left:1.5px solid #d6e0d8;}
-  .pnota2 .shipping-icon{width:24px;height:24px;margin:0 auto 8px;}
-  .pnota2 .shipping-icon svg{width:24px;height:24px;}
   .pnota2 .shipping-label{display:block;font-size:14px;color:#7a8580;margin-bottom:7px;}
   .pnota2 .shipping-value{display:block;font-size:19px;font-weight:800;color:#1a1a1a;}
   .pnota2 .cost-summary{display:flex;flex-direction:column;gap:11px;}
@@ -623,12 +622,8 @@
     display:flex;justify-content:space-between;align-items:center;
     background:#ffffff;border:1.5px solid #d6e0d8;border-radius:18px;padding:18px 26px;margin-top:18px;
   }
-  .pnota2 .pay-status .l{font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;}
+  .pnota2 .pay-status .l{font-size:16px;font-weight:800;}
   .pnota2 .pay-status .v{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;}
-  .pnota2 .order-footer{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:20px;}
-  .pnota2 .footer-icon{width:19px;height:19px;flex-shrink:0;}
-  .pnota2 .footer-icon svg{width:19px;height:19px;}
-  .pnota2 .footer-text{font-size:13.5px;color:#5b6660;margin:0;text-align:center;}
 
   /* ===== responsive: HP / layar sempit =====
      Kondisi kedua (max-height + landscape + pointer:coarse) supaya HP yang
@@ -5241,7 +5236,7 @@ const MASTER_DATA_WORKER_URL = "https://raspy-limit-ba21.rincian-pemesanan.worke
 // CATATAN: karena file ini statis & dibuka langsung di browser, nilai
 // ini tetap terlihat siapa saja yang buka "View Page Source" — ini
 // menutup akses acak/asal ketemu URL, BUKAN pengganti login sungguhan.
-const APP_SECRET = "GANTI_DENGAN_SECRET_YANG_SAMA_DENGAN_WORKER";
+const APP_SECRET = "281207767041cf19440c0b849f4d5027";
 // Helper: gabungkan header X-App-Secret ke setiap request ke worker,
 // supaya tidak perlu diketik ulang manual di tiap fetch().
 function workerHeaders(extra){
@@ -5308,7 +5303,10 @@ async function pushMasterDataToServer(){
       body: JSON.stringify(body),
     });
     if(!res.ok){
-      showMsg("Gagal menyimpan ke server (perubahan tetap tersimpan di HP ini).", true);
+      const body = await res.json().catch(()=> ({}));
+      const detail = body.message || body.error || ("HTTP " + res.status);
+      console.log("Master data online gagal dikirim - detail server:", detail);
+      showMsg("Gagal menyimpan ke server: " + detail + " (perubahan tetap tersimpan di HP ini).", true);
       return false;
     }else{
       window.__lastServerSnapshot = JSON.parse(JSON.stringify({ products: PRODUCTS, ekspedisi: EKSPEDISI, settings: settingsToSend }));
@@ -6074,9 +6072,11 @@ function buildPrintNotaV2(tab){
       <div class="product-cols">
         <div class="product-col-num"><div class="product-number">${idx+1}</div></div>
         <div class="product-col-thumb"><img class="product-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'"></div>
-        <div class="product-col-name"><p class="product-name">${name}</p><p class="product-qty-sub">${qty} ${satuanLabel}</p></div>
+        <div class="product-col-name"><p class="product-name">${name}</p></div>
+        <div class="product-col-qty"><span class="product-val">${qty} ${satuanLabel}</span></div>
         <div class="product-col-harga"><span class="product-val-muted">${harga}</span></div>
         <div class="product-col-diskon"><span class="product-val-muted">${diskon}</span></div>
+        <div class="product-col-satuan"><span class="product-val">${hargaSatuan}</span></div>
         <div class="product-col-total"><span class="product-total">${total}</span></div>
       </div>
     </div>`;
@@ -6085,9 +6085,11 @@ function buildPrintNotaV2(tab){
   const headRow = `<div class="product-cols product-list-head">
     <div class="product-col-num"></div>
     <div class="product-col-thumb"></div>
-    <div class="product-col-name"><span>Produk &amp; Qty</span></div>
+    <div class="product-col-name"><span>Produk</span></div>
+    <div class="product-col-qty"><span>Qty</span></div>
     <div class="product-col-harga"><span>Harga</span></div>
     <div class="product-col-diskon"><span>Diskon</span></div>
+    <div class="product-col-satuan"><span>Satuan</span></div>
     <div class="product-col-total"><span>Total</span></div>
   </div>`;
 
@@ -6111,8 +6113,6 @@ function buildPrintNotaV2(tab){
   const isKembalian = statusLabel === "Kembalian";
   const signPrefix = isKurang ? "-" : "";
   const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#1c7a45");
-  const statusBg = isKurang ? "#fdecea" : (isKembalian ? "#e8f0fe" : "#e6f6ea");
-  const statusBorder = isKurang ? "#f3b4ae" : (isKembalian ? "#aac9f7" : "#9fd4ae");
 
   const jamSekarang = new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
 
@@ -6127,6 +6127,8 @@ function buildPrintNotaV2(tab){
           <span><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2" stroke="#5b6660" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v3.4M16 3v3.4" stroke="#5b6660" stroke-width="1.6" stroke-linecap="round"/></svg>${tgl}</span>
           <span class="divider"></span>
           <span><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.3" stroke="#5b6660" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="#5b6660" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${jamSekarang} WIB</span>
+          <span class="divider"></span>
+          <span><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" stroke="#5b6660" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12h6M9 15.5h6" stroke="#5b6660" stroke-width="1.5" stroke-linecap="round"/></svg>–</span>
         </div>
       </div>
 
@@ -6144,9 +6146,9 @@ function buildPrintNotaV2(tab){
           <h2 class="section-title">INFORMASI PENGIRIMAN</h2>
         </div>
         <div class="shipping-content">
-          <div class="shipping-item"><div class="shipping-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 7.5L12 12l8-4.5M12 12v9" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/></svg></div><span class="shipping-label">Total produk</span><strong class="shipping-value">${totalqty}</strong></div>
-          <div class="shipping-item"><div class="shipping-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M7 8h10" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/><path d="M4 8l3-3.2 3 3.2M14 8l3-3.2 3 3.2" stroke="#1c7a45" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.3 8a2.8 3.6 0 0 0 5.6 0M14.3 8a2.8 3.6 0 0 0 5.6 0" stroke="#1c7a45" stroke-width="1.4" stroke-linecap="round"/><path d="M8 20h8" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/></svg></div><span class="shipping-label">Total berat</span><strong class="shipping-value">${totalberat}</strong></div>
-          <div class="shipping-item"><div class="shipping-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/><circle cx="15.5" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/></svg></div><span class="shipping-label">Ekspedisi</span><strong class="shipping-value">${ekspedisi}</strong></div>
+          <div class="shipping-item"><span class="shipping-label">Total produk</span><strong class="shipping-value">${totalqty}</strong></div>
+          <div class="shipping-item"><span class="shipping-label">Total berat</span><strong class="shipping-value">${totalberat}</strong></div>
+          <div class="shipping-item"><span class="shipping-label">Ekspedisi</span><strong class="shipping-value">${ekspedisi}</strong></div>
         </div>
       </div>
 
@@ -6162,14 +6164,10 @@ function buildPrintNotaV2(tab){
         <span class="grand-total-label">TOTAL PEMBAYARAN</span>
         <strong class="grand-total-value">${grandtotal}</strong>
       </div>
-      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div class="pay-status" style="flex-direction:column;align-items:stretch;gap:10px;background:${statusBg};border-color:${statusBorder};">
+      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div class="pay-status" style="flex-direction:column;align-items:stretch;gap:10px;">
         ${kelebihan!==0 ? `<div class="cost-row"><span class="cost-label">Kelebihan bayar sebelumnya</span><strong class="cost-value">${kelebihanFmt}</strong></div>` : ``}
         <div class="cost-row"><span class="l" style="color:${statusColor}">${statusLabel}</span><span class="v" style="color:${statusColor}">${signPrefix}${selisihFmt}</span></div>
       </div>` : ``}
-      <div class="order-footer">
-        <div class="footer-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#2b2b2b"/><path d="M8 12.3l2.6 2.6L16.2 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <p class="footer-text">Terima kasih atas kepercayaannya, semoga membawa keberkahan untuk kita semua ❤️</p>
-      </div>
     </div>
   `;
 }
@@ -6604,7 +6602,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         }),
       });
       const body = await res.json().catch(()=>({}));
-      if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
+      if(!res.ok || !body.ok) throw new Error(body.message || body.error || ("HTTP " + res.status));
 
       statusEl.textContent = "Berhasil dikirim ke grup Telegram.";
       statusEl.style.color = "var(--primary-green)";
@@ -9025,7 +9023,7 @@ if ("serviceWorker" in navigator) {
       try{
         const res = await fetch(MASTER_DATA_WORKER_URL + "/ai-quota-status", { headers: workerHeaders() });
         const data = await res.json();
-        if(!res.ok || data.error) throw new Error(data.error || "Gagal ambil data.");
+        if(!res.ok || data.error) throw new Error(data.message || data.error || "Gagal ambil data.");
 
         const rows = data.groq.map(g=>
           g.budgetTokens==null ? cooldownBadgeRow(g.label, g.cooldown) : barRow(g.label, g.usedTokens, g.budgetTokens, g.percent)
