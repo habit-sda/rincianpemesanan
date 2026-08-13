@@ -538,120 +538,91 @@
      konsisten dengan yang tampil di layar. Jangan ganti balik ke
      gradient tanpa tes render dulu. ===== */
   .pnota2{
-    width:1080px;height:auto;background:#ffffff;color:#17231D;font-family:'Roboto',sans-serif;
-    padding:38px 42px 42px;position:relative;overflow:hidden;
+    width:1080px;height:auto;background:#ffffff;color:#1a1a1a;font-family:'Roboto',sans-serif;
+    padding:46px 40px 40px;position:relative;overflow:hidden;
   }
-  .pnota2 .bg-blob{position:absolute;border-radius:50%;background:#EAF7EF;z-index:0;}
-  .pnota2 .bg-blob-1{width:230px;height:230px;top:-130px;left:-100px;}
-  .pnota2 .bg-blob-2{width:190px;height:190px;top:-110px;right:-90px;}
-  .pnota2 .order-header,.pnota2 .order-section,.pnota2 .summary-area,.pnota2 .grand-total,.pnota2 .pay-status{position:relative;z-index:1;}
-
-  /* ---- header: dipadatkan, logo jadi brand marker bukan hero ---- */
-  .pnota2 .order-header{ text-align:center; margin-bottom:22px; }
-  .pnota2 .order-logo-img{display:block;margin:0 auto 10px;}
+  .pnota2 .bg-blob{position:absolute;border-radius:50%;background:#e3f4e7;z-index:0;}
+  .pnota2 .bg-blob-1{width:260px;height:260px;top:-120px;left:-90px;}
+  .pnota2 .bg-blob-2{width:220px;height:220px;top:-100px;right:-80px;}
+  .pnota2 .order-header,.pnota2 .order-section,.pnota2 .grand-total,.pnota2 .pay-status{position:relative;z-index:1;}
+  .pnota2 .order-header{ text-align:center; margin-bottom:14px; }
+  .pnota2 .order-logo-img{display:block;margin:0 auto 6px;}
   .pnota2 .order-title{
-    font-size:29px;font-weight:800;color:#0D6335;letter-spacing:.03em;margin:0 0 9px;
+    font-size:17px;font-weight:800;color:#155a34;letter-spacing:.03em;margin:0 0 6px;
   }
   .pnota2 .order-meta{
-    display:flex;align-items:center;justify-content:center;gap:12px;
-    font-size:14.5px;color:#68736D;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    font-size:12.5px;color:#5b6660;
   }
-  .pnota2 .order-meta span{display:inline-flex;align-items:center;gap:6px;}
-  .pnota2 .order-meta svg{width:14px;height:14px;flex-shrink:0;color:#68736D;}
-  .pnota2 .order-meta .divider{width:1px;height:13px;background:#DCE8DF;}
-
-  /* ---- card section (dipertahankan untuk Pesanan & Pengiriman) ---- */
+  .pnota2 .order-meta span{display:inline-flex;align-items:center;gap:5px;}
+  .pnota2 .order-meta svg{width:12px;height:12px;flex-shrink:0;color:#5b6660;}
+  .pnota2 .order-meta .divider{width:1px;height:11px;background:#c9d2cc;}
   .pnota2 .order-section{
-    background:#ffffff;border:1.5px solid #DCE8DF;border-radius:18px;
-    padding:22px 26px;margin-bottom:16px;
+    background:#ffffff;border:1.5px solid #d6e0d8;border-radius:18px;
+    padding:24px 26px;margin-bottom:18px;
   }
-  .pnota2 .section-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .pnota2 .section-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
   .pnota2 .section-icon{
-    width:36px;height:36px;border-radius:10px;background:#EAF7EF;
+    width:38px;height:38px;border-radius:11px;background:#e6f6ea;
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
-  .pnota2 .section-icon svg{width:19px;height:19px;color:#168548;}
+  .pnota2 .section-icon svg{width:20px;height:20px;color:#1c7a45;}
   .pnota2 .section-title{
-    font-size:15.5px;font-weight:800;color:#168548;letter-spacing:.04em;margin:0;
+    font-size:16.5px;font-weight:800;color:#1c7a45;letter-spacing:.04em;margin:0;
   }
-
-  /* ---- daftar produk: disederhanakan, focal point nota ----
-     ①  [foto]  Nama produk                 1 Karton   Rp 326.400
-                Rp 326.400 / Karton
-     Tanpa kolom qty/harga/diskon/satuan/total terpisah — cukup 1 baris
-     ringkas per item supaya tetap nyaman dibaca sampai 8–10 item. */
   .pnota2 .product-list{display:flex;flex-direction:column;}
-  .pnota2 .product-item{
+  .pnota2 .product-cols{
     display:flex;align-items:center;gap:14px;
-    padding:13px 0;border-bottom:1px solid #EDF3EE;
   }
-  .pnota2 .product-item:first-child{padding-top:0;}
+  .pnota2 .product-col-num{width:28px;flex-shrink:0;}
+  .pnota2 .product-col-thumb{width:56px;flex-shrink:0;}
+  .pnota2 .product-col-name{min-width:0;flex:1 1 0;}
+  .pnota2 .product-col-qty{width:78px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-harga{width:104px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-diskon{width:80px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-satuan{width:112px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-col-total{width:128px;flex-shrink:0;text-align:right;}
+  .pnota2 .product-list-head{
+    padding:0 0 14px;border-bottom:2px solid #d6e0d8;margin-bottom:0;
+  }
+  .pnota2 .product-list-head span{
+    font-size:12px;font-weight:800;color:#7a8580;letter-spacing:.04em;text-transform:uppercase;
+  }
+  .pnota2 .product-item{
+    padding:16px 0;border-bottom:1.5px solid #edf1ee;
+  }
   .pnota2 .product-item:last-child{border-bottom:none;padding-bottom:0;}
   .pnota2 .product-number{
-    width:26px;height:26px;border-radius:50%;background:#168548;color:#fff;
-    font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    width:28px;height:28px;border-radius:50%;background:#1c7a45;color:#fff;
+    font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;
   }
   .pnota2 .product-thumb{
-    width:52px;height:52px;border-radius:12px;object-fit:cover;background:#F2F6F2;border:1px solid #E6EBE6;flex-shrink:0;
+    width:56px;height:56px;border-radius:12px;object-fit:cover;background:#f2f6f2;border:1.5px solid #e6ebe6;
   }
-  .pnota2 .product-name-wrap{min-width:0;flex:1 1 0;}
-  .pnota2 .product-name{font-size:16px;font-weight:700;color:#17231D;margin:0 0 3px;}
-  .pnota2 .product-sub{font-size:13px;color:#68736D;margin:0;font-variant-numeric:tabular-nums;}
-  .pnota2 .product-qty{
-    flex-shrink:0;text-align:right;font-size:14px;color:#68736D;font-weight:600;
-    font-variant-numeric:tabular-nums;min-width:74px;
-  }
-  .pnota2 .product-total{
-    flex-shrink:0;text-align:right;font-size:16.5px;font-weight:800;color:#168548;
-    font-variant-numeric:tabular-nums;min-width:114px;
-  }
-  .pnota2 .product-list-total{text-align:center;margin-top:16px;}
-  .pnota2 .product-list-total span{
-    display:inline-block;padding:6px 18px;border-radius:999px;background:#EAF7EF;
-    color:#168548;font-size:12.5px;font-weight:800;letter-spacing:.03em;
-  }
-
-  /* ---- info pengiriman ---- */
+  .pnota2 .product-name{font-size:16.5px;font-weight:700;color:#1a1a1a;}
+  .pnota2 .product-val{font-size:15.5px;font-weight:700;color:#1a1a1a;font-variant-numeric:tabular-nums;}
+  .pnota2 .product-val-muted{font-size:15px;color:#5b6660;font-variant-numeric:tabular-nums;}
+  .pnota2 .product-total{font-size:16.5px;font-weight:800;color:#1c7a45;font-variant-numeric:tabular-nums;}
   .pnota2 .shipping-content{display:flex;}
   .pnota2 .shipping-item{flex:1;text-align:center;padding:0 10px;}
-  .pnota2 .shipping-item + .shipping-item{border-left:1.5px solid #DCE8DF;}
-  .pnota2 .shipping-label{display:block;font-size:13.5px;color:#68736D;margin-bottom:7px;}
-  .pnota2 .shipping-value{display:block;font-size:18px;font-weight:800;color:#17231D;}
-
-  /* ---- ringkasan biaya: dibuat seperti summary area, BUKAN card besar
-     tambahan — cukup garis putus-putus tipis antar baris. ---- */
-  .pnota2 .summary-area{padding:2px 4px 20px;}
-  .pnota2 .cost-row{
-    display:flex;justify-content:space-between;align-items:center;
-    font-size:15.5px;padding:10px 0;border-bottom:1px dashed #DCE8DF;
-  }
-  .pnota2 .cost-row:last-child{border-bottom:none;}
-  .pnota2 .cost-label{color:#68736D;}
-  .pnota2 .cost-value{font-weight:700;color:#17231D;font-variant-numeric:tabular-nums;}
-
-  /* ---- grand total: destination utama nota, angka jauh lebih dominan
-     daripada label ---- */
+  .pnota2 .shipping-item + .shipping-item{border-left:1.5px solid #d6e0d8;}
+  .pnota2 .shipping-label{display:block;font-size:14px;color:#7a8580;margin-bottom:7px;}
+  .pnota2 .shipping-value{display:block;font-size:19px;font-weight:800;color:#1a1a1a;}
+  .pnota2 .cost-summary{display:flex;flex-direction:column;gap:11px;}
+  .pnota2 .cost-row{display:flex;justify-content:space-between;font-size:17px;}
+  .pnota2 .cost-label{color:#5b6660;}
+  .pnota2 .cost-value{font-weight:700;color:#1a1a1a;font-variant-numeric:tabular-nums;}
   .pnota2 .grand-total{
-    display:flex;align-items:center;justify-content:space-between;
-    background:#EAF7EF;border:1.5px solid #B9E3C6;border-radius:18px;padding:20px 24px;margin-bottom:0;
+    display:flex;justify-content:space-between;align-items:center;
+    background:#e6f6ea;border:2px solid #9fd4ae;border-radius:18px;padding:26px 28px;margin-bottom:0;
   }
-  .pnota2 .grand-total-left{display:flex;align-items:center;gap:14px;}
-  .pnota2 .grand-total-icon{
-    width:42px;height:42px;border-radius:12px;background:#168548;
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  }
-  .pnota2 .grand-total-icon svg{width:21px;height:21px;color:#ffffff;}
-  .pnota2 .grand-total-label{font-size:14px;font-weight:800;color:#0D6335;letter-spacing:.05em;}
-  .pnota2 .grand-total-value{font-size:36px;font-weight:800;color:#0D6335;font-variant-numeric:tabular-nums;}
-
-  /* ---- status pembayaran: alert semantic (warna & tint ikut status),
-     bukan sekadar teks berwarna di dalam kotak netral. ---- */
+  .pnota2 .grand-total-label{font-size:16.5px;font-weight:800;color:#1c7a45;letter-spacing:.04em;}
+  .pnota2 .grand-total-value{font-size:32px;font-weight:800;color:#124a2c;font-variant-numeric:tabular-nums;}
   .pnota2 .pay-status{
-    display:flex;flex-direction:column;gap:9px;
-    background:#FEF2F1;border:1.5px solid #F3B8B1;border-radius:16px;padding:16px 24px;margin-top:16px;
+    display:flex;justify-content:space-between;align-items:center;
+    background:#ffffff;border:1.5px solid #d6e0d8;border-radius:18px;padding:18px 26px;margin-top:18px;
   }
-  .pnota2 .pay-status .cost-row{border-bottom:none;padding:0;}
-  .pnota2 .pay-status .l{font-size:15px;font-weight:800;}
+  .pnota2 .pay-status .l{font-size:16px;font-weight:800;}
   .pnota2 .pay-status .v{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;}
 
   /* ===== responsive: HP / layar sempit =====
@@ -4105,6 +4076,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
       </div>
       <div class="md-card">
+        <h3>Isi Nama Otomatis (Foto Tanpa Caption)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Aktifkan hapus & kirim ulang otomatis</div>
+            <div class="md-togglerow-sub">Foto bukti transfer TANPA caption yang di-reply ke Rincian Pemesanan di grup dihapus lalu dikirim ulang bot dengan caption = nama customer. Nonaktif = foto tanpa caption dibiarkan APA ADANYA total (tidak dihapus/repost, tidak dibaca vision, tidak dapat reaction ✅/⚠️) — dan baris "Total: Rp..." di caption Rincian Pemesanan ikut disembunyikan. Foto yang SUDAH ada caption sendiri tidak terpengaruh toggle ini.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-autorepostnocaption">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card">
         <h3>Tombol Cepat Finance (Konfirmasi/Hoax/Deposit/Void)</h3>
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M7 12h2M13 12h4M7 15h10" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
@@ -5089,7 +5074,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, autoRepostNoCaptionEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -5103,6 +5088,7 @@ function loadSettings(){
     if(typeof s.telegramBotEnabled === "boolean") SETTINGS.telegramBotEnabled = s.telegramBotEnabled;
     if(typeof s.pasteOrderEnabled === "boolean") SETTINGS.pasteOrderEnabled = s.pasteOrderEnabled;
     if(typeof s.dmAutoMatchEnabled === "boolean") SETTINGS.dmAutoMatchEnabled = s.dmAutoMatchEnabled;
+    if(typeof s.autoRepostNoCaptionEnabled === "boolean") SETTINGS.autoRepostNoCaptionEnabled = s.autoRepostNoCaptionEnabled;
     if(typeof s.stickerButtonsEnabled === "boolean") SETTINGS.stickerButtonsEnabled = s.stickerButtonsEnabled;
     if(typeof s.stickyFormButtonsEnabled === "boolean") SETTINGS.stickyFormButtonsEnabled = s.stickyFormButtonsEnabled;
     if(typeof s.customBlueThemeEnabled === "boolean") SETTINGS.customBlueThemeEnabled = s.customBlueThemeEnabled;
@@ -5265,7 +5251,7 @@ const MASTER_DATA_WORKER_URL = "https://raspy-limit-ba21.rincian-pemesanan.worke
 // CATATAN: karena file ini statis & dibuka langsung di browser, nilai
 // ini tetap terlihat siapa saja yang buka "View Page Source" — ini
 // menutup akses acak/asal ketemu URL, BUKAN pengganti login sungguhan.
-const APP_SECRET = "281207767041cf19440c0b849f4d5027";
+const APP_SECRET = "GANTI_DENGAN_SECRET_YANG_SAMA_DENGAN_WORKER";
 // Helper: gabungkan header X-App-Secret ke setiap request ke worker,
 // supaya tidak perlu diketik ulang manual di tiap fetch().
 function workerHeaders(extra){
@@ -5332,10 +5318,7 @@ async function pushMasterDataToServer(){
       body: JSON.stringify(body),
     });
     if(!res.ok){
-      const body = await res.json().catch(()=> ({}));
-      const detail = body.message || body.error || ("HTTP " + res.status);
-      console.log("Master data online gagal dikirim - detail server:", detail);
-      showMsg("Gagal menyimpan ke server: " + detail + " (perubahan tetap tersimpan di HP ini).", true);
+      showMsg("Gagal menyimpan ke server (perubahan tetap tersimpan di HP ini).", true);
       return false;
     }else{
       window.__lastServerSnapshot = JSON.parse(JSON.stringify({ products: PRODUCTS, ekspedisi: EKSPEDISI, settings: settingsToSend }));
@@ -6061,10 +6044,10 @@ const ORDER_LOGO_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
   `<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-        <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0D6335" flood-opacity="0.25"></feDropShadow>
+        <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#075F43" flood-opacity="0.25"></feDropShadow>
       </filter>
     </defs>
-    <circle cx="100" cy="100" r="88" fill="#168548" filter="url(#shadow)"></circle>
+    <circle cx="100" cy="100" r="88" fill="#087A55" filter="url(#shadow)"></circle>
     <circle cx="100" cy="100" r="82" fill="none" stroke="#FFFFFF" stroke-width="4"></circle>
     <circle cx="100" cy="100" r="72" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.95"></circle>
     <text x="100" y="123" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800" letter-spacing="-4" fill="#FFFFFF">Rp</text>
@@ -6091,29 +6074,36 @@ function buildPrintNotaV2(tab){
     const prod = findProduct(name);
     const qty = tr.querySelector("input.qty").value || "0";
     const satuanLabel = prod ? prod.satuan : "";
-    // Subjudul di bawah nama produk SEKARANG menampilkan besaran DISKON per
-    // satuan (bukan harga satuan setelah diskon seperti sebelumnya), mis.
-    // "Diskon Rp 57.600 / Karton". Dihitung dari selisih harga awal (kolom
-    // "harga") vs harga satuan setelah diskon (kolom "satuan") — sumber
-    // datanya tetap sama tabel, cuma yang ditampilkan beda.
-    const hargaAwal = parseRp(tr.querySelector('[data-f="harga"]').textContent);
-    const hargaSatuan = parseRp(tr.querySelector('[data-f="satuan"]').textContent);
-    const diskonPerSatuan = Math.max(0, hargaAwal - hargaSatuan);
+    const harga = tr.querySelector('[data-f="harga"]').textContent;
+    const diskonEl = tr.querySelector('[data-f="diskon"]');
+    const diskon = diskonEl ? diskonEl.textContent : "–";
+    const hargaSatuan = tr.querySelector('[data-f="satuan"]').textContent;
     const total = tr.querySelector('[data-f="total"]').textContent;
     const imgSrc = (prod && prod.gambar) ? prod.gambar : PRODUCT_IMG_PLACEHOLDER;
     return `<div class="product-item">
-      <div class="product-number">${idx+1}</div>
-      <img class="product-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'">
-      <div class="product-name-wrap">
-        <p class="product-name">${name}</p>
-        <p class="product-sub">Diskon ${rupiah(diskonPerSatuan)} / ${satuanLabel}</p>
+      <div class="product-cols">
+        <div class="product-col-num"><div class="product-number">${idx+1}</div></div>
+        <div class="product-col-thumb"><img class="product-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'"></div>
+        <div class="product-col-name"><p class="product-name">${name}</p></div>
+        <div class="product-col-qty"><span class="product-val">${qty} ${satuanLabel}</span></div>
+        <div class="product-col-harga"><span class="product-val-muted">${harga}</span></div>
+        <div class="product-col-diskon"><span class="product-val-muted">${diskon}</span></div>
+        <div class="product-col-satuan"><span class="product-val">${hargaSatuan}</span></div>
+        <div class="product-col-total"><span class="product-total">${total}</span></div>
       </div>
-      <div class="product-qty">${qty} ${satuanLabel}</div>
-      <div class="product-total">${total}</div>
     </div>`;
   }).join("");
 
-  const itemCountPill = `<div class="product-list-total"><span>Total ${rows.length} item</span></div>`;
+  const headRow = `<div class="product-cols product-list-head">
+    <div class="product-col-num"></div>
+    <div class="product-col-thumb"></div>
+    <div class="product-col-name"><span>Produk</span></div>
+    <div class="product-col-qty"><span>Qty</span></div>
+    <div class="product-col-harga"><span>Harga</span></div>
+    <div class="product-col-diskon"><span>Diskon</span></div>
+    <div class="product-col-satuan"><span>Satuan</span></div>
+    <div class="product-col-total"><span>Total</span></div>
+  </div>`;
 
   const hari = document.getElementById("hariNow").textContent;
   const tgl = document.getElementById("tglNow").textContent;
@@ -6134,39 +6124,37 @@ function buildPrintNotaV2(tab){
   const isKurang = statusLabel === "Kurang bayar";
   const isKembalian = statusLabel === "Kembalian";
   const signPrefix = isKurang ? "-" : "";
-  const statusColor = isKurang ? "#D92D20" : (isKembalian ? "#1a73e8" : "#168548");
-  // Kotak status ikut berubah warna (bg tint + border) sesuai status —
-  // bukan cuma teksnya — supaya jadi alert semantic yang langsung terbaca
-  // sekilas, bukan kotak netral dengan teks berwarna di dalamnya.
-  const statusBg = isKurang ? "#FEF2F1" : (isKembalian ? "#EAF2FE" : "#EAF7EF");
-  const statusBorder = isKurang ? "#F3B8B1" : (isKembalian ? "#B8D4F5" : "#B9E3C6");
+  const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#1c7a45");
+
+  const jamSekarang = new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
 
   return `
     <div class="pnota2 order-summary">
       <div class="bg-blob bg-blob-1"></div>
       <div class="bg-blob bg-blob-2"></div>
       <div class="order-header">
-        <img class="order-logo-img" src="${ORDER_LOGO_IMG}" width="56" height="56" alt="">
+        <img class="order-logo-img" src="${ORDER_LOGO_IMG}" width="60" height="60" alt="">
         <h1 class="order-title">RINCIAN PEMESANAN</h1>
         <div class="order-meta">
-          <span><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2" stroke="#68736D" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v3.4M16 3v3.4" stroke="#68736D" stroke-width="1.6" stroke-linecap="round"/></svg>${tgl}</span>
+          <span><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2" stroke="#5b6660" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v3.4M16 3v3.4" stroke="#5b6660" stroke-width="1.6" stroke-linecap="round"/></svg>${tgl}</span>
           <span class="divider"></span>
-          <span><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.3" stroke="#68736D" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="#68736D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${hari}</span>
+          <span><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.3" stroke="#5b6660" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="#5b6660" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${jamSekarang} WIB</span>
+          <span class="divider"></span>
+          <span><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" stroke="#5b6660" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12h6M9 15.5h6" stroke="#5b6660" stroke-width="1.5" stroke-linecap="round"/></svg>–</span>
         </div>
       </div>
 
       <div class="order-section">
         <div class="section-header">
-          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8.5V7a6 6 0 0 1 12 0v1.5" stroke="#168548" stroke-width="1.7" stroke-linecap="round"/><rect x="4" y="8.5" width="16" height="12" rx="2" stroke="#168548" stroke-width="1.7"/></svg></div>
+          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8.5V7a6 6 0 0 1 12 0v1.5" stroke="#1c7a45" stroke-width="1.7" stroke-linecap="round"/><rect x="4" y="8.5" width="16" height="12" rx="2" stroke="#1c7a45" stroke-width="1.7"/></svg></div>
           <h2 class="section-title">PESANAN (${rows.length} ITEM)</h2>
         </div>
-        <div class="product-list">${itemsHtml}</div>
-        ${itemCountPill}
+        <div class="product-list">${headRow}${itemsHtml}</div>
       </div>
 
       <div class="order-section">
         <div class="section-header">
-          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="#168548" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="#168548" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.6" stroke="#168548" stroke-width="1.3"/><circle cx="15.5" cy="15.5" r="1.6" stroke="#168548" stroke-width="1.3"/></svg></div>
+          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/><circle cx="15.5" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/></svg></div>
           <h2 class="section-title">INFORMASI PENGIRIMAN</h2>
         </div>
         <div class="shipping-content">
@@ -6176,20 +6164,19 @@ function buildPrintNotaV2(tab){
         </div>
       </div>
 
-      <div class="summary-area">
-        <div class="cost-row"><span class="cost-label">Subtotal produk</span><strong class="cost-value">${subtotal}</strong></div>
-        <div class="cost-row"><span class="cost-label">Ongkir</span><strong class="cost-value">${ongkir}</strong></div>
-        <div class="cost-row"><span class="cost-label">Diskon ongkir</span><strong class="cost-value">${diskonongkir}</strong></div>
+      <div class="order-section">
+        <div class="cost-summary">
+          <div class="cost-row"><span class="cost-label">Subtotal produk</span><strong class="cost-value">${subtotal}</strong></div>
+          <div class="cost-row"><span class="cost-label">Ongkir</span><strong class="cost-value">${ongkir}</strong></div>
+          <div class="cost-row"><span class="cost-label">Diskon ongkir</span><strong class="cost-value">${diskonongkir}</strong></div>
+        </div>
       </div>
 
       <div class="grand-total">
-        <div class="grand-total-left">
-          <div class="grand-total-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12h6M9 15.5h6" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          <span class="grand-total-label">TOTAL PEMBAYARAN</span>
-        </div>
+        <span class="grand-total-label">TOTAL PEMBAYARAN</span>
         <strong class="grand-total-value">${grandtotal}</strong>
       </div>
-      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div class="pay-status" style="background:${statusBg};border-color:${statusBorder};">
+      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div class="pay-status" style="flex-direction:column;align-items:stretch;gap:10px;">
         ${kelebihan!==0 ? `<div class="cost-row"><span class="cost-label">Kelebihan bayar sebelumnya</span><strong class="cost-value">${kelebihanFmt}</strong></div>` : ``}
         <div class="cost-row"><span class="l" style="color:${statusColor}">${statusLabel}</span><span class="v" style="color:${statusColor}">${signPrefix}${selisihFmt}</span></div>
       </div>` : ``}
@@ -6627,7 +6614,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         }),
       });
       const body = await res.json().catch(()=>({}));
-      if(!res.ok || !body.ok) throw new Error(body.message || body.error || ("HTTP " + res.status));
+      if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
 
       statusEl.textContent = "Berhasil dikirim ke grup Telegram.";
       statusEl.style.color = "var(--primary-green)";
@@ -8928,6 +8915,19 @@ if ("serviceWorker" in navigator) {
     await confirmMasterDataSave(SETTINGS.dmAutoMatchEnabled ? "Cocok Otomatis Bukti Transfer (DM Bot) diaktifkan." : "Cocok Otomatis Bukti Transfer (DM Bot) dinonaktifkan.");
   });
 
+  /* ---------- toggle Isi Nama Otomatis / foto tanpa caption (Tampilan) ----------
+     Murni dibaca oleh worker.js (backend) — sama seperti toggle DM Bot.
+     Nonaktif = foto bukti transfer tanpa caption dibiarkan polos total
+     (tidak dihapus/repost, tidak dibaca vision, tidak dapat reaction),
+     dan baris "Total: Rp..." di caption Rincian Pemesanan ikut disembunyikan. */
+  const toggleAutoRepostNoCaption = document.getElementById("md-toggle-autorepostnocaption");
+  toggleAutoRepostNoCaption.checked = SETTINGS.autoRepostNoCaptionEnabled;
+  toggleAutoRepostNoCaption.addEventListener("change", async ()=>{
+    SETTINGS.autoRepostNoCaptionEnabled = toggleAutoRepostNoCaption.checked;
+    saveSettings();
+    await confirmMasterDataSave(SETTINGS.autoRepostNoCaptionEnabled ? "Isi Nama Otomatis (Foto Tanpa Caption) diaktifkan." : "Isi Nama Otomatis (Foto Tanpa Caption) dinonaktifkan.");
+  });
+
   /* ---------- toggle Tombol Cepat Finance / stiker (Tampilan) ----------
      Murni dibaca oleh worker.js (backend) — sama seperti toggle DM Bot. */
   const toggleDarkMode = document.getElementById("md-toggle-darkmode");
@@ -9048,7 +9048,7 @@ if ("serviceWorker" in navigator) {
       try{
         const res = await fetch(MASTER_DATA_WORKER_URL + "/ai-quota-status", { headers: workerHeaders() });
         const data = await res.json();
-        if(!res.ok || data.error) throw new Error(data.message || data.error || "Gagal ambil data.");
+        if(!res.ok || data.error) throw new Error(data.error || "Gagal ambil data.");
 
         const rows = data.groq.map(g=>
           g.budgetTokens==null ? cooldownBadgeRow(g.label, g.cooldown) : barRow(g.label, g.usedTokens, g.budgetTokens, g.percent)
