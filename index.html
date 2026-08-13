@@ -582,6 +582,8 @@
   .pnota2 .product-col-diskon{width:80px;flex-shrink:0;text-align:right;}
   .pnota2 .product-col-satuan{width:112px;flex-shrink:0;text-align:right;}
   .pnota2 .product-col-total{width:128px;flex-shrink:0;text-align:right;}
+  .pnota2 .shipping-icon{width:24px;height:24px;margin:0 auto 8px;}
+  .pnota2 .shipping-icon svg{width:24px;height:24px;}
   .pnota2 .product-list-head{
     padding:0 0 14px;border-bottom:2px solid #d6e0d8;margin-bottom:0;
   }
@@ -622,8 +624,12 @@
     display:flex;justify-content:space-between;align-items:center;
     background:#ffffff;border:1.5px solid #d6e0d8;border-radius:18px;padding:18px 26px;margin-top:18px;
   }
-  .pnota2 .pay-status .l{font-size:16px;font-weight:800;}
+  .pnota2 .pay-status .l{font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;}
   .pnota2 .pay-status .v{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .pnota2 .order-footer{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:20px;}
+  .pnota2 .footer-icon{width:19px;height:19px;flex-shrink:0;}
+  .pnota2 .footer-icon svg{width:19px;height:19px;}
+  .pnota2 .footer-text{font-size:13.5px;color:#5b6660;margin:0;text-align:center;}
 
   /* ===== responsive: HP / layar sempit =====
      Kondisi kedua (max-height + landscape + pointer:coarse) supaya HP yang
@@ -4076,6 +4082,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
       </div>
       <div class="md-card">
+        <h3>Isi Nama Otomatis (Foto Tanpa Caption)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.4" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Aktifkan hapus & kirim ulang otomatis</div>
+            <div class="md-togglerow-sub">Foto bukti transfer TANPA caption yang di-reply ke Rincian Pemesanan di grup dihapus lalu dikirim ulang bot dengan caption = nama customer. Nonaktif = foto tanpa caption dibiarkan APA ADANYA total (tidak dihapus/repost, tidak dibaca vision, tidak dapat reaction ✅/⚠️) — dan baris "Total: Rp..." di caption Rincian Pemesanan ikut disembunyikan. Foto yang SUDAH ada caption sendiri tidak terpengaruh toggle ini.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-autorepostnocap">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card">
         <h3>Tombol Cepat Finance (Konfirmasi/Hoax/Deposit/Void)</h3>
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M7 12h2M13 12h4M7 15h10" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
@@ -5060,7 +5080,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -5087,6 +5107,7 @@ function loadSettings(){
     if(Array.isArray(s.financeList)) SETTINGS.financeList = s.financeList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
     if(typeof s.resiCrossCheckThresholdPercent === "number" && s.resiCrossCheckThresholdPercent > 0) SETTINGS.resiCrossCheckThresholdPercent = s.resiCrossCheckThresholdPercent;
     if(typeof s.resiCrossCheckReactionEnabled === "boolean") SETTINGS.resiCrossCheckReactionEnabled = s.resiCrossCheckReactionEnabled;
+    if(typeof s.autoRepostNoCaptionEnabled === "boolean") SETTINGS.autoRepostNoCaptionEnabled = s.autoRepostNoCaptionEnabled;
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
 function saveSettings(){
@@ -6113,6 +6134,8 @@ function buildPrintNotaV2(tab){
   const isKembalian = statusLabel === "Kembalian";
   const signPrefix = isKurang ? "-" : "";
   const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#1c7a45");
+  const statusBg = isKurang ? "#fdecea" : (isKembalian ? "#e8f0fe" : "#e6f6ea");
+  const statusBorder = isKurang ? "#f3b4ae" : (isKembalian ? "#aac9f7" : "#9fd4ae");
 
   const jamSekarang = new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
 
@@ -6146,9 +6169,9 @@ function buildPrintNotaV2(tab){
           <h2 class="section-title">INFORMASI PENGIRIMAN</h2>
         </div>
         <div class="shipping-content">
-          <div class="shipping-item"><span class="shipping-label">Total produk</span><strong class="shipping-value">${totalqty}</strong></div>
-          <div class="shipping-item"><span class="shipping-label">Total berat</span><strong class="shipping-value">${totalberat}</strong></div>
-          <div class="shipping-item"><span class="shipping-label">Ekspedisi</span><strong class="shipping-value">${ekspedisi}</strong></div>
+          <div class="shipping-item"><div class="shipping-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 7.5L12 12l8-4.5M12 12v9" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/></svg></div><span class="shipping-label">Total produk</span><strong class="shipping-value">${totalqty}</strong></div>
+          <div class="shipping-item"><div class="shipping-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M7 8h10" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/><path d="M4 8l3-3.2 3 3.2M14 8l3-3.2 3 3.2" stroke="#1c7a45" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.3 8a2.8 3.6 0 0 0 5.6 0M14.3 8a2.8 3.6 0 0 0 5.6 0" stroke="#1c7a45" stroke-width="1.4" stroke-linecap="round"/><path d="M8 20h8" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/></svg></div><span class="shipping-label">Total berat</span><strong class="shipping-value">${totalberat}</strong></div>
+          <div class="shipping-item"><div class="shipping-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/><circle cx="15.5" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/></svg></div><span class="shipping-label">Ekspedisi</span><strong class="shipping-value">${ekspedisi}</strong></div>
         </div>
       </div>
 
@@ -6164,24 +6187,45 @@ function buildPrintNotaV2(tab){
         <span class="grand-total-label">TOTAL PEMBAYARAN</span>
         <strong class="grand-total-value">${grandtotal}</strong>
       </div>
-      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div class="pay-status" style="flex-direction:column;align-items:stretch;gap:10px;">
+      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div class="pay-status" style="flex-direction:column;align-items:stretch;gap:10px;background:${statusBg};border-color:${statusBorder};">
         ${kelebihan!==0 ? `<div class="cost-row"><span class="cost-label">Kelebihan bayar sebelumnya</span><strong class="cost-value">${kelebihanFmt}</strong></div>` : ``}
         <div class="cost-row"><span class="l" style="color:${statusColor}">${statusLabel}</span><span class="v" style="color:${statusColor}">${signPrefix}${selisihFmt}</span></div>
       </div>` : ``}
+      <div class="order-footer">
+        <div class="footer-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#2b2b2b"/><path d="M8 12.3l2.6 2.6L16.2 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <p class="footer-text">Terima kasih atas kepercayaannya, semoga membawa keberkahan untuk kita semua ❤️</p>
+      </div>
     </div>
   `;
 }
 
-async function renderCanvas(){
-  const tab = document.querySelector(".tab-btn.active").dataset.tab;
-  const holder = document.getElementById("print-holder");
-  const useV2 = getNotaDesignPref() === "baru";
-  holder.innerHTML = useV2 ? buildPrintNotaV2(tab) : buildPrintNota(tab);
-  await new Promise(r=>setTimeout(r, 50)); // beri waktu render/layout
-  const target = holder.querySelector(useV2 ? ".pnota2" : ".pnota");
-  const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:1, useCORS:true});
-  holder.innerHTML = "";
-  return canvas;
+/* renderCanvas() dipanggil dari BANYAK tempat (tombol unduh/bagikan/kirim,
+   DAN autosave draft yang otomatis jalan sambil CS mengetik nama customer
+   di popup Kirim ke Telegram). Semuanya berbagi SATU elemen DOM sementara
+   (#print-holder) untuk menggambar nota sebelum di-screenshot.
+   Kalau dua pemanggilan ini kebetulan tumpang tindih waktunya, yang satu
+   bisa "menimpa"/mengosongkan #print-holder sebelum yang lain sempat
+   mengambil elemennya — hasilnya html2canvas menerima null/undefined dan
+   gagal dengan error "Invalid element provided as first argument".
+   Solusinya: antre-kan (serialize) semua pemanggilan renderCanvas() lewat
+   satu rantai Promise, supaya cuma SATU render yang jalan dalam satu waktu. */
+let _renderCanvasQueue = Promise.resolve();
+function renderCanvas(){
+  const run = async () => {
+    const tab = document.querySelector(".tab-btn.active").dataset.tab;
+    const holder = document.getElementById("print-holder");
+    const useV2 = getNotaDesignPref() === "baru";
+    holder.innerHTML = useV2 ? buildPrintNotaV2(tab) : buildPrintNota(tab);
+    await new Promise(r=>setTimeout(r, 50)); // beri waktu render/layout
+    const target = holder.querySelector(useV2 ? ".pnota2" : ".pnota");
+    const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:1, useCORS:true});
+    holder.innerHTML = "";
+    return canvas;
+  };
+  const result = _renderCanvasQueue.then(run, run);
+  // apapun hasilnya (sukses/gagal), giliran berikutnya tetap lanjut jalan
+  _renderCanvasQueue = result.then(()=>{}, ()=>{});
+  return result;
 }
 
 function downloadCanvas(canvas){
@@ -9172,6 +9216,15 @@ if ("serviceWorker" in navigator) {
     saveSettings();
     await confirmMasterDataSave(SETTINGS.resiCrossCheckReactionEnabled ? "Reaksi otomatis di foto resi diaktifkan." : "Reaksi otomatis di foto resi dinonaktifkan.");
   });
+
+  const toggleAutoRepostNoCap = document.getElementById("md-toggle-autorepostnocap");
+  toggleAutoRepostNoCap.checked = SETTINGS.autoRepostNoCaptionEnabled;
+  toggleAutoRepostNoCap.addEventListener("change", async ()=>{
+    SETTINGS.autoRepostNoCaptionEnabled = toggleAutoRepostNoCap.checked;
+    saveSettings();
+    await confirmMasterDataSave(SETTINGS.autoRepostNoCaptionEnabled ? "Isi nama otomatis (foto tanpa caption) diaktifkan." : "Isi nama otomatis (foto tanpa caption) dinonaktifkan.");
+  });
+
 
   /* ---------- buka/tutup ---------- */
   const trigger = document.getElementById("md-secret-tap");
