@@ -842,6 +842,8 @@
     .home-actionrow.calc .home-actionrow-label{color:var(--ink);}
     .home-actionrow.tgid .home-actionrow-icon{background:#546e7a;}
     .home-actionrow.tgid .home-actionrow-label{color:#546e7a;}
+    .home-actionrow.kwitansi .home-actionrow-icon{background:#c9860a;}
+    .home-actionrow.kwitansi .home-actionrow-label{color:#c9860a;}
     .home-actionrow.reset{border:1.5px solid #f2b3ab;}
     .home-actionrow.reset .home-actionrow-icon{background:var(--danger-red);}
     .home-actionrow.reset .home-actionrow-label{color:var(--danger-red);}
@@ -3442,6 +3444,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 7h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8.3" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="15.7" cy="12" r="1" fill="currentColor"/><circle cx="8.3" cy="15.6" r="1" fill="currentColor"/><circle cx="12" cy="15.6" r="1" fill="currentColor"/><circle cx="15.7" cy="15.6" r="1" fill="currentColor"/></svg>
       Kalkulator
     </button>
+    <button type="button" class="habit-sidebar-link" id="sb-kwitansi">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 2.5h9l3 3V21.5H6V2.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 10.5h6M9 14h6M9 17.5h3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Kwitansi
+    </button>
   </nav>
   <div class="habit-sidebar-version">Habit · versi <span id="sb-app-version">2.9.3</span></div>
 </aside>
@@ -3547,6 +3553,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
               <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M8 7h8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="8.3" cy="12" r="1" fill="#fff"/><circle cx="12" cy="12" r="1" fill="#fff"/><circle cx="15.7" cy="12" r="1" fill="#fff"/><circle cx="8.3" cy="15.6" r="1" fill="#fff"/><circle cx="12" cy="15.6" r="1" fill="#fff"/><circle cx="15.7" cy="15.6" r="1" fill="#fff"/></svg>
             </span>
             <span class="home-actionrow-textwrap"><span class="home-actionrow-label">Kalkulator</span></span>
+            <span class="home-actionrow-arrow">›</span>
+          </button>
+          <button type="button" class="home-actionrow kwitansi" id="home-link-kwitansi">
+            <span class="home-actionrow-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M6 2.5h9l3 3V21.5H6V2.5z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 10.5h6M9 14h6M9 17.5h3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </span>
+            <span class="home-actionrow-textwrap"><span class="home-actionrow-label">Kwitansi</span></span>
             <span class="home-actionrow-arrow">›</span>
           </button>
           <button type="button" class="home-actionrow reset" id="home-link-reset">
@@ -4153,6 +4166,8 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <input type="text" id="md-finance-name" placeholder="Nama (mis. Fulanah)" style="flex:1; min-width:120px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
           <input type="text" inputmode="numeric" id="md-finance-id" placeholder="Telegram ID (angka)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
         </div>
+        <input type="text" id="md-finance-ttd" placeholder="Link Tanda Tangan (URL gambar, opsional)" style="width:100%; box-sizing:border-box; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card); margin-top:8px;">
+        <div class="md-note" style="margin-top:6px;">Tempel link gambar tanda tangan (bukan unggah file) — dipakai otomatis saat Finance ini dipilih di popup Kwitansi. Bisa dikosongkan dulu lalu diisi/diubah belakangan lewat kolom di tiap baris daftar di bawah.</div>
         <div class="md-pin-err" id="md-finance-err"></div>
         <button class="md-btn primary" id="md-finance-add" style="margin-top:10px;">+ Tambah Finance</button>
       </div>
@@ -4408,6 +4423,75 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
   </div>
 
+  <!-- ================= POPUP KWITANSI (Tanda Terima Pembayaran) ================= -->
+  <div id="kwitansi-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup confirm-popup" role="dialog" aria-label="Buat Kwitansi" style="max-height:88vh;overflow-y:auto;">
+      <div class="calc-head">
+        <span>🧾 Kwitansi</span>
+        <button id="kwitansi-close" class="calc-close" aria-label="Tutup">✕</button>
+      </div>
+      <div class="confirm-body">
+        <p>Isi data pembayaran, lalu unduh kwitansinya sebagai gambar — tata letaknya mengikuti kwitansi yang biasa dipakai.</p>
+
+        <label for="kw-nama" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Telah terima dari <span style="color:var(--danger-red);">*wajib</span></label>
+        <input type="text" id="kw-nama" class="kt-input" placeholder="Nama pengirim/customer" autocomplete="off">
+
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <div style="flex:1;">
+            <label for="kw-invoice" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Invoice No (opsional)</label>
+            <input type="text" id="kw-invoice" class="kt-input" placeholder="—" autocomplete="off">
+          </div>
+          <div style="flex:1;">
+            <label for="kw-tanggal" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Tanggal</label>
+            <input type="date" id="kw-tanggal" class="kt-input" autocomplete="off">
+          </div>
+        </div>
+
+        <label for="kw-banyaknya" style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-top:10px;display:block;">Banyaknya (Rp) <span style="color:var(--danger-red);">*wajib</span></label>
+        <input type="text" id="kw-banyaknya" class="kt-input" placeholder="0" inputmode="numeric" autocomplete="off">
+
+        <label for="kw-untuk" style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-top:10px;display:block;">Untuk Pembayaran</label>
+        <input type="text" id="kw-untuk" class="kt-input" placeholder="mis. Tagihan 50 Karton Halawa" autocomplete="off">
+
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <div style="flex:1;">
+            <label for="kw-saldo-awal" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Saldo Awal (Rp)</label>
+            <input type="text" id="kw-saldo-awal" class="kt-input" placeholder="0" inputmode="numeric" autocomplete="off">
+          </div>
+          <div style="flex:1;">
+            <label for="kw-pembayaran" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Pembayaran (Rp)</label>
+            <input type="text" id="kw-pembayaran" class="kt-input" placeholder="0" inputmode="numeric" autocomplete="off">
+          </div>
+        </div>
+        <p class="kt-hint">Kekurangan (otomatis): <b id="kw-kekurangan-preview">Rp 0</b></p>
+
+        <div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);">
+          <label for="kw-penyetuju-select" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Tanda tangan (Disetujui oleh)</label>
+          <p class="kt-hint" style="margin-top:2px;">Pilih dari Daftar Finance (Master Data → Tampilan) — tanda tangannya otomatis terpakai sesuai link yang diisi di sana.</p>
+          <select id="kw-penyetuju-select" class="kt-input"></select>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+            <div id="kw-ttd-preview-wrap" style="width:84px;height:52px;border:1px dashed var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;flex-shrink:0;">
+              <span id="kw-ttd-empty" style="font-size:10px;color:var(--ink-soft);text-align:center;">Belum ada</span>
+              <img id="kw-ttd-img" src="" alt="Tanda tangan" crossorigin="anonymous" style="max-width:100%;max-height:100%;display:none;">
+            </div>
+            <div id="kw-nama-penyetuju-wrap" style="flex:1;min-width:0;">
+              <label for="kw-nama-penyetuju" style="font-size:11.5px;font-weight:700;color:var(--ink-soft);">Nama yang menyetujui</label>
+              <input type="text" id="kw-nama-penyetuju" class="kt-input" placeholder="mis. Nanik" autocomplete="off" style="margin-top:4px;">
+            </div>
+          </div>
+        </div>
+
+        <p class="kt-hint" id="kw-status"></p>
+      </div>
+      <div class="confirm-actionrow" style="flex-wrap:wrap;">
+        <button id="kwitansi-cancel" class="calc-actbtn calc-clearbtn" style="flex:1 1 100%;">Tutup</button>
+        <button id="kwitansi-copy" class="calc-actbtn calc-clearbtn" style="flex:1;">⧉ Salin</button>
+        <button id="kwitansi-share" class="calc-actbtn calc-clearbtn" style="flex:1;">⇪ Bagikan</button>
+        <button id="kwitansi-download" class="calc-actbtn confirm-okbtn kt-okbtn" style="flex:1;">⬇ Unduh</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= POPUP TAMBAH EKSPEDISI BARU ================= -->
   <div id="md-ekspedisi-add-overlay" class="md-overlay" hidden>
     <div class="calc-popup confirm-popup" role="dialog" aria-label="Tambah ekspedisi baru">
@@ -4447,7 +4531,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.16.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.17.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Tanda tangan Kwitansi sekarang <b>dikelola per admin Finance</b> lewat Master Data → Tampilan → Daftar Finance: tiap Finance yang terdaftar bisa diisi <b>Link Tanda Tangan (URL)</b> sendiri-sendiri (ditempel, bukan unggah file), lengkap dengan thumbnail pratinjau di daftarnya. Popup Kwitansi tidak lagi unggah gambar per HP — sekarang tinggal <b>pilih nama dari dropdown "Disetujui oleh"</b>, tanda tangannya otomatis terpakai. Opsi "Lainnya (isi manual)" tetap tersedia untuk penyetuju di luar Daftar Finance (tanpa gambar tanda tangan).</li>
+            <li>Popup Kwitansi dapat 2 tombol baru <b>⧉ Salin</b> &amp; <b>⇪ Bagikan</b> di samping ⬇ Unduh — perilakunya sama seperti tombol Salin/Bagikan di nota (fallback otomatis ke unduh kalau perangkat/browser tidak mendukung).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.16.1</div>
           <ul>
             <li><b>Perbaikan bug:</b> tombol "Cek Pembaruan" &amp; "ID Telegram Saya" di footer sebelumnya <b>tidak pernah muncul sama sekali</b> (baik di HP maupun desktop) — kena hide tidak sengaja oleh aturan CSS yang sebenarnya cuma ditujukan buat menyembunyikan link "Riwayat Update" versi footer (karena sudah ada duplikatnya di Beranda). Sekarang cuma "Riwayat Update" yang disembunyikan di footer, "Cek Pembaruan" &amp; "ID Telegram Saya" sudah kelihatan lagi.</li>
             <li><b>Perbaikan kontras (dark mode + Tema Biru Custom):</b> ikon ringkasan di layar Review (Total qty/Total berat/Subtotal/Ongkir/Diskon Ongkir) nyaris tidak kelihatan karena warna birunya terlalu gelap di atas latar kartu yang juga gelap. Warna biru & latar kotak ikonnya dicerahkan khusus mode gelap supaya jelas kebaca, sama seperti perlakuan tema hijau standar.</li>
@@ -7227,6 +7318,339 @@ document.addEventListener("keydown", (e)=>{
   });
 })();
 
+/* ============ Kwitansi (Tanda Terima Pembayaran) ============
+   Popup form terpisah dari alur Nota — hasilnya digambar ke #print-holder
+   (elemen sementara yang sama dipakai renderCanvas() untuk nota) lalu
+   di-screenshot pakai html2canvas, sama seperti tombol Unduh nota.
+   Tanda tangan disimpan sebagai dataURL di localStorage supaya tidak
+   perlu upload ulang setiap kali bikin kwitansi baru. */
+(function(){
+  const KW_NAMA_KEY = "notaHalawa_kwitansiTtdNama"; // nama terakhir dipakai di mode manual
+  const KW_SELECTED_KEY = "notaHalawa_kwitansiPenyetujuId"; // Telegram ID Finance (atau "__manual__") terakhir dipilih
+
+  const overlay = document.getElementById("kwitansi-overlay");
+  if(!overlay) return;
+
+  const btnOpenHome = document.getElementById("home-link-kwitansi");
+  const btnOpenSidebar = document.getElementById("sb-kwitansi");
+  const btnClose = document.getElementById("kwitansi-close");
+  const btnCancel = document.getElementById("kwitansi-cancel");
+  const btnDownload = document.getElementById("kwitansi-download");
+  const btnCopy = document.getElementById("kwitansi-copy");
+  const btnShare = document.getElementById("kwitansi-share");
+  const statusEl = document.getElementById("kw-status");
+
+  const elNama = document.getElementById("kw-nama");
+  const elInvoice = document.getElementById("kw-invoice");
+  const elTanggal = document.getElementById("kw-tanggal");
+  const elBanyaknya = document.getElementById("kw-banyaknya");
+  const elUntuk = document.getElementById("kw-untuk");
+  const elSaldoAwal = document.getElementById("kw-saldo-awal");
+  const elPembayaran = document.getElementById("kw-pembayaran");
+  const elKekuranganPreview = document.getElementById("kw-kekurangan-preview");
+  const elNamaPenyetuju = document.getElementById("kw-nama-penyetuju");
+  const elNamaPenyetujuWrap = document.getElementById("kw-nama-penyetuju-wrap");
+  const elPenyetujuSelect = document.getElementById("kw-penyetuju-select");
+
+  const elTtdImg = document.getElementById("kw-ttd-img");
+  const elTtdEmpty = document.getElementById("kw-ttd-empty");
+
+  applyRibuanTo("kw-banyaknya", "kw-saldo-awal", "kw-pembayaran");
+
+  function getTtdNama(){ try{ return localStorage.getItem(KW_NAMA_KEY) || ""; }catch(e){ return ""; } }
+  function setTtdNama(v){ try{ localStorage.setItem(KW_NAMA_KEY, v || ""); }catch(e){} }
+  function getSelectedId(){ try{ return localStorage.getItem(KW_SELECTED_KEY) || ""; }catch(e){ return ""; } }
+  function setSelectedId(v){ try{ localStorage.setItem(KW_SELECTED_KEY, v || ""); }catch(e){} }
+
+  function findFinance(telegramId){
+    return (Array.isArray(SETTINGS.financeList) ? SETTINGS.financeList : []).find(f=> f.telegramId === telegramId);
+  }
+  function currentTtdUrl(){
+    const val = elPenyetujuSelect.value;
+    if(!val || val === "__manual__") return "";
+    const f = findFinance(val);
+    return (f && f.ttdUrl) ? f.ttdUrl : "";
+  }
+
+  /* Isi ulang pilihan "Disetujui oleh" dari Daftar Finance (Master Data →
+     Tampilan) setiap popup dibuka, supaya selalu ikut data terbaru. */
+  function renderPenyetujuOptions(){
+    const list = Array.isArray(SETTINGS.financeList) ? SETTINGS.financeList : [];
+    const prev = elPenyetujuSelect.value;
+    elPenyetujuSelect.innerHTML = `<option value="">— Pilih —</option>` +
+      list.map(f=> `<option value="${(f.telegramId||"").replace(/"/g,"&quot;")}">${(f.name||"").replace(/</g,"&lt;")}</option>`).join("") +
+      `<option value="__manual__">Lainnya (isi manual)</option>`;
+    if(prev && Array.from(elPenyetujuSelect.options).some(o=> o.value === prev)) elPenyetujuSelect.value = prev;
+  }
+
+  function refreshTtdPreview(){
+    const ttd = currentTtdUrl();
+    if(ttd){
+      elTtdImg.src = ttd; elTtdImg.style.display = "block"; elTtdEmpty.style.display = "none";
+    } else {
+      elTtdImg.src = ""; elTtdImg.style.display = "none"; elTtdEmpty.style.display = "block";
+    }
+  }
+
+  function applyPenyetujuSelection(){
+    const val = elPenyetujuSelect.value;
+    if(val === "__manual__"){
+      elNamaPenyetuju.readOnly = false;
+      elNamaPenyetuju.placeholder = "mis. Nanik";
+      elNamaPenyetuju.value = getTtdNama();
+    } else if(val){
+      const f = findFinance(val);
+      elNamaPenyetuju.readOnly = true;
+      elNamaPenyetuju.value = f ? f.name : "";
+    } else {
+      elNamaPenyetuju.readOnly = true;
+      elNamaPenyetuju.value = "";
+      elNamaPenyetuju.placeholder = "Pilih dulu di atas";
+    }
+    refreshTtdPreview();
+  }
+
+  elPenyetujuSelect.addEventListener("change", ()=>{
+    setSelectedId(elPenyetujuSelect.value);
+    applyPenyetujuSelection();
+  });
+  elNamaPenyetuju.addEventListener("input", ()=>{
+    if(elPenyetujuSelect.value === "__manual__") setTtdNama(elNamaPenyetuju.value.trim());
+  });
+
+  function recalcKekurangan(){
+    const saldoAwal = parseRp(elSaldoAwal.value);
+    const pembayaran = parseRp(elPembayaran.value);
+    elKekuranganPreview.textContent = rupiah(saldoAwal - pembayaran);
+  }
+  elSaldoAwal.addEventListener("input", recalcKekurangan);
+  elPembayaran.addEventListener("input", recalcKekurangan);
+
+  // Saldo Awal otomatis ikut "Banyaknya" selama user belum mengubahnya sendiri
+  // (dianggap "belum disentuh" kalau isinya masih kosong atau masih sama
+  // dengan nilai Banyaknya sebelumnya) — meniru pola di file Excel acuan
+  // (NASUHA: Saldo Awal = Banyaknya saat pembayaran belum ada).
+  let saldoAwalTouched = false;
+  elSaldoAwal.addEventListener("focus", ()=>{ saldoAwalTouched = true; });
+  elBanyaknya.addEventListener("input", ()=>{
+    if(!saldoAwalTouched){ elSaldoAwal.value = elBanyaknya.value; recalcKekurangan(); }
+  });
+
+  function todayISO(){
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  }
+  function formatTanggalID(iso){
+    if(!iso) return "—";
+    const [y,m,d] = iso.split("-");
+    const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    const mi = parseInt(m,10)-1;
+    if(!y || !d || isNaN(mi) || !bulan[mi]) return iso;
+    return `${parseInt(d,10)} ${bulan[mi]} ${y}`;
+  }
+
+  function openModal(){
+    elTanggal.value = elTanggal.value || todayISO();
+    renderPenyetujuOptions();
+    const sel = getSelectedId();
+    if(sel && Array.from(elPenyetujuSelect.options).some(o=> o.value === sel)) elPenyetujuSelect.value = sel;
+    applyPenyetujuSelection();
+    saldoAwalTouched = false;
+    recalcKekurangan();
+    statusEl.textContent = "";
+    overlay.hidden = false;
+    setTimeout(()=> elNama.focus(), 50);
+  }
+  function closeModal(){ overlay.hidden = true; }
+
+  if(btnOpenHome) btnOpenHome.addEventListener("click", openModal);
+  if(btnOpenSidebar) btnOpenSidebar.addEventListener("click", openModal);
+  btnClose.addEventListener("click", closeModal);
+  btnCancel.addEventListener("click", closeModal);
+  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
+  document.addEventListener("keydown", (e)=>{ if(!overlay.hidden && e.key === "Escape") closeModal(); });
+
+  /* ---- Bangun HTML kwitansi, gambar sesuai pola sheet acuan (NASUHA):
+     kop nama+wilayah kiri, Invoice No/Tanggal kanan atas, baris
+     "Telah terima dari/Banyaknya/Untuk Pembayaran" kiri, blok
+     Saldo Awal/Pembayaran/Kekurangan kanan, lalu baris tanda tangan. ---- */
+  function buildPrintKwitansi(data){
+    const ttdImgHtml = data.ttd
+      ? `<img src="${data.ttd}" alt="Tanda tangan" crossorigin="anonymous" style="max-height:56px;max-width:170px;object-fit:contain;display:block;margin:0 0 4px auto;">`
+      : `<div style="height:56px;"></div>`;
+    return `
+      <div class="pkwitansi" style="width:560px;box-sizing:border-box;background:#ffffff;padding:34px 40px;font-family:'Roboto',Arial,sans-serif;color:#1a1a1a;">
+        <div style="text-align:center;font-size:22px;font-weight:800;letter-spacing:.06em;margin-bottom:22px;">RECEIPT</div>
+
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;">
+          <div>
+            <div style="font-size:15px;font-weight:800;">Halawa</div>
+            <div style="font-size:12.5px;color:#555;">Jawa Timur</div>
+          </div>
+          <table style="font-size:12.5px;border-collapse:collapse;">
+            <tr><td style="padding:2px 8px 2px 0;color:#555;">Invoice No</td><td style="padding:2px 0;color:#555;">:</td><td style="padding:2px 0 2px 8px;font-weight:600;">${data.invoice || "—"}</td></tr>
+            <tr><td style="padding:2px 8px 2px 0;color:#555;">Tanggal</td><td style="padding:2px 0;color:#555;">:</td><td style="padding:2px 0 2px 8px;font-weight:600;">${data.tanggalDisplay}</td></tr>
+          </table>
+        </div>
+
+        <table style="font-size:13px;border-collapse:collapse;margin-bottom:18px;width:100%;">
+          <tr><td style="padding:3px 8px 3px 0;color:#555;white-space:nowrap;">Telah terima dari</td><td style="padding:3px 0;color:#555;">:</td><td style="padding:3px 0 3px 10px;font-weight:700;">${data.nama}</td></tr>
+          <tr><td style="padding:3px 8px 3px 0;color:#555;white-space:nowrap;">Banyaknya</td><td style="padding:3px 0;color:#555;">:</td><td style="padding:3px 0 3px 10px;font-weight:700;">${rupiah(data.banyaknya)}</td></tr>
+          <tr><td style="padding:3px 8px 3px 0;color:#555;white-space:nowrap;vertical-align:top;">Untuk Pembayaran</td><td style="padding:3px 0;color:#555;vertical-align:top;">:</td><td style="padding:3px 0 3px 10px;">${data.untuk || "—"}</td></tr>
+        </table>
+
+        <div style="display:flex;justify-content:flex-end;margin-bottom:30px;">
+          <table style="font-size:12.5px;border-collapse:collapse;">
+            <tr><td style="padding:2px 8px 2px 0;color:#555;">Saldo Awal</td><td style="padding:2px 0;color:#555;">:</td><td style="padding:2px 0 2px 8px;font-weight:600;text-align:right;">${rupiah(data.saldoAwal)}</td></tr>
+            <tr><td style="padding:2px 8px 2px 0;color:#555;">Pembayaran</td><td style="padding:2px 0;color:#555;">:</td><td style="padding:2px 0 2px 8px;font-weight:600;text-align:right;">${rupiah(data.pembayaran)}</td></tr>
+            <tr><td style="padding:2px 8px 2px 0;color:#555;">Kekurangan</td><td style="padding:2px 0;color:#555;">:</td><td style="padding:2px 0 2px 8px;font-weight:700;text-align:right;">${rupiah(data.kekurangan)}</td></tr>
+          </table>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px;">
+          <div style="font-size:12px;color:#555;">Penerima / Received By</div>
+          <div style="font-size:12px;color:#555;text-align:right;">Disetujui oleh/Approve by</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:44px;">
+          <div style="width:190px;border-top:1px solid #999;"></div>
+          <div style="width:190px;text-align:right;">
+            ${ttdImgHtml}
+            <div style="border-top:1px solid #999;padding-top:4px;font-weight:600;font-size:12.5px;">${data.namaPenyetuju || "&nbsp;"}</div>
+          </div>
+        </div>
+
+        <div style="margin-top:26px;font-size:12.5px;color:#555;">Terima Kasih</div>
+      </div>`;
+  }
+
+  function readForm(){
+    return {
+      nama: elNama.value.trim(),
+      invoice: elInvoice.value.trim(),
+      tanggalDisplay: formatTanggalID(elTanggal.value || todayISO()),
+      banyaknya: parseRp(elBanyaknya.value),
+      untuk: elUntuk.value.trim(),
+      saldoAwal: parseRp(elSaldoAwal.value),
+      pembayaran: parseRp(elPembayaran.value),
+      kekurangan: parseRp(elSaldoAwal.value) - parseRp(elPembayaran.value),
+      ttd: currentTtdUrl(),
+      namaPenyetuju: elNamaPenyetuju.value.trim()
+    };
+  }
+
+  /* ---- validasi form + build canvas kwitansi, dipakai bersama oleh
+     tombol Unduh/Salin/Bagikan supaya perilakunya konsisten. Return null
+     kalau validasi gagal (pesan errornya sudah ditulis ke statusEl). ---- */
+  function validateForm(){
+    const data = readForm();
+    if(!data.nama){
+      statusEl.textContent = "Isi dulu \"Telah terima dari\"."; statusEl.style.color = "var(--danger-red)";
+      elNama.focus();
+      return null;
+    }
+    if(!data.banyaknya){
+      statusEl.textContent = "Isi dulu \"Banyaknya\"."; statusEl.style.color = "var(--danger-red)";
+      elBanyaknya.focus();
+      return null;
+    }
+    return data;
+  }
+
+  async function buildKwitansiCanvas(data){
+    // dipakai lewat rantai antrean yang sama dengan renderCanvas() nota,
+    // supaya tidak tumpang tindih kalau kebetulan ada proses render lain
+    // yang memakai #print-holder di waktu bersamaan.
+    const run = async () => {
+      const holder = document.getElementById("print-holder");
+      holder.innerHTML = buildPrintKwitansi(data);
+      await new Promise(r=>setTimeout(r, 50));
+      const target = holder.querySelector(".pkwitansi");
+      const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:2, useCORS:true});
+      holder.innerHTML = "";
+      return canvas;
+    };
+    return await (_renderCanvasQueue = _renderCanvasQueue.then(run, run));
+  }
+
+  function downloadKwitansiCanvas(canvas, nama){
+    const link = document.createElement("a");
+    link.download = `kwitansi-${(nama||"tanpa-nama").replace(/[^a-z0-9]+/gi,"-")}-${Date.now()}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+
+  btnDownload.addEventListener("click", async ()=>{
+    const data = validateForm();
+    if(!data) return;
+    if(elPenyetujuSelect.value === "__manual__") setTtdNama(data.namaPenyetuju);
+    btnDownload.disabled = true;
+    statusEl.textContent = "Menyiapkan gambar…"; statusEl.style.color = "var(--ink-soft)";
+    try{
+      const canvas = await buildKwitansiCanvas(data);
+      downloadKwitansiCanvas(canvas, data.nama);
+      statusEl.textContent = "Kwitansi berhasil diunduh."; statusEl.style.color = "var(--primary-green)";
+    }catch(e){
+      statusEl.textContent = "Gagal membuat gambar: "+e.message; statusEl.style.color = "var(--danger-red)";
+    }finally{
+      btnDownload.disabled = false;
+    }
+  });
+
+  if(btnCopy) btnCopy.addEventListener("click", async ()=>{
+    const data = validateForm();
+    if(!data) return;
+    if(elPenyetujuSelect.value === "__manual__") setTtdNama(data.namaPenyetuju);
+    btnCopy.disabled = true;
+    statusEl.textContent = "Menyalin gambar…"; statusEl.style.color = "var(--ink-soft)";
+    try{
+      const canvas = await buildKwitansiCanvas(data);
+      if(!window.isSecureContext || !navigator.clipboard || !window.ClipboardItem){
+        downloadKwitansiCanvas(canvas, data.nama);
+        statusEl.textContent = "Browser/perangkat ini tidak mendukung salin gambar ke clipboard. Kwitansi diunduh sebagai gantinya."; statusEl.style.color = "var(--danger-red)";
+        return;
+      }
+      try{
+        const blob = await new Promise((resolve, reject)=> canvas.toBlob(b=> b ? resolve(b) : reject(new Error("Gagal membuat blob gambar")), "image/png"));
+        await navigator.clipboard.write([ new ClipboardItem({ "image/png": blob }) ]);
+        statusEl.textContent = "Kwitansi disalin — tinggal paste (Ctrl/Cmd+V) ke WhatsApp, chat, dll."; statusEl.style.color = "var(--primary-green)";
+      }catch(err){
+        downloadKwitansiCanvas(canvas, data.nama);
+        statusEl.textContent = clipboardErrorMessage(err); statusEl.style.color = "var(--danger-red)";
+      }
+    }catch(e){
+      statusEl.textContent = "Gagal membuat gambar: "+e.message; statusEl.style.color = "var(--danger-red)";
+    }finally{
+      btnCopy.disabled = false;
+    }
+  });
+
+  if(btnShare) btnShare.addEventListener("click", async ()=>{
+    const data = validateForm();
+    if(!data) return;
+    if(elPenyetujuSelect.value === "__manual__") setTtdNama(data.namaPenyetuju);
+    btnShare.disabled = true;
+    statusEl.textContent = "Menyiapkan gambar untuk dibagikan…"; statusEl.style.color = "var(--ink-soft)";
+    try{
+      const canvas = await buildKwitansiCanvas(data);
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+      const file = new File([blob], `kwitansi-${(data.nama||"tanpa-nama").replace(/[^a-z0-9]+/gi,"-")}-${Date.now()}.png`, {type:"image/png"});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], title:"Kwitansi (Habit)"});
+        statusEl.textContent = "Dialog share terbuka — pilih WhatsApp/chat tujuan."; statusEl.style.color = "var(--primary-green)";
+      } else {
+        downloadKwitansiCanvas(canvas, data.nama);
+        statusEl.textContent = "Fitur Bagikan tidak didukung browser ini — kwitansi diunduh sebagai gantinya."; statusEl.style.color = "var(--danger-red)";
+      }
+    }catch(e){
+      if(e.name !== "AbortError"){ // AbortError = user membatalkan dialog share, bukan error
+        statusEl.textContent = "Gagal membagikan: "+(e.name||e.message)+" — gunakan tombol Unduh sebagai alternatif."; statusEl.style.color = "var(--danger-red)";
+      }
+    }finally{
+      btnShare.disabled = false;
+    }
+  });
+})();
+
 /* ============ Popup Riwayat Update (Changelog) ============ */
 (function(){
   const overlay = document.getElementById("changelog-overlay");
@@ -9101,8 +9525,12 @@ if ("serviceWorker" in navigator) {
     const listEl = document.getElementById("md-finance-list");
     const nameInput = document.getElementById("md-finance-name");
     const idInput = document.getElementById("md-finance-id");
+    const ttdInput = document.getElementById("md-finance-ttd");
     const errEl = document.getElementById("md-finance-err");
     const btnAdd = document.getElementById("md-finance-add");
+
+    // ikon tanda tangan bawaan (dipakai kalau baris belum punya link TTD)
+    const FINANCE_TTD_PLACEHOLDER_HTML = `<span style="font-size:16px;opacity:.45;">✍️</span>`;
 
     function renderFinanceList(){
       if(!listEl) return;
@@ -9111,15 +9539,19 @@ if ("serviceWorker" in navigator) {
         return;
       }
       listEl.innerHTML = SETTINGS.financeList.map((f, i)=> `
-        <div style="display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:9px; padding:9px 12px;">
-          <div style="flex:1; min-width:0;">
+        <div style="display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:9px; padding:9px 12px; flex-wrap:wrap;">
+          <div class="md-finance-thumb" data-idx="${i}" style="width:40px; height:40px; flex-shrink:0; border:1px dashed var(--line); border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#fafafa;">
+            ${f.ttdUrl ? `<img src="${f.ttdUrl.replace(/"/g,"&quot;")}" alt="TTD ${(f.name||"").replace(/</g,"&lt;")}" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'⚠️',style:'font-size:16px;'}));">` : FINANCE_TTD_PLACEHOLDER_HTML}
+          </div>
+          <div style="flex:1; min-width:110px;">
             <div style="font-weight:700; font-size:13.5px; color:var(--ink);">${(f.name||"").replace(/</g,"&lt;")}</div>
             <div style="font-size:11.5px; color:var(--ink-soft);">ID: ${(f.telegramId||"").replace(/</g,"&lt;")}</div>
           </div>
-          <button type="button" class="md-btn danger" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
+          <input type="text" class="md-finance-ttd-edit" data-idx="${i}" value="${(f.ttdUrl||"").replace(/"/g,"&quot;")}" placeholder="Link Tanda Tangan (URL)" style="flex:1.4; min-width:170px; height:38px; border:1px solid var(--line); border-radius:8px; padding:0 10px; font-size:12.5px; background:var(--card);">
+          <button type="button" class="md-btn danger md-finance-del-btn" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
         </div>
       `).join("");
-      listEl.querySelectorAll("button[data-idx]").forEach(btn=>{
+      listEl.querySelectorAll(".md-finance-del-btn").forEach(btn=>{
         btn.addEventListener("click", async ()=>{
           const idx = parseInt(btn.dataset.idx, 10);
           SETTINGS.financeList.splice(idx, 1);
@@ -9128,19 +9560,31 @@ if ("serviceWorker" in navigator) {
           await confirmMasterDataSave("Finance dihapus dari daftar.");
         });
       });
+      listEl.querySelectorAll(".md-finance-ttd-edit").forEach(inp=>{
+        inp.addEventListener("change", async ()=>{
+          const idx = parseInt(inp.dataset.idx, 10);
+          const f = SETTINGS.financeList[idx];
+          if(!f) return;
+          f.ttdUrl = inp.value.trim();
+          saveSettings();
+          renderFinanceList();
+          await confirmMasterDataSave("Tanda tangan \"" + (f.name||"") + "\" diperbarui.");
+        });
+      });
     }
 
     btnAdd.addEventListener("click", async ()=>{
       const name = nameInput.value.trim();
       const telegramId = idInput.value.trim();
+      const ttdUrl = ttdInput.value.trim();
       errEl.textContent = "";
       if(!name){ errEl.textContent = "Nama wajib diisi."; return; }
       if(!/^\d+$/.test(telegramId)){ errEl.textContent = "Telegram ID harus berupa angka (bukan username)."; return; }
       if(!Array.isArray(SETTINGS.financeList)) SETTINGS.financeList = [];
       if(SETTINGS.financeList.some(f=> f.telegramId === telegramId)){ errEl.textContent = "Telegram ID ini sudah ada di daftar."; return; }
-      SETTINGS.financeList.push({ name, telegramId });
+      SETTINGS.financeList.push({ name, telegramId, ttdUrl });
       saveSettings();
-      nameInput.value = ""; idInput.value = "";
+      nameInput.value = ""; idInput.value = ""; ttdInput.value = "";
       renderFinanceList();
       await confirmMasterDataSave("Finance \"" + name + "\" ditambahkan.");
     });
