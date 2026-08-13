@@ -287,6 +287,9 @@
   .update-popup-sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;}
   .update-popup-list{margin:0;padding-left:18px;}
   .update-popup-list li{font-size:12.5px;color:var(--ink);line-height:1.6;margin-bottom:3px;}
+  .uptodate-popup-body{padding-bottom:16px;text-align:center;}
+  .uptodate-popup .update-popup-version{text-align:center;font-size:17px;}
+  .uptodate-popup .calc-head span{display:flex;align-items:center;gap:6px;}
 
   @media (max-width:480px){
     /* Popup mobile: dikunci agar TIDAK PERNAH melebihi lebar layar
@@ -3563,7 +3566,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       Kwitansi
     </button>
   </nav>
-  <div class="habit-sidebar-version">Habit · versi <span id="sb-app-version">2.17.1</span></div>
+  <div class="habit-sidebar-version">Habit · versi <span id="sb-app-version">2.17.2</span></div>
 </aside>
 <div class="wrap">
 
@@ -4472,7 +4475,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="footer-bank-line">BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.17.1</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.17.2</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -4653,7 +4656,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.17.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.17.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Tombol <b>"Cek Pembaruan"</b> di footer: kalau ternyata belum ada versi baru, sekarang muncul <b>popup konfirmasi "✅ Sudah Versi Terbaru"</b> yang jelas kelihatan (bukan pesan kecil di pojok yang gampang kelewat) — otomatis tertutup sendiri dalam 3 detik, atau bisa ditutup manual lebih awal.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.17.1</div>
           <ul>
             <li>Tampilan hasil unduhan/salin/bagikan (desain "Baru", diaktifkan lewat Master Data → Tampilan) <b>dirombak</b> jadi gaya tabel yang lebih ringkas: header kolom Produk/Harga/Diskon/Total, harga satuan asli (sebelum diskon) ikut ditampilkan di samping diskonnya, judul dan Total Pembayaran berwarna hijau, teks pendukung dipertegas supaya lebih mudah dibaca. Status pembayaran (Kurang bayar/Lunas/Kembalian) dan kelebihan bayar sebelumnya tetap tampil seperti biasa. Desain "Lama" dan cara mengaktifkannya tidak berubah.</li>
           </ul>
@@ -5239,6 +5248,24 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="calc-actionrow">
         <button id="update-later" class="calc-actbtn calc-clearbtn">Nanti Saja</button>
         <button id="update-apply" class="calc-actbtn confirm-okbtn">Perbarui Sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= POPUP "SUDAH VERSI TERBARU" ================= 
+       Muncul cuma dari tombol "Cek Pembaruan" manual (bukan pengecekan
+       otomatis diam-diam) — supaya user yang sengaja mengecek selalu
+       dapat konfirmasi visual, bukan cuma toast kecil yang gampang
+       kelewat. Tertutup sendiri 3 detik, atau bisa ditutup manual. -->
+  <div id="uptodate-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup update-popup uptodate-popup" role="dialog" aria-label="Sudah versi terbaru">
+      <div class="calc-head">
+        <span>✅ Sudah Versi Terbaru</span>
+        <button id="uptodate-close" class="calc-close" aria-label="Tutup">✕</button>
+      </div>
+      <div class="update-popup-body uptodate-popup-body">
+        <div class="update-popup-version" id="uptodate-version-label">v0</div>
+        <div class="update-popup-sub" style="margin-bottom:0;">Tidak ada pembaruan baru — app kamu sudah versi terkini.</div>
       </div>
     </div>
   </div>
@@ -7849,6 +7876,9 @@ if ("serviceWorker" in navigator) {
   const btnClose = document.getElementById("update-close");
   const btnLater = document.getElementById("update-later");
   const btnApply = document.getElementById("update-apply");
+  const uptodateOverlay = document.getElementById("uptodate-overlay");
+  const uptodateVersionEl = document.getElementById("uptodate-version-label");
+  const btnUptodateClose = document.getElementById("uptodate-close");
   const LS_KEY = "notaHalawaLastNotifiedVersion";
 
   let refreshing = false;
@@ -7869,6 +7899,27 @@ if ("serviceWorker" in navigator) {
   btnLater.addEventListener("click", closeUpdatePopup);
   updateOverlay.addEventListener("click", (e)=>{ if(e.target === updateOverlay) closeUpdatePopup(); });
   document.addEventListener("keydown", (e)=>{ if(!updateOverlay.hidden && e.key === "Escape") closeUpdatePopup(); });
+
+  // ---- Popup "Sudah Versi Terbaru" — dipicu HANYA dari tombol "Cek
+  // Pembaruan" manual di footer, saat versi server SAMA dengan versi yang
+  // lagi dibuka. Tertutup sendiri 3 detik (bisa juga ditutup manual lebih
+  // awal lewat tombol ✕ atau klik di luar popup — keduanya membatalkan
+  // timer auto-close supaya tidak terjadi hilang ganda). ----
+  let uptodateAutoCloseTimer = null;
+  function closeUptodatePopup(){
+    uptodateOverlay.hidden = true;
+    clearTimeout(uptodateAutoCloseTimer);
+    uptodateAutoCloseTimer = null;
+  }
+  function showUpToDatePopup(version){
+    uptodateVersionEl.textContent = version ? ("v" + version) : "Versi terbaru";
+    uptodateOverlay.hidden = false;
+    clearTimeout(uptodateAutoCloseTimer);
+    uptodateAutoCloseTimer = setTimeout(closeUptodatePopup, 3000);
+  }
+  if(btnUptodateClose) btnUptodateClose.addEventListener("click", closeUptodatePopup);
+  if(uptodateOverlay) uptodateOverlay.addEventListener("click", (e)=>{ if(e.target === uptodateOverlay) closeUptodatePopup(); });
+  document.addEventListener("keydown", (e)=>{ if(uptodateOverlay && !uptodateOverlay.hidden && e.key === "Escape") closeUptodatePopup(); });
 
   btnApply.addEventListener("click", ()=>{
     closeUpdatePopup();
@@ -8030,7 +8081,7 @@ if ("serviceWorker" in navigator) {
         return;
       }
       if(info.version === currentVersion){
-        showMsg(`Sudah pakai versi terbaru (v${currentVersion}).`);
+        showUpToDatePopup(currentVersion);
         return;
       }
       // Versi di server beda dari yang lagi dibuka. Kalau kebetulan SW
