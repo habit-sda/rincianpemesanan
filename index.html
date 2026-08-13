@@ -537,6 +537,58 @@
      (pakai warna rgba datar, bukan gradient), supaya hasil gambar akhir
      konsisten dengan yang tampil di layar. Jangan ganti balik ke
      gradient tanpa tes render dulu. ===== */
+  /* ===== Desain nota "Referensi 1" — tabel dengan header kolom
+     (Produk/Harga/Diskon/Total), judul & total pembayaran hijau, teks
+     abu dipertegas. Class terpisah (.pnota2-v3) supaya .pnota2 lama di
+     bawah ini tetap utuh sebagai cadangan/tidak terpakai — buildPrintNotaV2()
+     sekarang merender struktur ini, bukan struktur .pnota2 lama. ===== */
+  .pnota2-v3{
+    width:1080px;background:#F6FBF7;color:#171717;font-family:'Roboto',sans-serif;
+    padding:46px 44px;position:relative;
+  }
+  .pnota2-v3 .v3-title{
+    font-size:32px;font-weight:800;color:#00845F;text-align:center;margin:0 0 6px;
+  }
+  .pnota2-v3 .v3-date{
+    font-size:20px;color:#3f3f3d;text-align:center;margin:0 0 30px;
+  }
+  .pnota2-v3 .v3-thead{
+    display:flex;align-items:center;gap:18px;padding:0 0 14px;
+    border-bottom:2px solid #171717;margin-bottom:2px;
+  }
+  .pnota2-v3 .v3-col-thumb{width:60px;flex-shrink:0;}
+  .pnota2-v3 .v3-col-name{flex:1;min-width:0;}
+  .pnota2-v3 .v3-col-harga{width:170px;flex-shrink:0;text-align:right;}
+  .pnota2-v3 .v3-col-diskon{width:150px;flex-shrink:0;text-align:right;}
+  .pnota2-v3 .v3-col-total{width:190px;flex-shrink:0;text-align:right;}
+  .pnota2-v3 .v3-thead span{font-size:19px;font-weight:700;color:#3f3f3d;}
+  .pnota2-v3 .v3-row{
+    display:flex;align-items:center;gap:18px;padding:22px 0;
+    border-bottom:1px solid #E5E7EB;
+  }
+  .pnota2-v3 .v3-row:last-child{border-bottom:none;}
+  .pnota2-v3 .v3-thumb{
+    width:60px;height:60px;border-radius:12px;object-fit:cover;
+    background:#F9FAFB;border:1.5px solid #E5E7EB;
+  }
+  .pnota2-v3 .v3-name{font-size:24px;font-weight:700;color:#171717;margin:0;}
+  .pnota2-v3 .v3-qty{font-size:19px;color:#3f3f3d;margin:5px 0 0;}
+  .pnota2-v3 .v3-harga{font-size:22px;color:#3f3f3d;text-align:right;}
+  .pnota2-v3 .v3-diskon{font-size:22px;color:#3f3f3d;text-align:right;}
+  .pnota2-v3 .v3-total{font-size:24px;font-weight:700;color:#171717;text-align:right;}
+  .pnota2-v3 .v3-stats{display:flex;margin-top:26px;padding-top:22px;border-top:1px solid #E5E7EB;}
+  .pnota2-v3 .v3-stats>div{flex:1;text-align:center;}
+  .pnota2-v3 .v3-stats>div+div{border-left:1px solid #E5E7EB;}
+  .pnota2-v3 .v3-stats .l{font-size:18px;color:#3f3f3d;margin:0 0 6px;}
+  .pnota2-v3 .v3-stats .v{font-size:22px;font-weight:700;color:#171717;margin:0;}
+  .pnota2-v3 .v3-grand{
+    margin-top:24px;background:#D9ECD4;border-radius:18px;padding:26px 30px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .pnota2-v3 .v3-grand .l{font-size:22px;font-weight:700;color:#00845F;}
+  .pnota2-v3 .v3-grand .v{font-size:32px;font-weight:800;color:#00845F;}
+  .pnota2-v3 .v3-footer{text-align:center;margin-top:24px;font-size:19px;color:#3f3f3d;}
+
   .pnota2{
     width:1080px;height:auto;background:#ffffff;color:#1a1a1a;font-family:'Roboto',sans-serif;
     padding:46px 40px 40px;position:relative;overflow:hidden;
@@ -998,6 +1050,38 @@
       width:52px;height:52px;border-radius:10px;object-fit:cover;
       flex-shrink:0;margin-right:12px;background:#f5ede1;
     }
+    /* ---------- Mode Kasir: katalog produk klik-gambar (desktop) ----------
+       Dipakai di dalam form "Tambah produk" (wa-form-${sheet}) sebagai
+       pengganti visual dari <select> biasa (select-nya tetap ada di DOM,
+       disembunyikan, supaya semua logika simpan/edit/dedup yang sudah ada
+       tidak perlu disentuh sama sekali — kartu di sini cuma "mengklik"
+       select itu lewat value+dispatchEvent). */
+    .wiz-kasir-search{
+      width:100%;box-sizing:border-box;padding:10px 14px;margin-bottom:10px;
+      border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);
+      font-size:13.5px;font-family:'Roboto',sans-serif;
+    }
+    .wiz-kasir-search:focus{ outline:none;border-color:var(--primary-green); }
+    .wiz-kasir-grid{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;
+      max-height:340px;overflow-y:auto;padding:2px;
+    }
+    .wiz-kasir-card{
+      display:flex;flex-direction:column;align-items:center;text-align:center;
+      background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+      padding:10px 8px 9px;cursor:pointer;transition:.15s ease;font-family:'Roboto',sans-serif;
+    }
+    .wiz-kasir-card:hover{ border-color:var(--primary-green);transform:translateY(-1px); }
+    .wiz-kasir-card.selected{ border-color:var(--primary-green);background:var(--wiz-tint); }
+    .wiz-kasir-card-img{
+      width:56px;height:56px;border-radius:10px;object-fit:cover;background:#f5ede1;margin-bottom:6px;
+    }
+    .wiz-kasir-card-name{
+      font-size:11.5px;font-weight:700;color:var(--ink);line-height:1.25;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .wiz-kasir-card-price{ font-size:11px;font-weight:700;color:var(--primary-green);margin-top:3px; }
+    .wiz-kasir-empty{ grid-column:1/-1;text-align:center;font-size:12.5px;color:var(--ink-soft);padding:20px 0; }
     .wiz-pcard-nameline{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;}
     .wiz-pcard-name{font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
     .wiz-qty-badge{
@@ -3148,6 +3232,13 @@
 .theme-header-btn svg{ width: 15px; height: 15px; flex-shrink: 0; }
 .theme-header-btn[hidden]{ display: none !important; } /* master OFF (Master Data) selalu menang */
 body:not(.showing-home) .theme-header-btn{ display: none !important; } /* selain Dashboard, disembunyikan */
+/* Tombol "Tampilan Input" — beda dari tombol Tema (theme-feature-ui),
+   tombol ini TIDAK dikontrol saklar Master Data, cuma disembunyikan di
+   HP lewat CSS (breakpoint sama dengan isDesktopWiz() di JS: 901px). */
+.inputmode-header-btn{ display: none !important; }
+@media (min-width:901px){
+  body.showing-home .inputmode-header-btn{ display: inline-flex !important; }
+}
 
 /* =========================================================
    MODE GELAP — token warna inti. Sebagian besar UI (teks, latar
@@ -3262,7 +3353,8 @@ html[data-theme="dark"] textarea{
 html[data-theme="dark"] input::placeholder{ color: var(--ink-soft); opacity: .8; }
 html[data-theme="dark"] .wiz-preview-img,
 html[data-theme="dark"] .wiz-pcard-img,
-html[data-theme="dark"] .wiz-pcard-rev-img{ background: #26221c; }
+html[data-theme="dark"] .wiz-pcard-rev-img,
+html[data-theme="dark"] .wiz-kasir-card-img{ background: #26221c; }
 html[data-theme="dark"] .wiz-summary-card .row,
 html[data-theme="dark"] .wiz-sumcard .wiz-revrow{ border-color: var(--line); }
 html[data-theme="dark"] .wiz-preview-strip{ background: #20262b; }
@@ -3399,6 +3491,30 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
   </div>
 </div>
+<!-- Popup "Tampilan Input" — pilih Mode Kasir (klik gambar produk dari
+     katalog, alur toko fisik) vs Mode Tabel (cari & pilih, seperti
+     sebelumnya). Preferensi PER PERANGKAT (localStorage), cuma tampil
+     lewat tombol #btn-inputmode-open yang sendirinya cuma nongol di
+     layar desktop (lihat CSS .inputmode-header-btn). -->
+<div class="md-overlay" id="inputmode-overlay" hidden>
+  <div class="md-pinbox" style="max-width:340px;">
+    <button type="button" id="inputmode-overlay-close" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;line-height:1;">×</button>
+    <h3 style="margin:0 0 4px;font-size:16px;">Tampilan Input Produk</h3>
+    <div class="md-note" style="margin-bottom:16px;">Cuma berlaku di layar desktop HP/komputer ini — nggak disamakan ke semua orang.</div>
+    <div id="inputmode-menu" role="menu" style="display:flex;flex-direction:column;gap:6px;">
+      <button type="button" class="theme-menu-item" data-inputmode-choice="kasir" role="menuitemradio">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Mode Kasir <span class="md-note" style="display:block;font-size:11px;margin:0;">Klik gambar produk dari katalog</span></span>
+        <svg class="theme-menu-check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="theme-menu-item" data-inputmode-choice="tabel" role="menuitemradio">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span>Mode Tabel <span class="md-note" style="display:block;font-size:11px;margin:0;">Cari & pilih dari daftar</span></span>
+        <svg class="theme-menu-check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 <aside class="habit-sidebar" id="habit-sidebar" aria-label="Navigasi utama">
   <div class="habit-sidebar-logo">
     <img src="habit-logo.png" alt="" width="34" height="34">
@@ -3447,7 +3563,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       Kwitansi
     </button>
   </nav>
-  <div class="habit-sidebar-version">Habit · versi <span id="sb-app-version">2.9.3</span></div>
+  <div class="habit-sidebar-version">Habit · versi <span id="sb-app-version">2.17.1</span></div>
 </aside>
 <div class="wrap">
 
@@ -3480,6 +3596,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <button type="button" id="btn-theme-open-mobile" class="theme-header-btn theme-feature-ui" hidden aria-label="Ganti tema tampilan">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 12.7A6.5 6.5 0 1 1 11.3 6a5 5 0 0 0 6.7 6.7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
           <span>Tema</span>
+        </button>
+        <!-- Tombol "Tampilan Input" — SENGAJA cuma tampil di layar desktop
+             (CSS .inputmode-header-btn, breakpoint sama dengan isDesktopWiz()
+             di JS: min-width:901px). Di HP disembunyikan total karena kartu
+             HP sudah punya alur sentuh sendiri, tidak perlu mode kasir. -->
+        <button type="button" id="btn-inputmode-open" class="theme-header-btn inputmode-header-btn" aria-label="Ganti tampilan input produk">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span>Tampilan Input</span>
         </button>
         <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-help-btn" id="home-help-btn">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="#1a1a1a" stroke-width="1.8"/></svg>
@@ -4348,7 +4472,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="footer-bank-line">BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.16.1</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.17.1</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -4529,7 +4653,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.17.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.17.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Tampilan hasil unduhan/salin/bagikan (desain "Baru", diaktifkan lewat Master Data → Tampilan) <b>dirombak</b> jadi gaya tabel yang lebih ringkas: header kolom Produk/Harga/Diskon/Total, harga satuan asli (sebelum diskon) ikut ditampilkan di samping diskonnya, judul dan Total Pembayaran berwarna hijau, teks pendukung dipertegas supaya lebih mudah dibaca. Status pembayaran (Kurang bayar/Lunas/Kembalian) dan kelebihan bayar sebelumnya tetap tampil seperti biasa. Desain "Lama" dan cara mengaktifkannya tidak berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.17.0</div>
           <ul>
             <li>Tanda tangan Kwitansi sekarang <b>dikelola per admin Finance</b> lewat Master Data → Tampilan → Daftar Finance: tiap Finance yang terdaftar bisa diisi <b>Link Tanda Tangan (URL)</b> sendiri-sendiri (ditempel, bukan unggah file), lengkap dengan thumbnail pratinjau di daftarnya. Popup Kwitansi tidak lagi unggah gambar per HP — sekarang tinggal <b>pilih nama dari dropdown "Disetujui oleh"</b>, tanda tangannya otomatis terpakai. Opsi "Lainnya (isi manual)" tetap tersedia untuk penyetuju di luar Daftar Finance (tanpa gambar tanda tangan).</li>
             <li>Tampilan hasil unduhan/salin/bagikan Kwitansi <b>dirombak total</b> supaya lebih rapi &amp; profesional mengikuti pola kwitansi acuan: pita merah "RECEIPT" di atas, label Invoice No/Tanggal pakai font serif miring, baris "Telah terima dari/Banyaknya/Untuk Pembayaran" jadi tabel bertepi abu-abu, ringkasan Saldo Awal/Pembayaran/Kekurangan rata kanan dipisah garis putus-putus dari baris tanda tangan. Tidak ada perubahan pada field isian di popup, cuma hasil gambarnya.</li>
@@ -5139,6 +5269,12 @@ const PRODUCT_IMG_PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(
     <path d="M47 24v16l-15 7V31l15-7z" fill="#c9a06e" stroke="#b98b52" stroke-width="1.4" stroke-linejoin="round"/>
   </svg>`
 );
+/* Escape HTML kecil untuk dipakai di template kartu Mode Kasir (nama produk
+   dari Master Data ditulis admin sendiri, tapi tetap di-escape jaga-jaga
+   supaya karakter seperti < / " tidak merusak markup kartu). */
+function escHtml(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
 const EKSPEDISI = ["313 Express","APM Logistics","Baraka Express","Buton Express","Diambil Sendiri","Duta Express","IDTruck","Indah Logistik","JNE Express","JNE Trucking","JNT Cargo","JNT Express","KALOG","Laris Cargo","LSJ Cargo","Pangeran Express","Papandayan Cargo","Sajira Mahardika","Sentral Cargo","TAM Cargo","Toyyib Logistik","Tri Tunggal","Wahana","CalistaExpress","Lion Parcel"];
 /* Pengaturan aktif/nonaktifkan autocomplete (combobox cari-ketik) per
    field — kalau nonaktif, field kembali jadi <select> biasa. Diatur dari
@@ -5287,6 +5423,24 @@ function applyTheme(){
   });
 }
 
+/* ============================================================
+   MODE INPUT PRODUK — "Kasir" (klik gambar produk dari katalog)
+   vs "Tabel" (cari & pilih, seperti sebelumnya). SENGAJA disimpan
+   LOKAL per HP/browser (localStorage), sama seperti THEME_KEY —
+   BUKAN disamakan ke semua orang lewat Master Data. Cuma berlaku
+   di layar desktop (>=901px, sama dengan breakpoint isDesktopWiz());
+   di HP selalu pakai Mode Tabel apapun preferensinya, karena kartu
+   HP sudah punya alur sentuh sendiri yang beda. Default "tabel"
+   supaya tidak ada yang berubah untuk siapa pun sampai mereka
+   aktifkan sendiri lewat tombol "Tampilan Input" di Beranda. */
+const INPUT_MODE_KEY = "notaHalawa_inputMode"; // isi: "tabel" | "kasir"
+function getInputModePref(){
+  try{ return localStorage.getItem(INPUT_MODE_KEY) === "kasir" ? "kasir" : "tabel"; }catch(e){ return "tabel"; }
+}
+function setInputModePref(val){
+  try{ localStorage.setItem(INPUT_MODE_KEY, val === "kasir" ? "kasir" : "tabel"); }catch(e){}
+}
+
 loadSettings();
 applySettingsToDom();
 applyTheme(); // panggil sekali lagi eksplisit di sini (jaga-jaga kalau fitur baru diaktifkan tepat saat load)
@@ -5328,6 +5482,40 @@ if(window.matchMedia){
       setThemePref(item.dataset.themeChoice);
       applyTheme();
       closeOverlay();
+    });
+  });
+})();
+
+/* ---------- Popup "Tampilan Input" (Mode Kasir vs Mode Tabel) ----------
+   Trigger cuma ada di .home-topbar desktop (tombol #btn-inputmode-open,
+   disembunyikan di HP lewat CSS min-width:901px) — sama persis pola
+   tombol Tema di atas, cuma popup & key localStorage-nya beda. */
+(function(){
+  const overlay = document.getElementById("inputmode-overlay");
+  const menu = document.getElementById("inputmode-menu");
+  if(!overlay || !menu) return;
+  function markActive(){
+    menu.querySelectorAll(".theme-menu-item").forEach(el=>{
+      el.classList.toggle("active", el.dataset.inputmodeChoice === getInputModePref());
+    });
+  }
+  function closeOverlay(){ overlay.hidden = true; }
+  function openOverlay(){ overlay.hidden = false; markActive(); }
+  const openBtn = document.getElementById("btn-inputmode-open");
+  if(openBtn) openBtn.addEventListener("click", openOverlay);
+  const closeBtn = document.getElementById("inputmode-overlay-close");
+  if(closeBtn) closeBtn.addEventListener("click", closeOverlay);
+  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeOverlay(); });
+  menu.querySelectorAll(".theme-menu-item").forEach(item=>{
+    item.addEventListener("click", ()=>{
+      setInputModePref(item.dataset.inputmodeChoice);
+      markActive();
+      closeOverlay();
+      // Render ulang step "list" kedua tab supaya form Tambah produk yang
+      // lagi kebuka langsung ikut ganti tampilan tanpa perlu tutup-buka lagi.
+      // (renderListStep sendiri terbungkus IIFE lain, makanya dipanggil
+      // lewat window.__refreshPasteOrderUI yang sudah diekspos untuk itu.)
+      if(window.__refreshPasteOrderUI) window.__refreshPasteOrderUI();
     });
   });
 })();
@@ -6167,50 +6355,41 @@ function buildPrintNotaV2(tab){
     return sel && sel.value !== "";
   });
 
-  const itemsHtml = rows.map((tr,idx)=>{
+  const rowsHtml = rows.map((tr)=>{
     const name = tr.querySelector("select.prod").value;
     const prod = findProduct(name);
     const qty = tr.querySelector("input.qty").value || "0";
     const satuanLabel = prod ? prod.satuan : "";
-    const harga = tr.querySelector('[data-f="harga"]').textContent;
+    const hargaAsliTxt = tr.querySelector('[data-f="harga"]').textContent;
     const diskonEl = tr.querySelector('[data-f="diskon"]');
-    const diskon = diskonEl ? diskonEl.textContent : "–";
-    const total = tr.querySelector('[data-f="total"]').textContent;
+    const diskonTxt = diskonEl ? diskonEl.textContent : "–";
+    const totalTxt = tr.querySelector('[data-f="total"]').textContent;
     const imgSrc = (prod && prod.gambar) ? prod.gambar : PRODUCT_IMG_PLACEHOLDER;
-    return `<div class="product-item">
-      <div class="product-cols">
-        <div class="product-col-num"><div class="product-number">${idx+1}</div></div>
-        <div class="product-col-thumb"><img class="product-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'"></div>
-        <div class="product-col-name">
-          <p class="product-name">${name}</p>
-          <p class="product-qty-sub">${qty} ${satuanLabel}</p>
-        </div>
-        <div class="product-col-harga"><span class="product-val-muted">${harga}</span></div>
-        <div class="product-col-diskon"><span class="product-val-muted">${diskon}</span></div>
-        <div class="product-col-total"><span class="product-total">${total}</span></div>
+    return `<div class="v3-row">
+      <img class="v3-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'">
+      <div class="v3-col-name">
+        <p class="v3-name">${name}</p>
+        <p class="v3-qty">${qty} ${satuanLabel}</p>
       </div>
+      <div class="v3-col-harga v3-harga">${hargaAsliTxt}</div>
+      <div class="v3-col-diskon v3-diskon">${diskonTxt}</div>
+      <div class="v3-col-total v3-total">${totalTxt}</div>
     </div>`;
   }).join("");
 
-  const headRow = `<div class="product-cols product-list-head">
-    <div class="product-col-num"></div>
-    <div class="product-col-thumb"></div>
-    <div class="product-col-name"><span>Produk &amp; Qty</span></div>
-    <div class="product-col-harga"><span>Harga</span></div>
-    <div class="product-col-diskon"><span>Diskon</span></div>
-    <div class="product-col-total"><span>Total</span></div>
+  const headRow = `<div class="v3-thead">
+    <div class="v3-col-thumb"></div>
+    <div class="v3-col-name"><span>Produk</span></div>
+    <div class="v3-col-harga"><span>Harga</span></div>
+    <div class="v3-col-diskon"><span>Diskon</span></div>
+    <div class="v3-col-total"><span>Total</span></div>
   </div>`;
 
   const hari = document.getElementById("hariNow").textContent;
   const tgl = document.getElementById("tglNow").textContent;
   const ekspedisi = document.getElementById(pfx+"-ekspedisi").value || "–";
-  const totalqty = document.getElementById(pfx+"-totalqty").textContent;
   const totalberat = document.getElementById(pfx+"-totalberat").textContent;
-  const subtotal = document.getElementById(pfx+"-subtotal").textContent;
   const ongkir = document.getElementById(pfx+"-ongkir").textContent.replace(/\s*\(manual\)\s*$/i, "");
-  const diskonongkir = tab==="penjualan"
-    ? document.getElementById("pj-diskonongkir").textContent
-    : (document.getElementById("cs-diskonongkir").value ? rupiah(parseRp(document.getElementById("cs-diskonongkir").value)) : "Rp 0");
   const grandtotal = document.getElementById(pfx+"-grandtotal").textContent;
 
   const kelebihan = parseRp(document.getElementById(pfx+"-kelebihan").value);
@@ -6220,66 +6399,30 @@ function buildPrintNotaV2(tab){
   const isKurang = statusLabel === "Kurang bayar";
   const isKembalian = statusLabel === "Kembalian";
   const signPrefix = isKurang ? "-" : "";
-  const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#1c7a45");
-  const statusBg = isKurang ? "#fdecea" : (isKembalian ? "#e8f0fe" : "#e6f6ea");
-  const statusBorder = isKurang ? "#f3b4ae" : (isKembalian ? "#aac9f7" : "#9fd4ae");
-
-  const jamSekarang = new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+  const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#00845F");
+  const statusBg = isKurang ? "#fdecea" : (isKembalian ? "#e8f0fe" : "#D9ECD4");
+  const statusBorder = isKurang ? "#f3b4ae" : (isKembalian ? "#aac9f7" : "#bfe0c9");
 
   return `
-    <div class="pnota2 order-summary">
-      <div class="bg-blob bg-blob-1"></div>
-      <div class="bg-blob bg-blob-2"></div>
-      <div class="order-header">
-        <img class="order-logo-img" src="${ORDER_LOGO_IMG}" width="84" height="84" alt="">
-        <h1 class="order-title">RINCIAN PEMESANAN</h1>
-        <div class="order-meta">
-          <span><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2" stroke="#5b6660" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v3.4M16 3v3.4" stroke="#5b6660" stroke-width="1.6" stroke-linecap="round"/></svg>${tgl}</span>
-          <span class="divider"></span>
-          <span><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.3" stroke="#5b6660" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="#5b6660" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${jamSekarang} WIB</span>
-        </div>
+    <div class="pnota2 pnota2-v3">
+      <p class="v3-title">Rincian pemesanan</p>
+      <p class="v3-date">${hari}, ${tgl}</p>
+      ${headRow}
+      ${rowsHtml}
+      <div class="v3-stats">
+        <div><p class="l">Total berat</p><p class="v">${totalberat}</p></div>
+        <div><p class="l">Ekspedisi</p><p class="v">${ekspedisi}</p></div>
+        <div><p class="l">Ongkir</p><p class="v">${ongkir}</p></div>
       </div>
-
-      <div class="order-section">
-        <div class="section-header">
-          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8.5V7a6 6 0 0 1 12 0v1.5" stroke="#1c7a45" stroke-width="1.7" stroke-linecap="round"/><rect x="4" y="8.5" width="16" height="12" rx="2" stroke="#1c7a45" stroke-width="1.7"/></svg></div>
-          <h2 class="section-title">PESANAN (${rows.length} ITEM)</h2>
-        </div>
-        <div class="product-list">${headRow}${itemsHtml}</div>
+      <div class="v3-grand">
+        <span class="l">Total pembayaran</span>
+        <span class="v">${grandtotal}</span>
       </div>
-
-      <div class="order-section">
-        <div class="section-header">
-          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/><circle cx="15.5" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/></svg></div>
-          <h2 class="section-title">INFORMASI PENGIRIMAN</h2>
-        </div>
-        <div class="shipping-content">
-          <div class="shipping-item"><div class="shipping-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 7.5L12 12l8-4.5M12 12v9" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/></svg></div><span class="shipping-label">Total produk</span><strong class="shipping-value">${totalqty}</strong></div>
-          <div class="shipping-item"><div class="shipping-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M7 8h10" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/><path d="M4 8l3-3.2 3 3.2M14 8l3-3.2 3 3.2" stroke="#1c7a45" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.3 8a2.8 3.6 0 0 0 5.6 0M14.3 8a2.8 3.6 0 0 0 5.6 0" stroke="#1c7a45" stroke-width="1.4" stroke-linecap="round"/><path d="M8 20h8" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/></svg></div><span class="shipping-label">Total berat</span><strong class="shipping-value">${totalberat}</strong></div>
-          <div class="shipping-item"><div class="shipping-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15V7.5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v7.5" stroke="#1c7a45" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11h3l3 2.5V15h-6z" stroke="#1c7a45" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/><circle cx="15.5" cy="15.5" r="1.6" stroke="#1c7a45" stroke-width="1.3"/></svg></div><span class="shipping-label">Ekspedisi</span><strong class="shipping-value">${ekspedisi}</strong></div>
-        </div>
-      </div>
-
-      <div class="order-section">
-        <div class="cost-summary">
-          <div class="cost-row"><span class="cost-label">Subtotal produk</span><strong class="cost-value">${subtotal}</strong></div>
-          <div class="cost-row"><span class="cost-label">Ongkir</span><strong class="cost-value">${ongkir}</strong></div>
-          <div class="cost-row"><span class="cost-label">Diskon ongkir</span><strong class="cost-value">${diskonongkir}</strong></div>
-        </div>
-      </div>
-
-      <div class="grand-total">
-        <span class="grand-total-label">TOTAL PEMBAYARAN</span>
-        <strong class="grand-total-value">${grandtotal}</strong>
-      </div>
-      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div class="pay-status" style="flex-direction:column;align-items:stretch;gap:10px;background:${statusBg};border-color:${statusBorder};">
-        ${kelebihan!==0 ? `<div class="cost-row"><span class="cost-label">Kelebihan bayar sebelumnya</span><strong class="cost-value">${kelebihanFmt}</strong></div>` : ``}
-        <div class="cost-row"><span class="l" style="color:${statusColor}">${statusLabel}</span><span class="v" style="color:${statusColor}">${signPrefix}${selisihFmt}</span></div>
+      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div style="margin-top:14px;padding:16px 20px;border-radius:14px;background:${statusBg};border:1.5px solid ${statusBorder};display:flex;flex-direction:column;gap:8px;">
+        ${kelebihan!==0 ? `<div style="display:flex;justify-content:space-between;font-size:19px;color:#3f3f3d;"><span>Kelebihan bayar sebelumnya</span><strong style="color:#171717;">${kelebihanFmt}</strong></div>` : ``}
+        <div style="display:flex;justify-content:space-between;font-size:22px;font-weight:700;color:${statusColor};"><span>${statusLabel}</span><span>${signPrefix}${selisihFmt}</span></div>
       </div>` : ``}
-      <div class="order-footer">
-        <div class="footer-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#2b2b2b"/><path d="M8 12.3l2.6 2.6L16.2 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <p class="footer-text">Terima kasih atas kepercayaannya, semoga membawa keberkahan untuk kita semua ❤️</p>
-      </div>
+      <p class="v3-footer">Terima kasih atas kepercayaannya, semoga membawa keberkahan untuk kita semua</p>
     </div>
   `;
 }
@@ -8408,6 +8551,35 @@ if ("serviceWorker" in navigator) {
   }
   window.__openPasteOrderModal = openPasteOrderModal;
 
+  /* ---------- Mode Kasir: kartu katalog klik-gambar (pengganti <select>) ----------
+     Select asli TETAP dirender (disembunyikan) di dalam wrapper ini supaya
+     prodEl = document.getElementById("wa-prod-"+sheet) yang dipakai di
+     banyak tempat lain (comboboxify, updHint, tombol Simpan, dst) tidak
+     perlu diubah sama sekali — kartu di sini cuma menuliskan value select
+     itu lalu dispatchEvent("change"), persis seperti kalau user memilih
+     dari dropdown biasa. */
+  function renderKasirCatalogHtml(sheet, prodVal){
+    const list = prodListOf(sheet);
+    const cardsHtml = list.map(p=>{
+      const img = p.gambar || PRODUCT_IMG_PLACEHOLDER;
+      const isSel = p.name===prodVal;
+      return `<button type="button" class="wiz-kasir-card${isSel?" selected":""}" data-kasir-prod="${escHtml(p.name)}">
+        <img class="wiz-kasir-card-img" src="${img}" alt="" onerror="this.onerror=null;this.src='${PRODUCT_IMG_PLACEHOLDER}';">
+        <div class="wiz-kasir-card-name">${escHtml(p.name)}</div>
+        <div class="wiz-kasir-card-price">${rupiah(p.harga)}</div>
+      </button>`;
+    }).join("");
+    const options = list.map(p=>
+      `<option value="${escHtml(p.name)}" ${p.name===prodVal?"selected":""}>${escHtml(p.name)}</option>`).join("");
+    return `
+      <div class="wiz-kasir-catalog" id="wa-kasir-${sheet}">
+        <input type="text" class="wiz-kasir-search" id="wa-kasir-search-${sheet}" placeholder="🔍 Cari produk...">
+        <div class="wiz-kasir-grid" id="wa-kasir-grid-${sheet}">${cardsHtml || `<div class="wiz-kasir-empty">Belum ada produk di Master Data.</div>`}</div>
+      </div>
+      <select id="wa-prod-${sheet}" style="display:none;"><option value="">— pilih produk —</option>${options}</select>
+    `;
+  }
+
   function renderListStep(sheet){
     const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="list"]`);
     const st = wizState[sheet];
@@ -8526,6 +8698,13 @@ if ("serviceWorker" in navigator) {
     }
     const options = prodListOf(sheet).map(p=>
       `<option value="${p.name}" ${p.name===prodVal?"selected":""}>${p.name}</option>`).join("");
+    // Mode Kasir cuma berlaku di desktop & waktu MENAMBAH produk baru (bukan
+    // edit — edit selalu lewat kartu inline "inlineCardEdit", tidak pernah
+    // lewat formHtml ini, jadi tidak perlu ditangani di sini sama sekali).
+    const useKasirCatalog = !editing && getInputModePref()==="kasir" && isDesktopWiz();
+    const prodFieldHtml = useKasirCatalog
+      ? renderKasirCatalogHtml(sheet, prodVal)
+      : `<select id="wa-prod-${sheet}"><option value="">— pilih produk —</option>${options}</select>`;
 
     const formHtml = (showForm && !inlineCardEdit) ? `
       <div class="wiz-inline-form" id="wa-form-${sheet}">
@@ -8533,7 +8712,7 @@ if ("serviceWorker" in navigator) {
         <div class="wiz-preview-strip" id="wa-preview-${sheet}" style="display:none;"></div>
         <div class="wiz-section">
           <div class="wiz-section-label"><span class="wiz-section-ic">📦</span> Produk</div>
-          <select id="wa-prod-${sheet}"><option value="">— pilih produk —</option>${options}</select>
+          ${prodFieldHtml}
         </div>
         ${sheet==="custom" ? `
         <div class="wiz-section">
@@ -8684,7 +8863,10 @@ if ("serviceWorker" in navigator) {
     const hintEl = document.getElementById("wa-hint-"+sheet);
     const previewEl = document.getElementById("wa-preview-"+sheet);
     const prodEl = document.getElementById("wa-prod-"+sheet);
-    if(SETTINGS.autocompleteProduk) comboboxify(prodEl, "Pilih produk...");
+    // Combobox teks (cari-ketik) cuma dipasang di Mode Tabel — di Mode
+    // Kasir, select ini sengaja disembunyikan total (diganti kartu grid di
+    // bawah), jadi combobox tidak perlu (dan tidak boleh) dibungkus di sini.
+    if(SETTINGS.autocompleteProduk && !useKasirCatalog) comboboxify(prodEl, "Pilih produk...");
     function updHint(){
       const p = findProduct(prodEl.value);
       const q = parseFloat(qtyEl.value)||0;
@@ -8740,6 +8922,55 @@ if ("serviceWorker" in navigator) {
       updHint();
     });
     updHint();
+
+    /* ---------- wiring khusus Mode Kasir: klik kartu = pilih produk ---------- */
+    if(useKasirCatalog){
+      const kasirGrid = document.getElementById("wa-kasir-grid-"+sheet);
+      const kasirSearch = document.getElementById("wa-kasir-search-"+sheet);
+      function pickKasirCard(name){
+        prodEl.value = name;
+        prodEl.dispatchEvent(new Event("change", {bubbles:true}));
+        if(kasirGrid){
+          kasirGrid.querySelectorAll(".wiz-kasir-card").forEach(el=>{
+            el.classList.toggle("selected", el.dataset.kasirProd === name);
+          });
+        }
+        // Sama seperti alur dropdown: begitu produk dipilih, fokus otomatis
+        // pindah ke kolom Jumlah supaya CS tinggal ketik angka lalu Enter
+        // (bindAutoSelect di qtyEl bikin isinya langsung ke-select).
+        qtyEl.focus();
+        try{ qtyEl.select(); }catch(e){}
+      }
+      if(kasirGrid){
+        kasirGrid.addEventListener("click", (e)=>{
+          const card = e.target.closest(".wiz-kasir-card");
+          if(!card) return;
+          pickKasirCard(card.dataset.kasirProd);
+        });
+      }
+      if(kasirSearch){
+        kasirSearch.addEventListener("input", ()=>{
+          const q = kasirSearch.value.trim().toLowerCase();
+          let anyVisible = false;
+          kasirGrid.querySelectorAll(".wiz-kasir-card").forEach(card=>{
+            const match = card.dataset.kasirProd.toLowerCase().includes(q);
+            card.style.display = match ? "" : "none";
+            if(match) anyVisible = true;
+          });
+          let emptyEl = kasirGrid.querySelector(".wiz-kasir-empty-search");
+          if(!anyVisible){
+            if(!emptyEl){
+              emptyEl = document.createElement("div");
+              emptyEl.className = "wiz-kasir-empty wiz-kasir-empty-search";
+              emptyEl.textContent = "Tidak ada produk yang cocok.";
+              kasirGrid.appendChild(emptyEl);
+            }
+          } else if(emptyEl){
+            emptyEl.remove();
+          }
+        });
+      }
+    }
 
     const qtyMinusBtn = document.getElementById("wa-qtyminus-"+sheet);
     const qtyPlusBtn = document.getElementById("wa-qtyplus-"+sheet);
