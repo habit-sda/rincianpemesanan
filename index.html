@@ -1170,7 +1170,17 @@
       width:24px;height:24px;border-radius:6px;border:1px solid var(--line);background:var(--paper-dark);
       color:var(--ink);font-weight:700;font-size:13px;cursor:pointer;line-height:1;
     }
-    .pos-qty-val{font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;min-width:26px;text-align:center;}
+    .pos-qty-val{display:flex;align-items:center;gap:4px;}
+    .pos-qty-input{
+      font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;
+      width:34px;text-align:center;border:1px solid transparent;border-radius:6px;
+      background:transparent;color:var(--ink);padding:3px 2px;
+    }
+    .pos-qty-input:hover{border-color:var(--line);background:var(--paper-dark);}
+    .pos-qty-input:focus{
+      border-color:var(--primary-green);background:var(--card);outline:none;
+    }
+    .pos-qty-unit{font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;color:var(--ink-soft);}
     .pos-cart-item-total{font-weight:700;font-size:12.5px;color:var(--primary-green);font-family:'Roboto Mono',monospace;}
     .pos-cart-item-diskon{
       margin-top:6px;display:flex;align-items:center;gap:6px;
@@ -1942,14 +1952,23 @@
   .wiz-pos-host .entry-col-head{ margin-bottom: 0; }
   .wiz-pos-host .pos-view.active{
     margin-top: 16px;
-    /* Kolom kanan (Keranjang) TIDAK dikunci fr sendiri lagi — lebarnya
-       diambil pixel-perfect dari lebar kartu Preview Nota (.wiz-summary-card)
-       lewat variabel --pos-cart-w yang di-set oleh syncPosCartWidth() di JS
-       (perlu begitu karena .wiz-pos-host punya padding kiri/kanan sendiri
-       yang tidak dimiliki .wiz-summary-card, jadi rasio fr murni tidak
-       pernah bisa persis sama). Fallback 340px kalau JS belum sempat jalan. */
+    /* Kolom kanan (Keranjang) lebarnya diambil pixel-perfect dari lebar
+       kartu Preview Nota (.wiz-summary-card) lewat variabel --pos-cart-w
+       yang di-set oleh syncPosCartWidth() di JS.
+       INI SAJA TERNYATA BELUM CUKUP: .wiz-pos-host punya padding-right
+       22px sendiri yang tidak dimiliki .wiz-desktop-grid (tempat
+       .wiz-summary-card duduk, grid itu sama sekali tanpa padding).
+       Karena kolom kiri grid ini "1fr" (lentur), berapa pun nilai
+       --pos-cart-w yang dipasang, TEPI KANAN Keranjang selalu mentok di
+       (tepi-konten - 22px) — tidak pernah bisa mencapai tepi kanan asli
+       yang sama dengan Preview Nota, walau lebarnya sudah identik.
+       margin-right:-22px di bawah ini membatalkan padding-right host
+       KHUSUS untuk grid pos-view ini, supaya kolom Keranjang benar-benar
+       bisa mencapai tepi kanan sungguhan (bukan cuma lebarnya yang sama,
+       tapi tepi kanan & kirinya juga lurus/pas dengan Preview Nota). */
     grid-template-columns: minmax(0, 1fr) var(--pos-cart-w, 340px);
     gap: 24px;
+    margin-right: -22px;
   }
   .wiz-pos-host .pos-grid{
     grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
@@ -3962,6 +3981,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div class="entry-col-head">
             <h2 class="section-title">Rincian Pemesanan</h2>
             <div class="mode-toggle" data-modetoggle="penjualan">
+              <button type="button" class="mode-toggle-btn" data-mode="tabel">📋 Mode Tabel</button>
               <button type="button" class="mode-toggle-btn" data-mode="kasir">🛒 Mode Kasir</button>
             </div>
           </div>
@@ -4089,6 +4109,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div class="entry-col-head">
             <h2 class="section-title">Rincian Pemesanan (Custom)</h2>
             <div class="mode-toggle" data-modetoggle="custom">
+              <button type="button" class="mode-toggle-btn" data-mode="tabel">📋 Mode Tabel</button>
               <button type="button" class="mode-toggle-btn" data-mode="kasir">🛒 Mode Kasir</button>
             </div>
           </div>
@@ -4659,7 +4680,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="footer-bank-line">BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.21.1</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.21.5</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -4840,10 +4861,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.21.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.21.5 <span class="changelog-tag">Sekarang</span></div>
           <ul>
-            <li><b>Perbaikan lebar kolom Keranjang</b> — di rilis sebelumnya, lebar kolom Keranjang cuma disamakan lewat rasio grid (fr), tapi ternyata masih beda ~15px karena kartu Keranjang punya padding tambahan yang tidak dimiliki kartu Preview Nota. Sekarang lebar kolom Keranjang diambil langsung (pixel-perfect) dari lebar kartu Preview Nota yang sudah dirender browser, jadi selalu identik di ukuran layar berapa pun.</li>
-            <li><b>Mode Kasir jadi satu-satunya tampilan di kartu Rincian Pemesanan</b> — tombol "Mode Tabel" di dalam kartu Rincian Pemesanan (tab Penjualan &amp; Custom, desktop) dihapus, tinggal "Mode Kasir" saja, jadi kartu ini selalu tampil gaya kasir toko sekarang. Popup "Tampilan Input" di header (pemicu katalog kasir untuk form "+ Tambah produk") tidak diubah, masih punya kedua pilihan seperti biasa. Tampilan HP tidak disentuh sama sekali. Lebar kolom "Keranjang" juga disamakan dengan kolom "Preview Nota" di bawahnya (dulu proporsinya sedikit beda), murni penyesuaian tampilan — tidak ada perhitungan/data yang berubah.</li>
+            <li><b>Qty di Keranjang (Mode Kasir) bisa diketik langsung</b> — angka qty di setiap item Keranjang sekarang jadi kolom yang bisa diklik/tap: begitu diklik, isinya langsung terseleksi semua supaya bisa langsung ketik angka baru tanpa hapus manual dulu. Tekan Enter atau klik di luar untuk menyimpan. Ketik 0 atau kosongkan lalu keluar dari kolom = produk otomatis dihapus dari keranjang, sama seperti sebelumnya lewat tombol "−". Tombol −/+ tetap ada & masih berfungsi seperti biasa untuk penyesuaian cepat.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.21.4</div>
+          <ul>
+            <li><b>Mode Tabel dikembalikan (kartu Rincian Pemesanan)</b> — tombol "Mode Tabel" di kartu Rincian Pemesanan (tab Penjualan &amp; Custom, desktop) yang sempat dihapus sekarang aktif lagi. Jadi kartu ini punya 2 tampilan yang bisa dipilih bebas: <b>Mode Tabel</b> (form/tabel klasik, seperti versi sebelum fitur Kasir ada) atau <b>Mode Kasir</b> (grid katalog+keranjang layar penuh seperti yang berjalan sekarang). Sebelumnya sempat dipaksa selalu "Mode Kasir" saja, yang jadi penyebab kartu "+ Tambah produk" (dipakai Mode Tabel) selalu hilang walau sudah pilih "Mode Tabel" di popup "Tampilan Input" header — sekarang perbaikan itu tidak diperlukan lagi karena akar masalahnya (mode dipaksa) sudah dicabut. Lebar kolom "Keranjang" di Mode Kasir tetap pixel-perfect sama dengan Preview Nota (perbaikan v2.21.1–v2.21.2 dipertahankan).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.20.0</div>
+          <ul>
             <li><b>Mode Kasir (tahap 2)</b> — kartu <b>Pengiriman</b> (pilih Ekspedisi &amp; lihat Ongkir) dan kartu <b>Preview Nota</b> (Ringkasan pesanan lengkap + tombol Unduh/Bagikan/Salin/<b>Kirim ke Grup Telegram</b>) sekarang ikut tampil di bawah layar Mode Kasir — jadi alurnya lengkap satu layar: klik produk → atur ekspedisi/ongkir → kirim, tanpa perlu pindah ke Mode Tabel sama sekali. Kartu "+ Tambah produk" (yang cuma dipakai Mode Tabel) disembunyikan di Mode Kasir supaya tidak dobel dengan grid katalog di atasnya. Tidak ada rumus/alur baru — kartu Pengiriman &amp; Preview Nota ini murni kartu yang sudah ada sebelumnya, cuma sekarang ikut kelihatan bareng grid+keranjang.</li>
           </ul>
         </div>
@@ -10751,11 +10782,11 @@ if ("serviceWorker" in navigator) {
    Kasir ini — ganti di salah satu mode langsung kelihatan di mode lain.
    ============================================================ */
 (function(){
-  const KASIR_MODE_KEY = "notaHalawa_posMode_"; // + sheet, isi dulu: "tabel" | "kasir"
-  // Mode Tabel dihapus dari kartu Rincian Pemesanan (tombolnya sudah tidak
-  // ada) — jadi kartu ini SELALU pakai Mode Kasir sekarang, termasuk untuk
-  // user lama yang localStorage-nya kebetulan masih tersimpan "tabel".
-  function getPosMode(sheet){ return "kasir"; }
+  const KASIR_MODE_KEY = "notaHalawa_posMode_"; // + sheet, isi: "tabel" | "kasir"
+  function getPosMode(sheet){
+    try{ return localStorage.getItem(KASIR_MODE_KEY+sheet) === "kasir" ? "kasir" : "tabel"; }
+    catch(e){ return "tabel"; }
+  }
   function setPosMode(sheet, val){
     try{ localStorage.setItem(KASIR_MODE_KEY+sheet, val === "kasir" ? "kasir" : "tabel"); }catch(e){}
   }
@@ -10906,6 +10937,21 @@ if ("serviceWorker" in navigator) {
     renderPosGrid(sheet);
     renderPosCart(sheet);
   }
+  // Commit qty yang diketik LANGSUNG di kolom angka Keranjang (bukan cuma
+  // lewat tombol −/+). Dipanggil saat user selesai edit (blur / tekan Enter).
+  // Sama seperti stepQty: 0 atau kosong/tidak valid -> hapus item dari
+  // keranjang, di luar batas 0..1000 -> dijepit (clamp), supaya perilakunya
+  // konsisten dengan tombol −/+ yang sudah ada.
+  function setQtyDirect(sheet, tr, rawVal){
+    const parsed = parseFloat(String(rawVal).replace(",", "."));
+    const next = Math.min(1000, Math.max(0, isNaN(parsed) ? 0 : parsed));
+    if(next <= 0){ removeFromCart(sheet, tr); return; }
+    const qtyEl = tr.querySelector("input.qty");
+    qtyEl.value = next;
+    qtyEl.dispatchEvent(new Event("input", {bubbles:true}));
+    renderPosGrid(sheet);
+    renderPosCart(sheet);
+  }
   function removeFromCart(sheet, tr){
     const sel = tr.querySelector("select.prod");
     const qtyEl = tr.querySelector("input.qty");
@@ -10942,7 +10988,10 @@ if ("serviceWorker" in navigator) {
       <div class="pos-cart-item-row">
         <div class="pos-qty-stepper">
           <button type="button" class="pos-qty-btn" data-pos-minus="${i}" aria-label="Kurangi">−</button>
-          <span class="pos-qty-val">${qty} ${satuan}</span>
+          <span class="pos-qty-val">
+            <input type="text" inputmode="decimal" class="pos-qty-input" value="${qty}" data-pos-qtyinput="${i}" aria-label="Ubah qty ${escHtml(name)}">
+            <span class="pos-qty-unit">${satuan}</span>
+          </span>
           <button type="button" class="pos-qty-btn" data-pos-plus="${i}" aria-label="Tambah">+</button>
         </div>
         <div class="pos-cart-item-total">${totalTxt}</div>
@@ -10963,6 +11012,26 @@ if ("serviceWorker" in navigator) {
     });
     host.querySelectorAll("[data-pos-minus]").forEach(el=>{
       el.addEventListener("click", ()=> stepQty(sheet, trs[+el.dataset.posMinus], -1));
+    });
+    // Klik/tap langsung di angka qty -> seleksi semua isinya (select all)
+    // supaya user bisa langsung ketik ulang tanpa perlu hapus manual dulu.
+    // Enter = commit & lepas fokus, blur = commit ke data. Klik tombol
+    // −/+ atau produk lain saat sedang fokus di sini tetap aman karena
+    // commit terjadi di blur, bukan di setiap ketikan.
+    host.querySelectorAll("[data-pos-qtyinput]").forEach(el=>{
+      const tr = trs[+el.dataset.posQtyinput];
+      el.addEventListener("click", ()=> el.select());
+      el.addEventListener("focus", ()=> el.select());
+      el.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter"){ e.preventDefault(); el.blur(); }
+      });
+      // stopPropagation supaya event input/change dari kolom ini TIDAK
+      // memicu listener global (document-level "input"/"change" di bawah,
+      // dipakai untuk live-sync field lain) yang akan me-render-ulang
+      // Keranjang di tengah user mengetik & bikin fokusnya kelempar keluar.
+      el.addEventListener("input", (e)=> e.stopPropagation());
+      el.addEventListener("change", (e)=> e.stopPropagation());
+      el.addEventListener("blur", ()=> setQtyDirect(sheet, tr, el.value));
     });
     host.querySelectorAll("[data-pos-remove]").forEach(el=>{
       el.addEventListener("click", ()=> removeFromCart(sheet, trs[+el.dataset.posRemove]));
