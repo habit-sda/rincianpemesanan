@@ -3413,6 +3413,13 @@ body:not(.showing-home) .theme-header-btn{ display: none !important; } /* selain
 @media (min-width:901px){
   body.showing-home .inputmode-header-btn{ display: inline-flex !important; }
 }
+/* Tombol ini sekarang PERMANEN disembunyikan di Beranda (lihat catatan
+   di markup #btn-inputmode-open) — selector ID di bawah SENGAJA dipakai
+   supaya menang lawan aturan "display:inline-flex !important" di atas
+   (spesifisitas ID selalu lebih tinggi daripada kombinasi class apa pun),
+   jadi atribut hidden pada tombolnya benar-benar berlaku di semua lebar
+   layar, bukan cuma kealahan spesifisitas CSS. */
+#btn-inputmode-open{ display: none !important; }
 
 /* =========================================================
    MODE GELAP — token warna inti. Sebagian besar UI (teks, latar
@@ -3771,11 +3778,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 12.7A6.5 6.5 0 1 1 11.3 6a5 5 0 0 0 6.7 6.7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
           <span>Tema</span>
         </button>
-        <!-- Tombol "Tampilan Input" — SENGAJA cuma tampil di layar desktop
-             (CSS .inputmode-header-btn, breakpoint sama dengan isDesktopWiz()
-             di JS: min-width:901px). Di HP disembunyikan total karena kartu
-             HP sudah punya alur sentuh sendiri, tidak perlu mode kasir. -->
-        <button type="button" id="btn-inputmode-open" class="theme-header-btn inputmode-header-btn" aria-label="Ganti tampilan input produk">
+        <!-- Tombol "Tampilan Input" — DISEMBUNYIKAN (hidden) di Beranda.
+             Getinput ModePref() di bawah sekarang dipaksa selalu balikin
+             "tabel", jadi popup ini jadi tidak relevan lagi & tombol
+             pemicunya sengaja ditutup total lewat atribut hidden. Markup
+             popup (#inputmode-overlay) & JS wiring-nya SENGAJA tidak
+             dihapus (cuma tidak pernah kebuka lagi lewat tombol ini),
+             supaya gampang diaktifkan lagi nanti kalau perlu. -->
+        <button type="button" id="btn-inputmode-open" class="theme-header-btn inputmode-header-btn" aria-label="Ganti tampilan input produk" hidden>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/></svg>
           <span>Tampilan Input</span>
         </button>
@@ -4680,7 +4690,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="footer-bank-line">BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.21.5</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.21.7</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -4861,7 +4871,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.21.5 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.21.7 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan tombol "Tampilan Input" masih muncul</b> — perbaikan v2.21.6 (menyembunyikan tombol ini) belum berhasil karena ada aturan CSS lain (<code>display:inline-flex !important</code> khusus layar desktop) yang spesifisitasnya lebih tinggi daripada atribut hidden yang dipasang, jadi tombolnya tetap kepaksa muncul. Sekarang ditambah aturan CSS dengan selector ID yang dijamin menang, jadi tombolnya benar-benar hilang di semua lebar layar.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.21.6</div>
+          <ul>
+            <li><b>Tombol & popup "Tampilan Input" disembunyikan</b> — tombol "Tampilan Input" di header Beranda (desktop) sekarang disembunyikan, dan form "+ Tambah produk" (dipakai saat kartu Rincian Pemesanan ada di Mode Tabel) dipaksa selalu tampil "Mode Tabel" (cari & pilih dari daftar) — pilihan "Mode Kasir" di form itu tidak lagi bisa diaktifkan siapa pun. Ini terpisah dari toggle Mode Tabel/Mode Kasir di kartu Rincian Pemesanan sendiri (v2.21.4), yang tidak berubah & tetap bisa dipilih bebas.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.21.5</div>
           <ul>
             <li><b>Qty di Keranjang (Mode Kasir) bisa diketik langsung</b> — angka qty di setiap item Keranjang sekarang jadi kolom yang bisa diklik/tap: begitu diklik, isinya langsung terseleksi semua supaya bisa langsung ketik angka baru tanpa hapus manual dulu. Tekan Enter atau klik di luar untuk menyimpan. Ketik 0 atau kosongkan lalu keluar dari kolom = produk otomatis dihapus dari keranjang, sama seperti sebelumnya lewat tombol "−". Tombol −/+ tetap ada & masih berfungsi seperti biasa untuk penyesuaian cepat.</li>
           </ul>
@@ -5687,18 +5709,22 @@ function applyTheme(){
 
 /* ============================================================
    MODE INPUT PRODUK — "Kasir" (klik gambar produk dari katalog)
-   vs "Tabel" (cari & pilih, seperti sebelumnya). SENGAJA disimpan
-   LOKAL per HP/browser (localStorage), sama seperti THEME_KEY —
-   BUKAN disamakan ke semua orang lewat Master Data. Cuma berlaku
-   di layar desktop (>=901px, sama dengan breakpoint isDesktopWiz());
-   di HP selalu pakai Mode Tabel apapun preferensinya, karena kartu
-   HP sudah punya alur sentuh sendiri yang beda. Default "tabel"
-   supaya tidak ada yang berubah untuk siapa pun sampai mereka
-   aktifkan sendiri lewat tombol "Tampilan Input" di Beranda. */
+   vs "Tabel" (cari & pilih, seperti sebelumnya).
+   SEKARANG DIPAKSA SELALU "tabel" — tombol pemicu popup ("Tampilan
+   Input" di Beranda) sudah disembunyikan (lihat atribut hidden di
+   markup #btn-inputmode-open), jadi tidak ada cara lagi bagi siapa
+   pun untuk pindah ke "kasir" lewat popup itu. getInputModePref()
+   di bawah SENGAJA tidak lagi baca localStorage sama sekali (beda
+   dari getPosMode() punya kartu Rincian Pemesanan yang TETAP baca
+   preferensi asli) — supaya form "+ Tambah produk" selalu tampil
+   Mode Tabel (cari & pilih dari daftar), termasuk untuk user lama
+   yang localStorage-nya kebetulan masih tersimpan "kasir". Fungsi
+   setInputModePref() & popup #inputmode-overlay sendiri tidak
+   dihapus (cuma tidak pernah terpanggil lagi), supaya gampang
+   diaktifkan lagi nanti kalau perlu — tinggal balikin fungsi ini
+   ke versi baca localStorage & buka lagi tombolnya. */
 const INPUT_MODE_KEY = "notaHalawa_inputMode"; // isi: "tabel" | "kasir"
-function getInputModePref(){
-  try{ return localStorage.getItem(INPUT_MODE_KEY) === "kasir" ? "kasir" : "tabel"; }catch(e){ return "tabel"; }
-}
+function getInputModePref(){ return "tabel"; }
 function setInputModePref(val){
   try{ localStorage.setItem(INPUT_MODE_KEY, val === "kasir" ? "kasir" : "tabel"); }catch(e){}
 }
