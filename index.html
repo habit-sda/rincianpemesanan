@@ -4285,6 +4285,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           </label>
         </div>
       </div>
+      <div class="md-card">
+        <h3>Teguran foto resi tanpa nama</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 8v5" stroke="var(--primary-green)" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.2" r="0.9" fill="var(--primary-green)"/><circle cx="12" cy="12" r="8.5" stroke="var(--primary-green)" stroke-width="1.6"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Kirim balasan otomatis di grup resi</div>
+            <div class="md-togglerow-sub">Aktif (default) = tiap foto resi masuk tanpa nama customer yang bisa dikenali, bot langsung reply foto itu minta nama ditambahkan di caption/pesan terpisah. Nonaktif = bot tidak membalas apa-apa di grup, TAPI foto tetap masuk antrian dan tetap bisa dicek/diisi lewat <code>/resipending</code>/<code>/resiisi</code> di DM seperti biasa.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-resinonamereminder">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
     </div>
 
     <div class="md-section" id="md-sec-hapus">
@@ -5589,7 +5603,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, resiNoNameReminderEnabled:true};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -5616,6 +5630,7 @@ function loadSettings(){
     if(Array.isArray(s.financeList)) SETTINGS.financeList = s.financeList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
     if(typeof s.resiCrossCheckThresholdPercent === "number" && s.resiCrossCheckThresholdPercent > 0) SETTINGS.resiCrossCheckThresholdPercent = s.resiCrossCheckThresholdPercent;
     if(typeof s.resiCrossCheckReactionEnabled === "boolean") SETTINGS.resiCrossCheckReactionEnabled = s.resiCrossCheckReactionEnabled;
+    if(typeof s.resiNoNameReminderEnabled === "boolean") SETTINGS.resiNoNameReminderEnabled = s.resiNoNameReminderEnabled;
     if(typeof s.autoRepostNoCaptionEnabled === "boolean") SETTINGS.autoRepostNoCaptionEnabled = s.autoRepostNoCaptionEnabled;
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
@@ -10229,6 +10244,14 @@ if ("serviceWorker" in navigator) {
     SETTINGS.resiCrossCheckReactionEnabled = toggleResiReaction.checked;
     saveSettings();
     await confirmMasterDataSave(SETTINGS.resiCrossCheckReactionEnabled ? "Reaksi otomatis di foto resi diaktifkan." : "Reaksi otomatis di foto resi dinonaktifkan.");
+  });
+
+  const toggleResiNoNameReminder = document.getElementById("md-toggle-resinonamereminder");
+  toggleResiNoNameReminder.checked = SETTINGS.resiNoNameReminderEnabled;
+  toggleResiNoNameReminder.addEventListener("change", async ()=>{
+    SETTINGS.resiNoNameReminderEnabled = toggleResiNoNameReminder.checked;
+    saveSettings();
+    await confirmMasterDataSave(SETTINGS.resiNoNameReminderEnabled ? "Balasan otomatis foto resi tanpa nama diaktifkan." : "Balasan otomatis foto resi tanpa nama dinonaktifkan.");
   });
 
   const toggleAutoRepostNoCap = document.getElementById("md-toggle-autorepostnocap");
