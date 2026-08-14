@@ -1152,6 +1152,16 @@
       padding:12px;display:flex;flex-direction:column;min-width:0;
     }
     .pos-cart-title{font-weight:700;font-size:13.5px;margin-bottom:8px;color:var(--ink);}
+    .pos-cart-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+    .pos-cart-head .pos-cart-title{margin-bottom:0;}
+    .pos-cart-reset{
+      display:none;align-items:center;gap:4px;border:none;background:none;
+      font-size:11.5px;font-weight:700;color:var(--ink-soft);cursor:pointer;
+      padding:4px 6px;border-radius:6px;line-height:1;white-space:nowrap;
+    }
+    .pos-cart-reset:hover{color:var(--danger-red);background:rgba(220,38,38,.08);}
+    .pos-cart-reset.show{display:inline-flex;}
+    .pos-cart-reset svg{width:13px;height:13px;flex:none;}
     .pos-cart-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px;}
     .pos-cart-empty{font-size:12.5px;color:var(--ink-soft);text-align:center;padding:24px 4px;}
     .pos-cart-item{
@@ -4011,7 +4021,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
               <div class="pos-grid" id="pos-grid-penjualan"></div>
             </div>
             <div class="pos-cart-col">
-              <div class="pos-cart-title">Keranjang</div>
+              <div class="pos-cart-head">
+                <div class="pos-cart-title">Keranjang</div>
+                <button type="button" class="pos-cart-reset" id="pos-cart-reset-penjualan" title="Kosongkan keranjang">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m2 0-1 12a2 2 0 01-2 2H9a2 2 0 01-2-2L6 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Reset
+                </button>
+              </div>
               <div class="pos-cart-list" id="pos-cart-penjualan"></div>
             </div>
           </div>
@@ -4139,7 +4155,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
               <div class="pos-grid" id="pos-grid-custom"></div>
             </div>
             <div class="pos-cart-col">
-              <div class="pos-cart-title">Keranjang</div>
+              <div class="pos-cart-head">
+                <div class="pos-cart-title">Keranjang</div>
+                <button type="button" class="pos-cart-reset" id="pos-cart-reset-custom" title="Kosongkan keranjang">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m2 0-1 12a2 2 0 01-2 2H9a2 2 0 01-2-2L6 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Reset
+                </button>
+              </div>
               <div class="pos-cart-list" id="pos-cart-custom"></div>
             </div>
           </div>
@@ -11013,6 +11035,34 @@ if ("serviceWorker" in navigator) {
     renderPosGrid(sheet);
     renderPosCart(sheet);
   }
+  /* ---------- Reset keranjang (Mode Kasir) — mengosongkan SEMUA baris
+     produk yang sedang terisi di sheet ini sekaligus (bukan cuma satu
+     per satu lewat ✕), dipicu tombol "Reset" di header Keranjang. Minta
+     konfirmasi dulu karena aksinya tidak bisa dibatalkan. Field lain di
+     luar keranjang (Ekspedisi/Ongkir, dll) tidak ikut disentuh — murni
+     mengosongkan produk & qty & diskon per baris, sama seperti kalau
+     tombol ✕ ditekan satu-satu di tiap item. ---- */
+  function resetPosCart(sheet){
+    const trs = trsOfPos(sheet).filter(tr=> tr.querySelector("select.prod").value);
+    if(!trs.length) return;
+    if(!confirm("Kosongkan semua produk di keranjang ini?")) return;
+    trs.forEach(tr=>{
+      const sel = tr.querySelector("select.prod");
+      const qtyEl = tr.querySelector("input.qty");
+      const dEl = tr.querySelector("input.diskon");
+      sel.value = "";
+      qtyEl.value = "";
+      if(dEl) dEl.value = "";
+      if(sel._comboSync) sel._comboSync();
+      sel.dispatchEvent(new Event("change", {bubbles:true}));
+    });
+    renderPosGrid(sheet);
+    renderPosCart(sheet);
+  }
+  ["penjualan","custom"].forEach(sheet=>{
+    const btn = document.getElementById("pos-cart-reset-"+sheet);
+    if(btn) btn.addEventListener("click", ()=> resetPosCart(sheet));
+  });
   function posCartItemHtml(sheet, tr, i){
     const name = tr.querySelector("select.prod").value;
     const qty = parseFloat(tr.querySelector("input.qty").value) || 0;
@@ -11053,6 +11103,8 @@ if ("serviceWorker" in navigator) {
     if(!host) return;
     const trs = trsOfPos(sheet);
     const filled = trs.map((tr,i)=>({tr,i})).filter(o=> o.tr.querySelector("select.prod").value);
+    const resetBtn = document.getElementById("pos-cart-reset-"+sheet);
+    if(resetBtn) resetBtn.classList.toggle("show", filled.length > 0);
     host.innerHTML = filled.length
       ? filled.map(o=> posCartItemHtml(sheet, o.tr, o.i)).join("") + (fullMsg ? `<div class="pos-cart-full-msg">${escHtml(fullMsg)}</div>` : ``)
       : `<div class="pos-cart-empty">Keranjang masih kosong.<br>Klik produk di sebelah kiri untuk menambah.</div>`;
