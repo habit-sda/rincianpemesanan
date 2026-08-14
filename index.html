@@ -1085,6 +1085,106 @@
     }
     .wiz-kasir-card-price{ font-size:11px;font-weight:700;color:var(--primary-green);margin-top:3px; }
     .wiz-kasir-empty{ grid-column:1/-1;text-align:center;font-size:12.5px;color:var(--ink-soft);padding:20px 0; }
+
+    /* ============================================================
+       MODE KASIR (layar penuh) — pengganti tabel "Rincian Pemesanan"
+       di desktop/tablet (>600px). Ini BUKAN sumber data baru: grid kiri
+       & keranjang kanan cuma "mengklik" select.prod / input.qty /
+       input.diskon yang SUDAH ADA di tabel tersembunyi (#rows-penjualan
+       / #rows-custom), lalu memicu event input/change yang sama —
+       supaya calc(), draft, undo, dst tetap satu sumber kebenaran
+       dengan Mode Tabel. Field Ekspedisi/Ongkir & kartu Nota di
+       sebelahnya TIDAK diubah oleh modul ini (menyusul iterasi
+       berikutnya), tetap tampil apa adanya di bawah/samping.
+       Mobile (≤600px) sama sekali tidak tersentuh (entry-col memang
+       sudah disembunyikan total di mobile, dipakai wizard sendiri). */
+    .entry-col-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+    .entry-col-head .section-title{margin:0;}
+    .mode-toggle{
+      display:inline-flex;background:var(--paper-dark);border:1px solid var(--line);
+      border-radius:10px;padding:3px;gap:2px;
+    }
+    .mode-toggle-btn{
+      font-family:'Roboto',sans-serif;font-size:12px;font-weight:700;
+      background:none;border:none;color:var(--ink-soft);border-radius:7px;
+      padding:7px 12px;cursor:pointer;white-space:nowrap;
+    }
+    .mode-toggle-btn.active{background:var(--card);color:var(--primary-green);box-shadow:0 1px 3px rgba(0,0,0,.12);}
+
+    .pos-view{display:none;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:6px;}
+    .pos-view.active{display:grid;}
+    .pos-grid-col{min-width:0;}
+    .pos-search{
+      width:100%;box-sizing:border-box;padding:10px 14px;margin-bottom:10px;
+      border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);
+      font-size:13.5px;font-family:'Roboto',sans-serif;
+    }
+    .pos-search:focus{outline:none;border-color:var(--primary-green);}
+    .pos-grid{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;
+      max-height:420px;overflow-y:auto;padding:2px;align-content:start;
+    }
+    .pos-card{
+      display:flex;flex-direction:column;align-items:center;text-align:center;
+      background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+      padding:10px 8px 9px;cursor:pointer;transition:.12s ease;font-family:'Roboto',sans-serif;
+      position:relative;user-select:none;
+    }
+    .pos-card:hover{border-color:var(--primary-green);transform:translateY(-1px);}
+    .pos-card:active{transform:translateY(0);background:var(--wiz-tint);}
+    .pos-card.in-cart{border-color:var(--primary-green);background:var(--wiz-tint);}
+    .pos-card-img{width:60px;height:60px;border-radius:10px;object-fit:cover;background:#f5ede1;margin-bottom:6px;}
+    .pos-card-name{
+      font-size:11.5px;font-weight:700;color:var(--ink);line-height:1.25;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .pos-card-price{font-size:11px;font-weight:700;color:var(--primary-green);margin-top:3px;}
+    .pos-card-badge{
+      position:absolute;top:-6px;right:-6px;background:var(--primary-green);color:#fff;
+      font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;padding:0 5px;
+      font-family:'Roboto Mono',monospace;box-shadow:0 1px 3px rgba(0,0,0,.25);
+    }
+    .pos-empty{grid-column:1/-1;text-align:center;font-size:12.5px;color:var(--ink-soft);padding:20px 0;}
+
+    .pos-cart-col{
+      background:var(--paper-dark);border:1px solid var(--line);border-radius:12px;
+      padding:12px;display:flex;flex-direction:column;min-width:0;
+    }
+    .pos-cart-title{font-weight:700;font-size:13.5px;margin-bottom:8px;color:var(--ink);}
+    .pos-cart-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px;}
+    .pos-cart-empty{font-size:12.5px;color:var(--ink-soft);text-align:center;padding:24px 4px;}
+    .pos-cart-item{
+      background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px;
+    }
+    .pos-cart-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+    .pos-cart-item-name{font-weight:700;font-size:12.5px;color:var(--ink);line-height:1.3;}
+    .pos-cart-item-sub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+    .pos-cart-item-remove{
+      background:none;border:none;color:var(--danger-red);cursor:pointer;font-size:15px;
+      line-height:1;padding:2px 4px;flex-shrink:0;
+    }
+    .pos-cart-item-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;}
+    .pos-qty-stepper{display:flex;align-items:center;gap:6px;}
+    .pos-qty-btn{
+      width:24px;height:24px;border-radius:6px;border:1px solid var(--line);background:var(--paper-dark);
+      color:var(--ink);font-weight:700;font-size:13px;cursor:pointer;line-height:1;
+    }
+    .pos-qty-val{font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;min-width:26px;text-align:center;}
+    .pos-cart-item-total{font-weight:700;font-size:12.5px;color:var(--primary-green);font-family:'Roboto Mono',monospace;}
+    .pos-cart-item-diskon{
+      margin-top:6px;display:flex;align-items:center;gap:6px;
+    }
+    .pos-cart-item-diskon label{font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
+    .pos-cart-item-diskon input{
+      flex:1;min-width:0;height:26px;border:1px solid var(--line);border-radius:6px;
+      padding:0 8px;font-size:11.5px;font-family:'Roboto Mono',monospace;
+    }
+    .pos-cart-full-msg{font-size:11.5px;color:var(--danger-red);text-align:center;padding:8px 4px 0;}
+    @media (max-width:900px){
+      .pos-view{grid-template-columns:1fr;}
+      .pos-cart-col{order:-1;}
+    }
     .wiz-pcard-nameline{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;}
     .wiz-pcard-name{font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
     .wiz-qty-badge{
@@ -1814,6 +1914,58 @@
     align-items: start;
   }
   .wiz-steps-col{ min-width: 0; }
+
+  /* ---------- Mode Kasir (layar penuh, desktop asli ≥901px) ----------
+     .wiz-pos-host adalah kartu baris pertama yang selalu tampil (berisi
+     judul "Rincian Pemesanan" + toggle Mode Tabel/Mode Kasir), lebarnya
+     dipaksa penuh (grid-column:1/-1) supaya selalu terlihat & bisa
+     diklik APAPUN mode yang aktif — tidak disembunyikan sama sekali,
+     supaya tombol togglenya sendiri tidak pernah "hilang" gara-gara
+     mode yang sedang aktif. Isinya (.entry-col-head + .pos-view) murni
+     DIPINDAH dari .entry-col (versi tablet 601–900px) oleh JS
+     (relayoutPosForViewport), bukan diduplikasi — jadi id/listener yang
+     sudah dipasang tetap satu-satunya & utuh.
+     Saat Mode Kasir aktif DAN layar ≥901px, kelas "kasir-active" pada
+     .wiz-desktop-grid menyembunyikan kartu "Input Penjualan/Pengiriman"
+     (.wiz-steps-col) & "Ringkasan Pesanan" (.wiz-summary-card), lalu
+     grid dijadikan 1 kolom penuh supaya katalog produk + keranjang bisa
+     memakai seluruh lebar layar (persis gambar acuan kasir toko),
+     menyisakan HANYA sidebar menu di kiri seperti diminta. */
+  .wiz-pos-host{
+    grid-column: 1 / -1;
+    background: #fff;
+    border: 1px solid var(--habit-border);
+    border-radius: var(--habit-radius);
+    box-shadow: var(--habit-shadow);
+    padding: 18px 22px;
+  }
+  .wiz-pos-host .entry-col-head{ margin-bottom: 0; }
+  .wiz-pos-host .pos-view.active{
+    margin-top: 16px;
+    /* Kolom kanan (Keranjang) TIDAK dikunci fr sendiri lagi — lebarnya
+       diambil pixel-perfect dari lebar kartu Preview Nota (.wiz-summary-card)
+       lewat variabel --pos-cart-w yang di-set oleh syncPosCartWidth() di JS
+       (perlu begitu karena .wiz-pos-host punya padding kiri/kanan sendiri
+       yang tidak dimiliki .wiz-summary-card, jadi rasio fr murni tidak
+       pernah bisa persis sama). Fallback 340px kalau JS belum sempat jalan. */
+    grid-template-columns: minmax(0, 1fr) var(--pos-cart-w, 340px);
+    gap: 24px;
+  }
+  .wiz-pos-host .pos-grid{
+    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+    gap: 14px;
+    max-height: calc(100vh - 320px);
+  }
+  .wiz-pos-host .pos-card{ padding: 14px 10px 12px; }
+  .wiz-pos-host .pos-card-img{ width: 72px; height: 72px; }
+  .wiz-pos-host .pos-cart-col{
+    max-height: calc(100vh - 320px);
+    display: flex;
+    flex-direction: column;
+  }
+  .wiz-pos-host .pos-cart-list{ max-height: none; flex: 1; }
+
+  .wiz-desktop-grid.kasir-active .wiz-step[data-wstep="list"]{ display: none; }
 
   .wiz-summary-card{
     display: block;
@@ -3786,6 +3938,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </button>
       </div>
       <div class="wiz-desktop-grid">
+        <div class="wiz-pos-host" data-poshost="penjualan"></div>
         <div class="wiz-steps-col">
           <div class="wiz-step active" data-wstep="list"></div>
           <div class="wiz-step" data-wstep="ship"></div>
@@ -3806,7 +3959,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="sheet" id="capture-penjualan">
       <div class="grid">
         <div class="entry-col">
-          <h2 class="section-title">Rincian Pemesanan</h2>
+          <div class="entry-col-head">
+            <h2 class="section-title">Rincian Pemesanan</h2>
+            <div class="mode-toggle" data-modetoggle="penjualan">
+              <button type="button" class="mode-toggle-btn" data-mode="kasir">🛒 Mode Kasir</button>
+            </div>
+          </div>
           <div class="table-scroll">
           <table>
             <thead><tr>
@@ -3816,6 +3974,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             </tr></thead>
             <tbody id="rows-penjualan"></tbody>
           </table>
+          </div>
+          <div class="pos-view" id="pos-view-penjualan" data-possheet="penjualan">
+            <div class="pos-grid-col">
+              <input type="text" class="pos-search" id="pos-search-penjualan" placeholder="🔍 Cari produk...">
+              <div class="pos-grid" id="pos-grid-penjualan"></div>
+            </div>
+            <div class="pos-cart-col">
+              <div class="pos-cart-title">Keranjang</div>
+              <div class="pos-cart-list" id="pos-cart-penjualan"></div>
+            </div>
           </div>
           <div class="row" style="margin-top:6px;">
             <span class="lbl">Total Qty</span><span class="val" id="pj-totalqty">–</span>
@@ -3897,6 +4065,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </button>
       </div>
       <div class="wiz-desktop-grid">
+        <div class="wiz-pos-host" data-poshost="custom"></div>
         <div class="wiz-steps-col">
           <div class="wiz-step active" data-wstep="list"></div>
           <div class="wiz-step" data-wstep="ship"></div>
@@ -3917,7 +4086,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="sheet" id="capture-custom">
       <div class="grid">
         <div class="entry-col">
-          <h2 class="section-title">Rincian Pemesanan (Custom)</h2>
+          <div class="entry-col-head">
+            <h2 class="section-title">Rincian Pemesanan (Custom)</h2>
+            <div class="mode-toggle" data-modetoggle="custom">
+              <button type="button" class="mode-toggle-btn" data-mode="kasir">🛒 Mode Kasir</button>
+            </div>
+          </div>
           <div class="table-scroll">
           <table>
             <thead><tr>
@@ -3927,6 +4101,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             </tr></thead>
             <tbody id="rows-custom"></tbody>
           </table>
+          </div>
+          <div class="pos-view" id="pos-view-custom" data-possheet="custom">
+            <div class="pos-grid-col">
+              <input type="text" class="pos-search" id="pos-search-custom" placeholder="🔍 Cari produk...">
+              <div class="pos-grid" id="pos-grid-custom"></div>
+            </div>
+            <div class="pos-cart-col">
+              <div class="pos-cart-title">Keranjang</div>
+              <div class="pos-cart-list" id="pos-cart-custom"></div>
+            </div>
           </div>
           <div class="row" style="margin-top:6px;">
             <span class="lbl">Total Qty</span><span class="val" id="cs-totalqty">–</span>
@@ -4475,7 +4659,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="footer-bank-line">BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
     <div id="berlaku" style="margin-top:6px;"></div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.17.2</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.21.1</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -4656,7 +4840,27 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.17.2 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.21.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan lebar kolom Keranjang</b> — di rilis sebelumnya, lebar kolom Keranjang cuma disamakan lewat rasio grid (fr), tapi ternyata masih beda ~15px karena kartu Keranjang punya padding tambahan yang tidak dimiliki kartu Preview Nota. Sekarang lebar kolom Keranjang diambil langsung (pixel-perfect) dari lebar kartu Preview Nota yang sudah dirender browser, jadi selalu identik di ukuran layar berapa pun.</li>
+            <li><b>Mode Kasir jadi satu-satunya tampilan di kartu Rincian Pemesanan</b> — tombol "Mode Tabel" di dalam kartu Rincian Pemesanan (tab Penjualan &amp; Custom, desktop) dihapus, tinggal "Mode Kasir" saja, jadi kartu ini selalu tampil gaya kasir toko sekarang. Popup "Tampilan Input" di header (pemicu katalog kasir untuk form "+ Tambah produk") tidak diubah, masih punya kedua pilihan seperti biasa. Tampilan HP tidak disentuh sama sekali. Lebar kolom "Keranjang" juga disamakan dengan kolom "Preview Nota" di bawahnya (dulu proporsinya sedikit beda), murni penyesuaian tampilan — tidak ada perhitungan/data yang berubah.</li>
+            <li><b>Mode Kasir (tahap 2)</b> — kartu <b>Pengiriman</b> (pilih Ekspedisi &amp; lihat Ongkir) dan kartu <b>Preview Nota</b> (Ringkasan pesanan lengkap + tombol Unduh/Bagikan/Salin/<b>Kirim ke Grup Telegram</b>) sekarang ikut tampil di bawah layar Mode Kasir — jadi alurnya lengkap satu layar: klik produk → atur ekspedisi/ongkir → kirim, tanpa perlu pindah ke Mode Tabel sama sekali. Kartu "+ Tambah produk" (yang cuma dipakai Mode Tabel) disembunyikan di Mode Kasir supaya tidak dobel dengan grid katalog di atasnya. Tidak ada rumus/alur baru — kartu Pengiriman &amp; Preview Nota ini murni kartu yang sudah ada sebelumnya, cuma sekarang ikut kelihatan bareng grid+keranjang.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.19.0</div>
+          <ul>
+            <li><b>Mode Kasir (tahap 1, perbaikan tampilan)</b> — di layar desktop asli (lebar ≥901px, dengan sidebar menu di kiri), tombol <b>Mode Tabel / Mode Kasir</b> sekarang benar-benar tampil &amp; berfungsi: pilih <b>Mode Kasir</b> untuk mengganti SELURUH area "Input Penjualan" (kartu Input Penjualan+Pengiriman &amp; Ringkasan Pesanan) jadi 1 layar penuh gaya kasir toko — grid produk klik-langsung-masuk-keranjang di kiri, keranjang+total di kanan — menyisakan hanya menu sidebar di sebelah kiri layar. Pilih <b>Mode Tabel</b> untuk kembali ke tampilan kartu wizard seperti sebelumnya. Di lebar tablet (601–900px) tampilannya tidak berubah dari sebelumnya. Ini murni perubahan tampilan/tata letak — sumber data, kalkulasi, &amp; ongkir/ekspedisi masih 100% sama seperti Mode Tabel, cuma sekarang benar-benar kelihatan bedanya di desktop.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.18.0</div>
+          <ul>
+            <li><b>Mode Kasir (tahap 1)</b> — layar "Rincian Pemesanan" di desktop/tablet (tab Penjualan &amp; Custom) sekarang punya 2 tampilan yang bisa dipilih lewat tombol di pojok kanan atas: <b>Mode Tabel</b> (seperti sebelumnya) atau <b>Mode Kasir</b> (grid produk di kiri, klik gambar produk langsung masuk keranjang di kanan — tanpa form terpisah). Kedua mode membaca &amp; menulis data yang sama persis, jadi ganti-ganti mode tidak pernah bikin data hilang atau beda. Field Ekspedisi/Ongkir dan kartu Nota belum berubah — menyusul di tahap berikutnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.17.2</div>
           <ul>
             <li>Tombol <b>"Cek Pembaruan"</b> di footer: kalau ternyata belum ada versi baru, sekarang muncul <b>popup konfirmasi "✅ Sudah Versi Terbaru"</b> yang jelas kelihatan (bukan pesan kecil di pojok yang gampang kelewat) — otomatis tertutup sendiri dalam 3 detik, atau bisa ditutup manual lebih awal.</li>
           </ul>
@@ -7234,6 +7438,7 @@ calc("penjualan"); calc("custom");
     // ikut menunjukkan versi kosong, TANPA pindah layar sama sekali.
     showMsg(`Semua isian di tab "${namaTab}" sudah dikosongkan.`);
     if(window.wizRefresh) window.wizRefresh(activeTab);
+    if(window.wizRefreshPos) window.wizRefreshPos(activeTab);
   }
 
   document.getElementById("btn-reset").addEventListener("click", ()=>{
@@ -10525,6 +10730,322 @@ if ("serviceWorker" in navigator) {
       await confirmMasterDataSave("PIN sudah direset ke PIN bawaan.");
     }
   });
+})();
+</script>
+
+<script>
+/* ============================================================
+   MODE KASIR (desktop/tablet, >600px) — grid produk klik-langsung-
+   masuk-keranjang, menggantikan tabel "Rincian Pemesanan".
+   TAHAP 1: grid produk + keranjang hidup saja. Ekspedisi/ongkir &
+   kirim ke grup BELUM disentuh sama sekali di sini — field-field itu
+   tetap tampil apa adanya di bawah (sama untuk Mode Tabel & Kasir).
+
+   Prinsip yang sama seperti modul Mode Kasir yang sudah ada di form
+   "Tambah produk": TIDAK ADA sumber data baru. Grid & keranjang di
+   sini murni membaca/menulis ke select.prod / input.qty / input.diskon
+   yang SUDAH ADA di #rows-penjualan / #rows-custom (dibangun oleh
+   buildRows(), dihitung oleh calc() yang juga sudah ada), lalu memicu
+   event "input"/"change" yang sama persis supaya kalkulasi, draft
+   otomatis, dan Mode Tabel tetap 100% sinkron dua arah dengan Mode
+   Kasir ini — ganti di salah satu mode langsung kelihatan di mode lain.
+   ============================================================ */
+(function(){
+  const KASIR_MODE_KEY = "notaHalawa_posMode_"; // + sheet, isi dulu: "tabel" | "kasir"
+  // Mode Tabel dihapus dari kartu Rincian Pemesanan (tombolnya sudah tidak
+  // ada) — jadi kartu ini SELALU pakai Mode Kasir sekarang, termasuk untuk
+  // user lama yang localStorage-nya kebetulan masih tersimpan "tabel".
+  function getPosMode(sheet){ return "kasir"; }
+  function setPosMode(sheet, val){
+    try{ localStorage.setItem(KASIR_MODE_KEY+sheet, val === "kasir" ? "kasir" : "tabel"); }catch(e){}
+  }
+
+  function trsOfPos(sheet){ return [...document.querySelectorAll("#rows-"+(sheet==="penjualan"?"penjualan":"custom")+" tr")]; }
+  function prodListOfPos(sheet){ return sheet==="penjualan" ? PRODUCTS_PENJUALAN : PRODUCTS; }
+
+  /* ---------- deteksi desktop asli (breakpoint sama persis dengan
+     isDesktopWiz() di modul wizard) — dipakai supaya grid+keranjang
+     Mode Kasir dipindah ke kartu penuh-lebar .wiz-pos-host cuma di
+     ≥901px, sedangkan di tablet (601–900px) tetap di tempat asalnya
+     (dalam .entry-col, sebelah tabel klasik), TIDAK ADA yang berubah
+     di sana dari Tahap 1. ---------- */
+  function isDesktopWizPos(){
+    return !!(window.matchMedia && window.matchMedia("(min-width:901px)").matches);
+  }
+  /* ---------- pindahkan .entry-col-head (judul+toggle) & .pos-view
+     (grid+keranjang) antara .entry-col (tablet) <-> .wiz-pos-host
+     (desktop asli) — MURNI pindah posisi elemen DOM yang sudah ada
+     (appendChild/insertBefore), tidak ada elemen baru dibuat & tidak
+     ada yang dihapus, jadi semua id/listener yang sudah dipasang
+     (renderPosGrid/renderPosCart/dst) tetap utuh & satu-satunya.
+     .table-scroll dipakai sebagai "jangkar" tetap supaya urutan
+     balik ke tablet selalu benar: head sebelum tabel, pos-view
+     sesudah tabel — sama seperti markup asli. ---------- */
+  function relayoutPosForViewport(){
+    ["penjualan","custom"].forEach(sheet=>{
+      const entryCol = document.querySelector(`#capture-${sheet} .entry-col`);
+      const head = document.querySelector(`#capture-${sheet} .entry-col-head`);
+      const tableScroll = document.querySelector(`#capture-${sheet} .table-scroll`);
+      const posView = document.getElementById("pos-view-"+sheet);
+      const host = document.querySelector(`.wiz-pos-host[data-poshost="${sheet}"]`);
+      if(!entryCol || !head || !tableScroll || !posView || !host) return;
+      if(isDesktopWizPos()){
+        if(head.parentElement !== host) host.appendChild(head);
+        if(posView.parentElement !== host) host.appendChild(posView);
+      } else {
+        if(head.parentElement !== entryCol) entryCol.insertBefore(head, tableScroll);
+        if(posView.parentElement !== entryCol) tableScroll.insertAdjacentElement("afterend", posView);
+      }
+    });
+  }
+
+  /* ---------- toggle Mode Tabel <-> Mode Kasir ---------- */
+  function applyToggleUI(sheet){
+    const mode = getPosMode(sheet);
+    const wrap = document.querySelector(`[data-modetoggle="${sheet}"]`);
+    if(wrap){
+      wrap.querySelectorAll(".mode-toggle-btn").forEach(btn=>{
+        btn.classList.toggle("active", btn.dataset.mode === mode);
+      });
+    }
+    const tableScroll = document.querySelector(`#capture-${sheet} .table-scroll`);
+    const posView = document.getElementById("pos-view-"+sheet);
+    if(tableScroll) tableScroll.style.display = mode === "kasir" ? "none" : "";
+    if(posView) posView.classList.toggle("active", mode === "kasir");
+    // Desktop asli (≥901px): kartu "Input Penjualan/Pengiriman" &
+    // "Ringkasan Pesanan" disembunyikan & grid dijadikan 1 kolom penuh
+    // HANYA saat Mode Kasir aktif — di Mode Tabel, wizard kartu yang
+    // sudah ada tetap tampil seperti biasa (2 kolom), tidak disentuh.
+    const wizGrid = document.querySelector(`#wiz-${sheet} .wiz-desktop-grid`);
+    if(wizGrid) wizGrid.classList.toggle("kasir-active", mode === "kasir" && isDesktopWizPos());
+    if(mode === "kasir"){
+      renderPosGrid(sheet);
+      renderPosCart(sheet);
+    }
+  }
+  document.querySelectorAll(".mode-toggle").forEach(wrap=>{
+    const sheet = wrap.dataset.modetoggle;
+    wrap.querySelectorAll(".mode-toggle-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        setPosMode(sheet, btn.dataset.mode);
+        applyToggleUI(sheet);
+      });
+    });
+  });
+
+  /* ---------- grid produk ---------- */
+  function posCardHtml(sheet, p, qtyInCart){
+    const img = p.gambar ? p.gambar : PRODUCT_IMG_PLACEHOLDER;
+    return `<button type="button" class="pos-card${qtyInCart>0?" in-cart":""}" data-pos-prod="${escHtml(p.name)}">
+      ${qtyInCart>0 ? `<span class="pos-card-badge">${qtyInCart}</span>` : ``}
+      <img class="pos-card-img" src="${img}" alt="" onerror="this.onerror=null;this.src='${PRODUCT_IMG_PLACEHOLDER}';">
+      <div class="pos-card-name">${escHtml(p.name)}</div>
+      <div class="pos-card-price">${rupiah(p.harga)}</div>
+    </button>`;
+  }
+  function currentCartQty(sheet, name){
+    const tr = trsOfPos(sheet).find(tr=> tr.querySelector("select.prod").value === name);
+    return tr ? (parseFloat(tr.querySelector("input.qty").value)||0) : 0;
+  }
+  function renderPosGrid(sheet){
+    const grid = document.getElementById("pos-grid-"+sheet);
+    if(!grid) return;
+    const list = prodListOfPos(sheet);
+    const q = (document.getElementById("pos-search-"+sheet)?.value || "").trim().toLowerCase();
+    const filtered = q ? list.filter(p=> p.name.toLowerCase().includes(q)) : list;
+    grid.innerHTML = filtered.length
+      ? filtered.map(p=> posCardHtml(sheet, p, currentCartQty(sheet, p.name))).join("")
+      : `<div class="pos-empty">Produk tidak ditemukan.</div>`;
+    grid.querySelectorAll("[data-pos-prod]").forEach(card=>{
+      card.addEventListener("click", ()=> addToCart(sheet, card.dataset.posProd));
+    });
+  }
+  const searchHandlers = {};
+  document.querySelectorAll(".pos-search").forEach(inp=>{
+    const sheet = inp.id.replace("pos-search-","");
+    inp.addEventListener("input", ()=> renderPosGrid(sheet));
+  });
+
+  /* ---------- tambah ke keranjang: cari baris produk yg sama (tambah
+     qty), kalau belum ada cari baris kosong, kalau tabel penuh (7 baris
+     terisi produk berbeda) tampilkan pesan — TIDAK ada baris baru dibuat
+     di luar 7 baris yang memang sudah ada (ROWS=7, sesuai file asli). */
+  function addToCart(sheet, name){
+    const trs = trsOfPos(sheet);
+    let tr = trs.find(t=> t.querySelector("select.prod").value === name);
+    if(tr){
+      const qtyEl = tr.querySelector("input.qty");
+      const next = Math.min(1000, (parseFloat(qtyEl.value)||0) + 1);
+      qtyEl.value = next;
+      qtyEl.dispatchEvent(new Event("input", {bubbles:true}));
+    } else {
+      tr = trs.find(t=> t.querySelector("select.prod").value === "");
+      if(!tr){
+        renderPosCart(sheet, "Keranjang penuh — maksimal 7 produk berbeda. Hapus salah satu dulu untuk menambah produk lain.");
+        return;
+      }
+      const sel = tr.querySelector("select.prod");
+      sel.value = name;
+      if(sel._comboSync) sel._comboSync();
+      sel.dispatchEvent(new Event("change", {bubbles:true}));
+      const qtyEl = tr.querySelector("input.qty");
+      qtyEl.value = "1";
+      qtyEl.dispatchEvent(new Event("input", {bubbles:true}));
+    }
+    renderPosGrid(sheet);
+    renderPosCart(sheet);
+  }
+
+  /* ---------- keranjang ---------- */
+  function stepQty(sheet, tr, delta){
+    const qtyEl = tr.querySelector("input.qty");
+    const next = Math.min(1000, Math.max(0, (parseFloat(qtyEl.value)||0) + delta));
+    if(next <= 0){ removeFromCart(sheet, tr); return; }
+    qtyEl.value = next;
+    qtyEl.dispatchEvent(new Event("input", {bubbles:true}));
+    renderPosGrid(sheet);
+    renderPosCart(sheet);
+  }
+  function removeFromCart(sheet, tr){
+    const sel = tr.querySelector("select.prod");
+    const qtyEl = tr.querySelector("input.qty");
+    const dEl = tr.querySelector("input.diskon");
+    sel.value = "";
+    qtyEl.value = "";
+    if(dEl) dEl.value = "";
+    if(sel._comboSync) sel._comboSync();
+    sel.dispatchEvent(new Event("change", {bubbles:true}));
+    renderPosGrid(sheet);
+    renderPosCart(sheet);
+  }
+  function posCartItemHtml(sheet, tr, i){
+    const name = tr.querySelector("select.prod").value;
+    const qty = parseFloat(tr.querySelector("input.qty").value) || 0;
+    const p = findProduct(name);
+    const satuan = p ? p.satuan : "";
+    const hargaTxt = tr.querySelector('[data-f="satuan"]')?.textContent || "–";
+    const totalTxt = tr.querySelector('[data-f="total"]')?.textContent || "–";
+    const dEl = tr.querySelector("input.diskon");
+    const diskonHtml = (sheet === "custom" && dEl) ? `
+      <div class="pos-cart-item-diskon">
+        <label>Diskon</label>
+        <input type="text" inputmode="numeric" value="${escHtml(dEl.value||"")}" placeholder="0.2 / 55000" data-pos-diskon="${i}">
+      </div>` : ``;
+    return `<div class="pos-cart-item" data-pos-row="${i}">
+      <div class="pos-cart-item-top">
+        <div>
+          <div class="pos-cart-item-name">${escHtml(name)}</div>
+          <div class="pos-cart-item-sub">${hargaTxt}/${satuan}</div>
+        </div>
+        <button type="button" class="pos-cart-item-remove" data-pos-remove="${i}" aria-label="Hapus ${escHtml(name)}">✕</button>
+      </div>
+      <div class="pos-cart-item-row">
+        <div class="pos-qty-stepper">
+          <button type="button" class="pos-qty-btn" data-pos-minus="${i}" aria-label="Kurangi">−</button>
+          <span class="pos-qty-val">${qty} ${satuan}</span>
+          <button type="button" class="pos-qty-btn" data-pos-plus="${i}" aria-label="Tambah">+</button>
+        </div>
+        <div class="pos-cart-item-total">${totalTxt}</div>
+      </div>
+      ${diskonHtml}
+    </div>`;
+  }
+  function renderPosCart(sheet, fullMsg){
+    const host = document.getElementById("pos-cart-"+sheet);
+    if(!host) return;
+    const trs = trsOfPos(sheet);
+    const filled = trs.map((tr,i)=>({tr,i})).filter(o=> o.tr.querySelector("select.prod").value);
+    host.innerHTML = filled.length
+      ? filled.map(o=> posCartItemHtml(sheet, o.tr, o.i)).join("") + (fullMsg ? `<div class="pos-cart-full-msg">${escHtml(fullMsg)}</div>` : ``)
+      : `<div class="pos-cart-empty">Keranjang masih kosong.<br>Klik produk di sebelah kiri untuk menambah.</div>`;
+    host.querySelectorAll("[data-pos-plus]").forEach(el=>{
+      el.addEventListener("click", ()=> stepQty(sheet, trs[+el.dataset.posPlus], 1));
+    });
+    host.querySelectorAll("[data-pos-minus]").forEach(el=>{
+      el.addEventListener("click", ()=> stepQty(sheet, trs[+el.dataset.posMinus], -1));
+    });
+    host.querySelectorAll("[data-pos-remove]").forEach(el=>{
+      el.addEventListener("click", ()=> removeFromCart(sheet, trs[+el.dataset.posRemove]));
+    });
+    host.querySelectorAll("[data-pos-diskon]").forEach(el=>{
+      el.addEventListener("change", ()=>{
+        const tr = trs[+el.dataset.posDiskon];
+        const dEl = tr.querySelector("input.diskon");
+        if(!dEl) return;
+        dEl.value = el.value;
+        dEl.dispatchEvent(new Event("input", {bubbles:true}));
+        renderPosCart(sheet);
+      });
+    });
+  }
+
+  /* ---------- sinkron kartu grid (badge qty) & keranjang tiap ada
+     perubahan apa pun di halaman — sama seperti pola syncAllDesktopSummaries
+     yang sudah ada, murah (cuma baca ulang tabel) & tidak butuh hook ke
+     setiap fungsi lain satu-satu. Cuma jalan kalau Mode Kasir aktif. */
+  function refreshActivePos(){
+    ["penjualan","custom"].forEach(sheet=>{
+      if(getPosMode(sheet) === "kasir"){
+        renderPosGrid(sheet);
+        renderPosCart(sheet);
+      }
+    });
+  }
+  document.addEventListener("input", ()=> setTimeout(refreshActivePos, 30));
+  document.addEventListener("change", ()=> setTimeout(refreshActivePos, 30));
+
+  /* ---------- samakan lebar kolom Keranjang dgn kolom Preview Nota ----------
+     .wiz-pos-host (tempat Keranjang) & .wiz-desktop-grid (tempat
+     Preview Nota/.wiz-summary-card) adalah 2 grid TERPISAH dengan padding
+     yang beda, jadi rasio fr murni tidak pernah persis sama pixel-nya.
+     Solusinya: ukur lebar asli .wiz-summary-card yang sudah dirender
+     browser, lalu paksa kolom Keranjang ikut lebar itu persis lewat
+     custom property --pos-cart-w (dibaca oleh CSS .pos-view.active di atas). */
+  function syncPosCartWidth(){
+    ["penjualan","custom"].forEach(sheet=>{
+      const host = document.querySelector(`.wiz-pos-host[data-poshost="${sheet}"]`);
+      const summary = document.getElementById("wsm-"+sheet);
+      if(!host || !summary) return;
+      const w = summary.offsetWidth;
+      if(w > 0) host.style.setProperty("--pos-cart-w", w+"px");
+    });
+  }
+
+  /* ---------- inisialisasi tampilan awal (baca preferensi tersimpan) ---------- */
+  relayoutPosForViewport();
+  applyToggleUI("penjualan");
+  applyToggleUI("custom");
+  syncPosCartWidth();
+  // Preview Nota baru selesai dirender/reflow browser sedikit belakangan
+  // (font/gambar dsb) — ukur ulang sesaat setelah load supaya angka
+  // pertamanya juga sudah akurat, bukan cuma yang ke-2 dst.
+  setTimeout(syncPosCartWidth, 300);
+  // dipakai IIFE Reset supaya grid+keranjang ikut kosong tanpa reload —
+  // relayout dulu (jaga-jaga kalau reset dipanggil tepat saat resize)
+  // baru refresh tampilan togglenya.
+  window.wizRefreshPos = function(sheet){
+    relayoutPosForViewport();
+    applyToggleUI(sheet);
+    syncPosCartWidth();
+  };
+  // Saat lebar layar berpindah lintas breakpoint 901px (mis. jendela
+  // di-resize / rotate tablet), .entry-col-head & .pos-view dipindah
+  // ulang ke tempat yang benar (tablet <-> desktop), sama seperti
+  // relayoutWizardForViewport() untuk langkah Review.
+  let __posRelayoutTimer = null;
+  window.addEventListener("resize", ()=>{
+    clearTimeout(__posRelayoutTimer);
+    __posRelayoutTimer = setTimeout(()=>{
+      relayoutPosForViewport();
+      applyToggleUI("penjualan");
+      applyToggleUI("custom");
+      syncPosCartWidth();
+    }, 120);
+  });
+  // Ganti tab (Beranda/Penjualan/Custom) & buka sidebar bisa mengubah
+  // lebar kolom kanan juga (kartu yang sebelumnya hidden jadi punya
+  // ukuran nyata pertama kali) — ukur ulang begitu ada klik di app.
+  document.addEventListener("click", ()=> setTimeout(syncPosCartWidth, 60));
 })();
 </script>
 
