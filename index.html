@@ -217,6 +217,39 @@
   .confirm-actionrow button{flex:1;border:none;border-radius:6px;padding:10px 0;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
   .confirm-okbtn{background:var(--danger-red);color:#fff;}
   #update-apply.confirm-okbtn{background:var(--primary-green);}
+
+  /* ---- Popup "Konfirmasi Reset" (dipakai tombol Reset tab & tombol
+     Reset Keranjang Mode Kasir) — versi tampilan lebih formal: benar-benar
+     di TENGAH layar (bukan nempel atas seperti popup kalkulator/form
+     lain), dengan ikon peringatan & tata letak center-align. Di-scope
+     lewat ID #reset-confirm-overlay supaya tidak mengubah popup lain
+     yang memang sengaja nempel atas (kalkulator, dsb). ---- */
+  #reset-confirm-overlay{
+    align-items:center;background:rgba(15,23,32,.55);
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  }
+  .reset-confirm-popup{
+    position:relative;width:320px;border-radius:16px;
+    box-shadow:0 20px 48px rgba(0,0,0,.28);
+  }
+  .reset-confirm-x{
+    position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;
+    background:var(--paper-dark);color:var(--ink-soft);font-size:12px;z-index:1;
+    font-family:'Roboto',sans-serif;
+  }
+  .reset-confirm-x:hover{background:var(--line);}
+  .reset-confirm-body{padding:30px 24px 6px;text-align:center;}
+  .reset-confirm-icon{
+    width:54px;height:54px;border-radius:50%;background:#fce8e6;color:var(--danger-red);
+    display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px;
+  }
+  .reset-confirm-title{font-size:15px;font-weight:700;color:var(--ink);margin:0 0 6px;line-height:1.45;}
+  .reset-confirm-body .confirm-warning{text-align:center;font-size:11.5px;}
+  .reset-confirm-actionrow{padding:20px 22px 22px;gap:10px;}
+  .reset-cancel-btn{background:var(--paper-dark);color:var(--ink-soft);}
+  .reset-cancel-btn:hover{background:var(--line);}
+  .reset-confirm-actionrow .confirm-okbtn:hover{background:#a3160f;}
   .kt-okbtn{background:var(--primary-green);}
   .kt-input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;font-family:'Roboto',sans-serif;color:var(--ink);margin-top:8px;}
   .kt-input:focus{outline:none;border-color:var(--primary-green);}
@@ -1155,13 +1188,14 @@
     .pos-cart-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
     .pos-cart-head .pos-cart-title{margin-bottom:0;}
     .pos-cart-reset{
-      display:none;align-items:center;gap:4px;border:none;background:none;
-      font-size:11.5px;font-weight:700;color:var(--ink-soft);cursor:pointer;
-      padding:4px 6px;border-radius:6px;line-height:1;white-space:nowrap;
+      display:none;align-items:center;gap:5px;border:none;background:var(--danger-red);
+      font-size:14.5px;font-weight:700;color:#fff;cursor:pointer;
+      padding:7px 12px;border-radius:8px;line-height:1;white-space:nowrap;
+      box-shadow:0 1px 3px rgba(0,0,0,.2);
     }
-    .pos-cart-reset:hover{color:var(--danger-red);background:rgba(220,38,38,.08);}
+    .pos-cart-reset:hover{background:#a3160f;}
     .pos-cart-reset.show{display:inline-flex;}
-    .pos-cart-reset svg{width:13px;height:13px;flex:none;}
+    .pos-cart-reset svg{width:16px;height:16px;flex:none;}
     .pos-cart-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px;}
     .pos-cart-empty{font-size:12.5px;color:var(--ink-soft);text-align:center;padding:24px 4px;}
     .pos-cart-item{
@@ -4736,17 +4770,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
 
   <!-- ================= POPUP KONFIRMASI RESET ================= -->
   <div id="reset-confirm-overlay" class="calc-overlay" hidden>
-    <div class="calc-popup confirm-popup" role="dialog" aria-label="Konfirmasi reset">
-      <div class="calc-head">
-        <span>Konfirmasi Reset</span>
-        <button id="reset-confirm-close" class="calc-close" aria-label="Batal">✕</button>
-      </div>
-      <div class="confirm-body">
-        <p id="reset-confirm-text">Kosongkan semua isian di tab ini?</p>
+    <div class="calc-popup confirm-popup reset-confirm-popup" role="dialog" aria-label="Konfirmasi reset">
+      <button id="reset-confirm-close" class="reset-confirm-x" aria-label="Batal">✕</button>
+      <div class="confirm-body reset-confirm-body">
+        <div class="reset-confirm-icon">⚠</div>
+        <p id="reset-confirm-text" class="reset-confirm-title">Kosongkan semua isian di tab ini?</p>
         <p class="confirm-warning">Tindakan ini tidak bisa dibatalkan.</p>
       </div>
-      <div class="confirm-actionrow">
-        <button id="reset-confirm-cancel" class="calc-actbtn calc-clearbtn">Batal</button>
+      <div class="confirm-actionrow reset-confirm-actionrow">
+        <button id="reset-confirm-cancel" class="calc-actbtn reset-cancel-btn">Batal</button>
         <button id="reset-confirm-ok" class="calc-actbtn confirm-okbtn">Ya, Kosongkan</button>
       </div>
     </div>
@@ -7488,14 +7520,28 @@ calc("penjualan"); calc("custom");
   const btnClose = document.getElementById("reset-confirm-close");
   const btnOk = document.getElementById("reset-confirm-ok");
   let targetTab = null;
+  let pendingCallback = null; // dipakai jalur generik (mis. reset Keranjang Mode Kasir)
 
   function openConfirm(tab){
     targetTab = tab;
+    pendingCallback = null;
     const namaTab = tab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
     textEl.textContent = `Kosongkan semua isian di tab "${namaTab}"?`;
     overlay.hidden = false;
   }
-  function closeConfirm(){ overlay.hidden = true; targetTab = null; }
+  function closeConfirm(){ overlay.hidden = true; targetTab = null; pendingCallback = null; }
+
+  /* ---- Jalur generik: popup konfirmasi kustom yang sama, dipakai fitur
+     lain (mis. tombol Reset Keranjang di Mode Kasir) supaya seluruh app
+     konsisten pakai 1 komponen popup ini, bukan confirm() bawaan browser
+     yang tampilannya kecil/kurang jelas & bisa diblokir di iframe. ---- */
+  function showGeneric(message, onConfirm){
+    targetTab = null;
+    pendingCallback = onConfirm;
+    textEl.textContent = message;
+    overlay.hidden = false;
+  }
+  window.showResetConfirm = showGeneric;
 
   function doReset(activeTab){
     const pfx = activeTab === "penjualan" ? "pj" : "cs";
@@ -7541,6 +7587,7 @@ calc("penjualan"); calc("custom");
   });
   btnOk.addEventListener("click", ()=>{
     if(targetTab) doReset(targetTab);
+    else if(pendingCallback) pendingCallback();
     closeConfirm();
   });
   btnCancel.addEventListener("click", closeConfirm);
@@ -11045,19 +11092,20 @@ if ("serviceWorker" in navigator) {
   function resetPosCart(sheet){
     const trs = trsOfPos(sheet).filter(tr=> tr.querySelector("select.prod").value);
     if(!trs.length) return;
-    if(!confirm("Kosongkan semua produk di keranjang ini?")) return;
-    trs.forEach(tr=>{
-      const sel = tr.querySelector("select.prod");
-      const qtyEl = tr.querySelector("input.qty");
-      const dEl = tr.querySelector("input.diskon");
-      sel.value = "";
-      qtyEl.value = "";
-      if(dEl) dEl.value = "";
-      if(sel._comboSync) sel._comboSync();
-      sel.dispatchEvent(new Event("change", {bubbles:true}));
+    window.showResetConfirm("Kosongkan semua produk di keranjang ini?", ()=>{
+      trs.forEach(tr=>{
+        const sel = tr.querySelector("select.prod");
+        const qtyEl = tr.querySelector("input.qty");
+        const dEl = tr.querySelector("input.diskon");
+        sel.value = "";
+        qtyEl.value = "";
+        if(dEl) dEl.value = "";
+        if(sel._comboSync) sel._comboSync();
+        sel.dispatchEvent(new Event("change", {bubbles:true}));
+      });
+      renderPosGrid(sheet);
+      renderPosCart(sheet);
     });
-    renderPosGrid(sheet);
-    renderPosCart(sheet);
   }
   ["penjualan","custom"].forEach(sheet=>{
     const btn = document.getElementById("pos-cart-reset-"+sheet);
