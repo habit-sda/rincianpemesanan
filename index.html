@@ -1122,7 +1122,7 @@
     .pos-search:focus{outline:none;border-color:var(--primary-green);}
     .pos-grid{
       display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;
-      max-height:420px;overflow-y:auto;padding:2px;align-content:start;
+      max-height:420px;overflow-y:auto;overflow-x:hidden;padding:12px 2px 2px;align-content:start;
     }
     .pos-card{
       display:flex;flex-direction:column;align-items:center;text-align:center;
@@ -1140,8 +1140,8 @@
     }
     .pos-card-price{font-size:11px;font-weight:700;color:var(--primary-green);margin-top:3px;}
     .pos-card-badge{
-      position:absolute;top:-6px;right:-6px;background:var(--primary-green);color:#fff;
-      font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:10px;
+      position:absolute;top:-6px;right:-6px;background:var(--danger-red);color:#fff;
+      font-size:14px;font-weight:700;min-width:23px;height:23px;border-radius:12px;
       display:flex;align-items:center;justify-content:center;padding:0 5px;
       font-family:'Roboto Mono',monospace;box-shadow:0 1px 3px rgba(0,0,0,.25);
     }
