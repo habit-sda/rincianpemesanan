@@ -582,43 +582,89 @@
     width:716px;background:#F6FBF7;color:#171717;font-family:'Roboto',sans-serif;
     padding:30px 28px;position:relative;
   }
+  /* ---- header: logo bulat + judul + tanggal/jam ---- */
+  .pnota2-v3 .v3-header{text-align:center;margin:0 0 22px;}
+  .pnota2-v3 .v3-logo{width:52px;height:52px;display:block;margin:0 auto 10px;}
   .pnota2-v3 .v3-title{
-    font-size:31px;font-weight:800;color:#00845F;text-align:center;margin:0 0 5px;
+    font-size:29px;font-weight:800;color:#00845F;text-align:center;margin:0 0 8px;
   }
-  .pnota2-v3 .v3-date{
-    font-size:20px;color:#3f3f3d;text-align:center;margin:0 0 24px;
+  .pnota2-v3 .v3-meta{
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    font-size:16.5px;color:#5b6660;
+  }
+  .pnota2-v3 .v3-meta span{display:inline-flex;align-items:center;gap:6px;}
+  .pnota2-v3 .v3-meta svg{width:15px;height:15px;flex-shrink:0;color:#5b6660;}
+  .pnota2-v3 .v3-meta .v3-meta-divider{width:1px;height:13px;background:#c9d2cc;}
+  /* ---- kartu produk (card bersegmen) ---- */
+  .pnota2-v3 .v3-product-card{
+    background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;
+    padding:14px 16px 4px;margin:0 0 16px;
   }
   .pnota2-v3 .v3-thead{
-    display:flex;align-items:center;gap:16px;padding:0 0 11px;
+    display:flex;align-items:stretch;gap:14px;padding:0 0 11px;
     border-bottom:2px solid #171717;margin-bottom:2px;
   }
-  .pnota2-v3 .v3-col-thumb{width:54px;flex-shrink:0;}
-  .pnota2-v3 .v3-col-name{flex:0 0 180px;min-width:0;}
-  .pnota2-v3 .v3-col-harga{width:106px;flex-shrink:0;text-align:right;}
-  .pnota2-v3 .v3-col-diskon{width:106px;flex-shrink:0;text-align:right;}
-  .pnota2-v3 .v3-col-total{width:150px;flex-shrink:0;text-align:right;}
-  .pnota2-v3 .v3-thead span{font-size:18px;font-weight:700;color:#3f3f3d;white-space:nowrap;}
+  .pnota2-v3 .v3-col-num{width:26px;flex-shrink:0;}
+  .pnota2-v3 .v3-col-thumb{width:50px;flex-shrink:0;}
+  .pnota2-v3 .v3-col-name{flex:0 0 122px;min-width:0;}
+  .pnota2-v3 .v3-col-harga{
+    width:100px;flex-shrink:0;text-align:center;
+    display:flex;align-items:center;justify-content:center;
+    border-left:1px solid #E2E8E4;padding:0 6px;
+  }
+  .pnota2-v3 .v3-col-diskon{
+    width:100px;flex-shrink:0;text-align:center;
+    display:flex;align-items:center;justify-content:center;
+    border-left:1px solid #E2E8E4;padding:0 6px;
+  }
+  .pnota2-v3 .v3-col-total{
+    width:160px;flex-shrink:0;text-align:right;
+    display:flex;align-items:center;justify-content:flex-end;
+    border-left:1px solid #E2E8E4;padding-left:12px;
+  }
+  .pnota2-v3 .v3-thead span{font-size:17px;font-weight:700;color:#3f3f3d;white-space:nowrap;}
   .pnota2-v3 .v3-row{
-    display:flex;align-items:center;gap:16px;padding:16px 0;
+    display:flex;align-items:stretch;gap:14px;padding:16px 0;
     border-bottom:1px solid #E5E7EB;
   }
   .pnota2-v3 .v3-row:last-child{border-bottom:none;}
-  .pnota2-v3 .v3-thumb{
-    width:54px;height:54px;border-radius:10px;object-fit:cover;
-    background:#F9FAFB;border:1.5px solid #E5E7EB;
+  .pnota2-v3 .v3-badge-num{
+    width:26px;height:26px;border-radius:50%;background:#00845F;color:#fff;
+    font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;align-self:center;
   }
-  .pnota2-v3 .v3-name{font-size:22px;font-weight:700;color:#171717;margin:0;}
-  .pnota2-v3 .v3-qty{font-size:18px;color:#3f3f3d;margin:4px 0 0;}
-  .pnota2-v3 .v3-harga{font-size:19px;color:#3f3f3d;text-align:right;white-space:nowrap;}
-  .pnota2-v3 .v3-diskon{font-size:19px;color:#3f3f3d;text-align:right;white-space:nowrap;}
-  .pnota2-v3 .v3-total{font-size:21px;font-weight:700;color:#171717;text-align:right;white-space:nowrap;}
-  .pnota2-v3 .v3-stats{display:flex;margin-top:20px;padding-top:16px;border-top:1px solid #E5E7EB;}
+  .pnota2-v3 .v3-thumb{
+    width:50px;height:50px;border-radius:10px;object-fit:cover;
+    background:#F9FAFB;border:1.5px solid #E5E7EB;align-self:center;
+  }
+  .pnota2-v3 .v3-name{font-size:21px;font-weight:700;color:#171717;margin:0;}
+  .pnota2-v3 .v3-qty{margin:6px 0 0;}
+  .pnota2-v3 .v3-harga{font-size:18px;color:#171717;white-space:nowrap;}
+  .pnota2-v3 .v3-diskon{font-size:18px;color:#171717;white-space:nowrap;}
+  .pnota2-v3 .v3-badge{
+    display:inline-block;background:#00845F;color:#fff;font-size:15px;font-weight:700;
+    padding:3px 11px;border-radius:999px;line-height:1.5;white-space:nowrap;
+  }
+  .pnota2-v3 .v3-total{font-size:20px;font-weight:700;color:#171717;white-space:nowrap;}
+  /* ---- kartu info pengiriman ---- */
+  .pnota2-v3 .v3-ship-card{
+    background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;
+    padding:16px;margin:0 0 16px;
+  }
+  .pnota2-v3 .v3-stats{display:flex;}
   .pnota2-v3 .v3-stats>div{flex:1;text-align:center;}
   .pnota2-v3 .v3-stats>div+div{border-left:1px solid #E5E7EB;}
   .pnota2-v3 .v3-stats .l{font-size:16.5px;color:#3f3f3d;margin:0 0 4px;}
   .pnota2-v3 .v3-stats .v{font-size:19.5px;font-weight:700;color:#171717;margin:0;}
+  /* ---- rincian biaya sebelum grand total ---- */
+  .pnota2-v3 .v3-costs{margin:0 0 14px;padding:2px 2px 0;}
+  .pnota2-v3 .v3-costs .v3-cost-row{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:17.5px;color:#3f3f3d;padding:6px 0;
+  }
+  .pnota2-v3 .v3-costs .v3-cost-row b{color:#171717;font-weight:700;}
   .pnota2-v3 .v3-grand{
-    margin-top:18px;background:#D9ECD4;border-radius:14px;padding:18px 20px;
+    margin-top:0;background:#D9ECD4;border-radius:14px;padding:18px 20px;
     display:flex;justify-content:space-between;align-items:center;
   }
   .pnota2-v3 .v3-grand .l{font-size:19px;font-weight:700;color:#00845F;}
@@ -6712,7 +6758,7 @@ function buildPrintNotaV2(tab){
     return sel && sel.value !== "";
   });
 
-  const rowsHtml = rows.map((tr)=>{
+  const rowsHtml = rows.map((tr, idx)=>{
     const name = tr.querySelector("select.prod").value;
     const prod = findProduct(name);
     const qty = tr.querySelector("input.qty").value || "0";
@@ -6723,10 +6769,11 @@ function buildPrintNotaV2(tab){
     const totalTxt = tr.querySelector('[data-f="total"]').textContent;
     const imgSrc = (prod && prod.gambar) ? prod.gambar : PRODUCT_IMG_PLACEHOLDER;
     return `<div class="v3-row">
+      <div class="v3-badge-num">${idx+1}</div>
       <img class="v3-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'">
       <div class="v3-col-name">
         <p class="v3-name">${name}</p>
-        <p class="v3-qty">${qty} ${satuanLabel}</p>
+        <p class="v3-qty"><span class="v3-badge">${qty} ${satuanLabel}</span></p>
       </div>
       <div class="v3-col-harga v3-harga">${hargaAsliTxt}</div>
       <div class="v3-col-diskon v3-diskon">${diskonTxt}</div>
@@ -6735,8 +6782,9 @@ function buildPrintNotaV2(tab){
   }).join("");
 
   const headRow = `<div class="v3-thead">
+    <div class="v3-col-num"></div>
     <div class="v3-col-thumb"></div>
-    <div class="v3-col-name"><span>Produk</span></div>
+    <div class="v3-col-name"><span>Produk &amp; Qty</span></div>
     <div class="v3-col-harga"><span>Harga</span></div>
     <div class="v3-col-diskon"><span>Diskon</span></div>
     <div class="v3-col-total"><span>Total</span></div>
@@ -6748,6 +6796,14 @@ function buildPrintNotaV2(tab){
   const totalberat = document.getElementById(pfx+"-totalberat").textContent;
   const ongkir = document.getElementById(pfx+"-ongkir").textContent.replace(/\s*\(manual\)\s*$/i, "");
   const grandtotal = document.getElementById(pfx+"-grandtotal").textContent;
+  const subtotalTxt = document.getElementById(pfx+"-subtotal").textContent;
+  const diskonOngkirEl = document.getElementById(pfx+"-diskonongkir");
+  const diskonOngkirTxt = diskonOngkirEl.tagName === "INPUT"
+    ? rupiah(parseRp(diskonOngkirEl.value))
+    : diskonOngkirEl.textContent;
+
+  const now = new Date();
+  const jamTxt = String(now.getHours()).padStart(2,"0") + "." + String(now.getMinutes()).padStart(2,"0") + " WIB";
 
   const kelebihan = parseRp(document.getElementById(pfx+"-kelebihan").value);
   const kelebihanFmt = rupiah(kelebihan);
@@ -6761,15 +6817,31 @@ function buildPrintNotaV2(tab){
   const statusBorder = isKurang ? "#f3b4ae" : (isKembalian ? "#aac9f7" : "#bfe0c9");
 
   return `
-    <div class="pnota2 pnota2-v3">
-      <p class="v3-title">Rincian pemesanan</p>
-      <p class="v3-date">${hari}, ${tgl}</p>
-      ${headRow}
-      ${rowsHtml}
-      <div class="v3-stats">
-        <div><p class="l">Total berat</p><p class="v">${totalberat}</p></div>
-        <div><p class="l">Ekspedisi</p><p class="v">${ekspedisi}</p></div>
-        <div><p class="l">Ongkir</p><p class="v">${ongkir}</p></div>
+    <div class="pnota2-v3">
+      <div class="v3-header">
+        <img class="v3-logo" src="${ORDER_LOGO_IMG}" alt="">
+        <p class="v3-title">Rincian pemesanan</p>
+        <div class="v3-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>${hari}, ${tgl}</span>
+          <span class="v3-meta-divider"></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>${jamTxt}</span>
+        </div>
+      </div>
+      <div class="v3-product-card">
+        ${headRow}
+        ${rowsHtml}
+      </div>
+      <div class="v3-ship-card">
+        <div class="v3-stats">
+          <div><p class="l">Total berat</p><p class="v">${totalberat}</p></div>
+          <div><p class="l">Ekspedisi</p><p class="v">${ekspedisi}</p></div>
+          <div><p class="l">Ongkir</p><p class="v">${ongkir}</p></div>
+        </div>
+      </div>
+      <div class="v3-costs">
+        <div class="v3-cost-row"><span>Subtotal produk</span><b>${subtotalTxt}</b></div>
+        <div class="v3-cost-row"><span>Ongkir</span><b>${ongkir}</b></div>
+        <div class="v3-cost-row"><span>Diskon ongkir</span><b>${diskonOngkirTxt}</b></div>
       </div>
       <div class="v3-grand">
         <span class="l">Total pembayaran</span>
