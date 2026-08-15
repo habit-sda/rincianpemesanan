@@ -7600,7 +7600,12 @@ calc("penjualan"); calc("custom");
   window.__notaHalawaDraft = {
     save: saveDraft,
     clear: ()=>{ try{ localStorage.removeItem(DRAFT_KEY); }catch(e){} },
-    allowNextUnload: ()=>{ allowNextUnload = true; }
+    allowNextUnload: ()=>{ allowNextUnload = true; },
+    // dipakai fitur tarik Master Data dari server (pullMasterDataOnStart)
+    // supaya isian baris yang sedang diketik/dipulihkan TIDAK ikut hilang
+    // saat buildRows() dipanggil ulang gara-gara data produk diperbarui.
+    snapshotRows: ()=> ({ penjualan: serializeTab("penjualan"), custom: serializeTab("custom") }),
+    restoreRows: (data)=>{ if(!data) return; restoreTab("penjualan", data.penjualan); restoreTab("custom", data.custom); }
   };
 })();
 
@@ -10031,9 +10036,12 @@ if ("serviceWorker" in navigator) {
     sortEkspedisi();
     syncPenjualanSlice();
     saveMasterData();
+    const __rowsSnapshot = window.__notaHalawaDraft ? window.__notaHalawaDraft.snapshotRows() : null;
     buildRows("penjualan"); buildRows("custom");
     buildEkspedisi("penjualan"); buildEkspedisi("custom");
+    if(window.__notaHalawaDraft) window.__notaHalawaDraft.restoreRows(__rowsSnapshot);
     calc("penjualan"); calc("custom");
+    if(window.wizRefreshPos){ window.wizRefreshPos("penjualan"); window.wizRefreshPos("custom"); }
     await confirmMasterDataSave(customMsg || "Perubahan produk/ekspedisi tersimpan.");
   }
   loadMasterData();
@@ -10061,9 +10069,19 @@ if ("serviceWorker" in navigator) {
     saveMasterData();
     saveSettings();
     applySettingsToDom();
+    // Cadangkan dulu isian baris (termasuk yang baru dipulihkan loadDraft())
+    // SEBELUM buildRows() membangun ulang tabel dari nol akibat data produk
+    // baru dari server — tanpa ini, pesanan yang sedang diisi/dipulihkan
+    // hilang diam-diam begitu tarikan data ini selesai di belakang layar.
+    const __rowsSnapshot = window.__notaHalawaDraft ? window.__notaHalawaDraft.snapshotRows() : null;
     buildRows("penjualan"); buildRows("custom");
     buildEkspedisi("penjualan"); buildEkspedisi("custom");
+    if(window.__notaHalawaDraft) window.__notaHalawaDraft.restoreRows(__rowsSnapshot);
     calc("penjualan"); calc("custom");
+    // Segarkan tampilan Mode Kasir (grid produk + kartu keranjang) supaya
+    // ikut menampilkan isian yang baru dikembalikan, bukan tampilan basi
+    // dari sebelum buildRows() dipanggil.
+    if(window.wizRefreshPos){ window.wizRefreshPos("penjualan"); window.wizRefreshPos("custom"); }
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
     if(window.__renderFinanceList) window.__renderFinanceList();
     // Simpan snapshot versi server yang baru saja kita tahu — jadi acuan
