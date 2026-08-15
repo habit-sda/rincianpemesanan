@@ -6874,7 +6874,7 @@ function renderCanvas(){
     const useV2 = getNotaDesignPref() === "baru";
     holder.innerHTML = useV2 ? buildPrintNotaV2(tab) : buildPrintNota(tab);
     await new Promise(r=>setTimeout(r, 50)); // beri waktu render/layout
-    const target = holder.querySelector(useV2 ? ".pnota2" : ".pnota");
+    const target = holder.querySelector(useV2 ? ".pnota2-v3" : ".pnota");
     const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:1, useCORS:true});
     holder.innerHTML = "";
     return canvas;
