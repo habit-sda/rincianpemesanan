@@ -580,10 +580,10 @@
      sekarang merender struktur ini, bukan struktur .pnota2 lama. ===== */
   .pnota2-v3{
     width:716px;background:#F6FBF7;color:#171717;font-family:'Roboto',sans-serif;
-    padding:30px 28px;position:relative;
+    padding:36px 32px;position:relative;
   }
   /* ---- header: logo bulat + judul + tanggal/jam ---- */
-  .pnota2-v3 .v3-header{text-align:center;margin:0 0 22px;}
+  .pnota2-v3 .v3-header{text-align:center;margin:0 0 26px;}
   .pnota2-v3 .v3-logo{width:52px;height:52px;display:block;margin:0 auto 10px;}
   .pnota2-v3 .v3-title{
     font-size:29px;font-weight:800;color:#00845F;text-align:center;margin:0 0 8px;
@@ -598,11 +598,11 @@
   /* ---- kartu produk (card bersegmen) ---- */
   .pnota2-v3 .v3-product-card{
     background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;
-    padding:14px 16px 4px;margin:0 0 16px;
+    padding:18px 20px 6px;margin:0 0 20px;
   }
   .pnota2-v3 .v3-thead{
-    display:flex;align-items:stretch;gap:14px;padding:0 0 11px;
-    border-bottom:2px solid #171717;margin-bottom:2px;
+    display:flex;align-items:stretch;gap:18px;padding:0 0 13px;
+    border-bottom:2px solid #171717;margin-bottom:4px;
   }
   .pnota2-v3 .v3-col-num{width:26px;flex-shrink:0;}
   .pnota2-v3 .v3-col-thumb{width:50px;flex-shrink:0;}
@@ -624,7 +624,7 @@
   }
   .pnota2-v3 .v3-thead span{font-size:17px;font-weight:700;color:#3f3f3d;white-space:nowrap;}
   .pnota2-v3 .v3-row{
-    display:flex;align-items:stretch;gap:14px;padding:16px 0;
+    display:flex;align-items:stretch;gap:18px;padding:20px 0;
     border-bottom:1px solid #E5E7EB;
   }
   .pnota2-v3 .v3-row:last-child{border-bottom:none;}
@@ -638,7 +638,7 @@
     background:#F9FAFB;border:1.5px solid #E5E7EB;align-self:center;
   }
   .pnota2-v3 .v3-name{font-size:21px;font-weight:700;color:#171717;margin:0;}
-  .pnota2-v3 .v3-qty{margin:6px 0 0;}
+  .pnota2-v3 .v3-qty{margin:8px 0 0;}
   .pnota2-v3 .v3-harga{font-size:18px;color:#171717;white-space:nowrap;}
   .pnota2-v3 .v3-diskon{font-size:18px;color:#171717;white-space:nowrap;}
   .pnota2-v3 .v3-badge{
@@ -649,7 +649,7 @@
   /* ---- kartu info pengiriman ---- */
   .pnota2-v3 .v3-ship-card{
     background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;
-    padding:16px;margin:0 0 16px;
+    padding:20px;margin:0 0 20px;
   }
   .pnota2-v3 .v3-stats{display:flex;}
   .pnota2-v3 .v3-stats>div{flex:1;text-align:center;}
@@ -657,19 +657,19 @@
   .pnota2-v3 .v3-stats .l{font-size:16.5px;color:#3f3f3d;margin:0 0 4px;}
   .pnota2-v3 .v3-stats .v{font-size:19.5px;font-weight:700;color:#171717;margin:0;}
   /* ---- rincian biaya sebelum grand total ---- */
-  .pnota2-v3 .v3-costs{margin:0 0 14px;padding:2px 2px 0;}
+  .pnota2-v3 .v3-costs{margin:0 0 18px;padding:4px 2px 0;}
   .pnota2-v3 .v3-costs .v3-cost-row{
     display:flex;justify-content:space-between;align-items:center;
-    font-size:17.5px;color:#3f3f3d;padding:6px 0;
+    font-size:17.5px;color:#3f3f3d;padding:8px 0;
   }
   .pnota2-v3 .v3-costs .v3-cost-row b{color:#171717;font-weight:700;}
   .pnota2-v3 .v3-grand{
-    margin-top:0;background:#D9ECD4;border-radius:14px;padding:18px 20px;
+    margin-top:0;background:#D9ECD4;border-radius:14px;padding:20px 22px;
     display:flex;justify-content:space-between;align-items:center;
   }
   .pnota2-v3 .v3-grand .l{font-size:19px;font-weight:700;color:#00845F;}
   .pnota2-v3 .v3-grand .v{font-size:27px;font-weight:800;color:#00845F;}
-  .pnota2-v3 .v3-footer{text-align:center;margin-top:18px;font-size:17.5px;color:#3f3f3d;}
+  .pnota2-v3 .v3-footer{text-align:center;margin-top:22px;font-size:17.5px;color:#3f3f3d;}
 
   .pnota2{
     width:1080px;height:auto;background:#ffffff;color:#1a1a1a;font-family:'Roboto',sans-serif;
@@ -6774,8 +6774,8 @@ function buildPrintNotaV2(tab){
      tetap 1 baris, tidak lagi kepotong turun ke bawah. Lebar dasar
      (122px kolom / 716px kartu) tetap jadi batas MINIMUM supaya nota
      pendek tampilannya tidak berubah dari sebelumnya. ---- */
-  const NAME_COL_MIN = 122;
-  const CARD_WIDTH_BASE = 716;
+  const NAME_COL_MIN = 132;
+  const CARD_WIDTH_BASE = 762;
   const longestNamePx = rows.reduce((max, tr)=>{
     const w = measureV3NameWidth(tr.querySelector("select.prod").value || "");
     return Math.max(max, w);
@@ -6872,7 +6872,7 @@ function buildPrintNotaV2(tab){
         <span class="l">Total pembayaran</span>
         <span class="v">${grandtotal}</span>
       </div>
-      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div style="margin-top:12px;padding:13px 16px;border-radius:12px;background:${statusBg};border:1.5px solid ${statusBorder};display:flex;flex-direction:column;gap:6px;">
+      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div style="margin-top:16px;padding:16px 20px;border-radius:12px;background:${statusBg};border:1.5px solid ${statusBorder};display:flex;flex-direction:column;gap:8px;">
         ${kelebihan!==0 ? `<div style="display:flex;justify-content:space-between;font-size:18px;color:#3f3f3d;"><span>Kelebihan bayar sebelumnya</span><strong style="color:#171717;">${kelebihanFmt}</strong></div>` : ``}
         <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:700;color:${statusColor};"><span>${statusLabel}</span><span>${signPrefix}${selisihFmt}</span></div>
       </div>` : ``}
