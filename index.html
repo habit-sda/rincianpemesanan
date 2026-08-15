@@ -6750,6 +6750,17 @@ const ORDER_LOGO_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
    findProduct(name).gambar (Link Gambar di Master Data), fallback ke
    PRODUCT_IMG_PLACEHOLDER kalau belum diisi — sama seperti kartu produk
    di tempat lain di app ini. */
+/* ---- ukur lebar teks asli (px) pakai canvas, sesuai font & ukuran yang
+   dipakai nama produk (.v3-name: 700 21px Roboto) — supaya kolom nama &
+   kartu nota bisa dilebarkan PERSIS secukupnya, bukan tebakan kasar
+   per-karakter yang gampang meleset (huruf "i" vs "W" beda lebar jauh). ---- */
+let _v3MeasureCtx = null;
+function measureV3NameWidth(text){
+  if(!_v3MeasureCtx) _v3MeasureCtx = document.createElement("canvas").getContext("2d");
+  _v3MeasureCtx.font = "700 21px Roboto, sans-serif";
+  return _v3MeasureCtx.measureText(text).width;
+}
+
 function buildPrintNotaV2(tab){
   const pfx = tab==="penjualan" ? "pj" : "cs";
   const tbody = document.getElementById(tab==="penjualan" ? "rows-penjualan" : "rows-custom");
@@ -6757,6 +6768,20 @@ function buildPrintNotaV2(tab){
     const sel = tr.querySelector("select.prod");
     return sel && sel.value !== "";
   });
+
+  /* ---- lebar kolom nama & lebar kartu FLEKSIBEL mengikuti nama produk
+     terpanjang di pesanan ini — supaya nama produk apa pun panjangnya
+     tetap 1 baris, tidak lagi kepotong turun ke bawah. Lebar dasar
+     (122px kolom / 716px kartu) tetap jadi batas MINIMUM supaya nota
+     pendek tampilannya tidak berubah dari sebelumnya. ---- */
+  const NAME_COL_MIN = 122;
+  const CARD_WIDTH_BASE = 716;
+  const longestNamePx = rows.reduce((max, tr)=>{
+    const w = measureV3NameWidth(tr.querySelector("select.prod").value || "");
+    return Math.max(max, w);
+  }, 0);
+  const nameColWidth = Math.max(NAME_COL_MIN, Math.ceil(longestNamePx) + 4); // +4px jaga-jaga anti kepotong
+  const cardWidth = CARD_WIDTH_BASE + Math.max(0, nameColWidth - NAME_COL_MIN);
 
   const rowsHtml = rows.map((tr, idx)=>{
     const name = tr.querySelector("select.prod").value;
@@ -6771,8 +6796,8 @@ function buildPrintNotaV2(tab){
     return `<div class="v3-row">
       <div class="v3-badge-num">${idx+1}</div>
       <img class="v3-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'">
-      <div class="v3-col-name">
-        <p class="v3-name">${name}</p>
+      <div class="v3-col-name" style="flex-basis:${nameColWidth}px;">
+        <p class="v3-name" style="white-space:nowrap;">${name}</p>
         <p class="v3-qty"><span class="v3-badge">${qty} ${satuanLabel}</span></p>
       </div>
       <div class="v3-col-harga v3-harga">${hargaAsliTxt}</div>
@@ -6784,7 +6809,7 @@ function buildPrintNotaV2(tab){
   const headRow = `<div class="v3-thead">
     <div class="v3-col-num"></div>
     <div class="v3-col-thumb"></div>
-    <div class="v3-col-name"><span>Produk &amp; Qty</span></div>
+    <div class="v3-col-name" style="flex-basis:${nameColWidth}px;"><span>Produk &amp; Qty</span></div>
     <div class="v3-col-harga"><span>Harga</span></div>
     <div class="v3-col-diskon"><span>Diskon</span></div>
     <div class="v3-col-total"><span>Total</span></div>
@@ -6817,7 +6842,7 @@ function buildPrintNotaV2(tab){
   const statusBorder = isKurang ? "#f3b4ae" : (isKembalian ? "#aac9f7" : "#bfe0c9");
 
   return `
-    <div class="pnota2-v3">
+    <div class="pnota2-v3" style="width:${cardWidth}px;">
       <div class="v3-header">
         <img class="v3-logo" src="${ORDER_LOGO_IMG}" alt="">
         <p class="v3-title">Rincian pemesanan</p>
