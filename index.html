@@ -5667,6 +5667,48 @@ const PRODUCT_IMG_PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(
     <path d="M47 24v16l-15 7V31l15-7z" fill="#c9a06e" stroke="#b98b52" stroke-width="1.4" stroke-linejoin="round"/>
   </svg>`
 );
+/* ============================================================
+   CACHE GAMBAR PRODUK UNTUK NOTA (base64 di memori, per sesi)
+   Foto produk (prod.gambar) disimpan sebagai LINK URL, bukan file lokal —
+   jadi tiap kali nota digambar ulang buat Salin/Unduh/Bagikan/Kirim/autosave
+   draft, html2canvas HARUS download ulang foto itu dari internet dulu
+   sebelum bisa menggambar. Ini yang bikin proses Salin/Kirim terasa lama
+   (network-bound, bukan CPU), dan yang bikin autosave draft (jalan tiap CS
+   berhenti ngetik nama 1,2 detik) terasa berat di HP.
+   Solusinya: begitu 1 foto produk PERTAMA KALI berhasil di-download, ubah
+   jadi base64 (data URI) dan simpan di memori (Map ini) — render nota
+   BERIKUTNYA yang butuh foto produk yang sama langsung pakai versi base64
+   ini, TANPA fetch jaringan sama sekali. Cache ini per SESI (hilang kalau
+   tab ditutup) — cukup, karena tujuannya cuma menghindari fetch ULANG di
+   percobaan render kedua dst dalam 1 sesi kerja, bukan penyimpanan permanen. ---- */
+const _productImgDataCache = new Map(); // url -> base64 dataURL, atau null kalau gagal (supaya tidak dicoba fetch ulang terus tiap render dalam sesi yang sama)
+async function ensureProductImagesCached(urls){
+  const toFetch = [...new Set(urls)].filter(u => u && !u.startsWith("data:") && !_productImgDataCache.has(u));
+  if(!toFetch.length) return;
+  await Promise.all(toFetch.map(async (url) => {
+    try{
+      const res = await fetch(url, { mode: "cors" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const blob = await res.blob();
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+      _productImgDataCache.set(url, dataUrl);
+    }catch(e){
+      console.log("Gagal cache gambar produk (dipakai URL asli sbg fallback):", url, e);
+      _productImgDataCache.set(url, null); // gagal -> tandai supaya tidak dicoba fetch ulang tiap render, fallback ke URL asli
+    }
+  }));
+}
+function resolveCachedProductImg(url){
+  if(!url) return PRODUCT_IMG_PLACEHOLDER;
+  if(url.startsWith("data:")) return url;
+  const cached = _productImgDataCache.get(url);
+  return cached || url; // belum sempat di-cache / cache gagal -> pakai URL asli (browser masih boleh coba fetch normal)
+}
 /* Escape HTML kecil untuk dipakai di template kartu Mode Kasir (nama produk
    dari Master Data ditulis admin sendiri, tapi tetap di-escape jaga-jaga
    supaya karakter seperti < / " tidak merusak markup kartu). */
@@ -6792,7 +6834,7 @@ function buildPrintNotaV2(tab){
     const diskonEl = tr.querySelector('[data-f="diskon"]');
     const diskonTxt = diskonEl ? diskonEl.textContent : "–";
     const totalTxt = tr.querySelector('[data-f="total"]').textContent;
-    const imgSrc = (prod && prod.gambar) ? prod.gambar : PRODUCT_IMG_PLACEHOLDER;
+    const imgSrc = (prod && prod.gambar) ? resolveCachedProductImg(prod.gambar) : PRODUCT_IMG_PLACEHOLDER;
     return `<div class="v3-row">
       <div class="v3-badge-num">${idx+1}</div>
       <img class="v3-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'">
@@ -6862,7 +6904,6 @@ function buildPrintNotaV2(tab){
           <div><p class="l">Total qty</p><p class="v" style="color:#00845F;">${totalqty}</p></div>
           <div><p class="l">Total berat</p><p class="v">${totalberat}</p></div>
           <div><p class="l">Ekspedisi</p><p class="v">${ekspedisi}</p></div>
-          <div><p class="l">Ongkir</p><p class="v">${ongkir}</p></div>
         </div>
       </div>
       <div class="v3-costs">
@@ -6893,14 +6934,37 @@ function buildPrintNotaV2(tab){
    gagal dengan error "Invalid element provided as first argument".
    Solusinya: antre-kan (serialize) semua pemanggilan renderCanvas() lewat
    satu rantai Promise, supaya cuma SATU render yang jalan dalam satu waktu. */
+/* ---- Kumpulkan URL foto produk yang dipakai di tab ini SEKARANG — dipakai
+   buat pre-cache (lihat ensureProductImagesCached di atas) SEBELUM nota
+   digambar, supaya html2canvas tidak perlu nunggu fetch jaringan satu-satu
+   waktu menggambar tiap <img>. ---- */
+function getTabProductImageUrls(tab){
+  const tbody = document.getElementById(tab === "penjualan" ? "rows-penjualan" : "rows-custom");
+  if(!tbody) return [];
+  return [...tbody.querySelectorAll("tr")]
+    .map(tr => tr.querySelector("select.prod"))
+    .filter(sel => sel && sel.value !== "")
+    .map(sel => { const p = findProduct(sel.value); return p && p.gambar; })
+    .filter(Boolean);
+}
+
 let _renderCanvasQueue = Promise.resolve();
 function renderCanvas(){
   const run = async () => {
     const tab = document.querySelector(".tab-btn.active").dataset.tab;
     const holder = document.getElementById("print-holder");
     const useV2 = getNotaDesignPref() === "baru";
+    // Pre-cache SEMUA foto produk yang bakal dipakai SEBELUM elemen nota
+    // dibangun — ini yang menghilangkan jeda "nunggu foto ke-download"
+    // yang sebelumnya bikin Salin/Unduh/Bagikan/Kirim & autosave draft
+    // terasa lama (lihat catatan lengkap di ensureProductImagesCached).
+    if(useV2) await ensureProductImagesCached(getTabProductImageUrls(tab));
     holder.innerHTML = useV2 ? buildPrintNotaV2(tab) : buildPrintNota(tab);
-    await new Promise(r=>setTimeout(r, 50)); // beri waktu render/layout
+    // Foto sekarang sudah base64 (data URI) tertanam langsung di HTML kalau
+    // sempat ke-cache di atas — tidak perlu nunggu load gambar lagi, jadi
+    // jeda layout ini cukup dipersingkat (dari 50ms) tanpa bikin nota
+    // kepotong/salah ukur.
+    await new Promise(r=>setTimeout(r, 16));
     const target = holder.querySelector(useV2 ? ".pnota2-v3" : ".pnota");
     const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:1, useCORS:true});
     holder.innerHTML = "";
@@ -7169,6 +7233,27 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     senderPreview.textContent = val ? val : "(belum diatur)";
   }
 
+  /* ---- Cache gambar nota TERAKHIR yang di-render, dikunci per "signature"
+     data pesanan (bukan per nama customer — nama TIDAK ikut digambar di
+     nota, cuma dikirim terpisah sebagai caption/field). Kalau signature-nya
+     SAMA dengan render terakhir (mis. CS cuma lagi ngetik nama, produk/
+     ongkir/ekspedisi belum berubah), pakai gambar cache-nya langsung —
+     skip total proses renderCanvas() yang berat. Ini penyebab UTAMA
+     autosave draft terasa berat: sebelumnya SETIAP 1,2 detik jeda ngetik
+     nama, seluruh nota digambar ulang dari nol walau isinya belum berubah
+     sama sekali. ---- */
+  let _notaImageCache = { tab: null, signature: null, imageDataUrl: null };
+  function computeNotaSignature(tab, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate){
+    const tbody = document.getElementById(tab === "penjualan" ? "rows-penjualan" : "rows-custom");
+    const rowsSig = tbody ? tbody.innerText : "";
+    const pfx = tab === "penjualan" ? "pj" : "cs";
+    const kelebihanEl = document.getElementById(pfx + "-kelebihan");
+    const diskonOngkirEl = document.getElementById(pfx + "-diskonongkir");
+    const kelebihanSig = kelebihanEl ? kelebihanEl.value : "";
+    const diskonOngkirSig = diskonOngkirEl ? (diskonOngkirEl.value !== undefined ? diskonOngkirEl.value : diskonOngkirEl.textContent) : "";
+    return JSON.stringify([tab, getNotaDesignPref(), grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, rowsSig, kelebihanSig, diskonOngkirSig]);
+  }
+
   /* ---------- Kumpulkan data nota (dipakai bareng oleh kirim final MAUPUN
      autosave draft) — render canvas SEKALI, dipakai untuk keduanya. ---------- */
   async function collectNotaPayload(){
@@ -7187,8 +7272,16 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // Tanggal jadwal kirim (kalau sempat kebaca AI dari "Tempel Pesanan") —
     // dikirim diam-diam, dipakai server buat pengingat otomatis H-1.
     const deliveryDate = (window.wizState && window.wizState[tab] && window.wizState[tab].deliveryDate) || null;
-    const canvas = await renderCanvas();
-    const imageDataUrl = canvas.toDataURL("image/png");
+
+    const signature = computeNotaSignature(tab, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate);
+    let imageDataUrl;
+    if(_notaImageCache.tab === tab && _notaImageCache.signature === signature){
+      imageDataUrl = _notaImageCache.imageDataUrl;
+    }else{
+      const canvas = await renderCanvas();
+      imageDataUrl = canvas.toDataURL("image/png");
+      _notaImageCache = { tab, signature, imageDataUrl };
+    }
     return { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, imageDataUrl };
   }
 

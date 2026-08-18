@@ -4,23 +4,21 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v219";
+const CACHE_VERSION = "v220";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
    (skipWaiting otomatis) TANPA menunggu user klik "Perbarui Sekarang" di
    popup — begitu aktif, index.html otomatis reload halaman (lihat listener
-   "controllerchange" di index.html). Ini SENGAJA cuma untuk deploy v219 ini
-   (biar perubahan qty/Total qty langsung kepakai semua user), BUKAN
-   perubahan perilaku permanen — versi berikutnya yang TIDAK dimasukkan ke
-   daftar ini otomatis balik ke alur normal (popup persetujuan / auto-patch
-   diam-diam seperti sebelumnya). Kalau suatu saat butuh paksa update lagi,
-   tambahkan versi barunya ke daftar ini; kalau tidak, biarkan kosong/hapus
-   isinya supaya tidak pernah ke-trigger tanpa sengaja.
+   "controllerchange" di index.html). BUKAN perubahan perilaku permanen —
+   versi yang TIDAK dimasukkan ke daftar ini (seperti v220 sekarang) otomatis
+   pakai alur normal (popup persetujuan / auto-patch diam-diam seperti
+   biasa). Kalau suatu saat butuh paksa update lagi, tambahkan versi barunya
+   ke Set ini.
    PERINGATAN: user yang lagi isi form/nota bisa ke-reload tiba-tiba begitu
    halaman ini aktif (progres yang belum disimpan bisa hilang) — pakai
    fitur ini seperlunya saja, bukan kebiasaan tiap deploy. ---- */
-const FORCE_ACTIVATE_VERSIONS = new Set(["v219"]);
+const FORCE_ACTIVATE_VERSIONS = new Set([]);
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
 const CORE_ASSETS = [
   "./",
