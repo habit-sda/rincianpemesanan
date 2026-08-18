@@ -642,7 +642,7 @@
   .pnota2-v3 .v3-harga{font-size:18px;color:#171717;white-space:nowrap;}
   .pnota2-v3 .v3-diskon{font-size:18px;color:#171717;white-space:nowrap;}
   .pnota2-v3 .v3-badge{
-    display:inline-block;color:#5b6660;font-size:15px;font-weight:600;
+    display:inline-block;color:#00845F;font-size:15px;font-weight:600;
     white-space:nowrap;
   }
   .pnota2-v3 .v3-total{font-size:20px;font-weight:700;color:#171717;white-space:nowrap;}
@@ -6819,6 +6819,7 @@ function buildPrintNotaV2(tab){
   const tgl = document.getElementById("tglNow").textContent;
   const ekspedisi = document.getElementById(pfx+"-ekspedisi").value || "–";
   const totalberat = document.getElementById(pfx+"-totalberat").textContent;
+  const totalqty = document.getElementById(pfx+"-totalqty").textContent;
   const ongkir = document.getElementById(pfx+"-ongkir").textContent.replace(/\s*\(manual\)\s*$/i, "");
   const grandtotal = document.getElementById(pfx+"-grandtotal").textContent;
   const subtotalTxt = document.getElementById(pfx+"-subtotal").textContent;
@@ -6858,6 +6859,7 @@ function buildPrintNotaV2(tab){
       </div>
       <div class="v3-ship-card">
         <div class="v3-stats">
+          <div><p class="l">Total qty</p><p class="v" style="color:#00845F;">${totalqty}</p></div>
           <div><p class="l">Total berat</p><p class="v">${totalberat}</p></div>
           <div><p class="l">Ekspedisi</p><p class="v">${ekspedisi}</p></div>
           <div><p class="l">Ongkir</p><p class="v">${ongkir}</p></div>
