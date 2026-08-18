@@ -622,6 +622,7 @@
     display:flex;align-items:center;justify-content:flex-end;
     border-left:1px solid #E2E8E4;padding-left:12px;
   }
+  .pnota2-v3 .v3-thead .v3-col-total{justify-content:center;text-align:center;}
   .pnota2-v3 .v3-thead span{font-size:17px;font-weight:700;color:#3f3f3d;white-space:nowrap;}
   .pnota2-v3 .v3-row{
     display:flex;align-items:stretch;gap:18px;padding:20px 0;
@@ -6757,10 +6758,10 @@ function buildPrintNota(tab){
         </div>
       </div>
       <div class="pnota-grand"><span class="l">Grand Total</span><span class="v">${grandtotal}</span></div>
-      <div class="pnota-pay">
-        ${kelebihan!==0 ? `<div class="pnota-payline"><span class="l">Kelebihan bayar sebelumnya</span><span class="v">${kelebihanFmt}</span></div>` : ``}
+      ${kelebihan!==0 ? `<div class="pnota-pay">
+        <div class="pnota-payline"><span class="l">Kelebihan bayar sebelumnya</span><span class="v">${kelebihanFmt}</span></div>
         <div class="pnota-payline pnota-status" style="color:${statusColor}"><span class="l">${statusLabel}</span><span class="v">${signPrefix}${selisihFmt}</span></div>
-      </div>
+      </div>` : ``}
     </div>
   `;
 }
@@ -6915,8 +6916,8 @@ function buildPrintNotaV2(tab){
         <span class="l">Total pembayaran</span>
         <span class="v">${grandtotal}</span>
       </div>
-      ${(kelebihan!==0 || statusLabel!=="Lunas") ? `<div style="margin-top:16px;padding:16px 20px;border-radius:12px;background:${statusBg};border:1.5px solid ${statusBorder};display:flex;flex-direction:column;gap:8px;">
-        ${kelebihan!==0 ? `<div style="display:flex;justify-content:space-between;font-size:18px;color:#3f3f3d;"><span>Kelebihan bayar sebelumnya</span><strong style="color:#171717;">${kelebihanFmt}</strong></div>` : ``}
+      ${kelebihan!==0 ? `<div style="margin-top:16px;padding:16px 20px;border-radius:12px;background:${statusBg};border:1.5px solid ${statusBorder};display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:18px;color:#3f3f3d;"><span>Kelebihan bayar sebelumnya</span><strong style="color:#171717;">${kelebihanFmt}</strong></div>
         <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:700;color:${statusColor};"><span>${statusLabel}</span><span>${signPrefix}${selisihFmt}</span></div>
       </div>` : ``}
       <p class="v3-footer">Terima kasih atas kepercayaannya, semoga membawa keberkahan untuk kita semua</p>
