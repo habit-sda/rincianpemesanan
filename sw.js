@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v229";
+const CACHE_VERSION = "v230";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -18,7 +18,7 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    PERINGATAN: user yang lagi isi form/nota bisa ke-reload tiba-tiba begitu
    halaman ini aktif (progres yang belum disimpan bisa hilang) — pakai
    fitur ini seperlunya saja, bukan kebiasaan tiap deploy. ---- */
-const FORCE_ACTIVATE_VERSIONS = new Set(["v223"]);
+const FORCE_ACTIVATE_VERSIONS = new Set(["v230"]);
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
 const CORE_ASSETS = [
   "./",

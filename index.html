@@ -1243,6 +1243,12 @@
     .pos-cart-reset:hover{background:#a3160f;}
     .pos-cart-reset.show{display:inline-flex;}
     .pos-cart-reset svg{width:16px;height:16px;flex:none;}
+    /* Tombol "Lanjut ke pengiriman" — versi Mode Kasir HP (tampilannya
+       diatur di blok media max-width:600px di bawah). Default di sini
+       SELALU disembunyikan (desktop/tablet tidak butuh, karena kartu
+       Pengiriman & Preview Nota sudah ikut tampil di bawah grid+keranjang
+       — lihat catatan "Mode Kasir tahap 2" di changelog). */
+    .pos-cart-nextship{display:none;}
     .pos-cart-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px;}
     .pos-cart-empty{font-size:12.5px;color:var(--ink-soft);text-align:center;padding:24px 4px;}
     .pos-cart-item{
@@ -1345,6 +1351,20 @@
       .wiz-pos-host .pos-cart-col.expanded .pos-cart-head{display:flex;padding-top:2px;}
       .wiz-pos-host .pos-cart-col.expanded .pos-cart-list{display:flex;}
       .wiz-pos-host .pos-cart-empty{padding:14px 4px 4px;}
+      /* Tombol "Lanjut ke pengiriman" — SELALU nempel di bawah bar
+         ringkas keranjang (baik lagi collapsed maupun expanded), persis
+         seperti tombol "Lanjut ke pengiriman" di Mode Tabel HP, supaya
+         alurnya jelas & tidak bikin bingung harus pindah lewat mana.
+         Cuma tampil kalau keranjang ada isinya (toggle class "show" di
+         JS, sama pola dengan .pos-cart-reset.show). */
+      .wiz-pos-host .pos-cart-nextship{
+        display:none;width:calc(100% - 28px);margin:0 14px 12px;
+        border:none;border-radius:10px;background:var(--primary-green);
+        color:#fff;font-weight:700;font-size:13.5px;padding:11px 12px;
+        cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.18);
+      }
+      .wiz-pos-host .pos-cart-nextship.show{display:block;}
+      .wiz-pos-host .pos-cart-nextship:active{filter:brightness(.93);}
     }
     .wiz-pcard-nameline{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;}
     .wiz-pcard-name{font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
@@ -4169,6 +4189,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
                 </div>
                 <svg class="pos-cart-sheet-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
+              <button type="button" class="pos-cart-nextship" id="pos-cart-nextship-penjualan">Lanjut ke pengiriman →</button>
               <div class="pos-cart-head">
                 <div class="pos-cart-title">Keranjang</div>
                 <button type="button" class="pos-cart-reset" id="pos-cart-reset-penjualan" title="Kosongkan keranjang">
@@ -4310,6 +4331,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
                 </div>
                 <svg class="pos-cart-sheet-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
+              <button type="button" class="pos-cart-nextship" id="pos-cart-nextship-custom">Lanjut ke pengiriman →</button>
               <div class="pos-cart-head">
                 <div class="pos-cart-title">Keranjang</div>
                 <button type="button" class="pos-cart-reset" id="pos-cart-reset-custom" title="Kosongkan keranjang">
@@ -11495,6 +11517,22 @@ if ("serviceWorker" in navigator) {
     const btn = document.getElementById("pos-cart-reset-"+sheet);
     if(btn) btn.addEventListener("click", ()=> resetPosCart(sheet));
   });
+  /* ---------- tombol "Lanjut ke pengiriman" (Mode Kasir, HP) ----------
+     TIDAK memanggil wizGo() langsung (fungsi itu ada di scope modul
+     wizard mobile yang terpisah, bukan modul ini) — cukup "tekan"
+     tombol tab "Kirim" yang sudah ada & sudah berfungsi di .wiz-dots,
+     sama persis prinsipnya dengan modul wiring sidebar desktop ("remote
+     control": meniru klik elemen yang sudah ada, bukan bikin jalur
+     navigasi baru). Jadi 100% pakai alur pindah-step yang sudah teruji,
+     cuma dipicu dari tempat lain. */
+  ["penjualan","custom"].forEach(sheet=>{
+    const btn = document.getElementById("pos-cart-nextship-"+sheet);
+    if(!btn) return;
+    btn.addEventListener("click", ()=>{
+      const shipTab = document.querySelector(`.wiz-dots[data-wizdots="${sheet}"] [data-step="ship"]`);
+      if(shipTab) shipTab.click();
+    });
+  });
   function posCartItemHtml(sheet, tr, i){
     const name = tr.querySelector("select.prod").value;
     const qty = parseFloat(tr.querySelector("input.qty").value) || 0;
@@ -11537,6 +11575,8 @@ if ("serviceWorker" in navigator) {
     const filled = trs.map((tr,i)=>({tr,i})).filter(o=> o.tr.querySelector("select.prod").value);
     const resetBtn = document.getElementById("pos-cart-reset-"+sheet);
     if(resetBtn) resetBtn.classList.toggle("show", filled.length > 0);
+    const nextShipBtn = document.getElementById("pos-cart-nextship-"+sheet);
+    if(nextShipBtn) nextShipBtn.classList.toggle("show", filled.length > 0);
     host.innerHTML = filled.length
       ? filled.map(o=> posCartItemHtml(sheet, o.tr, o.i)).join("") + (fullMsg ? `<div class="pos-cart-full-msg">${escHtml(fullMsg)}</div>` : ``)
       : `<div class="pos-cart-empty">Keranjang masih kosong.<br>Klik produk di sebelah kiri untuk menambah.</div>`;
