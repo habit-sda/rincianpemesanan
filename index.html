@@ -5682,7 +5682,29 @@ const PRODUCT_IMG_PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(
    ini, TANPA fetch jaringan sama sekali. Cache ini per SESI (hilang kalau
    tab ditutup) — cukup, karena tujuannya cuma menghindari fetch ULANG di
    percobaan render kedua dst dalam 1 sesi kerja, bukan penyimpanan permanen. ---- */
-const _productImgDataCache = new Map(); // url -> base64 dataURL, atau null kalau gagal (supaya tidak dicoba fetch ulang terus tiap render dalam sesi yang sama)
+const _productImgDataCache = new Map(); // url -> base64 dataURL (SUDAH diperkecil), atau null kalau gagal (supaya tidak dicoba fetch ulang terus tiap render dalam sesi yang sama)
+// Ukuran maksimum foto produk hasil cache — foto asli di "Link Gambar" Master
+// Data seringkali resolusi penuh hasil jepretan HP (bisa beberapa MB), padahal
+// di nota cuma ditampilkan ~52px. Kalau dipakai apa adanya, browser tetap
+// harus DECODE gambar full-resolusi itu tiap kali digambar ke canvas (biaya
+// CPU, BUKAN jaringan) — ini yang bikin "Salin"/render nota tetap berat di HP
+// walau fotonya sudah tidak di-download ulang. Diperkecil dulu SEKALI di sini
+// (pakai <canvas> perantara) supaya biaya decode-nya proporsional dengan
+// ukuran tampil, bukan ukuran asli foto.
+const PRODUCT_IMG_CACHE_MAX_DIM = 240; // px, cukup tajam untuk retina di ukuran tampil ~52px
+async function downscaleImageBlob(blob, maxDim){
+  const bitmap = await createImageBitmap(blob).catch(()=> null);
+  if(!bitmap) throw new Error("DECODE_FAILED");
+  const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+  const w = Math.max(1, Math.round(bitmap.width * scale));
+  const h = Math.max(1, Math.round(bitmap.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(bitmap, 0, 0, w, h);
+  bitmap.close && bitmap.close();
+  return canvas.toDataURL("image/jpeg", 0.82); // JPEG cukup untuk foto produk, lebih ringan dari PNG
+}
 async function ensureProductImagesCached(urls){
   const toFetch = [...new Set(urls)].filter(u => u && !u.startsWith("data:") && !_productImgDataCache.has(u));
   if(!toFetch.length) return;
@@ -5691,12 +5713,21 @@ async function ensureProductImagesCached(urls){
       const res = await fetch(url, { mode: "cors" });
       if(!res.ok) throw new Error("HTTP " + res.status);
       const blob = await res.blob();
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(blob);
-      });
+      let dataUrl;
+      try{
+        // Jalur utama: perkecil dulu lewat createImageBitmap+canvas (jauh
+        // lebih ringan buat html2canvas menggambarnya nanti).
+        dataUrl = await downscaleImageBlob(blob, PRODUCT_IMG_CACHE_MAX_DIM);
+      }catch(resizeErr){
+        // createImageBitmap tidak didukung/gagal (browser lama) -> fallback
+        // pakai foto ukuran asli apa adanya, tetap lebih baik daripada gagal total.
+        dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(blob);
+        });
+      }
       _productImgDataCache.set(url, dataUrl);
     }catch(e){
       console.log("Gagal cache gambar produk (dipakai URL asli sbg fallback):", url, e);
@@ -6967,7 +6998,7 @@ function renderCanvas(){
     // kepotong/salah ukur.
     await new Promise(r=>setTimeout(r, 16));
     const target = holder.querySelector(useV2 ? ".pnota2-v3" : ".pnota");
-    const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:1, useCORS:true});
+    const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:1, useCORS:true, logging:false});
     holder.innerHTML = "";
     return canvas;
   };
