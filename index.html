@@ -1270,8 +1270,8 @@
     .pos-qty-val{display:flex;align-items:center;gap:4px;}
     .pos-qty-input{
       font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;
-      width:34px;text-align:center;border:1px solid transparent;border-radius:6px;
-      background:transparent;color:var(--ink);padding:3px 2px;
+      width:30px;box-sizing:border-box;text-align:center;border:1px solid transparent;border-radius:6px;
+      background:transparent;color:var(--ink);padding:3px 1px;
     }
     .pos-qty-input:hover{border-color:var(--line);background:var(--paper-dark);}
     .pos-qty-input:focus{
@@ -11558,7 +11558,7 @@ if ("serviceWorker" in navigator) {
         <div class="pos-qty-stepper">
           <button type="button" class="pos-qty-btn" data-pos-minus="${i}" aria-label="Kurangi">−</button>
           <span class="pos-qty-val">
-            <input type="text" inputmode="decimal" class="pos-qty-input" value="${qty}" data-pos-qtyinput="${i}" aria-label="Ubah qty ${escHtml(name)}">
+            <input type="text" inputmode="decimal" maxlength="4" class="pos-qty-input" value="${qty}" data-pos-qtyinput="${i}" aria-label="Ubah qty ${escHtml(name)}">
             <span class="pos-qty-unit">${satuan}</span>
           </span>
           <button type="button" class="pos-qty-btn" data-pos-plus="${i}" aria-label="Tambah">+</button>
@@ -11593,8 +11593,16 @@ if ("serviceWorker" in navigator) {
     // commit terjadi di blur, bukan di setiap ketikan.
     host.querySelectorAll("[data-pos-qtyinput]").forEach(el=>{
       const tr = trs[+el.dataset.posQtyinput];
-      el.addEventListener("click", ()=> el.select());
-      el.addEventListener("focus", ()=> el.select());
+      // PENTING: select() harus dibungkus setTimeout(...,0), BUKAN dipanggil
+      // langsung di event focus/click — sama seperti pola bindAutoSelect()
+      // yang sudah dipakai di field lain. Kalau dipanggil langsung/sinkron,
+      // di banyak browser mobile (terutama Android) posisi kursor bawaan
+      // browser akan menimpa hasil select() sepersekian detik kemudian,
+      // sehingga yang ke-select cuma sebagian/tidak sama sekali — efeknya
+      // field TERLIHAT bisa disentuh & angkanya bisa di-select/disalin,
+      // tapi ketikan baru tidak menggantikan apa-apa (nyambung/tidak masuk)
+      // karena kursor sebenarnya tidak di posisi yang diharapkan.
+      el.addEventListener("focus", ()=> setTimeout(()=>{ try{ el.select(); }catch(e){} }, 0));
       el.addEventListener("keydown", (e)=>{
         if(e.key === "Enter"){ e.preventDefault(); el.blur(); }
       });
