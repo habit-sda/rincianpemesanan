@@ -1267,15 +1267,16 @@
       width:24px;height:24px;border-radius:6px;border:1px solid var(--line);background:var(--paper-dark);
       color:var(--ink);font-weight:700;font-size:13px;cursor:pointer;line-height:1;
     }
-    .pos-qty-val{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+    .pos-qty-val{display:flex;align-items:center;gap:4px;flex:0 0 auto;}
     .pos-qty-input{
       font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;
-      /* Lebar dipatok pakai satuan "ch" (lebar 1 karakter font monospace)
-         supaya PAS menampung maxlength="4" (mis. "1000") tanpa kepotong —
-         sebelumnya lebar tetap 30px, kepentok bahkan untuk 3 digit,
-         sehingga angka terlihat mepet/terpotong ("berantakan"). +6px
-         untuk padding kiri-kanan supaya tetap lega, bukan mepet border. */
-      width:calc(4ch + 6px);min-width:calc(4ch + 6px);box-sizing:border-box;text-align:center;
+      /* Lebar dikunci PIXEL TETAP (bukan "ch") + flex:0 0 auto, supaya
+         box TIDAK PERNAH melar ikut panjang angka yang diketik (ini yang
+         kemarin bikin kolom qty melebar & mendorong nominal "Rp" sampai
+         keluar layar). 40px pas untuk 4 digit (maxlength="4") pada
+         font-size 12.5px, dengan sedikit sisa ruang di kiri-kanan. */
+      width:40px;flex:0 0 40px;min-width:0;max-width:40px;
+      box-sizing:border-box;text-align:center;
       border:1px solid transparent;border-radius:6px;
       background:transparent;color:var(--ink);padding:3px 2px;
     }
@@ -1283,14 +1284,20 @@
     .pos-qty-input:focus{
       border-color:var(--primary-green);background:var(--card);outline:none;
     }
-    .pos-qty-unit{font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;color:var(--ink-soft);flex-shrink:0;}
-    .pos-qty-stepper{flex-shrink:0;}
+    .pos-qty-unit{
+      font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;color:var(--ink-soft);
+      flex:0 0 auto;max-width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+    .pos-qty-stepper{flex:0 0 auto;}
     .pos-cart-item-total{
       font-weight:700;font-size:12.5px;color:var(--primary-green);font-family:'Roboto Mono',monospace;
-      /* flex-shrink:0 + nowrap supaya nominal total TIDAK ikut terdesak/
-         pecah ke 2 baris waktu kolom qty melebar (mis. isi 4 digit) —
-         ini penyebab tampilan "berantakan" yang dikeluhkan. */
-      flex-shrink:0;white-space:nowrap;text-align:right;
+      /* flex:1 (bukan cuma flex-shrink:0) supaya nominal MENGISI sisa
+         ruang & tetap kebaca utuh di kanan — sebelumnya cuma
+         flex-shrink:0 tanpa batas lebar pasti dari sisi kolom qty,
+         jadi kalau qty ikut melebar (bug di atas), nominal ini yang
+         kedorong keluar layar. Sekarang kolom qty dikunci px tetap,
+         jadi ruang sisa untuk nominal juga pasti konsisten. */
+      flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;
     }
     .pos-cart-item-diskon{
       margin-top:6px;display:flex;align-items:center;gap:6px;
