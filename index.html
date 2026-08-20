@@ -1267,18 +1267,31 @@
       width:24px;height:24px;border-radius:6px;border:1px solid var(--line);background:var(--paper-dark);
       color:var(--ink);font-weight:700;font-size:13px;cursor:pointer;line-height:1;
     }
-    .pos-qty-val{display:flex;align-items:center;gap:4px;}
+    .pos-qty-val{display:flex;align-items:center;gap:4px;flex-shrink:0;}
     .pos-qty-input{
       font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;
-      width:30px;box-sizing:border-box;text-align:center;border:1px solid transparent;border-radius:6px;
-      background:transparent;color:var(--ink);padding:3px 1px;
+      /* Lebar dipatok pakai satuan "ch" (lebar 1 karakter font monospace)
+         supaya PAS menampung maxlength="4" (mis. "1000") tanpa kepotong —
+         sebelumnya lebar tetap 30px, kepentok bahkan untuk 3 digit,
+         sehingga angka terlihat mepet/terpotong ("berantakan"). +6px
+         untuk padding kiri-kanan supaya tetap lega, bukan mepet border. */
+      width:calc(4ch + 6px);min-width:calc(4ch + 6px);box-sizing:border-box;text-align:center;
+      border:1px solid transparent;border-radius:6px;
+      background:transparent;color:var(--ink);padding:3px 2px;
     }
     .pos-qty-input:hover{border-color:var(--line);background:var(--paper-dark);}
     .pos-qty-input:focus{
       border-color:var(--primary-green);background:var(--card);outline:none;
     }
-    .pos-qty-unit{font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;color:var(--ink-soft);}
-    .pos-cart-item-total{font-weight:700;font-size:12.5px;color:var(--primary-green);font-family:'Roboto Mono',monospace;}
+    .pos-qty-unit{font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;color:var(--ink-soft);flex-shrink:0;}
+    .pos-qty-stepper{flex-shrink:0;}
+    .pos-cart-item-total{
+      font-weight:700;font-size:12.5px;color:var(--primary-green);font-family:'Roboto Mono',monospace;
+      /* flex-shrink:0 + nowrap supaya nominal total TIDAK ikut terdesak/
+         pecah ke 2 baris waktu kolom qty melebar (mis. isi 4 digit) —
+         ini penyebab tampilan "berantakan" yang dikeluhkan. */
+      flex-shrink:0;white-space:nowrap;text-align:right;
+    }
     .pos-cart-item-diskon{
       margin-top:6px;display:flex;align-items:center;gap:6px;
     }
@@ -11728,6 +11741,21 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("resize", ()=>{
     clearTimeout(__posRelayoutTimer);
     __posRelayoutTimer = setTimeout(()=>{
+      // PENTING: di HP, munculnya keyboard virtual (mis. saat user tap
+      // kolom qty Keranjang) IKUT memicu event "resize" ini (viewport
+      // menyempit) — padahal itu bukan perpindahan breakpoint sungguhan.
+      // Kalau tetap lanjut re-render di sini, applyToggleUI() akan
+      // memanggil renderPosCart() yang isinya host.innerHTML = ...,
+      // yaitu menghancurkan & membuat ulang SEMUA elemen Keranjang,
+      // termasuk kolom qty yang sedang fokus/diketik user -> keyboard
+      // otomatis tertutup sendiri & ketikan user tidak pernah tersimpan.
+      // Jadi kalau user sedang fokus di kolom qty, lewati re-render ini;
+      // relayout breakpoint sungguhan tetap akan jalan begitu user
+      // selesai edit (blur memicu renderPosCart lewat setQtyDirect).
+      const activeIsQtyInput = document.activeElement &&
+        document.activeElement.classList &&
+        document.activeElement.classList.contains("pos-qty-input");
+      if(activeIsQtyInput) return;
       relayoutPosForViewport();
       applyToggleUI("penjualan");
       applyToggleUI("custom");
