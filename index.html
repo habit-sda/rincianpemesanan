@@ -1816,6 +1816,7 @@
   .md-quota-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;}
   .md-quota-badge.ok{background:#e3f3ec;color:var(--primary-green);}
   .md-quota-badge.cooldown{background:#fde8e6;color:var(--danger-red);}
+  .md-quota-badge.neutral{background:#eceff1;color:#607d8b;}
   .md-quota-error{font-size:12px;color:var(--danger-red);}
   .md-quota-loading{font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:8px;}
   .md-quota-spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--primary-green);animation:md-quota-spin-kf .7s linear infinite;flex-shrink:0;}
@@ -3814,6 +3815,9 @@ html[data-theme="dark"] .wiz-stamp,
 html[data-theme="dark"] .md-quota-badge.cooldown{
   background: #3a2020;
 }
+html[data-theme="dark"] .md-quota-badge.neutral{
+  background: #2a2f33; color: #90a4ae;
+}
 html[data-theme="dark"] .combo-item:hover,
 html[data-theme="dark"] .combo-item.active{ background: var(--wiz-badge-est-bg); }
 html[data-theme="dark"] .combo-item{ border-bottom-color: var(--line); }
@@ -3935,7 +3939,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       Kwitansi
     </button>
   </nav>
-  <div class="habit-sidebar-version">Habit · versi <span id="sb-app-version">2.17.2</span></div>
+  <div class="habit-sidebar-version">Habit · versi <span id="sb-app-version">2.22.0</span></div>
 </aside>
 <div class="wrap">
 
@@ -5147,6 +5151,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div class="changelog-ver">v2.21.8</div>
           <ul>
             <li>Penyegaran sesi aplikasi & perbaikan/peningkatan umum di balik layar.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.22.0</div>
+          <ul>
+            <li><b>Tier vision tengah — Mistral (baca nominal struk/nota)</b> — sistem baca nominal otomatis dari foto (bukti transfer maupun resi ekspedisi) sekarang punya 3 lapis cadangan, bukan 2: <b>Groq → Mistral → Cloudflare Workers AI</b>. Mistral (akun gratis "Experiment", kuota terpisah total dari Groq/Workers AI) dicoba di tengah kalau Groq gagal/kuota mepet, sebelum jatuh ke Workers AI — jadi peluang foto ketemu "tidak yakin" karena kuota habis makin kecil. Kartu "Kuota AI Hari Ini" di Master Data → Tampilan dan command DM "ai"/"kuota"/"statistik" ikut menampilkan status tier Mistral ini. Perlu diisi secret <code>MISTRAL_API_KEY</code> di Worker untuk mengaktifkan — kalau kosong, tier ini otomatis dilewati diam-diam (alur lama Groq → Workers AI tetap jalan seperti biasa, tidak ada yang rusak).</li>
           </ul>
         </div>
         <div class="changelog-item">
@@ -10574,6 +10584,17 @@ if ("serviceWorker" in navigator) {
         const rows = data.groq.map(g=>
           g.budgetTokens==null ? cooldownBadgeRow(g.label, g.cooldown) : barRow(g.label, g.usedTokens, g.budgetTokens, g.percent)
         ).join("");
+        const mistralRow = !data.mistral || !data.mistral.configured
+          ? `
+          <div class="md-quota-row">
+            <div class="md-quota-row-head">
+              <span class="md-quota-row-label">🇪🇺 Mistral (tier tengah)</span>
+              <span class="md-quota-badge neutral">Belum dikonfigurasi</span>
+            </div>
+            <div class="md-quota-row-sub">Isi secret MISTRAL_API_KEY di Worker untuk mengaktifkan tier cadangan tengah ini.</div>
+          </div>`
+          : barRow("🇪🇺 Mistral (tier tengah)", data.mistral.usedRequests, data.mistral.budgetRequests, data.mistral.percent)
+            .replace("token</", "request</"); // barRow default label satuannya "token", di sini satuannya request
         const workersRow = `
           <div class="md-quota-row workers-ai">
             <div class="md-quota-row-head">
@@ -10587,6 +10608,7 @@ if ("serviceWorker" in navigator) {
         resultEl.innerHTML = `
           <div class="md-quota-updated">Diperbarui ${data.dateLabel} WIB</div>
           ${rows}
+          ${mistralRow}
           ${workersRow}
         `;
       }catch(e){
