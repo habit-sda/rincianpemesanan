@@ -4484,10 +4484,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-card md-pinform">
         <h3>Ambang cross-check resi vs ongkir</h3>
         <div class="md-note" style="margin-bottom:12px;">
-          Saat foto resi masuk ke grup resi Telegram (atau dicek lewat <code>/ongkir</code>/<code>/resi</code> di DM),
-          bot membandingkan Grand Total Rincian Pemesanan terakhir customer itu dengan nominal resi ekspedisi yang sama.
-          Kalau selisihnya melewati persentase di bawah ini, bot memberi reaksi 👀 di foto resi tsb (👍 kalau masih wajar) —
-          sekedar indikator, tidak pernah mengubah/memblokir apa pun.
+          Dipakai KHUSUS untuk tampilan on-demand <code>/ongkir</code>/<code>/resi</code> di DM: bot membandingkan Grand
+          Total Rincian Pemesanan terakhir customer itu dengan nominal resi ekspedisi yang sama, dan menandai selisihnya
+          kalau melewati persentase di bawah ini. Sekedar catatan teks di DM, tidak pernah mengubah/memblokir apa pun.
+          Catatan: reaksi 👍/🤔 otomatis di foto resi grup (lihat kartu di bawah) SEKARANG murni soal kualitas baca
+          nominal AI, TIDAK lagi memakai ambang ini — ambang ini cuma berlaku buat tampilan DM di atas.
         </div>
         <label>Selisih dianggap perlu dicek kalau lebih dari (%)</label>
         <input type="number" inputmode="numeric" id="md-resi-threshold" min="1" max="100" style="max-width:140px;">
@@ -4495,12 +4496,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <button class="md-btn primary" id="md-resi-threshold-save">Simpan ambang</button>
       </div>
       <div class="md-card">
-        <h3>Reaksi cross-check resi vs ongkir</h3>
+        <h3>Reaksi otomatis foto resi (nominal)</h3>
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 10h.01M15 10h.01" stroke="var(--primary-green)" stroke-width="1.8" stroke-linecap="round"/><path d="M8 15c1.2 1 2.6 1.5 4 1.5s2.8-.5 4-1.5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="8.5" stroke="var(--primary-green)" stroke-width="1.6"/></svg></div>
           <div class="md-togglerow-text">
             <div class="md-togglerow-label">Aktifkan reaksi otomatis di foto resi</div>
-            <div class="md-togglerow-sub">Aktif = tiap foto resi yang masuk grup resi (dan sudah ketahuan nama customernya) otomatis dapat reaksi 👍/👀/🤔 sesuai hasil cross-check di atas. Nonaktif = bot balik ke perilaku lama, murni mencatat riwayat tanpa reaksi sama sekali — catatan riwayat resi & cross-check on-demand lewat <code>/ongkir</code>/<code>/resi</code> di DM tetap jalan seperti biasa.</div>
+            <div class="md-togglerow-sub">Aktif = SETIAP foto resi yang masuk grup resi langsung dapat reaksi 👍 (nominal berhasil dibaca AI dengan yakin) atau 🤔 (tidak yakin/gagal terbaca) — TIDAK perlu menunggu nama atau ekspedisi ketahuan dulu (nama sekarang murni dipakai buat isi caption, bukan penentu reaksi). Kalau ternyata foto sama kekirim dobel, reaksinya ditimpa jadi 😱. Nonaktif = bot balik ke perilaku lama, murni mencatat riwayat tanpa reaksi sama sekali — catatan riwayat resi & cross-check on-demand lewat <code>/ongkir</code>/<code>/resi</code> di DM tetap jalan seperti biasa.</div>
           </div>
           <label class="md-switch">
             <input type="checkbox" id="md-toggle-resireaction">
