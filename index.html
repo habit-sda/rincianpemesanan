@@ -4505,6 +4505,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
 
     <div class="md-section" id="md-sec-dashboard">
+      <div class="md-card" id="md-quota-card">
+        <h3>Kuota AI Hari Ini</h3>
+        <div class="md-note" style="margin-bottom:12px;">Sisa jatah gratis Groq &amp; Cloudflare Workers AI untuk tanggal berjalan (reset otomatis tiap hari) — sekedar info, tidak mengubah apa pun.</div>
+        <button class="md-btn" id="md-quota-check" type="button">🔎 Cek Kuota AI Hari Ini</button>
+        <div id="md-quota-result" class="md-quota-result" hidden></div>
+      </div>
       <div class="md-card">
         <h3>Status Infrastruktur</h3>
         <div class="md-note" style="margin-bottom:12px;">Status koneksi GitHub, Bot Telegram, Cron, dan tier AI (Groq/Mistral/Workers AI) — dimuat otomatis, sekedar info, tidak mengubah apa pun.</div>
@@ -4663,12 +4669,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <span class="md-switch-track"><span class="md-switch-knob"></span></span>
           </label>
         </div>
-      </div>
-      <div class="md-card" id="md-quota-card">
-        <h3>Kuota AI Hari Ini</h3>
-        <div class="md-note" style="margin-bottom:12px;">Sisa jatah gratis Groq &amp; Cloudflare Workers AI untuk tanggal berjalan (reset otomatis tiap hari) — sekedar info, tidak mengubah apa pun.</div>
-        <button class="md-btn" id="md-quota-check" type="button">🔎 Cek Kuota AI Hari Ini</button>
-        <div id="md-quota-result" class="md-quota-result" hidden></div>
       </div>
       <div class="md-card">
         <h3>Autocomplete (cari-ketik)</h3>
@@ -10778,6 +10778,9 @@ if ("serviceWorker" in navigator) {
         btn.disabled = false;
       }
     }
+    // Diekspos supaya openPanel() bisa memuatnya otomatis begitu Master
+    // Data dibuka — konsisten dengan kartu dashboard lain (tanpa tombol).
+    window.__mdCheckQuota = checkQuota;
     btn.addEventListener("click", checkQuota);
   })();
 
@@ -11349,6 +11352,7 @@ if ("serviceWorker" in navigator) {
     renderEkspedisiList();
     resetHapusForm();
     if(window.__mdCheckStatus) window.__mdCheckStatus();
+    if(window.__mdCheckQuota) window.__mdCheckQuota();
     if(mdPendingTab){
       const tabBtn = document.querySelector('.md-tab[data-md-tab="'+mdPendingTab+'"]');
       if(tabBtn) tabBtn.click();
