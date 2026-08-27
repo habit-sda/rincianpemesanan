@@ -1863,6 +1863,11 @@
   .md-nama-row button:hover{background:var(--paper-dark);}
   .md-nama-edit-row{display:flex;gap:8px;flex:1;}
   .md-nama-edit-row input{flex:1;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;}
+  .md-nama-pagination{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;}
+  .md-nama-pagination button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 14px;font-size:12.5px;cursor:pointer;color:var(--ink);}
+  .md-nama-pagination button:hover:not(:disabled){background:var(--paper-dark);}
+  .md-nama-pagination button:disabled{opacity:.4;cursor:not-allowed;}
+  .md-nama-page-info{font-size:12px;color:var(--ink-soft);white-space:nowrap;}
   @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
     .md-panel{padding:0;display:block;background:#ffffff;}
     .md-panel-sheet{border-radius:0;max-width:none;box-shadow:none;padding:16px 16px 40px;}
@@ -10998,17 +11003,39 @@ if ("serviceWorker" in navigator) {
     if(!listEl || !searchEl) return;
     let allNames = [];
     let editingName = null;
+    let currentPage = 1;
+    const PAGE_SIZE = 20;
 
     function escapeHtmlNama(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
-    function render(){
+    function getFiltered(){
       const q = searchEl.value.trim().toLowerCase();
-      const filtered = q ? allNames.filter(n=> n.toLowerCase().includes(q)) : allNames;
+      return q ? allNames.filter(n=> n.toLowerCase().includes(q)) : allNames;
+    }
+
+    function paginationHtml(totalPages){
+      if(totalPages <= 1) return "";
+      return `
+        <div class="md-nama-pagination">
+          <button type="button" class="md-nama-page-prev" ${currentPage<=1?"disabled":""}>‹ Sebelumnya</button>
+          <span class="md-nama-page-info">Halaman ${currentPage} dari ${totalPages}</span>
+          <button type="button" class="md-nama-page-next" ${currentPage>=totalPages?"disabled":""}>Selanjutnya ›</button>
+        </div>`;
+    }
+
+    function render(){
+      const filtered = getFiltered();
       if(!filtered.length){
         listEl.innerHTML = `<div class="md-hanging-empty">${allNames.length ? "Tidak ada nama yang cocok dicari." : "Belum ada nama tersimpan."}</div>`;
         return;
       }
-      listEl.innerHTML = filtered.map(n=>{
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      if(currentPage > totalPages) currentPage = totalPages;
+      if(currentPage < 1) currentPage = 1;
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+      const rowsHtml = pageItems.map(n=>{
         if(n === editingName){
           return `
             <div class="md-nama-row" data-name="${escapeHtmlNama(n)}">
@@ -11026,6 +11053,8 @@ if ("serviceWorker" in navigator) {
             <button type="button" class="del md-nama-del-btn">🗑️ Hapus</button>
           </div>`;
       }).join("");
+
+      listEl.innerHTML = rowsHtml + paginationHtml(totalPages);
     }
 
     async function loadNames(){
@@ -11034,15 +11063,22 @@ if ("serviceWorker" in navigator) {
         const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
         const data = await res.json();
         allNames = Array.isArray(data.names) ? data.names : [];
+        currentPage = 1;
         render();
       }catch(e){
         listEl.innerHTML = `<div class="md-quota-error">Gagal memuat daftar nama: ${String(e.message||e)}</div>`;
       }
     }
 
-    searchEl.addEventListener("input", render);
+    searchEl.addEventListener("input", ()=>{ currentPage = 1; render(); });
 
     listEl.addEventListener("click", async (e)=>{
+      if(e.target.classList.contains("md-nama-page-prev")){
+        currentPage--; render(); return;
+      }
+      if(e.target.classList.contains("md-nama-page-next")){
+        currentPage++; render(); return;
+      }
       const row = e.target.closest(".md-nama-row");
       if(!row) return;
       const name = row.dataset.name;
