@@ -7598,6 +7598,11 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // Tanggal jadwal kirim (kalau sempat kebaca AI dari "Tempel Pesanan") —
     // dikirim diam-diam, dipakai server buat pengingat otomatis H-1.
     const deliveryDate = (window.wizState && window.wizState[tab] && window.wizState[tab].deliveryDate) || null;
+    // Nilai "Kelebihan bayar sebelumnya" (field pj-kelebihan / cs-kelebihan) —
+    // sebelumnya cuma dipakai lokal di sini untuk hitung status Lunas/Kurang
+    // bayar/Kembalian di gambar nota, TIDAK pernah dikirim ke server. Sekarang
+    // ikut dikumpulkan supaya bisa dikirim & dicatat di Rincian Pemesanan.
+    const kelebihanNum = parseRp(document.getElementById(pfx+"-kelebihan").value) || 0;
 
     const signature = computeNotaSignature(tab, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate);
     let imageDataUrl;
@@ -7608,7 +7613,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       imageDataUrl = canvas.toDataURL("image/png");
       _notaImageCache = { tab, signature, imageDataUrl };
     }
-    return { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, imageDataUrl };
+    return { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, kelebihanNum, imageDataUrl };
   }
 
   /* ---------- Autosave draft ke server ----------
@@ -7740,7 +7745,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     statusEl.textContent = "Menyiapkan gambar nota…";
 
     try{
-      const { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, kelebihanNum, imageDataUrl } = await collectNotaPayload();
 
       statusEl.textContent = "Mengirim ke grup Telegram…";
       const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
@@ -7756,6 +7761,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           ratePerKg: ratePerKgNum,
           ekspedisi: ekspedisiName,
           deliveryDate,
+          kelebihanBayarSebelumnya: kelebihanNum,
           isRevisi: !!(revisiCheck && revisiCheck.checked),
           revisiTargetMessageId: pendingRevisiTargetMessageId,
         }),
