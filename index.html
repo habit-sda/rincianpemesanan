@@ -285,8 +285,13 @@
     word-break:break-word;line-height:1.65;max-height:340px;overflow-y:auto;
   }
   .po-result-scroll{max-height:340px;overflow-y:auto;padding-right:2px;}
-  .po-row{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;background:var(--card);transition:background .15s,opacity .15s;}
-  .po-row.po-row-matched{background:#e6f4ea;border-color:#c8e6cf;}
+  .po-row{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;background:var(--card);transition:background .15s,opacity .15s;position:relative;}
+  /* Ronde ke-2 "perjelas lagi": dinaikkan lebih jauh dari versi sebelumnya —
+     background lebih pekat/saturated + border tebal 2px (bukan cuma garis
+     tipis 1px), DAN ditambah badge teks "✓ Cocok" supaya kejelasan status
+     tidak cuma mengandalkan intensitas warna (juga bantu yang buta warna). */
+  .po-row.po-row-matched{background:#8fe0b3;border:2px solid #00693f;border-left:6px solid #00693f;}
+  .po-row-matchbadge{position:absolute;top:6px;right:8px;font-size:10px;font-weight:700;color:#00512f;background:#ffffff;padding:2px 7px;border-radius:99px;letter-spacing:.2px;}
   .po-row.po-row-unmatched{opacity:.6;}
   .po-row-raw{font-size:11px;color:var(--ink-soft);margin-bottom:6px;}
 
@@ -1821,53 +1826,6 @@
   .md-quota-loading{font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:8px;}
   .md-quota-spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--primary-green);animation:md-quota-spin-kf .7s linear infinite;flex-shrink:0;}
   @keyframes md-quota-spin-kf{to{transform:rotate(360deg);}}
-  /* ---------- Tab "Pemantauan" — dashboard status infrastruktur ---------- */
-  .md-status-pills{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;}
-  .md-status-pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:99px;}
-  .md-status-pill .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-  .md-status-pill.ok{background:#e3f3ec;color:#0b5d3c;}
-  .md-status-pill.ok .dot{background:var(--primary-green);}
-  .md-status-pill.warn{background:#fdf1de;color:#8a5a00;}
-  .md-status-pill.warn .dot{background:#f2a900;}
-  .md-status-pill.bad{background:#fde8e6;color:var(--danger-red);}
-  .md-status-pill.bad .dot{background:var(--danger-red);}
-  .md-status-pill.neutral{background:#eceff1;color:#607d8b;}
-  .md-status-pill.neutral .dot{background:#90a4ae;}
-  /* ---------- Dashboard: ringkasan invoice, hanging list, chart, histori ---------- */
-  .md-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
-  .md-metric-box{background:var(--paper-dark);border-radius:12px;padding:12px 14px;}
-  .md-metric-box .lbl{font-size:11.5px;color:var(--ink-soft);margin-bottom:4px;}
-  .md-metric-box .val{font-size:22px;font-weight:800;color:var(--ink);}
-  .md-metric-box.warn .val{color:#a15c00;}
-  .md-metric-box.ok .val{color:var(--primary-green);}
-  .md-hanging-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--paper-dark);}
-  .md-hanging-row .nm{font-size:12.5px;font-weight:700;color:var(--ink);}
-  .md-hanging-row .tt{font-size:12.5px;color:var(--danger-red);font-weight:700;}
-  .md-hanging-empty{font-size:12px;color:var(--ink-soft);}
-  .md-chart-wrap{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px;}
-  .md-chart-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;}
-  .md-chart-bar{width:100%;max-width:26px;border-radius:4px 4px 0 0;background:var(--primary-green);min-height:2px;}
-  .md-chart-col .day-lbl{font-size:10px;color:var(--ink-soft);}
-  .md-chart-legend{display:flex;gap:14px;font-size:11px;color:var(--ink-soft);margin-top:10px;flex-wrap:wrap;}
-  .md-chart-legend .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:-1px;}
-  .md-commit-row{padding:9px 0;border-bottom:1px solid var(--line);}
-  .md-commit-row:last-child{border-bottom:none;}
-  .md-commit-row .msg{font-size:12.5px;color:var(--ink);font-weight:700;}
-  .md-commit-row .meta{font-size:11px;color:var(--ink-soft);margin-top:2px;}
-  /* ---------- Master Nama Pelanggan ---------- */
-  .md-nama-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--paper-dark);}
-  .md-nama-row .nm{flex:1;font-size:13px;font-weight:700;color:var(--ink);word-break:break-word;}
-  .md-nama-row button{flex-shrink:0;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;}
-  .md-nama-row button.edit{color:#1a73e8;}
-  .md-nama-row button.del{color:var(--danger-red);}
-  .md-nama-row button:hover{background:var(--paper-dark);}
-  .md-nama-edit-row{display:flex;gap:8px;flex:1;}
-  .md-nama-edit-row input{flex:1;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;}
-  .md-nama-pagination{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;}
-  .md-nama-pagination button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 14px;font-size:12.5px;cursor:pointer;color:var(--ink);}
-  .md-nama-pagination button:hover:not(:disabled){background:var(--paper-dark);}
-  .md-nama-pagination button:disabled{opacity:.4;cursor:not-allowed;}
-  .md-nama-page-info{font-size:12px;color:var(--ink-soft);white-space:nowrap;}
   @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
     .md-panel{padding:0;display:block;background:#ffffff;}
     .md-panel-sheet{border-radius:0;max-width:none;box-shadow:none;padding:16px 16px 40px;}
@@ -3779,6 +3737,20 @@ html[data-theme="dark"] .wiz-summary-card .row,
 html[data-theme="dark"] .wiz-sumcard .wiz-revrow{ border-color: var(--line); }
 html[data-theme="dark"] .wiz-preview-strip{ background: #20262b; }
 html[data-theme="dark"] .wiz-preview-strip.filled{ background: var(--card); }
+/* .po-row-matched (kartu "Hasil Bacaan AI" tempel-pesanan) pakai warna
+   hardcode juga (lihat definisi dasarnya di atas) — ditimpa di sini biar
+   tetap jelas kebaca "produk berhasil dicocokkan" di atas latar gelap,
+   bukan malah jadi pudar/nyaris nyatu ke card gelap sekitarnya. Ronde
+   "perjelas lagi": dibikin lebih pekat/kontras dari versi awal. */
+html[data-theme="dark"] .po-row.po-row-matched{
+  background: #1c3a2a;
+  border-color: #3ddc9a;
+  border-left-color: #3ddc9a;
+}
+html[data-theme="dark"] .po-row-matchbadge{
+  background: #0e1113;
+  color: #3ddc9a;
+}
 html[data-theme="dark"] .home-tile:hover,
 html[data-theme="dark"] .home-actionrow:hover{ background: #22282d; }
 html[data-theme="dark"] .md-togglerow,
@@ -4499,50 +4471,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <button class="md-panel-close" id="md-panel-close" aria-label="Tutup">✕</button>
     </div>
     <div class="md-tabs">
-      <button class="md-tab" data-md-tab="dashboard">📊 Dashboard</button>
       <button class="md-tab active" data-md-tab="produk">📦 Produk</button>
       <button class="md-tab" data-md-tab="ekspedisi">🚚 Ekspedisi</button>
       <button class="md-tab" data-md-tab="hapus">🗑️ Hapus Data</button>
       <button class="md-tab" data-md-tab="tampilan">⚙️ Tampilan</button>
       <button class="md-tab" data-md-tab="rumus">🧮 Rumus</button>
       <button class="md-tab" data-md-tab="keamanan">🔒 Keamanan PIN</button>
-      <button class="md-tab" data-md-tab="namacustomer">👤 Master Nama</button>
-    </div>
-
-    <div class="md-section" id="md-sec-dashboard">
-      <div class="md-card" id="md-quota-card">
-        <h3>Kuota AI Hari Ini</h3>
-        <div class="md-note" style="margin-bottom:12px;">Sisa jatah gratis Groq &amp; Cloudflare Workers AI untuk tanggal berjalan (reset otomatis tiap hari) — sekedar info, tidak mengubah apa pun.</div>
-        <button class="md-btn" id="md-quota-check" type="button">🔎 Cek Kuota AI Hari Ini</button>
-        <div id="md-quota-result" class="md-quota-result" hidden></div>
-      </div>
-      <div class="md-card">
-        <h3>Status Infrastruktur</h3>
-        <div class="md-note" style="margin-bottom:12px;">Status koneksi GitHub, Bot Telegram, Cron, dan tier AI (Groq/Mistral/Workers AI) — dimuat otomatis, sekedar info, tidak mengubah apa pun.</div>
-        <div id="md-status-pills" class="md-status-pills" hidden></div>
-        <div id="md-status-result" class="md-quota-result"></div>
-      </div>
-      <div class="md-card">
-        <h3>Ringkasan Invoice Hari Ini</h3>
-        <div id="md-orders-metrics" class="md-metric-grid"></div>
-      </div>
-      <div class="md-card">
-        <h3>Invoice Menggantung</h3>
-        <div class="md-note" style="margin-bottom:10px;">Belum lunas/terverifikasi lebih dari 48 jam sejak dikirim ke grup.</div>
-        <div id="md-orders-hanging"></div>
-      </div>
-      <div class="md-card">
-        <h3>Tren Kuota AI (7 Hari Terakhir)</h3>
-        <div id="md-ai-weekly-chart"></div>
-      </div>
-      <div class="md-card">
-        <h3>Riwayat master-data.json</h3>
-        <div id="md-github-history"></div>
-      </div>
-      <div class="md-card">
-        <h3>Retensi Data Invoice</h3>
-        <div id="md-retention-info"></div>
-      </div>
     </div>
 
     <div class="md-section active" id="md-sec-produk">
@@ -4674,6 +4608,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <span class="md-switch-track"><span class="md-switch-knob"></span></span>
           </label>
         </div>
+      </div>
+      <div class="md-card" id="md-quota-card">
+        <h3>Kuota AI Hari Ini</h3>
+        <div class="md-note" style="margin-bottom:12px;">Sisa jatah gratis Groq &amp; Cloudflare Workers AI untuk tanggal berjalan (reset otomatis tiap hari) — sekedar info, tidak mengubah apa pun.</div>
+        <button class="md-btn" id="md-quota-check" type="button">🔎 Cek Kuota AI Hari Ini</button>
+        <div id="md-quota-result" class="md-quota-result" hidden></div>
       </div>
       <div class="md-card">
         <h3>Autocomplete (cari-ketik)</h3>
@@ -4895,16 +4835,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="md-note">Kalau PIN lupa, gunakan tombol "Lupa PIN?" di layar buka Master Data — otomatis kembali ke PIN bawaan (hubungi pengelola sistem kalau tidak tahu PIN bawaannya).</div>
       </div>
     </div>
-
-    <div class="md-section" id="md-sec-namacustomer">
-      <div class="md-card">
-        <h3>Master Nama Pelanggan</h3>
-        <div class="md-note" style="margin-bottom:12px;">Daftar nama yang muncul sebagai rekomendasi otomatis di field "Nama Customer" (popup Kirim ke Grup Telegram). Mengganti/menghapus nama di sini <b>HANYA</b> mengubah daftar rekomendasi ini — Rincian Pemesanan, riwayat ongkir, dan riwayat resi yang sudah terkirim sebelumnya tidak ikut berubah. Daftar ini permanen (tidak pernah terhapus otomatis oleh sistem manapun) — hapus di sini kalau memang perlu dibersihkan manual (mis. salah ketik/duplikat).</div>
-        <input type="text" id="md-nama-search" placeholder="Cari nama..." style="width:100%;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;margin-bottom:12px;">
-        <div id="md-nama-list"></div>
-      </div>
-    </div>
-
     </div>
   </div>
 
@@ -9427,6 +9357,7 @@ if ("serviceWorker" in navigator) {
       catalog.map(p=> `<option value="${p.name}">${p.name}</option>`).join("");
     const rowsHtml = poItems.length ? poItems.map((it,i)=> `
       <div class="po-row ${it.matchedProduct ? "po-row-matched" : "po-row-unmatched"}" data-po-rowbox="${i}">
+        ${it.matchedProduct ? `<span class="po-row-matchbadge" data-po-badge="${i}">✓ Cocok</span>` : ""}
         <div class="po-row-raw">"${escHtml(it.raw)}"</div>
         <div style="display:flex;gap:6px;align-items:center;">
           <select data-po-row="${i}" class="po-select" style="flex:1;min-width:0;padding:6px;border:1px solid var(--line);border-radius:6px;">${optionsHtml}</select>
@@ -9481,6 +9412,16 @@ if ("serviceWorker" in navigator) {
         if(box){
           box.classList.toggle("po-row-matched", !!sel.value);
           box.classList.toggle("po-row-unmatched", !sel.value);
+          let badge = box.querySelector(`[data-po-badge="${i}"]`);
+          if(sel.value && !badge){
+            badge = document.createElement("span");
+            badge.className = "po-row-matchbadge";
+            badge.dataset.poBadge = String(i);
+            badge.textContent = "✓ Cocok";
+            box.prepend(badge);
+          }else if(!sel.value && badge){
+            badge.remove();
+          }
         }
       });
     });
@@ -10783,356 +10724,7 @@ if ("serviceWorker" in navigator) {
         btn.disabled = false;
       }
     }
-    // Diekspos supaya openPanel() bisa memuatnya otomatis begitu Master
-    // Data dibuka — konsisten dengan kartu dashboard lain (tanpa tombol).
-    window.__mdCheckQuota = checkQuota;
     btn.addEventListener("click", checkQuota);
-  })();
-
-  /* ---------- Dashboard (Master Data) ----------
-     Murni baca (GET /system-status), tidak menyimpan apa pun — dimuat
-     OTOMATIS tiap kali panel Master Data dibuka (lihat window.__mdCheckStatus
-     yang dipanggil dari openPanel()), tanpa perlu tombol/klik apa pun. */
-  (function(){
-    const pillsEl = document.getElementById("md-status-pills");
-    const resultEl = document.getElementById("md-status-result");
-    if(!pillsEl || !resultEl) return;
-
-    function pillLevel(item){
-      if(!item) return "neutral";
-      if(item.configured === false) return "neutral";
-      if(item.ok) return "ok";
-      // cooldown/kuota mepet dianggap peringatan, bukan mati total
-      return item.message && /limit|penuh|mepet/i.test(item.message) ? "warn" : "bad";
-    }
-    function pill(label, item){
-      const lvl = pillLevel(item);
-      return `<span class="md-status-pill ${lvl}"><span class="dot"></span>${label}</span>`;
-    }
-    function detailRow(label, item, extraSub){
-      const lvl = pillLevel(item);
-      const badgeLabel = lvl === "ok" ? "✓ Normal" : lvl === "warn" ? "⚠️ Perhatian" : lvl === "neutral" ? "Belum dikonfigurasi" : "✗ Bermasalah";
-      return `
-        <div class="md-quota-row">
-          <div class="md-quota-row-head">
-            <span class="md-quota-row-label">${label}</span>
-            <span class="md-quota-badge ${lvl==="ok"?"ok":lvl==="neutral"?"neutral":"cooldown"}">${badgeLabel}</span>
-          </div>
-          <div class="md-quota-row-sub">${extraSub || (item && item.message) || "–"}</div>
-        </div>`;
-    }
-
-    async function checkStatus(){
-      pillsEl.hidden = true;
-      resultEl.innerHTML = `<div class="md-quota-loading"><span class="md-quota-spin"></span> Memuat status infrastruktur...</div>`;
-      try{
-        const res = await fetch(MASTER_DATA_WORKER_URL + "/system-status", { headers: workerHeaders() });
-        const data = await res.json();
-        if(!res.ok || data.error) throw new Error(data.message || data.error || "Gagal ambil data.");
-
-        pillsEl.hidden = false;
-        pillsEl.innerHTML = [
-          pill("Bot Telegram", data.telegram),
-          pill("GitHub", data.github),
-          pill("Cron", data.cron),
-          pill("Groq", data.groq),
-          pill("Mistral", data.mistral),
-          pill("Workers AI", data.workersAi),
-        ].join("");
-
-        const telegramSub = data.telegram && data.telegram.username ? `${data.telegram.message} (@${data.telegram.username})` : (data.telegram && data.telegram.message);
-        const telegramActivitySub = data.botActivity && data.botActivity.configured
-          ? (data.botActivity.ok ? `${telegramSub} · Aktivitas terakhir: ${data.botActivity.ket} (${data.botActivity.message})` : telegramSub)
-          : telegramSub;
-        const cronSub = data.cron && data.cron.lastRunTs ? `Terakhir jalan: ${data.cron.message} WIB` : (data.cron && data.cron.message);
-        const mistralSub = data.mistral && data.mistral.configured ? `${data.mistral.usedRequests ?? 0} / ${data.mistral.budgetRequests ?? "–"} request (${data.mistral.percent ?? 0}%)` : "Belum dikonfigurasi (MISTRAL_API_KEY kosong)";
-        const workersSub = data.workersAi && data.workersAi.configured !== false ? `${data.workersAi.percent ?? 0}% dari kuota Neuron harian terpakai` : "Penyimpanan tidak dikonfigurasi";
-
-        resultEl.innerHTML = `
-          <div class="md-quota-updated">Diperbarui ${data.dateLabel} WIB</div>
-          ${detailRow("Bot Telegram", data.telegram, telegramActivitySub)}
-          ${detailRow("GitHub Database", data.github)}
-          ${detailRow("Cron Pengingat", data.cron, cronSub)}
-          ${detailRow("Groq (AI)", data.groq)}
-          ${detailRow("Mistral (AI)", data.mistral, mistralSub)}
-          ${detailRow("Workers AI (AI)", data.workersAi, workersSub)}
-        `;
-
-        renderOrdersMetrics(data.orders);
-        renderHangingInvoices(data.orders);
-        renderAiWeeklyChart(data.aiWeekly);
-        renderGithubHistory(data.github, data.githubFile);
-        renderRetentionInfo(data.retention);
-      }catch(e){
-        pillsEl.hidden = true;
-        resultEl.innerHTML = `<div class="md-quota-error">Gagal memuat status: ${String(e.message||e)}</div>`;
-      }
-    }
-
-    /* ---- Ide #1: Ringkasan invoice hari ini ---- */
-    function renderOrdersMetrics(orders){
-      const el = document.getElementById("md-orders-metrics");
-      if(!el) return;
-      if(!orders || !orders.configured){
-        el.innerHTML = `<div class="md-hanging-empty">Penyimpanan tidak dikonfigurasi.</div>`;
-        return;
-      }
-      if(orders.ok === false){
-        el.innerHTML = `<div class="md-quota-error">${orders.message || "Gagal memuat."}</div>`;
-        return;
-      }
-      el.innerHTML = `
-        <div class="md-metric-box"><div class="lbl">Total invoice</div><div class="val">${orders.todayCount}</div></div>
-        <div class="md-metric-box ok"><div class="lbl">Lunas</div><div class="val">${orders.todayLunas}</div></div>
-        <div class="md-metric-box warn"><div class="lbl">Perlu perhatian</div><div class="val">${orders.todayPending}</div></div>
-      `;
-    }
-
-    /* ---- Ide #2: Invoice menggantung ---- */
-    function renderHangingInvoices(orders){
-      const el = document.getElementById("md-orders-hanging");
-      if(!el) return;
-      if(!orders || !orders.configured){
-        el.innerHTML = `<div class="md-hanging-empty">Penyimpanan tidak dikonfigurasi.</div>`;
-        return;
-      }
-      if(orders.ok === false){
-        el.innerHTML = `<div class="md-quota-error">${orders.message || "Gagal memuat."}</div>`;
-        return;
-      }
-      if(!orders.hangingCount){
-        el.innerHTML = `<div class="md-hanging-empty">Tidak ada invoice menggantung saat ini. Semua aman ✅.</div>`;
-        return;
-      }
-      const rows = orders.hangingList.map(h=> `
-        <div class="md-hanging-row"><span class="nm">${escapeHtmlDash(h.name)}</span><span class="tt">${formatRupiahDash(h.total)}</span></div>
-      `).join("");
-      const more = orders.hangingCount > orders.hangingList.length
-        ? `<div class="md-hanging-empty">+${orders.hangingCount - orders.hangingList.length} invoice menggantung lainnya.</div>` : "";
-      el.innerHTML = rows + more;
-    }
-    function escapeHtmlDash(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-    function formatRupiahDash(n){ return "Rp " + Math.round(n||0).toLocaleString("id-ID"); }
-
-    /* ---- Ide #3: Tren kuota AI 7 hari ---- */
-    function renderAiWeeklyChart(weekly){
-      const el = document.getElementById("md-ai-weekly-chart");
-      if(!el) return;
-      if(!weekly || !weekly.configured){
-        el.innerHTML = `<div class="md-hanging-empty">Penyimpanan tidak dikonfigurasi.</div>`;
-        return;
-      }
-      if(weekly.ok === false){
-        el.innerHTML = `<div class="md-quota-error">${weekly.message || "Gagal memuat."}</div>`;
-        return;
-      }
-      const days = weekly.days || [];
-      const maxVal = Math.max(1, ...days.map(d=> d.groqTokens));
-      const cols = days.map(d=> {
-        const h = Math.max(2, Math.round((d.groqTokens / maxVal) * 100));
-        return `<div class="md-chart-col"><div class="md-chart-bar" style="height:${h}px;" title="${d.groqTokens.toLocaleString("id-ID")} token"></div><div class="day-lbl">${d.label}</div></div>`;
-      }).join("");
-      el.innerHTML = `
-        <div class="md-chart-wrap">${cols}</div>
-        <div class="md-chart-legend"><span><span class="sw" style="background:var(--primary-green);"></span>Token Groq (teks+vision) per hari</span></div>
-      `;
-    }
-
-    /* ---- Ide #5: Riwayat commit master-data.json ---- */
-    function renderGithubHistory(github, fileInfo){
-      const el = document.getElementById("md-github-history");
-      if(!el) return;
-      if(!fileInfo || !fileInfo.configured){
-        el.innerHTML = `<div class="md-hanging-empty">GitHub belum dikonfigurasi.</div>`;
-        return;
-      }
-      if(fileInfo.ok === false){
-        el.innerHTML = `<div class="md-quota-error">${fileInfo.message || "Gagal memuat."}</div>`;
-        return;
-      }
-      const sizeLabel = fileInfo.sizeBytes != null ? `${(fileInfo.sizeBytes/1024).toLocaleString("id-ID",{maximumFractionDigits:1})} KB` : "–";
-      const commits = (fileInfo.commits || []).map(c=> {
-        let waktu = "–";
-        try{ waktu = new Date(c.date).toLocaleString("id-ID", { timeZone: "Asia/Jakarta", dateStyle: "medium", timeStyle: "short" }); }catch(e){}
-        return `<div class="md-commit-row"><div class="msg">${escapeHtmlDash(c.message || "(tanpa pesan commit)")}</div><div class="meta">${escapeHtmlDash(c.author)} · ${waktu} WIB</div></div>`;
-      }).join("");
-      el.innerHTML = `
-        <div class="md-note" style="margin-bottom:8px;">Ukuran file saat ini: <b>${sizeLabel}</b></div>
-        ${commits || `<div class="md-hanging-empty">Belum ada riwayat commit.</div>`}
-      `;
-    }
-
-    /* ---- Retensi data invoice (25 hari) + jaminan nama customer permanen ---- */
-    function renderRetentionInfo(retention){
-      const el = document.getElementById("md-retention-info");
-      if(!el) return;
-      if(!retention || !retention.configured){
-        el.innerHTML = `<div class="md-hanging-empty">Penyimpanan tidak dikonfigurasi.</div>`;
-        return;
-      }
-      if(retention.ok === false){
-        el.innerHTML = `<div class="md-quota-error">${retention.message || "Gagal memuat."}</div>`;
-        return;
-      }
-      const lc = retention.lastCleanup;
-      const lastCleanupLine = lc
-        ? `Pembersihan terakhir: <b>${lc.waktu} WIB</b> — ${lc.deletedCount} invoice dihapus, ${lc.remainingCount} invoice tersisa (masih dalam ${retention.retentionDays} hari).`
-        : `Belum pernah dijalankan sejak fitur ini aktif (akan jalan otomatis di siklus cron berikutnya).`;
-      el.innerHTML = `
-        <div class="md-metric-grid" style="margin-bottom:12px;">
-          <div class="md-metric-box"><div class="lbl">Retensi invoice</div><div class="val">${retention.retentionDays} hari</div></div>
-          <div class="md-metric-box ok"><div class="lbl">Nama tersimpan</div><div class="val">${retention.customerNameCount}</div></div>
-        </div>
-        <div class="md-note" style="margin-bottom:6px;">${lastCleanupLine}</div>
-        <div class="md-note" style="color:var(--primary-green);font-weight:700;">✓ Data nama pelanggan TIDAK PERNAH ikut terhapus oleh pembersihan otomatis ini — permanen selamanya kecuali dihapus manual lewat tab 👤 Master Nama.</div>
-      `;
-    }
-
-    // Diekspos supaya openPanel() bisa memuatnya otomatis begitu Master
-    // Data dibuka — tidak perlu tombol atau interaksi apa pun dari user.
-    window.__mdCheckStatus = checkStatus;
-  })();
-
-  /* ---------- Master Nama Pelanggan ----------
-     Dimuat otomatis begitu tab "Master Nama" dibuka (lihat pemanggilan di
-     handler klik .md-tab di bawah). Edit/hapus langsung ke server (bukan
-     ke SETTINGS lokal) supaya semua device lihat daftar yang sama. */
-  (function(){
-    const listEl = document.getElementById("md-nama-list");
-    const searchEl = document.getElementById("md-nama-search");
-    if(!listEl || !searchEl) return;
-    let allNames = [];
-    let editingName = null;
-    let currentPage = 1;
-    const PAGE_SIZE = 20;
-
-    function escapeHtmlNama(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-
-    function getFiltered(){
-      const q = searchEl.value.trim().toLowerCase();
-      return q ? allNames.filter(n=> n.toLowerCase().includes(q)) : allNames;
-    }
-
-    function paginationHtml(totalPages){
-      if(totalPages <= 1) return "";
-      return `
-        <div class="md-nama-pagination">
-          <button type="button" class="md-nama-page-prev" ${currentPage<=1?"disabled":""}>‹ Sebelumnya</button>
-          <span class="md-nama-page-info">Halaman ${currentPage} dari ${totalPages}</span>
-          <button type="button" class="md-nama-page-next" ${currentPage>=totalPages?"disabled":""}>Selanjutnya ›</button>
-        </div>`;
-    }
-
-    function render(){
-      const filtered = getFiltered();
-      if(!filtered.length){
-        listEl.innerHTML = `<div class="md-hanging-empty">${allNames.length ? "Tidak ada nama yang cocok dicari." : "Belum ada nama tersimpan."}</div>`;
-        return;
-      }
-      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-      if(currentPage > totalPages) currentPage = totalPages;
-      if(currentPage < 1) currentPage = 1;
-      const start = (currentPage - 1) * PAGE_SIZE;
-      const pageItems = filtered.slice(start, start + PAGE_SIZE);
-
-      const rowsHtml = pageItems.map(n=>{
-        if(n === editingName){
-          return `
-            <div class="md-nama-row" data-name="${escapeHtmlNama(n)}">
-              <div class="md-nama-edit-row">
-                <input type="text" class="md-nama-edit-input" value="${escapeHtmlNama(n)}">
-                <button type="button" class="edit md-nama-save">Simpan</button>
-                <button type="button" class="del md-nama-cancel">Batal</button>
-              </div>
-            </div>`;
-        }
-        return `
-          <div class="md-nama-row" data-name="${escapeHtmlNama(n)}">
-            <span class="nm">${escapeHtmlNama(n)}</span>
-            <button type="button" class="edit md-nama-edit-btn">✏️ Edit</button>
-            <button type="button" class="del md-nama-del-btn">🗑️ Hapus</button>
-          </div>`;
-      }).join("");
-
-      listEl.innerHTML = rowsHtml + paginationHtml(totalPages);
-    }
-
-    async function loadNames(){
-      listEl.innerHTML = `<div class="md-quota-loading"><span class="md-quota-spin"></span> Memuat daftar nama...</div>`;
-      try{
-        const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
-        const data = await res.json();
-        allNames = Array.isArray(data.names) ? data.names : [];
-        currentPage = 1;
-        render();
-      }catch(e){
-        listEl.innerHTML = `<div class="md-quota-error">Gagal memuat daftar nama: ${String(e.message||e)}</div>`;
-      }
-    }
-
-    searchEl.addEventListener("input", ()=>{ currentPage = 1; render(); });
-
-    listEl.addEventListener("click", async (e)=>{
-      if(e.target.classList.contains("md-nama-page-prev")){
-        currentPage--; render(); return;
-      }
-      if(e.target.classList.contains("md-nama-page-next")){
-        currentPage++; render(); return;
-      }
-      const row = e.target.closest(".md-nama-row");
-      if(!row) return;
-      const name = row.dataset.name;
-
-      if(e.target.classList.contains("md-nama-edit-btn")){
-        editingName = name;
-        render();
-        const input = listEl.querySelector(".md-nama-edit-input");
-        if(input){ input.focus(); input.select(); }
-        return;
-      }
-      if(e.target.classList.contains("md-nama-cancel")){
-        editingName = null;
-        render();
-        return;
-      }
-      if(e.target.classList.contains("md-nama-save")){
-        const input = row.querySelector(".md-nama-edit-input");
-        const newName = input ? input.value.trim() : "";
-        if(!newName){ alert("Nama baru tidak boleh kosong."); return; }
-        if(newName === name){ editingName = null; render(); return; }
-        try{
-          const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/rename", {
-            method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-            body: JSON.stringify({ oldName: name, newName }),
-          });
-          const data = await res.json();
-          if(!res.ok || data.error) throw new Error(data.error || "Gagal menyimpan.");
-          allNames = data.names;
-          editingName = null;
-          render();
-        }catch(err){
-          alert("Gagal mengubah nama: " + String(err.message || err));
-        }
-        return;
-      }
-      if(e.target.classList.contains("md-nama-del-btn")){
-        if(!confirm(`Hapus "${name}" dari daftar rekomendasi nama? Rincian Pemesanan yang sudah terkirim TIDAK ikut berubah.`)) return;
-        try{
-          const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
-            method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-            body: JSON.stringify({ name }),
-          });
-          const data = await res.json();
-          if(!res.ok || data.error) throw new Error(data.error || "Gagal menghapus.");
-          allNames = data.names;
-          render();
-        }catch(err){
-          alert("Gagal menghapus nama: " + String(err.message || err));
-        }
-      }
-    });
-
-    window.__mdLoadNamaList = loadNames;
   })();
 
   /* ---------- Daftar Finance (dipakai worker untuk validasi reaction/konfirmasi) ---------- */
@@ -11387,8 +10979,6 @@ if ("serviceWorker" in navigator) {
     renderProdukList();
     renderEkspedisiList();
     resetHapusForm();
-    if(window.__mdCheckStatus) window.__mdCheckStatus();
-    if(window.__mdCheckQuota) window.__mdCheckQuota();
     if(mdPendingTab){
       const tabBtn = document.querySelector('.md-tab[data-md-tab="'+mdPendingTab+'"]');
       if(tabBtn) tabBtn.click();
@@ -11447,7 +11037,6 @@ if ("serviceWorker" in navigator) {
       document.querySelectorAll(".md-section").forEach(s=>s.classList.remove("active"));
       tab.classList.add("active");
       document.getElementById("md-sec-"+tab.dataset.mdTab).classList.add("active");
-      if(tab.dataset.mdTab === "namacustomer" && window.__mdLoadNamaList) window.__mdLoadNamaList();
     });
   });
 
