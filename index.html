@@ -3,22 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- ============================================================
+     Telegram Mini App SDK — dimuat SEDINI MUNGKIN di <head>, sebelum
+     script lain, supaya window.Telegram.WebApp sudah siap dipakai.
+     Kalau halaman ini dibuka di browser biasa (bukan lewat tombol
+     "Open App" bot Telegram), script ini tetap ke-load tanpa error,
+     tapi window.Telegram.WebApp jadi tidak ada -- makanya SEMUA
+     pemakaiannya di bawah dibungkus pengecekan + try/catch supaya
+     app tetap jalan normal di luar Telegram.
+     ============================================================ -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <script>
-  // Bootstrap tema SEDINI MUNGKIN (sebelum CSS/body sempat di-paint) —
-  // cegah "kedipan" tema salah sesaat pas halaman baru dibuka. Baca
-  // langsung dari localStorage, sengaja tidak nunggu script utama di
-  // bawah (yang baru jalan setelah seluruh body ke-parse).
+  /* Bootstrap tema + init Telegram Mini App, DIGABUNG dalam satu blok
+     dan dijalankan SEDINI MUNGKIN (sebelum CSS/body sempat di-paint) —
+     supaya tidak ada "kedipan" tema salah, DAN supaya header/background
+     Telegram langsung disetel warna yang benar sesuai tema (bukan
+     ditentukan lebih dulu lalu baru disesuaikan belakangan). */
   (function(){
+    const tg = window.Telegram && window.Telegram.WebApp;
+    let resolved = "light";
     try{
       const settingsRaw = localStorage.getItem("notaHalawa_settings");
       const settings = settingsRaw ? JSON.parse(settingsRaw) : null;
       const featureOn = !settings || settings.darkModeFeatureEnabled !== false;
-      if(!featureOn) return; // default terang, sudah sesuai atribut bawaan (tanpa data-theme)
-      const pref = localStorage.getItem("notaHalawa_theme") || "light";
-      const resolved = (pref === "dark" || pref === "light") ? pref
-        : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-      document.documentElement.setAttribute("data-theme", resolved);
+      if(featureOn){
+        const pref = localStorage.getItem("notaHalawa_theme");
+        if(pref === "dark" || pref === "light"){
+          resolved = pref; // sudah dipilih manual di Master Data -> Tampilan, ini prioritas utama
+        } else if(tg && (tg.colorScheme === "dark" || tg.colorScheme === "light")){
+          // Belum pernah dipilih manual -> kalau dibuka lewat Telegram,
+          // ikuti tema Telegram user (lebih akurat & natural dibanding
+          // matchMedia browser system biasa saat berada di dalam Telegram).
+          resolved = tg.colorScheme;
+        } else if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches){
+          resolved = "dark";
+        }
+        if(resolved === "dark") document.documentElement.setAttribute("data-theme", "dark");
+      }
     }catch(e){ /* biarkan default terang kalau ada masalah baca localStorage */ }
+
+    if(!tg) return; // dibuka di luar Telegram (browser/PWA biasa) -> selesai di sini
+
+    try{
+      tg.ready();   // kasih tau klien Telegram Mini App sudah siap ditampilkan
+      tg.expand();  // langsung buka penuh (bukan cuma separuh layar) saat dibuka
+
+      // Samakan warna header & background WebView Telegram dengan tema
+      // app yang baru saja ditentukan di atas, supaya menyatu (bukan
+      // abu-abu default Telegram) DAN otomatis ikut gelap/terang.
+      const headerHex = resolved === "dark" ? "#0e1113" : "#00845f";
+      const bgHex = resolved === "dark" ? "#0e1113" : "#f8f9fa";
+      if(typeof tg.setHeaderColor === "function") tg.setHeaderColor(headerHex);
+      if(typeof tg.setBackgroundColor === "function") tg.setBackgroundColor(bgHex);
+
+      // Cegah swipe-turun tidak sengaja menutup Mini App -- form/step di
+      // app ini banyak yang panjang & butuh scroll, gampang kepencet
+      // swipe-down tanpa sengaja saat scroll cepat.
+      if(typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
+
+      // Cegah Mini App ke-tutup tidak sengaja saat user lagi isi form/nota
+      // -- progres yang belum disimpan bisa hilang kalau ke-close tiba-tiba
+      // (kekhawatiran yang sama seperti reload paksa yang dicatat di sw.js).
+      if(typeof tg.enableClosingConfirmation === "function") tg.enableClosingConfirmation();
+
+      // Tinggi viewport Telegram (bukan 100vh polos) -- WebView Telegram
+      // kadang salah ukur 100vh, terutama saat keyboard muncul/hilang.
+      // Dipakai lewat CSS var --tg-vh (lihat :root & body/popup di <style>),
+      // update lagi otomatis tiap kali Telegram mengubah ukurannya.
+      // PENTING: prioritaskan viewportHeight (nilai LANGSUNG/live) di atas
+      // viewportStableHeight -- stableHeight baru ter-update SETELAH
+      // animasi resize selesai, jadi kalau dipakai duluan, layout jadi
+      // terasa "telat" nyesuaikan pas keyboard baru muncul/hilang.
+      function applyViewportHeight(){
+        const h = tg.viewportHeight || tg.viewportStableHeight;
+        if(h) document.documentElement.style.setProperty("--tg-vh", h + "px");
+      }
+      applyViewportHeight();
+      if(typeof tg.onEvent === "function") tg.onEvent("viewportChanged", applyViewportHeight);
+
+      // Saat keyboard muncul (user fokus ke input/textarea/select), pastikan
+      // elemen yang lagi diketik tidak ketutup keyboard -- WebView Telegram
+      // tidak selalu auto-scroll ke elemen fokus seperti browser biasa.
+      // Delay kecil supaya animasi resize keyboard sempat selesai dulu
+      // sebelum dihitung posisi scroll-nya (kalau langsung, posisi yang
+      // dipakai masih posisi SEBELUM keyboard muncul, jadi salah target).
+      document.addEventListener("focusin", function(e){
+        const el = e.target;
+        if(!el || !el.matches) return;
+        if(!el.matches("input, textarea, select")) return;
+        setTimeout(function(){
+          try{ el.scrollIntoView({ block: "center", behavior: "smooth" }); }catch(err){}
+        }, 300);
+      });
+
+      // Data user Telegram yang lagi buka Mini App ini (kalau ada) tersimpan
+      // di tg.initDataUnsafe.user -- belum dipakai di app sekarang, cuma
+      // disiapkan di sini kalau nanti mau ditampilkan (mis. nama CS yang
+      // login) tanpa perlu tambah integrasi SDK baru lagi.
+    }catch(e){
+      console.log("Telegram WebApp init dilewati:", e);
+    }
   })();
 </script>
 
@@ -39,6 +125,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
+    /* Fallback 100vh biasa untuk browser normal / sebelum script Telegram
+       sempat jalan; begitu dibuka lewat Telegram, JS di <head> mengganti
+       nilai ini jadi tinggi viewport Telegram yang sebenarnya (px). */
+    --tg-vh:100vh;
     --paper:#ffffff;
     --paper-dark:#f8f9fa;
     --ink:#1a1a1a;
@@ -92,7 +182,7 @@
     color:var(--ink);
     font-family:'Roboto', sans-serif;
     padding:28px clamp(16px, 3vw, 48px) 80px;
-    min-height:100vh;
+    min-height:var(--tg-vh);
   }
   .wrap{max-width:1100px;margin:0 auto;}
 
@@ -858,7 +948,7 @@
     .wrap{background:#ffffff;}
     /* Beranda "Habit" — latar abu sangat muda, kartu/list putih di atasnya. */
     body.showing-home{background:#f7f9f8;}
-    body.showing-home .wrap{background:transparent;display:flex;flex-direction:column;min-height:calc(100vh - 108px);}
+    body.showing-home .wrap{background:transparent;display:flex;flex-direction:column;min-height:calc(var(--tg-vh) - 108px);}
 
     /* Header, tab atas, toolbar aksi, dan referensi ongkir wilayah adalah
        "chrome" desktop — di mobile digantikan sepenuhnya oleh Beranda +
@@ -1623,7 +1713,7 @@
   body.has-open-overlay{overflow:hidden;position:fixed;inset:0;width:100%;}
   .md-pinbox{
     width:100%;max-width:320px;background:var(--card);border-radius:16px;padding:26px 22px;text-align:center;
-    max-height:calc(100vh - 32px);overflow-y:auto;-webkit-overflow-scrolling:touch;
+    max-height:calc(var(--tg-vh) - 32px);overflow-y:auto;-webkit-overflow-scrolling:touch;
   }
   .md-pinbox h3{margin:0 0 6px;font-size:16px;}
   .md-pinbox p{margin:0 0 18px;font-size:12.5px;color:var(--ink-soft);}
@@ -2212,12 +2302,12 @@
   .wiz-pos-host .pos-grid{
     grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
     gap: 14px;
-    max-height: calc(100vh - 320px);
+    max-height: calc(var(--tg-vh) - 320px);
   }
   .wiz-pos-host .pos-card{ padding: 14px 10px 12px; }
   .wiz-pos-host .pos-card-img{ width: 72px; height: 72px; }
   .wiz-pos-host .pos-cart-col{
-    max-height: calc(100vh - 320px);
+    max-height: calc(var(--tg-vh) - 320px);
     display: flex;
     flex-direction: column;
   }
@@ -2512,7 +2602,7 @@
 
     font-family: 'Roboto', sans-serif;
 
-    min-height: 100vh;
+    min-height: var(--tg-vh);
   }
 
   .wrap {
@@ -12542,6 +12632,86 @@ if ("serviceWorker" in navigator) {
     applyLockState();
   })();
 })();
+</script>
+
+<script>
+  /* ============================================================
+     TOMBOL BACK TELEGRAM MINI APP
+     Tanpa ini, tombol back bawaan WebView Telegram (panah kembali di
+     header / gesture back) LANGSUNG MENUTUP Mini App begitu ditekan,
+     kapan pun, di layar mana pun. Blok ini membuatnya mundur SATU
+     LANGKAH DI DALAM APP dulu (Beranda <-> tab <-> step wizard,
+     dan menutup popup/overlay yang lagi terbuka), persis seperti
+     tombol back fisik Android yang sudah didukung app ini lewat
+     history.pushState/popstate (lihat blok "navigasi Beranda <->
+     panel" di script utama). Tidak menyentuh logika navigasi yang
+     sudah ada sama sekali -- cuma memanggil history.back() atau
+     mengklik tombol tutup overlay yang sudah ada.
+     Tombol back Telegram CUMA ditampilkan kalau user sedang TIDAK di
+     Beranda, ATAU ada popup/overlay yang lagi terbuka. Begitu balik ke
+     Beranda dengan semua popup tertutup, tombolnya disembunyikan lagi
+     -- supaya tombol back/gesture Telegram BERIKUTNYA baru menutup
+     Mini App, sesuai perilaku standar Mini App Telegram.
+     ============================================================ */
+  (function(){
+    try{
+      const tg = window.Telegram && window.Telegram.WebApp;
+      if(!tg || !tg.BackButton) return; // di luar Telegram -> tidak relevan, lewati
+
+      function findOpenOverlay(){
+        return document.querySelector(".md-overlay:not([hidden]), .calc-overlay:not([hidden])");
+      }
+
+      function closeOverlay(ov){
+        // Coba beberapa pola tombol tutup yang SUDAH DIPAKAI di app ini,
+        // urut dari yang paling spesifik -- supaya logika Batal/Simpan
+        // bawaan overlay itu (kalau ada) tetap jalan seperti biasa, bukan
+        // cuma disembunyikan paksa dari luar tanpa lewat handler aslinya.
+        const byId = document.getElementById(ov.id + "-close");
+        if(byId){ byId.click(); return; }
+        const calcClose = ov.querySelector(".calc-close");
+        if(calcClose){ calcClose.click(); return; }
+        const labeled = ov.querySelector('button[aria-label*="Tutup" i], button[aria-label*="Batal" i], button[aria-label*="Cancel" i]');
+        if(labeled){ labeled.click(); return; }
+        // Fallback terakhir kalau overlay ini kebetulan tidak punya tombol
+        // tutup yang dikenali di atas -- langsung sembunyikan. Tidak ideal
+        // (melewati logika batal/reset internalnya kalau ada), tapi lebih
+        // baik daripada tombol back Telegram jadi macet tidak berefek.
+        ov.hidden = true;
+      }
+
+      tg.BackButton.onClick(function(){
+        const ov = findOpenOverlay();
+        if(ov){ closeOverlay(ov); return; }
+        // Tidak ada popup terbuka -> mundur 1 langkah navigasi app
+        // (Beranda <-> tab <-> step wizard) lewat history.back(), yang
+        // sudah ditangkap oleh listener "popstate" milik app ini sendiri.
+        history.back();
+      });
+
+      function syncBackButtonVisibility(){
+        const showingHome = document.body.classList.contains("showing-home");
+        const overlayOpen = !!findOpenOverlay();
+        if(showingHome && !overlayOpen) tg.BackButton.hide();
+        else tg.BackButton.show();
+      }
+      // Pola "murah" yang sama seperti dipakai di sync lain pada script di
+      // atas (cek ulang status habis klik/navigasi) -- bukan observer berat
+      // yang harus dikaitkan ke tiap fungsi buka/tutup popup satu-satu.
+      document.addEventListener("click", ()=> setTimeout(syncBackButtonVisibility, 30));
+      window.addEventListener("popstate", ()=> setTimeout(syncBackButtonVisibility, 0));
+      // Jaring pengaman tambahan: ada kemungkinan overlay dibuka/ditutup
+      // tanpa lewat klik langsung (dipicu fungsi lain) -- MutationObserver
+      // pada atribut "hidden" memastikan status tombol tetap akurat.
+      const overlayObserver = new MutationObserver(()=> syncBackButtonVisibility());
+      document.querySelectorAll(".md-overlay, .calc-overlay").forEach((el)=>{
+        overlayObserver.observe(el, { attributes:true, attributeFilter:["hidden"] });
+      });
+      syncBackButtonVisibility();
+    }catch(e){
+      console.log("Telegram BackButton init dilewati:", e);
+    }
+  })();
 </script>
 </body>
 </html>
