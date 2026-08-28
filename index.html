@@ -7603,6 +7603,14 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // Kalau rate/kg DIPAKAI (bukan manual), fallback ini sengaja 0 --
     // rate/kg tetap satu-satunya acuan seperti sebelumnya, tidak dobel.
     const ongkirManualNum = ratePerKgNum > 0 ? 0 : (parseRp(document.getElementById(pfx+"-ongkir").textContent) || 0);
+    // Ongkir TOTAL (Rp) yang SUNGGUH-SUNGGUH berlaku untuk pesanan ini,
+    // apa pun modenya (rate/kg x berat, ATAU Ongkir Manual) — dibaca dari
+    // teks yang sudah tampil di kolom Ongkir (pj-ongkir/cs-ongkir), PERSIS
+    // sama dengan angka di gambar nota. Beda dengan ratePerKgNum (yang
+    // cuma tarif per-kg, bukan totalnya) — field ini dikirim supaya bot
+    // bisa menampilkan Ongkir yang BENAR (Rp total) di grup resi, bukan
+    // tarif per-kg yang butuh dikalikan berat dulu.
+    const ongkirTotalNum = parseRp(document.getElementById(pfx+"-ongkir").textContent) || 0;
     const ekspedisiName = document.getElementById(pfx+"-ekspedisi").value || "";
     // Tanggal jadwal kirim (kalau sempat kebaca AI dari "Tempel Pesanan") —
     // dikirim diam-diam, dipakai server buat pengingat otomatis H-1.
@@ -7622,7 +7630,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       imageDataUrl = canvas.toDataURL("image/png");
       _notaImageCache = { tab, signature, imageDataUrl };
     }
-    return { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ekspedisiName, deliveryDate, kelebihanNum, imageDataUrl };
+    return { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, imageDataUrl };
   }
 
   /* ---------- Autosave draft ke server ----------
@@ -7638,7 +7646,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     if(!senderId || !MASTER_DATA_WORKER_URL || isSavingDraft) return;
     isSavingDraft = true;
     try{
-      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ekspedisiName, deliveryDate, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, imageDataUrl } = await collectNotaPayload();
       await fetch(MASTER_DATA_WORKER_URL + "/save-draft", {
         method: "POST",
         headers: workerHeaders({ "Content-Type": "application/json" }),
@@ -7648,6 +7656,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           grandTotal: grandTotalNum,
           ratePerKg: ratePerKgNum,
           ongkirManual: ongkirManualNum,
+          ongkirTotal: ongkirTotalNum,
           ekspedisi: ekspedisiName,
           deliveryDate,
           image: imageDataUrl,
@@ -7755,7 +7764,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     statusEl.textContent = "Menyiapkan gambar nota…";
 
     try{
-      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ekspedisiName, deliveryDate, kelebihanNum, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, imageDataUrl } = await collectNotaPayload();
 
       statusEl.textContent = "Mengirim ke grup Telegram…";
       const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
@@ -7770,6 +7779,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           grandTotal: grandTotalNum,
           ratePerKg: ratePerKgNum,
           ongkirManual: ongkirManualNum,
+          ongkirTotal: ongkirTotalNum,
           ekspedisi: ekspedisiName,
           deliveryDate,
           kelebihanBayarSebelumnya: kelebihanNum,
