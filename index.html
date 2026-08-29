@@ -4841,6 +4841,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
       </div>
       <div class="md-card">
+        <h3>Rekap Invoice Harian Otomatis (DM ke CS &amp; Finance)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Kirim otomatis terjadwal</div>
+            <div class="md-togglerow-sub">Aktif: bot kirim DM rekap invoice harian otomatis sesuai jadwal (default Senin-Kamis 15.30, Jumat 14.30, Sabtu 11.30 WIB, bisa diatur per-orang lewat "/aturjadwal" di DM bot). Nonaktif: kirim otomatis dimatikan — tapi CS/Finance TETAP bisa minta manual kapan saja lewat DM bot, cukup ketik "rekap"/"hasil"/"laporan"/"lapor"/"data".</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-dailyrecap">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card">
         <h3>Tombol Simpan/Batal (form Tambah/Edit produk)</h3>
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M4 15h16" stroke="var(--primary-green)" stroke-width="1.6"/></svg></div>
@@ -5193,6 +5207,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <label>Batas subsidi produk, maks % dari ongkir</label>
         <input type="number" inputmode="numeric" id="md-ed-subsidibatas" min="0" max="100" style="max-width:140px;">
         <div class="md-note" id="md-ed-preview" style="margin-top:10px;font-weight:700;color:var(--ink);"></div>
+
+        <label style="margin-top:14px;">Nama petugas logistik ekspedisi ini</label>
+        <input type="text" id="md-ed-logistiknama" placeholder="mis. Pak Herry">
+        <label style="margin-top:8px;">ID Telegram petugas logistik</label>
+        <input type="text" inputmode="numeric" id="md-ed-logistikid" placeholder="mis. 123456789">
+        <div class="md-note">Isi buat aktifkan laporan otomatis ke petugas logistik ini via DM, tiap kali Finance approve (Konfirmasi) pesanan yang pakai ekspedisi ini. Kosongkan kalau belum ada/tidak perlu. Cek ID lewat bot <b>@userinfobot</b> di Telegram.</div>
       </div>
       <button class="md-modal-primary" id="md-ed-save">Simpan rumus</button>
       <button class="md-modal-secondary" id="md-ed-cancel">Batal</button>
@@ -6263,7 +6283,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -6282,6 +6302,7 @@ function loadSettings(){
     if(typeof s.customBlueThemeEnabled === "boolean") SETTINGS.customBlueThemeEnabled = s.customBlueThemeEnabled;
     if(typeof s.darkModeFeatureEnabled === "boolean") SETTINGS.darkModeFeatureEnabled = s.darkModeFeatureEnabled;
     if(typeof s.footerInfoEnabled === "boolean") SETTINGS.footerInfoEnabled = s.footerInfoEnabled;
+    if(typeof s.dailyRecapAutoEnabled === "boolean") SETTINGS.dailyRecapAutoEnabled = s.dailyRecapAutoEnabled;
     if(s.stickerReactionsEnabled && typeof s.stickerReactionsEnabled === "object"){
       ["konfirmasi","hoax","deposit","void"].forEach(k=>{
         if(typeof s.stickerReactionsEnabled[k] === "boolean") SETTINGS.stickerReactionsEnabled[k] = s.stickerReactionsEnabled[k];
@@ -7840,6 +7861,13 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // bayar/Kembalian di gambar nota, TIDAK pernah dikirim ke server. Sekarang
     // ikut dikumpulkan supaya bisa dikirim & dicatat di Rincian Pemesanan.
     const kelebihanNum = parseRp(document.getElementById(pfx+"-kelebihan").value) || 0;
+    // Total Qty & Total Berat -- dibaca APA ADANYA dari teks yang sudah
+    // tampil di ringkasan (bukan dihitung ulang di sini), PERSIS sama
+    // dengan yang ada di gambar nota. Dikirim ke server MURNI buat
+    // laporan ke petugas logistik (lihat handleStickerButtonPress
+    // "konfirmasi" di worker) -- bukan dipakai buat hitung ulang apa pun.
+    const totalQtyLabel = document.getElementById(pfx+"-totalqty").textContent || "";
+    const totalBeratLabel = document.getElementById(pfx+"-totalberat").textContent || "";
 
     const signature = computeNotaSignature(tab, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate);
     let imageDataUrl;
@@ -7850,7 +7878,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       imageDataUrl = canvas.toDataURL("image/png");
       _notaImageCache = { tab, signature, imageDataUrl };
     }
-    return { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, imageDataUrl };
+    return { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, totalQtyLabel, totalBeratLabel, imageDataUrl };
   }
 
   /* ---------- Autosave draft ke server ----------
@@ -7984,7 +8012,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     statusEl.textContent = "Menyiapkan gambar nota…";
 
     try{
-      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, totalQtyLabel, totalBeratLabel, imageDataUrl } = await collectNotaPayload();
 
       statusEl.textContent = "Mengirim ke grup Telegram…";
       const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
@@ -8003,6 +8031,8 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           ekspedisi: ekspedisiName,
           deliveryDate,
           kelebihanBayarSebelumnya: kelebihanNum,
+          totalQtyLabel,
+          totalBeratLabel,
           isRevisi: !!(revisiCheck && revisiCheck.checked),
           revisiTargetMessageId: pendingRevisiTargetMessageId,
         }),
@@ -10790,6 +10820,13 @@ if ("serviceWorker" in navigator) {
     if(typeof e.subsidiKhusus !== "boolean"){ e.subsidiKhusus = isIdtruckLegacy; ch = true; }
     if(typeof e.subsidiPersenOngkir !== "number"){ e.subsidiPersenOngkir = 20; ch = true; }
     if(typeof e.subsidiPersenBatas !== "number"){ e.subsidiPersenBatas = 80; ch = true; }
+    // ID Telegram + nama petugas logistik ekspedisi ini -- dipakai buat
+    // kirim DM laporan otomatis begitu Finance approve (Konfirmasi) sebuah
+    // Rincian Pemesanan (lihat handleStickerButtonPress "konfirmasi" di
+    // worker) -- laporan cuma dikirim ke logistik ekspedisi YANG DIPAKAI
+    // pesanan itu, bukan ke semua petugas logistik sekaligus.
+    if(typeof e.logistikId !== "string"){ e.logistikId = ""; ch = true; }
+    if(typeof e.logistikName !== "string"){ e.logistikName = ""; ch = true; }
     return ch;
   }
   function applyProdukDefaults(p){
@@ -10979,6 +11016,23 @@ if ("serviceWorker" in navigator) {
       saveSettings();
       applySettingsToDom();
       await confirmMasterDataSave(SETTINGS.footerInfoEnabled ? "Info footer (rekening & masa berlaku) ditampilkan." : "Info footer (rekening & masa berlaku) disembunyikan.");
+    });
+  }
+
+  /* ---------- toggle Rekap Invoice Harian Otomatis (Tampilan) ----------
+     Murni disimpan ke settings.dailyRecapAutoEnabled -- DIBACA & dicek
+     oleh WORKER (checkDailyCsRecap), bukan diproses di app ini sama
+     sekali. Nonaktif = cron otomatisnya dilewati, tapi command manual
+     ("rekap"/"hasil"/"laporan"/"lapor"/"data" di DM bot) tetap jalan
+     apa pun nilai toggle ini -- jadi TIDAK ada applySettingsToDom() yang
+     perlu dipanggil di sini (tidak ada elemen DOM app yang berubah). */
+  const toggleDailyRecap = document.getElementById("md-toggle-dailyrecap");
+  if(toggleDailyRecap){
+    toggleDailyRecap.checked = SETTINGS.dailyRecapAutoEnabled;
+    toggleDailyRecap.addEventListener("change", async ()=>{
+      SETTINGS.dailyRecapAutoEnabled = toggleDailyRecap.checked;
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.dailyRecapAutoEnabled ? "Rekap invoice harian otomatis diaktifkan." : "Rekap invoice harian otomatis dimatikan (command manual tetap bisa dipakai).");
     });
   }
 
@@ -11961,6 +12015,8 @@ if ("serviceWorker" in navigator) {
     document.getElementById("md-ed-subsidikhusus").checked = !!e.subsidiKhusus;
     document.getElementById("md-ed-subsidipersen").value = e.subsidiPersenOngkir ?? 20;
     document.getElementById("md-ed-subsidibatas").value = e.subsidiPersenBatas ?? 80;
+    document.getElementById("md-ed-logistiknama").value = e.logistikName || "";
+    document.getElementById("md-ed-logistikid").value = e.logistikId || "";
     updateEkspedisiDetailPreview();
     edOverlay.hidden = false;
   }
@@ -11973,6 +12029,8 @@ if ("serviceWorker" in navigator) {
     e.subsidiKhusus = document.getElementById("md-ed-subsidikhusus").checked;
     e.subsidiPersenOngkir = parseFloat(document.getElementById("md-ed-subsidipersen").value)||0;
     e.subsidiPersenBatas = parseFloat(document.getElementById("md-ed-subsidibatas").value)||0;
+    e.logistikName = document.getElementById("md-ed-logistiknama").value.trim();
+    e.logistikId = document.getElementById("md-ed-logistikid").value.trim();
     edOverlay.hidden = true;
     await refreshAfterDataChange("Rumus ekspedisi \"" + e.name + "\" disimpan.");
   });
