@@ -587,10 +587,17 @@
     padding:11px 14px;background:var(--card);margin-bottom:12px;
   }
   .ongkir-simple-eksp label{font-weight:700;font-size:13px;color:var(--ink);white-space:nowrap;margin:0;flex-shrink:0;}
-  .ongkir-simple-eksp .combo-wrap{flex:1;position:relative;display:flex;align-items:center;}
+  /* align-self:stretch WAJIB ada -- tanpa ini .combo-wrap (posisi:relative,
+     jadi acuan ".combo-list{top:100%}") cuma setinggi isinya sendiri (jadi
+     lebih pendek dari kartu "Ekspedisi" yang punya padding 11px atas-bawah),
+     akibatnya daftar dropdown nongol NYANGKUT/OVERLAP ke tengah kartu,
+     bukan rapi di bawahnya -- ini penyebab bug "list ekspedisi tidak bisa
+     discroll/kepotong" yang dilaporkan. Dengan stretch, tinggi .combo-wrap
+     disamakan PERSIS dengan tinggi kartu, jadi titik acuan "100%"-nya benar. */
+  .ongkir-simple-eksp .combo-wrap{flex:1;position:relative;display:flex;align-items:center;align-self:stretch;}
   .ongkir-simple-eksp .combo-input{
-    width:100%;border:none;background:transparent;text-align:right;
-    font-weight:700;font-size:13.5px;color:var(--ink);padding:2px 20px 2px 0;cursor:pointer;
+    width:100%;border:none;background:transparent;text-align:left;
+    font-weight:700;font-size:13.5px;color:var(--ink);padding:2px 20px 2px 4px;cursor:pointer;
   }
   .ongkir-simple-eksp .combo-input:focus{outline:none;}
   .ongkir-simple-eksp .combo-wrap::after{
@@ -599,6 +606,10 @@
     border-right:2px solid var(--ink-soft);border-bottom:2px solid var(--ink-soft);
     transform:translateY(-65%) rotate(45deg);pointer-events:none;
   }
+  /* Font nama ekspedisi di daftar dropdown -- HANYA yang di dalam kartu
+     Ekspedisi versi ringkas ini (.ongkir-simple-eksp), tidak menyentuh
+     .combo-item di tempat lain (field Produk, versi HP, dst). 13.5px + 5. */
+  .ongkir-simple-eksp .combo-item{font-size:18.5px;padding:12px 12px;}
   .ongkir-simple-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
   .ongkir-simple-box{
     border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;
@@ -3200,7 +3211,8 @@
     box-shadow:
       0 12px 30px rgba(0,0,0,.10);
 
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .combo-item {
