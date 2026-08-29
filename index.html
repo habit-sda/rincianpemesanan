@@ -5244,7 +5244,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.24.4</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.24.5</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5429,7 +5429,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.24.4 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.24.5 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug: popup "Perbarui Sekarang" muncul terus-menerus, tidak pernah sampai ke "Sudah Versi Terbaru"</b> — penyebabnya perbandingan teks versi yang formatnya beda: footer nulis nomor versi tanpa huruf "v" di depan (mis. "2.24.5"), sedangkan Riwayat Update pakai huruf "v" (mis. "v2.24.5"). Kode lama membandingkan dua teks itu apa adanya, jadi walau angkanya sama app tetap mengira selalu ada versi baru. Sekarang perbandingan dilakukan berdasarkan angka versinya saja (bukan teks mentah), jadi prefix "v" tidak lagi bikin salah deteksi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.24.4</div>
           <ul>
             <li><b>Rapikan menu Master Data (lanjutan)</b> — 5 pengaturan yang isinya sebenarnya terkait Finance tapi masih nyempil di tab "Tampilan" sekarang dipindah ke tab <b>💰 Finance</b>: "Rekap Invoice Harian Otomatis (DM ke CS &amp; Finance)", "Cocok Otomatis Bukti Transfer (DM Bot)", "Isi Nama Otomatis (Foto Tanpa Caption)", "Tampilkan Nominal di Caption Bukti Transfer", dan "Tombol Cepat Finance (Konfirmasi/Hoax/Deposit/Void)". Tidak ada perubahan fungsi/data/id elemen sama sekali, cuma lokasi menunya di tab Finance.</li>
           </ul>
@@ -9202,6 +9208,18 @@ if ("serviceWorker" in navigator) {
     if(!a || !b) return false; // format tak dikenal -> aman-nya anggap BUKAN patch, tetap tampilkan popup
     return a.major === b.major && a.minor === b.minor && a.patch !== b.patch;
   }
+  // true kalau dua string versi MERUJUK KE ANGKA YANG SAMA, walau formatnya
+  // beda (mis. "v2.24.4" dari Riwayat Update vs "2.24.4" tanpa prefix "v"
+  // dari footer #app-current-version) -- perbandingan string mentah (===)
+  // di sini SENGAJA dihindari karena dua sumber itu tidak selalu sama
+  // formatnya, dan kalau dibandingkan mentah-mentah app jadi mengira selalu
+  // ada versi baru padahal sebenarnya sama (popup "Perbarui Sekarang" tidak
+  // pernah berhenti muncul, "Sudah Versi Terbaru" tidak pernah kelihatan).
+  function versionsEqual(a, b){
+    const pa = parseVersion(a), pb = parseVersion(b);
+    if(!pa || !pb) return String(a || "") === String(b || "");
+    return pa.major === pb.major && pa.minor === pb.minor && pa.patch === pb.patch;
+  }
   function getCurrentAppVersion(){
     const el = document.getElementById("app-current-version");
     return el ? el.textContent.trim() : null;
@@ -9341,7 +9359,7 @@ if ("serviceWorker" in navigator) {
         showMsg("Gagal mengecek pembaruan (coba lagi nanti).", true);
         return;
       }
-      if(info.version === currentVersion){
+      if(versionsEqual(info.version, currentVersion)){
         showUpToDatePopup(currentVersion);
         return;
       }
