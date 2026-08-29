@@ -5244,6 +5244,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <button id="tgid-close" class="calc-close" aria-label="Tutup">✕</button>
       </div>
       <div class="confirm-body">
+        <p id="tgid-autonote" hidden style="background:#eaf4fb;border:1px solid var(--primary-green);border-radius:8px;padding:8px 10px;color:var(--ink);font-size:12.5px;">✅ Terdeteksi otomatis dari akun Telegram kamu (dibuka lewat bot) — biasanya tidak perlu diubah, tapi tetap bisa kamu ganti manual kalau perlu.</p>
         <p>Diisi sekali per HP/browser dengan <b>angka ID Telegram</b> kamu (cek lewat bot <b>@userinfobot</b> — chat dia, dia balas angkanya). Dipakai sebagai label "dikirim oleh" saat bukti nota dikirim ke grup Telegram. Kalau kamu memang member grup itu, sistem otomatis tampilkan <b>username asli</b> kamu di sana, bukan angkanya.</p>
         <label for="tgid-input" style="font-size:12px;font-weight:700;color:var(--ink-soft);">ID Telegram (angka)</label>
         <input type="text" id="tgid-input" class="kt-input" placeholder="mis. 216663781" autocomplete="off" inputmode="numeric">
@@ -6231,6 +6232,35 @@ function getTelegramTopicId(){
 function setTelegramTopicId(val){
   try{ localStorage.setItem(TELEGRAM_TOPIC_ID_KEY, (val || "").trim()); }catch(e){}
 }
+
+/* ---------- Auto-deteksi "ID Telegram Saya" kalau dibuka via Mini App bot ----------
+   Kalau app dibuka lewat tombol "Open App" bot Telegram (bukan browser/PWA
+   biasa), Telegram Mini App SDK otomatis kasih tahu siapa yang lagi buka
+   lewat tg.initDataUnsafe.user.id -- dipakai di sini buat ngisi/nimpa
+   "ID Telegram Saya" OTOMATIS tiap kali dibuka lewat Telegram, supaya user
+   TIDAK PERLU isi/simpan manual lagi lewat menu footer.
+   Kalau dibuka DI LUAR Telegram (browser/PWA biasa, tg atau initDataUnsafe.
+   user tidak ada) -- tidak disentuh sama sekali, tetap harus diisi manual
+   seperti biasa lewat menu "ID Telegram Saya" (perilaku lama, tidak berubah).
+   CATATAN KEAMANAN: initDataUnsafe TIDAK diverifikasi tanda tangannya
+   (makanya namanya "unsafe") -- bisa saja dipalsukan orang yang paham
+   DevTools. Ini tetap aman dipakai di sini karena levelnya cuma "label
+   nama pengirim" saat nota dikirim ke grup, BUKAN kunci otorisasi/akses
+   apa pun -- levelnya sama persis dengan kalau user isi manual sendiri
+   (yang juga sama sekali tidak diverifikasi). Kalau suatu saat butuh
+   identitas yang benar-benar terverifikasi, itu harus dicek di sisi
+   Worker pakai tg.initData (string bertanda tangan), bukan initDataUnsafe. */
+let TELEGRAM_SENDER_AUTO_DETECTED = false;
+(function(){
+  try{
+    const tg = window.Telegram && window.Telegram.WebApp;
+    const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+    if(tgUser && tgUser.id){
+      setTelegramSenderId(String(tgUser.id));
+      TELEGRAM_SENDER_AUTO_DETECTED = true;
+    }
+  }catch(e){ console.log("Auto-deteksi ID Telegram dilewati:", e); }
+})();
 
 const SETTINGS_KEY = "notaHalawa_settings";
 const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true};
@@ -7645,6 +7675,8 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     input.value = getTelegramSenderId();
     topicInput.value = getTelegramTopicId();
     statusEl.textContent = "";
+    const autoNote = document.getElementById("tgid-autonote");
+    if(autoNote) autoNote.hidden = !TELEGRAM_SENDER_AUTO_DETECTED;
     overlay.hidden = false;
     setTimeout(()=> input.focus(), 50);
   }
