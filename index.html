@@ -114,7 +114,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Habit">
+<meta name="apple-mobile-web-app-title" content="Rp">
 <link rel="apple-touch-icon" href="icon-180x180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
@@ -4671,6 +4671,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <button class="md-tab" data-md-tab="tampilan">⚙️ Tampilan</button>
       <button class="md-tab" data-md-tab="rumus">🧮 Rumus</button>
       <button class="md-tab" data-md-tab="keamanan">🔒 Keamanan PIN</button>
+      <button class="md-tab" data-md-tab="finance">💰 Finance</button>
       <button class="md-tab" data-md-tab="namacustomer">👤 Master Nama</button>
     </div>
 
@@ -4730,6 +4731,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <input type="text" id="md-ekspedisi-search" class="kt-input" placeholder="🔍 Cari nama ekspedisi..." autocomplete="off" style="margin-bottom:10px;">
         <div id="md-ekspedisi-list"></div>
         <button class="md-addrow" id="md-ekspedisi-add">+ Tambah ekspedisi</button>
+      </div>
+      <div class="md-card" id="md-logistik-card">
+        <h3>Daftar Logistik</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Begitu Finance klik tombol <b>Konfirmasi</b> di bukti transfer grup, bot otomatis DM ringkasan pesanan (customer, CS, Qty, Berat, ekspedisi) ke <b>semua</b> orang di daftar ini — bukan per-ekspedisi, cukup 1 daftar utama. Isi Telegram ID numerik (bukan username), bisa didapat lewat bot seperti @userinfobot. Boleh isi lebih dari 1 orang.
+        </div>
+        <div id="md-logistik-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input type="text" id="md-logistik-name" placeholder="Nama (mis. Fulan)" style="flex:1; min-width:120px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+          <input type="text" inputmode="numeric" id="md-logistik-id" placeholder="Telegram ID (angka)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+        </div>
+        <div class="md-pin-err" id="md-logistik-err"></div>
+        <button class="md-btn primary" id="md-logistik-add" style="margin-top:10px;">+ Tambah Petugas Logistik</button>
       </div>
       <div class="md-card md-pinform">
         <h3>Ambang cross-check resi vs ongkir</h3>
@@ -4841,20 +4855,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
       </div>
       <div class="md-card">
-        <h3>Rekap Invoice Harian Otomatis (DM ke CS &amp; Finance)</h3>
-        <div class="md-togglerow">
-          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-          <div class="md-togglerow-text">
-            <div class="md-togglerow-label">Kirim otomatis terjadwal</div>
-            <div class="md-togglerow-sub">Aktif: bot kirim DM rekap invoice harian otomatis sesuai jadwal (default Senin-Kamis 15.30, Jumat 14.30, Sabtu 11.30 WIB, bisa diatur per-orang lewat "/aturjadwal" di DM bot). Nonaktif: kirim otomatis dimatikan — tapi CS/Finance TETAP bisa minta manual kapan saja lewat DM bot, cukup ketik "rekap"/"hasil"/"laporan"/"lapor"/"data".</div>
-          </div>
-          <label class="md-switch">
-            <input type="checkbox" id="md-toggle-dailyrecap">
-            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
-          </label>
-        </div>
-      </div>
-      <div class="md-card">
         <h3>Tombol Simpan/Batal (form Tambah/Edit produk)</h3>
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M4 15h16" stroke="var(--primary-green)" stroke-width="1.6"/></svg></div>
@@ -4930,6 +4930,90 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           </label>
         </div>
       </div>
+    </div>
+
+    <div class="md-section" id="md-sec-rumus">
+      <div class="md-card md-pinform">
+        <h3>Batas tier diskon Grosir</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Tab <b>Penjualan (Grosir)</b> otomatis memilih tier diskon berdasarkan
+          <b>total jumlah karton</b> dalam satu pesanan (dijumlah dari semua produk).
+          Angka diskon &amp; subsidi ongkir tiap tier tetap diatur per produk lewat
+          ikon 🖼️ "Detail" di tab Produk — di sini cuma atur BATAS jumlahnya.
+        </div>
+        <label>Tier 1 berlaku untuk jumlah di bawah</label>
+        <input type="number" inputmode="numeric" id="md-tier-batas1" min="1" style="max-width:140px;">
+        <label>Tier 2 berlaku untuk jumlah di bawah</label>
+        <input type="number" inputmode="numeric" id="md-tier-batas2" min="2" style="max-width:140px;">
+        <div class="md-note" id="md-tier-preview" style="margin-top:12px;font-weight:700;color:var(--ink);"></div>
+        <div class="md-pin-err" id="md-tier-err"></div>
+        <button class="md-btn primary" id="md-tier-save">Simpan batas tier</button>
+      </div>
+      <div class="md-card md-pinform">
+        <h3>Rumus lain yang bisa diatur</h3>
+        <div class="md-note">
+          Aturan <b>pembulatan berat</b>, <b>minimum charge (kg)</b>, dan <b>skema subsidi ongkir khusus</b>
+          diatur per ekspedisi — buka tab 🚚 Ekspedisi, lalu ketuk ikon 🧮 di baris ekspedisi yang mau diubah.
+        </div>
+        <div class="md-note" style="margin-top:8px;">
+          Isi per Karton (dipakai untuk pecahan harga per Sachet/Renteng/Pack di ringkasan Penjualan)
+          diatur per produk — buka tab 📦 Produk, lalu ketuk ikon 🖼️ Detail di baris produk yang mau diubah.
+        </div>
+        <div class="md-note" style="margin-top:8px;opacity:.75;">
+          Catatan: label tier "Reseller/Grosir" di rujukan lama file ini sudah tidak aktif sejak filenya dibuat
+          (selalu "Reseller" apa pun jumlah pesanannya) — bukan bug baru, sengaja direplikasi apa adanya.
+        </div>
+      </div>
+    </div>
+
+    <div class="md-section" id="md-sec-keamanan">
+      <div class="md-card md-pinform">
+        <h3>Ubah PIN</h3>
+        <label>PIN saat ini</label>
+        <input type="password" inputmode="numeric" maxlength="6" id="md-pin-old">
+        <label>PIN baru (6 digit)</label>
+        <input type="password" inputmode="numeric" maxlength="6" id="md-pin-new">
+        <label>Ulangi PIN baru</label>
+        <input type="password" inputmode="numeric" maxlength="6" id="md-pin-new2">
+        <div class="md-pin-err" id="md-pin-change-err"></div>
+        <div>
+          <button class="md-btn primary" id="md-pin-save">Simpan PIN baru</button>
+          <button class="md-btn danger" id="md-pin-reset-btn">Reset ke PIN bawaan</button>
+        </div>
+        <div class="md-note">Kalau PIN lupa, gunakan tombol "Lupa PIN?" di layar buka Master Data — otomatis kembali ke PIN bawaan (hubungi pengelola sistem kalau tidak tahu PIN bawaannya).</div>
+      </div>
+    </div>
+
+    <div class="md-section" id="md-sec-finance">
+      <div class="md-card" id="md-finance-card">
+        <h3>Daftar Finance</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Orang yang balasan/reaksinya di grup Telegram (ke foto Rincian Pemesanan atau bukti transfer) dianggap sistem sebagai <b>konfirmasi pembayaran resmi</b> — dicatat waktunya untuk audit. Isi Telegram ID numerik masing-masing (bukan username), bisa didapat lewat bot seperti @userinfobot.
+        </div>
+        <div id="md-finance-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input type="text" id="md-finance-name" placeholder="Nama (mis. Fulanah)" style="flex:1; min-width:120px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+          <input type="text" inputmode="numeric" id="md-finance-id" placeholder="Telegram ID (angka)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+        </div>
+        <input type="text" id="md-finance-ttd" placeholder="Link Tanda Tangan (URL gambar, opsional)" style="width:100%; box-sizing:border-box; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card); margin-top:8px;">
+        <div class="md-note" style="margin-top:6px;">Tempel link gambar tanda tangan (bukan unggah file) — dipakai otomatis saat Finance ini dipilih di popup Kwitansi. Bisa dikosongkan dulu lalu diisi/diubah belakangan lewat kolom di tiap baris daftar di bawah.</div>
+        <div class="md-pin-err" id="md-finance-err"></div>
+        <button class="md-btn primary" id="md-finance-add" style="margin-top:10px;">+ Tambah Finance</button>
+      </div>
+      <div class="md-card">
+        <h3>Rekap Invoice Harian Otomatis (DM ke CS &amp; Finance)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Kirim otomatis terjadwal</div>
+            <div class="md-togglerow-sub">Aktif: bot kirim DM rekap invoice harian otomatis sesuai jadwal (default Senin-Kamis 15.30, Jumat 14.30, Sabtu 11.30 WIB, bisa diatur per-orang lewat "/aturjadwal" di DM bot). Nonaktif: kirim otomatis dimatikan — tapi CS/Finance TETAP bisa minta manual kapan saja lewat DM bot, cukup ketik "rekap"/"hasil"/"laporan"/"lapor"/"data".</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-dailyrecap">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
       <div class="md-card">
         <h3>Cocok Otomatis Bukti Transfer (DM Bot)</h3>
         <div class="md-togglerow">
@@ -4949,7 +5033,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.4" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
           <div class="md-togglerow-text">
-            <div class="md-togglerow-label">Aktifkan hapus & kirim ulang otomatis</div>
+            <div class="md-togglerow-label">Aktifkan hapus &amp; kirim ulang otomatis</div>
             <div class="md-togglerow-sub">Foto bukti transfer TANPA caption yang di-reply ke Rincian Pemesanan di grup dihapus lalu dikirim ulang bot dengan caption = nama customer. Nonaktif = foto tanpa caption dibiarkan APA ADANYA total (tidak dihapus/repost, tidak dibaca vision, tidak dapat reaction ✅/⚠️) — dan baris "Total: Rp..." di caption Rincian Pemesanan ikut disembunyikan. Foto yang SUDAH ada caption sendiri tidak terpengaruh toggle ini.</div>
           </div>
           <label class="md-switch">
@@ -4964,7 +5048,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M7 12h4M15 10v4M13 12h4" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
           <div class="md-togglerow-text">
             <div class="md-togglerow-label">Tambahkan baris nominal</div>
-            <div class="md-togglerow-sub">Berlaku saat bot hapus & kirim ulang foto bukti transfer tanpa caption (lihat toggle "Isi Nama Otomatis" di atas) — caption jadi 2 baris, contoh: "Fulan" lalu "BUKTI TRANSFER: Rp 737.000". Nonaktif = caption cuma nama seperti biasa. Kalau nominalnya tidak kebaca vision, baris ini tetap dilewati apapun nilai toggle ini.</div>
+            <div class="md-togglerow-sub">Berlaku saat bot hapus &amp; kirim ulang foto bukti transfer tanpa caption (lihat toggle "Isi Nama Otomatis" di atas) — caption jadi 2 baris, contoh: "Fulan" lalu "BUKTI TRANSFER: Rp 737.000". Nonaktif = caption cuma nama seperti biasa. Kalau nominalnya tidak kebaca vision, baris ini tetap dilewati apapun nilai toggle ini.</div>
           </div>
           <label class="md-switch">
             <input type="checkbox" id="md-toggle-shownominalcaption">
@@ -5019,73 +5103,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <label class="md-radio-chip"><input type="radio" name="md-stk-labelstyle" id="md-stk-labelstyle-text" value="text"> Teks + emoji (⚡ Aksi Finance)</label>
           <label class="md-radio-chip"><input type="radio" name="md-stk-labelstyle" id="md-stk-labelstyle-icon" value="icon"> Emoji saja (⚡)</label>
         </div>
-      </div>
-      <div class="md-card" id="md-finance-card">
-        <h3>Daftar Finance</h3>
-        <div class="md-note" style="margin-bottom:12px;">
-          Orang yang balasan/reaksinya di grup Telegram (ke foto Rincian Pemesanan atau bukti transfer) dianggap sistem sebagai <b>konfirmasi pembayaran resmi</b> — dicatat waktunya untuk audit. Isi Telegram ID numerik masing-masing (bukan username), bisa didapat lewat bot seperti @userinfobot.
-        </div>
-        <div id="md-finance-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <input type="text" id="md-finance-name" placeholder="Nama (mis. Fulanah)" style="flex:1; min-width:120px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
-          <input type="text" inputmode="numeric" id="md-finance-id" placeholder="Telegram ID (angka)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
-        </div>
-        <input type="text" id="md-finance-ttd" placeholder="Link Tanda Tangan (URL gambar, opsional)" style="width:100%; box-sizing:border-box; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card); margin-top:8px;">
-        <div class="md-note" style="margin-top:6px;">Tempel link gambar tanda tangan (bukan unggah file) — dipakai otomatis saat Finance ini dipilih di popup Kwitansi. Bisa dikosongkan dulu lalu diisi/diubah belakangan lewat kolom di tiap baris daftar di bawah.</div>
-        <div class="md-pin-err" id="md-finance-err"></div>
-        <button class="md-btn primary" id="md-finance-add" style="margin-top:10px;">+ Tambah Finance</button>
-      </div>
-    </div>
-
-    <div class="md-section" id="md-sec-rumus">
-      <div class="md-card md-pinform">
-        <h3>Batas tier diskon Grosir</h3>
-        <div class="md-note" style="margin-bottom:12px;">
-          Tab <b>Penjualan (Grosir)</b> otomatis memilih tier diskon berdasarkan
-          <b>total jumlah karton</b> dalam satu pesanan (dijumlah dari semua produk).
-          Angka diskon &amp; subsidi ongkir tiap tier tetap diatur per produk lewat
-          ikon 🖼️ "Detail" di tab Produk — di sini cuma atur BATAS jumlahnya.
-        </div>
-        <label>Tier 1 berlaku untuk jumlah di bawah</label>
-        <input type="number" inputmode="numeric" id="md-tier-batas1" min="1" style="max-width:140px;">
-        <label>Tier 2 berlaku untuk jumlah di bawah</label>
-        <input type="number" inputmode="numeric" id="md-tier-batas2" min="2" style="max-width:140px;">
-        <div class="md-note" id="md-tier-preview" style="margin-top:12px;font-weight:700;color:var(--ink);"></div>
-        <div class="md-pin-err" id="md-tier-err"></div>
-        <button class="md-btn primary" id="md-tier-save">Simpan batas tier</button>
-      </div>
-      <div class="md-card md-pinform">
-        <h3>Rumus lain yang bisa diatur</h3>
-        <div class="md-note">
-          Aturan <b>pembulatan berat</b>, <b>minimum charge (kg)</b>, dan <b>skema subsidi ongkir khusus</b>
-          diatur per ekspedisi — buka tab 🚚 Ekspedisi, lalu ketuk ikon 🧮 di baris ekspedisi yang mau diubah.
-        </div>
-        <div class="md-note" style="margin-top:8px;">
-          Isi per Karton (dipakai untuk pecahan harga per Sachet/Renteng/Pack di ringkasan Penjualan)
-          diatur per produk — buka tab 📦 Produk, lalu ketuk ikon 🖼️ Detail di baris produk yang mau diubah.
-        </div>
-        <div class="md-note" style="margin-top:8px;opacity:.75;">
-          Catatan: label tier "Reseller/Grosir" di rujukan lama file ini sudah tidak aktif sejak filenya dibuat
-          (selalu "Reseller" apa pun jumlah pesanannya) — bukan bug baru, sengaja direplikasi apa adanya.
-        </div>
-      </div>
-    </div>
-
-    <div class="md-section" id="md-sec-keamanan">
-      <div class="md-card md-pinform">
-        <h3>Ubah PIN</h3>
-        <label>PIN saat ini</label>
-        <input type="password" inputmode="numeric" maxlength="6" id="md-pin-old">
-        <label>PIN baru (6 digit)</label>
-        <input type="password" inputmode="numeric" maxlength="6" id="md-pin-new">
-        <label>Ulangi PIN baru</label>
-        <input type="password" inputmode="numeric" maxlength="6" id="md-pin-new2">
-        <div class="md-pin-err" id="md-pin-change-err"></div>
-        <div>
-          <button class="md-btn primary" id="md-pin-save">Simpan PIN baru</button>
-          <button class="md-btn danger" id="md-pin-reset-btn">Reset ke PIN bawaan</button>
-        </div>
-        <div class="md-note">Kalau PIN lupa, gunakan tombol "Lupa PIN?" di layar buka Master Data — otomatis kembali ke PIN bawaan (hubungi pengelola sistem kalau tidak tahu PIN bawaannya).</div>
       </div>
     </div>
 
@@ -5207,15 +5224,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <label>Batas subsidi produk, maks % dari ongkir</label>
         <input type="number" inputmode="numeric" id="md-ed-subsidibatas" min="0" max="100" style="max-width:140px;">
         <div class="md-note" id="md-ed-preview" style="margin-top:10px;font-weight:700;color:var(--ink);"></div>
-
-        <label style="margin-top:14px;">Nama petugas logistik ekspedisi ini</label>
-        <input type="text" id="md-ed-logistiknama" placeholder="mis. Pak Herry">
-        <label style="margin-top:8px;">ID Telegram petugas logistik</label>
-        <input type="text" inputmode="numeric" id="md-ed-logistikid" placeholder="mis. 123456789">
-        <div class="md-note">Isi buat aktifkan laporan otomatis ke petugas logistik ini via DM, tiap kali Finance approve (Konfirmasi) pesanan yang pakai ekspedisi ini. Kosongkan kalau belum ada/tidak perlu. Cek ID lewat bot <b>@userinfobot</b> di Telegram.</div>
       </div>
       <button class="md-modal-primary" id="md-ed-save">Simpan rumus</button>
       <button class="md-modal-secondary" id="md-ed-cancel">Batal</button>
+
     </div>
   </div>
 
@@ -5232,7 +5244,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.23.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.24.4</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5353,7 +5365,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
 
         <div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);">
           <label for="kw-penyetuju-select" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Tanda tangan (Disetujui oleh)</label>
-          <p class="kt-hint" style="margin-top:2px;">Pilih dari Daftar Finance (Master Data → Tampilan) — tanda tangannya otomatis terpakai sesuai link yang diisi di sana.</p>
+          <p class="kt-hint" style="margin-top:2px;">Pilih dari Daftar Finance (Master Data → Finance) — tanda tangannya otomatis terpakai sesuai link yang diisi di sana.</p>
           <select id="kw-penyetuju-select" class="kt-input"></select>
           <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
             <div id="kw-ttd-preview-wrap" style="width:84px;height:52px;border:1px dashed var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;flex-shrink:0;">
@@ -5417,7 +5429,38 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.23.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.24.4 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Rapikan menu Master Data (lanjutan)</b> — 5 pengaturan yang isinya sebenarnya terkait Finance tapi masih nyempil di tab "Tampilan" sekarang dipindah ke tab <b>💰 Finance</b>: "Rekap Invoice Harian Otomatis (DM ke CS &amp; Finance)", "Cocok Otomatis Bukti Transfer (DM Bot)", "Isi Nama Otomatis (Foto Tanpa Caption)", "Tampilkan Nominal di Caption Bukti Transfer", dan "Tombol Cepat Finance (Konfirmasi/Hoax/Deposit/Void)". Tidak ada perubahan fungsi/data/id elemen sama sekali, cuma lokasi menunya di tab Finance.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.24.3</div>
+          <ul>
+            <li><b>Rapikan menu Master Data</b> — supaya tab "Tampilan" tidak bercampur/ambigu isinya: <b>"Daftar Finance"</b> dipindah ke tab baru <b>💰 Finance</b> (berdiri sendiri), dan <b>"Daftar Logistik"</b> dipindah ke tab <b>🚚 Ekspedisi</b> (di bawah daftar ekspedisi). Tab "Tampilan" sekarang murni berisi pengaturan tampilan/toggle saja. Tidak ada perubahan fungsi/data, cuma lokasi menunya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.24.2</div>
+          <ul>
+            <li><b>Nama aplikasi saat di-install (iOS)</b> diubah dari "Habit" jadi "Rp" — cuma nama ikon di homescreen (meta <code>apple-mobile-web-app-title</code>), semua teks di dalam app (footer, sidebar, dll) tidak berubah. <b>Catatan: untuk Android/Chrome/desktop, nama install diatur di <code>manifest.json</code> (field <code>name</code>/<code>short_name</code>) — file itu belum diubah, perlu diedit terpisah.</b></li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.24.1</div>
+          <ul>
+            <li><b>Laporan logistik dirombak: 1 daftar utama, bukan per-ekspedisi</b> — field "Nama/ID petugas logistik" yang sebelumnya diisi per-baris ekspedisi (tab 🚚 Ekspedisi) dihapus, diganti <b>Master Data → Tampilan → "Daftar Logistik"</b> (gaya sama seperti Daftar Finance): 1 daftar, bisa isi lebih dari 1 orang/ID. Begitu Finance klik Konfirmasi, bot DM laporan ke <b>SEMUA</b> orang di daftar itu (bukan cuma 1 kontak sesuai ekspedisi pesanan) — cocok untuk usaha yang logistiknya ditangani internal, bukan per perusahaan ekspedisi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.24.0</div>
+          <ul>
+            <li><b>Laporan otomatis ke petugas logistik</b> — tab 🚚 Ekspedisi → ikon detail di tiap baris sekarang punya field baru "Nama petugas logistik" &amp; "ID Telegram petugas logistik", per-ekspedisi (beda ekspedisi bisa beda kontak). Begitu Finance klik tombol <b>Konfirmasi</b> di bukti transfer grup (bukan Hoax/Deposit/Void), bot otomatis DM petugas logistik ekspedisi yang dipakai pesanan itu: nama customer, CS, Total Qty, Total Berat, dan nama ekspedisi. Cuma dikirim sekali per pesanan (tidak dobel walau ada beberapa cicilan yang di-Konfirmasi). Kalau field logistik ekspedisi itu kosong, dilewati diam-diam. Catatan: Total Qty/Total Berat/CS di laporan ini cuma terisi untuk pesanan yang dibuat setelah update ini — data lama belum punya field ini.</li>
+            <li><b>Toggle "Rekap Invoice Harian Otomatis"</b> — Master Data → Tampilan sekarang punya saklar untuk mematikan/menyalakan kirim rekap invoice harian terjadwal ke DM CS &amp; Finance. Kalau dimatikan, kirim otomatis berhenti, tapi rekap manual tetap bisa diminta kapan saja lewat DM bot (ketik "rekap"/"hasil"/"laporan"/"lapor"/"data", atau "/rekap").</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.23.0</div>
           <ul>
             <li><b>Fitur baru: Revisi Pemesanan</b> — popup "Kirim ke Grup Telegram" sekarang punya checkbox "Revisi Pemesanan". Kalau dicentang, bot otomatis mencari rincian pemesanan LAMA dengan nama customer yang PERSIS sama, menghapusnya dari grup, lalu mengganti dengan rincian baru yang baru saja dikirim. Kalau rincian lama itu ternyata sudah ada bukti transfer/pembayaran masuk, bot TIDAK menghapus otomatis — muncul peringatan supaya dicek/dihapus manual dulu. Kalau nama yang sama punya lebih dari satu rincian lama yang masih aktif (belum lunas), muncul daftar pilihan supaya bisa dipilih manual mana yang mau diganti.</li>
           </ul>
@@ -6283,7 +6326,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -6310,6 +6353,7 @@ function loadSettings(){
     }
     if(s.stickerCollapsedLabelStyle === "text" || s.stickerCollapsedLabelStyle === "icon") SETTINGS.stickerCollapsedLabelStyle = s.stickerCollapsedLabelStyle;
     if(Array.isArray(s.financeList)) SETTINGS.financeList = s.financeList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
+    if(Array.isArray(s.logistikList)) SETTINGS.logistikList = s.logistikList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
     if(typeof s.resiCrossCheckThresholdPercent === "number" && s.resiCrossCheckThresholdPercent > 0) SETTINGS.resiCrossCheckThresholdPercent = s.resiCrossCheckThresholdPercent;
     if(typeof s.resiCrossCheckReactionEnabled === "boolean") SETTINGS.resiCrossCheckReactionEnabled = s.resiCrossCheckReactionEnabled;
     if(typeof s.resiNoNameReminderEnabled === "boolean") SETTINGS.resiNoNameReminderEnabled = s.resiNoNameReminderEnabled;
@@ -8766,7 +8810,7 @@ document.addEventListener("keydown", (e)=>{
   }
 
   /* Isi ulang pilihan "Disetujui oleh" dari Daftar Finance (Master Data →
-     Tampilan) setiap popup dibuka, supaya selalu ikut data terbaru. */
+     Finance) setiap popup dibuka, supaya selalu ikut data terbaru. */
   function renderPenyetujuOptions(){
     const list = Array.isArray(SETTINGS.financeList) ? SETTINGS.financeList : [];
     const prev = elPenyetujuSelect.value;
@@ -10820,13 +10864,6 @@ if ("serviceWorker" in navigator) {
     if(typeof e.subsidiKhusus !== "boolean"){ e.subsidiKhusus = isIdtruckLegacy; ch = true; }
     if(typeof e.subsidiPersenOngkir !== "number"){ e.subsidiPersenOngkir = 20; ch = true; }
     if(typeof e.subsidiPersenBatas !== "number"){ e.subsidiPersenBatas = 80; ch = true; }
-    // ID Telegram + nama petugas logistik ekspedisi ini -- dipakai buat
-    // kirim DM laporan otomatis begitu Finance approve (Konfirmasi) sebuah
-    // Rincian Pemesanan (lihat handleStickerButtonPress "konfirmasi" di
-    // worker) -- laporan cuma dikirim ke logistik ekspedisi YANG DIPAKAI
-    // pesanan itu, bukan ke semua petugas logistik sekaligus.
-    if(typeof e.logistikId !== "string"){ e.logistikId = ""; ch = true; }
-    if(typeof e.logistikName !== "string"){ e.logistikName = ""; ch = true; }
     return ch;
   }
   function applyProdukDefaults(p){
@@ -10913,6 +10950,7 @@ if ("serviceWorker" in navigator) {
     if(window.wizRefreshPos){ window.wizRefreshPos("penjualan"); window.wizRefreshPos("custom"); }
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
     if(window.__renderFinanceList) window.__renderFinanceList();
+    if(window.__renderLogistikList) window.__renderLogistikList();
     // Simpan snapshot versi server yang baru saja kita tahu — jadi acuan
     // buat pushMasterDataToServer() nanti (lihat komentar di fungsi itu).
     window.__lastServerSnapshot = JSON.parse(JSON.stringify({ products: PRODUCTS, ekspedisi: EKSPEDISI, settings: SETTINGS }));
@@ -10958,7 +10996,7 @@ if ("serviceWorker" in navigator) {
     await confirmMasterDataSave(SETTINGS.pasteOrderEnabled ? "Tempel Pesanan (AI) diaktifkan." : "Tempel Pesanan (AI) dinonaktifkan.");
   });
 
-  /* ---------- toggle Cocok Otomatis Bukti Transfer / DM Bot (Tampilan) ----------
+  /* ---------- toggle Cocok Otomatis Bukti Transfer / DM Bot (Finance) ----------
      Murni dibaca oleh worker.js (backend) — tidak ada elemen UI di app ini yang
      perlu disembunyikan/dimunculkan, cuma perlu tersimpan & sinkron ke server. */
   const toggleDmAutoMatch = document.getElementById("md-toggle-dmautomatch");
@@ -10969,7 +11007,7 @@ if ("serviceWorker" in navigator) {
     await confirmMasterDataSave(SETTINGS.dmAutoMatchEnabled ? "Cocok Otomatis Bukti Transfer (DM Bot) diaktifkan." : "Cocok Otomatis Bukti Transfer (DM Bot) dinonaktifkan.");
   });
 
-  /* ---------- toggle Tombol Cepat Finance / stiker (Tampilan) ----------
+  /* ---------- toggle Tombol Cepat Finance / stiker (Finance) ----------
      Murni dibaca oleh worker.js (backend) — sama seperti toggle DM Bot. */
   const toggleDarkMode = document.getElementById("md-toggle-darkmode");
   if(toggleDarkMode){
@@ -11019,7 +11057,7 @@ if ("serviceWorker" in navigator) {
     });
   }
 
-  /* ---------- toggle Rekap Invoice Harian Otomatis (Tampilan) ----------
+  /* ---------- toggle Rekap Invoice Harian Otomatis (Finance) ----------
      Murni disimpan ke settings.dailyRecapAutoEnabled -- DIBACA & dicek
      oleh WORKER (checkDailyCsRecap), bukan diproses di app ini sama
      sekali. Nonaktif = cron otomatisnya dilewati, tapi command manual
@@ -11584,6 +11622,61 @@ if ("serviceWorker" in navigator) {
     window.__renderFinanceList = renderFinanceList; // dipanggil ulang setelah pull data server
   })();
 
+  /* ---------- Daftar Logistik (1 daftar utama, bukan per-ekspedisi —
+     dipakai worker buat DM laporan "pesanan sudah di-ACC Finance"
+     ke SEMUA orang di daftar ini, tiap kali Finance klik Konfirmasi). */
+  (function(){
+    const listEl = document.getElementById("md-logistik-list");
+    const nameInput = document.getElementById("md-logistik-name");
+    const idInput = document.getElementById("md-logistik-id");
+    const errEl = document.getElementById("md-logistik-err");
+    const btnAdd = document.getElementById("md-logistik-add");
+    if(!listEl || !btnAdd) return;
+
+    function renderLogistikList(){
+      if(!Array.isArray(SETTINGS.logistikList) || !SETTINGS.logistikList.length){
+        listEl.innerHTML = `<div class="md-note" style="margin:0;">Belum ada petugas logistik yang ditambahkan.</div>`;
+        return;
+      }
+      listEl.innerHTML = SETTINGS.logistikList.map((f, i)=> `
+        <div style="display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:9px; padding:9px 12px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:110px;">
+            <div style="font-weight:700; font-size:13.5px; color:var(--ink);">${(f.name||"").replace(/</g,"&lt;")}</div>
+            <div style="font-size:11.5px; color:var(--ink-soft);">ID: ${(f.telegramId||"").replace(/</g,"&lt;")}</div>
+          </div>
+          <button type="button" class="md-btn danger md-logistik-del-btn" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
+        </div>
+      `).join("");
+      listEl.querySelectorAll(".md-logistik-del-btn").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const idx = parseInt(btn.dataset.idx, 10);
+          SETTINGS.logistikList.splice(idx, 1);
+          saveSettings();
+          renderLogistikList();
+          await confirmMasterDataSave("Petugas logistik dihapus dari daftar.");
+        });
+      });
+    }
+
+    btnAdd.addEventListener("click", async ()=>{
+      const name = nameInput.value.trim();
+      const telegramId = idInput.value.trim();
+      errEl.textContent = "";
+      if(!name){ errEl.textContent = "Nama wajib diisi."; return; }
+      if(!/^\d+$/.test(telegramId)){ errEl.textContent = "Telegram ID harus berupa angka (bukan username)."; return; }
+      if(!Array.isArray(SETTINGS.logistikList)) SETTINGS.logistikList = [];
+      if(SETTINGS.logistikList.some(f=> f.telegramId === telegramId)){ errEl.textContent = "Telegram ID ini sudah ada di daftar."; return; }
+      SETTINGS.logistikList.push({ name, telegramId });
+      saveSettings();
+      nameInput.value = ""; idInput.value = "";
+      renderLogistikList();
+      await confirmMasterDataSave("Petugas logistik \"" + name + "\" ditambahkan.");
+    });
+
+    renderLogistikList();
+    window.__renderLogistikList = renderLogistikList; // dipanggil ulang setelah pull data server
+  })();
+
   /* ---------- link Bantuan (Tampilan) ---------- */
   const bantuanLinkInput = document.getElementById("md-bantuan-link");
   const bantuanErr = document.getElementById("md-bantuan-err");
@@ -12015,8 +12108,6 @@ if ("serviceWorker" in navigator) {
     document.getElementById("md-ed-subsidikhusus").checked = !!e.subsidiKhusus;
     document.getElementById("md-ed-subsidipersen").value = e.subsidiPersenOngkir ?? 20;
     document.getElementById("md-ed-subsidibatas").value = e.subsidiPersenBatas ?? 80;
-    document.getElementById("md-ed-logistiknama").value = e.logistikName || "";
-    document.getElementById("md-ed-logistikid").value = e.logistikId || "";
     updateEkspedisiDetailPreview();
     edOverlay.hidden = false;
   }
@@ -12029,8 +12120,6 @@ if ("serviceWorker" in navigator) {
     e.subsidiKhusus = document.getElementById("md-ed-subsidikhusus").checked;
     e.subsidiPersenOngkir = parseFloat(document.getElementById("md-ed-subsidipersen").value)||0;
     e.subsidiPersenBatas = parseFloat(document.getElementById("md-ed-subsidibatas").value)||0;
-    e.logistikName = document.getElementById("md-ed-logistiknama").value.trim();
-    e.logistikId = document.getElementById("md-ed-logistikid").value.trim();
     edOverlay.hidden = true;
     await refreshAfterDataChange("Rumus ekspedisi \"" + e.name + "\" disimpan.");
   });
