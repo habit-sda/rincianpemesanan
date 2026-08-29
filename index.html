@@ -568,6 +568,65 @@
   .ongkir-indicator-red.is-filled{border-color:var(--danger-red);background:#fdecea;}
   .ongkir-indicator-red.is-filled .ongkir-indicator-badge{background:var(--danger-red);}
 
+  /* ============ Ongkir versi sederhana (DESKTOP SAJA — Mode Tabel & Mode
+     Kasir, tab Penjualan & Custom) ============
+     Dipakai HANYA di field #pj-*/#cs-* di dalam .entry-col (yang otomatis
+     disembunyikan di HP lewat rule ".entry-col{display:none}" pada media
+     query mobile yang sudah ada) — jadi TIDAK berpengaruh sama sekali ke
+     tampilan wizard HP (yang markup-nya sendiri, id ws-eksp-x/ws-rate-x/dst,
+     class .wiz-fieldcard/.wiz-disclose, beda total dari class di bawah ini).
+     id lama (pj-rate-wrap dkk) & logika lama (setupOngkirExclusive,
+     refreshAllOngkirIndicators toggle class "is-filled") tetap dipakai
+     apa adanya — cuma tampilannya yang dirombak jadi lebih ringkas:
+     1 baris Ekspedisi, 2 kotak Ongkir/Kg + Ongkir Total (Manual)
+     berdampingan, lalu 1 baris Kelebihan bayar. */
+  .ongkir-simple{margin-bottom:10px;}
+  .ongkir-simple-eksp{
+    display:flex;align-items:center;gap:10px;justify-content:space-between;
+    border:1.5px solid var(--primary-green);border-radius:10px;
+    padding:11px 14px;background:var(--card);margin-bottom:12px;
+  }
+  .ongkir-simple-eksp label{font-weight:700;font-size:13px;color:var(--ink);white-space:nowrap;margin:0;flex-shrink:0;}
+  .ongkir-simple-eksp .combo-wrap{flex:1;position:relative;display:flex;align-items:center;}
+  .ongkir-simple-eksp .combo-input{
+    width:100%;border:none;background:transparent;text-align:right;
+    font-weight:700;font-size:13.5px;color:var(--ink);padding:2px 20px 2px 0;cursor:pointer;
+  }
+  .ongkir-simple-eksp .combo-input:focus{outline:none;}
+  .ongkir-simple-eksp .combo-wrap::after{
+    /* chevron dekoratif murni tampilan — select/combobox aslinya tidak diubah */
+    content:"";position:absolute;right:2px;top:50%;width:8px;height:8px;
+    border-right:2px solid var(--ink-soft);border-bottom:2px solid var(--ink-soft);
+    transform:translateY(-65%) rotate(45deg);pointer-events:none;
+  }
+  .ongkir-simple-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .ongkir-simple-box{
+    border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;
+    background:var(--card);transition:border-color .15s,background-color .15s;
+  }
+  .ongkir-simple-box label{display:block;font-size:11.5px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;}
+  .ongkir-simple-input{
+    width:100%;border:none;background:transparent;text-align:right;
+    font-size:15px;font-weight:700;color:var(--ink);padding:0;font-family:'Roboto Mono',monospace;
+  }
+  .ongkir-simple-input::placeholder{color:var(--ink-soft);font-weight:400;}
+  .ongkir-simple-input:focus{outline:none;}
+  .ongkir-simple-box.is-filled{border-color:var(--primary-green);background:#eaf4fb;}
+  .ongkir-simple-row{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;
+    background:var(--card);transition:border-color .15s,background-color .15s;
+  }
+  .ongkir-simple-row label{font-weight:700;font-size:13px;color:var(--ink);margin:0;white-space:nowrap;}
+  .ongkir-simple-row.is-filled{border-color:var(--danger-red);background:#fdecea;}
+  .ongkir-simple-inline-input{
+    border:none;background:transparent;text-align:right;font-weight:700;font-size:13.5px;
+    color:var(--ink);width:130px;padding:0;font-family:'Roboto Mono',monospace;
+  }
+  .ongkir-simple-inline-input:focus{outline:none;}
+  html[data-theme="dark"] .ongkir-simple-box.is-filled,
+  html[data-theme="dark"] .ongkir-simple-row.is-filled{background:rgba(0,132,95,.14);}
+
   .breakdown{margin-top:12px;border-top:1px solid var(--line);padding-top:8px;}
   .breakdown .row{font-size:12px;border-bottom:none;}
 
@@ -1461,10 +1520,17 @@
       .wiz-pos-host .pos-cart-col.expanded .pos-cart-head{display:flex;padding-top:2px;}
       .wiz-pos-host .pos-cart-col.expanded .pos-cart-list{display:flex;}
       .wiz-pos-host .pos-cart-empty{padding:14px 4px 4px;}
-      /* Tombol "Lanjut ke pengiriman" — SELALU nempel di bawah bar
-         ringkas keranjang (baik lagi collapsed maupun expanded), persis
-         seperti tombol "Lanjut ke pengiriman" di Mode Tabel HP, supaya
-         alurnya jelas & tidak bikin bingung harus pindah lewat mana.
+      /* Tombol "Lanjut ke pengiriman" — sekarang diletakkan di HTML SETELAH
+         daftar item Keranjang (.pos-cart-list), persis konsisten dengan
+         tombol "Lanjut ke pengiriman" di Mode Tabel HP yang juga selalu
+         di paling bawah (di bawah semua kartu produk), supaya alurnya
+         jelas & tidak bikin bingung harus pindah lewat mana.
+         Saat Keranjang masih collapsed (.pos-cart-head & .pos-cart-list
+         sama-sama display:none), tombol ini otomatis "naik" jadi nempel
+         langsung di bawah bar ringkas — bukan lewat CSS order, murni
+         karena elemen di atasnya tidak makan tempat sama sekali saat
+         disembunyikan. Begitu di-expand, tombol turun ke bawah daftar
+         item, sesuai posisi barunya di HTML.
          Cuma tampil kalau keranjang ada isinya (toggle class "show" di
          JS, sama pola dengan .pos-cart-reset.show). */
       .wiz-pos-host .pos-cart-nextship{
@@ -4350,7 +4416,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
                 </div>
                 <svg class="pos-cart-sheet-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
-              <button type="button" class="pos-cart-nextship" id="pos-cart-nextship-penjualan">Lanjut ke pengiriman →</button>
               <div class="pos-cart-head">
                 <div class="pos-cart-title">Keranjang</div>
                 <button type="button" class="pos-cart-reset" id="pos-cart-reset-penjualan" title="Kosongkan keranjang">
@@ -4359,6 +4424,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
                 </button>
               </div>
               <div class="pos-cart-list" id="pos-cart-penjualan"></div>
+              <button type="button" class="pos-cart-nextship" id="pos-cart-nextship-penjualan">Lanjut ke pengiriman →</button>
             </div>
           </div>
           <div class="row" style="margin-top:6px;">
@@ -4366,30 +4432,25 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           </div>
           <div class="row" id="pj-beratrow"><span class="lbl">Total Berat</span><span class="val" id="pj-totalberat">–</span></div>
 
-          <div class="field" style="margin-top:14px;">
-            <label>Ekspedisi</label>
-            <select id="pj-ekspedisi"></select>
-          </div>
-          <div class="field ongkir-indicator" id="pj-rate-wrap">
-            <div class="ongkir-indicator-row">
-              <label>Rate ongkir (Rp / kg)</label>
-              <span class="ongkir-indicator-badge" id="pj-rate-badge">SEDANG DIPAKAI</span>
+          <div class="ongkir-simple" style="margin-top:14px;">
+            <div class="ongkir-simple-eksp">
+              <label>Ekspedisi :</label>
+              <select id="pj-ekspedisi"></select>
             </div>
-            <input type="text" inputmode="numeric" id="pj-rate" class="rate-input" placeholder="0" value="">
-          </div>
-          <div class="field ongkir-indicator" id="pj-ongkir-manual-wrap">
-            <div class="ongkir-indicator-row">
-              <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
-              <span class="ongkir-indicator-badge" id="pj-ongkir-manual-badge">SEDANG DIPAKAI</span>
+            <div class="ongkir-simple-grid">
+              <div class="ongkir-simple-box" id="pj-rate-wrap">
+                <label>Ongkir / Kg</label>
+                <input type="text" inputmode="numeric" id="pj-rate" class="rate-input ongkir-simple-input" placeholder="0" value="">
+              </div>
+              <div class="ongkir-simple-box" id="pj-ongkir-manual-wrap">
+                <label>Ongkir Total (Manual)</label>
+                <input type="text" inputmode="numeric" id="pj-ongkir-manual" class="rate-input ongkir-simple-input" placeholder="0" value="">
+              </div>
             </div>
-            <input type="text" inputmode="numeric" id="pj-ongkir-manual" class="rate-input" placeholder="0" value="">
-          </div>
-          <div class="field ongkir-indicator ongkir-indicator-red" id="pj-kelebihan-wrap">
-            <div class="ongkir-indicator-row">
-              <label>Kelebihan bayar sebelumnya</label>
-              <span class="ongkir-indicator-badge" id="pj-kelebihan-badge">ADA ISINYA</span>
+            <div class="ongkir-simple-row" id="pj-kelebihan-wrap">
+              <label>Kelebihan bayar :</label>
+              <input type="text" inputmode="numeric" id="pj-kelebihan" class="ongkir-simple-inline-input" value="0">
             </div>
-            <input type="text" inputmode="numeric" id="pj-kelebihan" value="0">
           </div>
         </div>
 
@@ -4492,7 +4553,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
                 </div>
                 <svg class="pos-cart-sheet-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
-              <button type="button" class="pos-cart-nextship" id="pos-cart-nextship-custom">Lanjut ke pengiriman →</button>
               <div class="pos-cart-head">
                 <div class="pos-cart-title">Keranjang</div>
                 <button type="button" class="pos-cart-reset" id="pos-cart-reset-custom" title="Kosongkan keranjang">
@@ -4501,6 +4561,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
                 </button>
               </div>
               <div class="pos-cart-list" id="pos-cart-custom"></div>
+              <button type="button" class="pos-cart-nextship" id="pos-cart-nextship-custom">Lanjut ke pengiriman →</button>
             </div>
           </div>
           <div class="row" style="margin-top:6px;">
@@ -4508,30 +4569,25 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           </div>
           <div class="row" id="cs-beratrow"><span class="lbl">Total Berat</span><span class="val" id="cs-totalberat">–</span></div>
 
-          <div class="field" style="margin-top:14px;">
-            <label>Ekspedisi</label>
-            <select id="cs-ekspedisi"></select>
-          </div>
-          <div class="field ongkir-indicator" id="cs-rate-wrap">
-            <div class="ongkir-indicator-row">
-              <label>Rate ongkir (Rp / kg)</label>
-              <span class="ongkir-indicator-badge" id="cs-rate-badge">SEDANG DIPAKAI</span>
+          <div class="ongkir-simple" style="margin-top:14px;">
+            <div class="ongkir-simple-eksp">
+              <label>Ekspedisi :</label>
+              <select id="cs-ekspedisi"></select>
             </div>
-            <input type="text" inputmode="numeric" id="cs-rate" class="rate-input" placeholder="0" value="">
-          </div>
-          <div class="field ongkir-indicator" id="cs-ongkir-manual-wrap">
-            <div class="ongkir-indicator-row">
-              <label>Ongkir Manual (opsional — isi untuk override hasil hitungan)</label>
-              <span class="ongkir-indicator-badge" id="cs-ongkir-manual-badge">SEDANG DIPAKAI</span>
+            <div class="ongkir-simple-grid">
+              <div class="ongkir-simple-box" id="cs-rate-wrap">
+                <label>Ongkir / Kg</label>
+                <input type="text" inputmode="numeric" id="cs-rate" class="rate-input ongkir-simple-input" placeholder="0" value="">
+              </div>
+              <div class="ongkir-simple-box" id="cs-ongkir-manual-wrap">
+                <label>Ongkir Total (Manual)</label>
+                <input type="text" inputmode="numeric" id="cs-ongkir-manual" class="rate-input ongkir-simple-input" placeholder="0" value="">
+              </div>
             </div>
-            <input type="text" inputmode="numeric" id="cs-ongkir-manual" class="rate-input" placeholder="0" value="">
-          </div>
-          <div class="field ongkir-indicator ongkir-indicator-red" id="cs-kelebihan-wrap">
-            <div class="ongkir-indicator-row">
-              <label>Kelebihan bayar sebelumnya</label>
-              <span class="ongkir-indicator-badge" id="cs-kelebihan-badge">ADA ISINYA</span>
+            <div class="ongkir-simple-row" id="cs-kelebihan-wrap">
+              <label>Kelebihan bayar :</label>
+              <input type="text" inputmode="numeric" id="cs-kelebihan" class="ongkir-simple-inline-input" value="0">
             </div>
-            <input type="text" inputmode="numeric" id="cs-kelebihan" value="0">
           </div>
           <div class="note" id="cs-note">Di sheet Custom: kolom <b>Diskon</b> diisi manual per baris (bukan otomatis), tidak ada aturan minimum 10&nbsp;kg untuk IDTruck, dan subsidi ongkir tidak otomatis (isi manual). Ini sesuai struktur asli filenya.</div>
         </div>
@@ -4747,6 +4803,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           </div>
           <label class="md-switch">
             <input type="checkbox" id="md-toggle-customblue">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card">
+        <h3>Info Footer (Rekening &amp; Masa Berlaku)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M3 10h18" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M6 14.5h6" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Tampilkan info footer</div>
+            <div class="md-togglerow-sub">Blok "PT. Halawa Bintang Utama", nomor rekening (BCA/BSI/Muamalat), dan "Daftar rincian pemesanan ini berlaku sampai ..." di bagian bawah halaman. Nonaktif = blok ini disembunyikan. Footer "Habit · versi · Cek Pembaruan · ID Telegram Saya" di bawahnya tidak ikut berubah, selalu tampil seperti biasa.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-footerinfo">
             <span class="md-switch-track"><span class="md-switch-knob"></span></span>
           </label>
         </div>
@@ -5117,9 +5187,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
   </details>
 
   <footer>
-    <div><b>PT. Halawa Bintang Utama</b></div>
-    <div class="footer-bank-line">BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
-    <div id="berlaku" style="margin-top:6px;"></div>
+    <div class="footer-info-block" id="footer-info-block">
+      <div><b>PT. Halawa Bintang Utama</b></div>
+      <div class="footer-bank-line">BCA 113037684 &nbsp;·&nbsp; BSI 7181382168 &nbsp;·&nbsp; Muamalat 7090016717</div>
+      <div id="berlaku" style="margin-top:6px;"></div>
+    </div>
     <div style="margin-top:8px;opacity:.6;">
       <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.23.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
@@ -6142,7 +6214,7 @@ function setTelegramTopicId(val){
 }
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -6160,6 +6232,7 @@ function loadSettings(){
     if(typeof s.stickyFormButtonsEnabled === "boolean") SETTINGS.stickyFormButtonsEnabled = s.stickyFormButtonsEnabled;
     if(typeof s.customBlueThemeEnabled === "boolean") SETTINGS.customBlueThemeEnabled = s.customBlueThemeEnabled;
     if(typeof s.darkModeFeatureEnabled === "boolean") SETTINGS.darkModeFeatureEnabled = s.darkModeFeatureEnabled;
+    if(typeof s.footerInfoEnabled === "boolean") SETTINGS.footerInfoEnabled = s.footerInfoEnabled;
     if(s.stickerReactionsEnabled && typeof s.stickerReactionsEnabled === "object"){
       ["konfirmasi","hoax","deposit","void"].forEach(k=>{
         if(typeof s.stickerReactionsEnabled[k] === "boolean") SETTINGS.stickerReactionsEnabled[k] = s.stickerReactionsEnabled[k];
@@ -6182,6 +6255,12 @@ function applySettingsToDom(){
   if(helpBtn) helpBtn.href = SETTINGS.bantuanLink;
   document.body.classList.toggle("sticky-form-btns-off", !SETTINGS.stickyFormButtonsEnabled);
   document.body.classList.toggle("custom-blue-theme", !!SETTINGS.customBlueThemeEnabled);
+  // Blok "PT. Halawa Bintang Utama · rekening · masa berlaku" di footer —
+  // murni tampil/sembunyi, tidak menyentuh footer "Habit · versi · Cek
+  // Pembaruan · ID Telegram Saya" yang selalu tampil apa adanya.
+  document.querySelectorAll(".footer-info-block").forEach(el=>{
+    el.hidden = !SETTINGS.footerInfoEnabled;
+  });
   document.querySelectorAll(".telegram-bot-ui").forEach(el=>{
     el.hidden = !SETTINGS.telegramBotEnabled;
   });
@@ -10217,71 +10296,121 @@ if ("serviceWorker" in navigator) {
     const kelebihanInp = document.getElementById(pfx+"-kelebihan");
     const diskonOngkirInp = sheet==="custom" ? document.getElementById("cs-diskonongkir") : null;
 
-    host.innerHTML = `
-      <div class="wiz-fieldcard">
-        <div class="wiz-section">
-          <div class="wiz-section-label"><span class="wiz-section-ic-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 7v10l8 4 8-4V7l-8-4z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><path d="M4 7l8 4 8-4M12 11v10" stroke="var(--primary-green)" stroke-width="1.4"/></svg></span> Ekspedisi</div>
-          <select id="ws-eksp-${sheet}"><option value="">— pilih ekspedisi —</option>${EKSPEDISI.map(e=>`<option value="${e.name}">${e.name}</option>`).join("")}</select>
+    /* Breakpoint SAMA PERSIS dengan isDesktopWiz() (min-width:901px, lihat
+       definisinya di atas) -- INI breakpoint desktop yang SUNGGUHAN dipakai
+       user (bukan .entry-col yang cuma nyala di 601-900px). Di lebar ini
+       field ongkir ditampilkan SEKALIGUS dalam kartu ringkas (Ekspedisi
+       1 baris, Ongkir/Kg + Ongkir Total berdampingan, Kelebihan bayar &
+       Diskon Ongkir 1 baris) TANPA disclosure toggle -- desktop cukup
+       lega buat semua field tampil langsung. Markup HP (progressive
+       disclosure, cabang else di bawah) TIDAK diubah sama sekali. */
+    const desktop = isDesktopWiz();
+
+    if(desktop){
+      host.innerHTML = `
+        <div class="ongkir-simple">
+          <div class="ongkir-simple-eksp">
+            <label>Ekspedisi :</label>
+            <select id="ws-eksp-${sheet}"><option value="">— pilih ekspedisi —</option>${EKSPEDISI.map(e=>`<option value="${e.name}">${e.name}</option>`).join("")}</select>
+          </div>
+          <div class="ongkir-simple-grid">
+            <div class="ongkir-simple-box">
+              <label>Ongkir / Kg</label>
+              <input type="text" inputmode="numeric" id="ws-rate-${sheet}" class="ongkir-simple-input" placeholder="0">
+            </div>
+            <div class="ongkir-simple-box">
+              <label>Ongkir Total (Manual)</label>
+              <input type="text" inputmode="numeric" id="ws-manualval-${sheet}" class="ongkir-simple-input" placeholder="0">
+            </div>
+          </div>
+          <div class="ongkir-simple-row">
+            <label>Kelebihan bayar :</label>
+            <input type="text" inputmode="numeric" id="ws-kelebihanval-${sheet}" class="ongkir-simple-inline-input" placeholder="0">
+          </div>
+          ${sheet==="custom" ? `
+          <div class="ongkir-simple-row">
+            <label>Diskon Ongkir (Manual) :</label>
+            <input type="text" inputmode="numeric" id="ws-diskonongkirval-${sheet}" class="ongkir-simple-inline-input" placeholder="0">
+          </div>` : ``}
         </div>
-        <div class="wiz-section">
-          <div class="wiz-section-label"><span class="wiz-section-ic-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12.5 3.5H20v7.5L11 20l-8-8 9.5-8.5z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><circle cx="15.5" cy="7.5" r="1.3" fill="var(--primary-green)"/></svg></span> Rate ongkir (Rp / kg)</div>
-          <input type="text" inputmode="numeric" id="ws-rate-${sheet}" placeholder="0">
+        <div class="wiz-cta-bar">
+          <button class="wiz-btn-primary" id="ws-next-${sheet}">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="#fff" stroke-width="1.8"/><path d="M15.5 15.5L21 21" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Lihat review & ringkasan pesanan
+          </button>
         </div>
-      </div>
-      <div class="wiz-disclose" id="ws-manual-toggle-${sheet}">
-        <span class="wiz-disclose-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M8 7h8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="8.3" cy="12" r="1" fill="#fff"/><circle cx="12" cy="12" r="1" fill="#fff"/><circle cx="15.7" cy="12" r="1" fill="#fff"/></svg></span>
-        <span class="wiz-disclose-text">
-          <div class="wiz-disclose-label">Gunakan ongkir manual</div>
-          <div class="wiz-disclose-sub">Masukkan ongkir total secara manual.</div>
-        </span>
-        <span class="arrow">›</span>
-      </div>
-      <div class="wiz-disclose-body" id="ws-manual-body-${sheet}">
-        <div class="wiz-field" style="margin-top:0;">
-          <label>Ongkir manual (override hasil hitungan)</label>
-          <input type="text" inputmode="numeric" id="ws-manualval-${sheet}" placeholder="0">
-        </div>
-      </div>
-      <div class="wiz-disclose" id="ws-kelebihan-toggle-${sheet}">
-        <span class="wiz-disclose-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M3 10h18" stroke="#fff" stroke-width="1.5"/><path d="M6 14.5h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-        <span class="wiz-disclose-text">
-          <div class="wiz-disclose-label">Ada kelebihan bayar sebelumnya</div>
-          <div class="wiz-disclose-sub">Gunakan saldo kelebihan untuk pesanan ini.</div>
-        </span>
-        <span class="arrow">›</span>
-      </div>
-      <div class="wiz-disclose-body" id="ws-kelebihan-body-${sheet}">
-        <div class="wiz-field" style="margin-top:0;">
-          <label>Nominal kelebihan bayar (Rp)</label>
-          <input type="text" inputmode="numeric" id="ws-kelebihanval-${sheet}" placeholder="0">
-        </div>
-      </div>
-      ${sheet==="custom" ? `
-      <div class="wiz-disclose" id="ws-diskonongkir-toggle-${sheet}">
-        <span class="wiz-disclose-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 12l-8 8-9-9V3h8l9 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1.2" fill="#fff"/></svg></span>
-        <span class="wiz-disclose-text">
-          <div class="wiz-disclose-label">Ada diskon ongkir manual</div>
-          <div class="wiz-disclose-sub">Kurangi ongkir dengan nominal tertentu.</div>
-        </span>
-        <span class="arrow">›</span>
-      </div>
-      <div class="wiz-disclose-body" id="ws-diskonongkir-body-${sheet}">
-        <div class="wiz-field" style="margin-top:0;">
-          <label>Nominal diskon ongkir (Rp)</label>
-          <input type="text" inputmode="numeric" id="ws-diskonongkirval-${sheet}" placeholder="0">
-        </div>
-      </div>` : ``}
-      <div class="wiz-cta-bar">
-        <button class="wiz-btn-primary" id="ws-next-${sheet}">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="#fff" stroke-width="1.8"/><path d="M15.5 15.5L21 21" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
-          Lihat review & ringkasan pesanan
+        <button class="wiz-btn-ghost accent" id="ws-back-${sheet}">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7" stroke="var(--primary-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Kembali ke daftar produk
         </button>
-      </div>
-      <button class="wiz-btn-ghost accent" id="ws-back-${sheet}">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7" stroke="var(--primary-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Kembali ke daftar produk
-      </button>
-    `;
+      `;
+    } else {
+      host.innerHTML = `
+        <div class="wiz-fieldcard">
+          <div class="wiz-section">
+            <div class="wiz-section-label"><span class="wiz-section-ic-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 7v10l8 4 8-4V7l-8-4z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><path d="M4 7l8 4 8-4M12 11v10" stroke="var(--primary-green)" stroke-width="1.4"/></svg></span> Ekspedisi</div>
+            <select id="ws-eksp-${sheet}"><option value="">— pilih ekspedisi —</option>${EKSPEDISI.map(e=>`<option value="${e.name}">${e.name}</option>`).join("")}</select>
+          </div>
+          <div class="wiz-section">
+            <div class="wiz-section-label"><span class="wiz-section-ic-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12.5 3.5H20v7.5L11 20l-8-8 9.5-8.5z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><circle cx="15.5" cy="7.5" r="1.3" fill="var(--primary-green)"/></svg></span> Rate ongkir (Rp / kg)</div>
+            <input type="text" inputmode="numeric" id="ws-rate-${sheet}" placeholder="0">
+          </div>
+        </div>
+        <div class="wiz-disclose" id="ws-manual-toggle-${sheet}">
+          <span class="wiz-disclose-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M8 7h8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="8.3" cy="12" r="1" fill="#fff"/><circle cx="12" cy="12" r="1" fill="#fff"/><circle cx="15.7" cy="12" r="1" fill="#fff"/></svg></span>
+          <span class="wiz-disclose-text">
+            <div class="wiz-disclose-label">Gunakan ongkir manual</div>
+            <div class="wiz-disclose-sub">Masukkan ongkir total secara manual.</div>
+          </span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="wiz-disclose-body" id="ws-manual-body-${sheet}">
+          <div class="wiz-field" style="margin-top:0;">
+            <label>Ongkir manual (override hasil hitungan)</label>
+            <input type="text" inputmode="numeric" id="ws-manualval-${sheet}" placeholder="0">
+          </div>
+        </div>
+        <div class="wiz-disclose" id="ws-kelebihan-toggle-${sheet}">
+          <span class="wiz-disclose-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M3 10h18" stroke="#fff" stroke-width="1.5"/><path d="M6 14.5h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <span class="wiz-disclose-text">
+            <div class="wiz-disclose-label">Ada kelebihan bayar sebelumnya</div>
+            <div class="wiz-disclose-sub">Gunakan saldo kelebihan untuk pesanan ini.</div>
+          </span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="wiz-disclose-body" id="ws-kelebihan-body-${sheet}">
+          <div class="wiz-field" style="margin-top:0;">
+            <label>Nominal kelebihan bayar (Rp)</label>
+            <input type="text" inputmode="numeric" id="ws-kelebihanval-${sheet}" placeholder="0">
+          </div>
+        </div>
+        ${sheet==="custom" ? `
+        <div class="wiz-disclose" id="ws-diskonongkir-toggle-${sheet}">
+          <span class="wiz-disclose-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 12l-8 8-9-9V3h8l9 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1.2" fill="#fff"/></svg></span>
+          <span class="wiz-disclose-text">
+            <div class="wiz-disclose-label">Ada diskon ongkir manual</div>
+            <div class="wiz-disclose-sub">Kurangi ongkir dengan nominal tertentu.</div>
+          </span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="wiz-disclose-body" id="ws-diskonongkir-body-${sheet}">
+          <div class="wiz-field" style="margin-top:0;">
+            <label>Nominal diskon ongkir (Rp)</label>
+            <input type="text" inputmode="numeric" id="ws-diskonongkirval-${sheet}" placeholder="0">
+          </div>
+        </div>` : ``}
+        <div class="wiz-cta-bar">
+          <button class="wiz-btn-primary" id="ws-next-${sheet}">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="#fff" stroke-width="1.8"/><path d="M15.5 15.5L21 21" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Lihat review & ringkasan pesanan
+          </button>
+        </div>
+        <button class="wiz-btn-ghost accent" id="ws-back-${sheet}">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7" stroke="var(--primary-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Kembali ke daftar produk
+        </button>
+      `;
+    }
 
     const wEksp = document.getElementById("ws-eksp-"+sheet);
     const wRate = document.getElementById("ws-rate-"+sheet);
@@ -10291,8 +10420,24 @@ if ("serviceWorker" in navigator) {
     wEksp.value = ekspSel.value; wRate.value = rateInp.value;
     wManualVal.value = manualInp.value; wKelebihanVal.value = kelebihanInp.value==="0" ? "" : kelebihanInp.value;
     if(SETTINGS.autocompleteEkspedisi) comboboxify(wEksp, "Pilih ekspedisi...");
-    if(manualInp.value) openDisclose(sheet, "manual");
-    if(kelebihanInp.value && kelebihanInp.value!=="0") openDisclose(sheet, "kelebihan");
+
+    function toggleDisclose(sh,key){
+      const t = document.getElementById(`ws-${key}-toggle-${sh}`), b = document.getElementById(`ws-${key}-body-${sh}`);
+      if(!t || !b) return; // tidak ada toggle di layout desktop -- aman diabaikan
+      t.classList.toggle("open"); b.classList.toggle("open");
+    }
+    function openDisclose(sh,key){
+      const t = document.getElementById(`ws-${key}-toggle-${sh}`), b = document.getElementById(`ws-${key}-body-${sh}`);
+      if(!t || !b) return; // idem
+      t.classList.add("open"); b.classList.add("open");
+    }
+    // Auto-expand disclosure kalau field-nya sudah keisi -- HANYA relevan
+    // di HP (di desktop semua field selalu kelihatan, tidak ada yang perlu
+    // "dibuka").
+    if(!desktop){
+      if(manualInp.value) openDisclose(sheet, "manual");
+      if(kelebihanInp.value && kelebihanInp.value!=="0") openDisclose(sheet, "kelebihan");
+    }
 
     wEksp.addEventListener("change", ()=>{ ekspSel.value = wEksp.value; ekspSel.dispatchEvent(new Event("change",{bubbles:true})); });
     wRate.addEventListener("input", ()=>{
@@ -10300,7 +10445,7 @@ if ("serviceWorker" in navigator) {
       rateInp.dispatchEvent(new Event("input",{bubbles:true}));
       // setupOngkirExclusive (dipasang ke field ASLI pj-/cs- rate & ongkir-manual)
       // barusan bisa saja langsung menolkan manualInp secara internal — proxy
-      // wManualVal yang tampil di layar HP ini perlu disinkron ULANG supaya
+      // wManualVal yang tampil di layar ini perlu disinkron ULANG supaya
       // ikut kelihatan kosong, bukan cuma field asli yang tersembunyi.
       wManualVal.value = (manualInp.value==="0" || manualInp.value==="") ? "" : manualInp.value;
     });
@@ -10311,24 +10456,18 @@ if ("serviceWorker" in navigator) {
     });
     wKelebihanVal.addEventListener("input", ()=>{ kelebihanInp.value = wKelebihanVal.value || "0"; kelebihanInp.dispatchEvent(new Event("input",{bubbles:true})); });
 
-    document.getElementById("ws-manual-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"manual"));
-    document.getElementById("ws-kelebihan-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"kelebihan"));
-    function toggleDisclose(sh,key){
-      const t = document.getElementById(`ws-${key}-toggle-${sh}`), b = document.getElementById(`ws-${key}-body-${sh}`);
-      t.classList.toggle("open"); b.classList.toggle("open");
-    }
-    function openDisclose(sh,key){
-      document.getElementById(`ws-${key}-toggle-${sh}`).classList.add("open");
-      document.getElementById(`ws-${key}-body-${sh}`).classList.add("open");
+    if(!desktop){
+      document.getElementById("ws-manual-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"manual"));
+      document.getElementById("ws-kelebihan-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"kelebihan"));
     }
 
     if(sheet==="custom" && diskonOngkirInp){
       const wDiskonOngkir = document.getElementById("ws-diskonongkirval-"+sheet);
       formatRibuan(wDiskonOngkir);
       wDiskonOngkir.value = diskonOngkirInp.value==="0" ? "" : diskonOngkirInp.value;
-      if(diskonOngkirInp.value && diskonOngkirInp.value!=="0") openDisclose(sheet,"diskonongkir");
+      if(!desktop && diskonOngkirInp.value && diskonOngkirInp.value!=="0") openDisclose(sheet,"diskonongkir");
       wDiskonOngkir.addEventListener("input", ()=>{ diskonOngkirInp.value = wDiskonOngkir.value || "0"; diskonOngkirInp.dispatchEvent(new Event("input",{bubbles:true})); });
-      document.getElementById("ws-diskonongkir-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"diskonongkir"));
+      if(!desktop) document.getElementById("ws-diskonongkir-toggle-"+sheet).addEventListener("click", ()=> toggleDisclose(sheet,"diskonongkir"));
     }
 
     document.getElementById("ws-next-"+sheet).addEventListener("click", ()=> wizGo(sheet, "review"));
@@ -10774,6 +10913,21 @@ if ("serviceWorker" in navigator) {
       saveSettings();
       applySettingsToDom();
       await confirmMasterDataSave(SETTINGS.stickyFormButtonsEnabled ? "Tombol Simpan/Batal jadi mengambang." : "Tombol Simpan/Batal kembali ke perilaku lama (statis).");
+    });
+  }
+
+  /* ---------- toggle Info Footer / rekening & masa berlaku (Tampilan) ----------
+     Murni tampil/sembunyi blok ".footer-info-block" (lihat applySettingsToDom()).
+     Footer "Habit · versi · Cek Pembaruan · ID Telegram Saya" TIDAK ikut
+     disentuh sama sekali oleh toggle ini. */
+  const toggleFooterInfo = document.getElementById("md-toggle-footerinfo");
+  if(toggleFooterInfo){
+    toggleFooterInfo.checked = SETTINGS.footerInfoEnabled;
+    toggleFooterInfo.addEventListener("change", async ()=>{
+      SETTINGS.footerInfoEnabled = toggleFooterInfo.checked;
+      saveSettings();
+      applySettingsToDom();
+      await confirmMasterDataSave(SETTINGS.footerInfoEnabled ? "Info footer (rekening & masa berlaku) ditampilkan." : "Info footer (rekening & masa berlaku) disembunyikan.");
     });
   }
 
@@ -12330,30 +12484,40 @@ if ("serviceWorker" in navigator) {
   }
 
   /* ---------- Bar keranjang ringkas (mobile bottom sheet) ----------
-     Cuma MENAMPILKAN ULANG angka yang sudah dihitung & sudah dirender
-     di tempat lain (span #wsm-x-totalitem / #wsm-x-grandtotal, dipakai
-     kartu "Ringkasan Pesanan" yang sudah ada) — sama persis prinsipnya
-     dengan kartu Ringkasan itu sendiri (tidak ada rumus baru di sini).
-     Kalau elemen sumbernya belum ada/belum sempat dirender, fallback
-     ke "0"/"Rp0" (defensive) supaya bar tidak pernah tampil kosong
-     atau error walau urutan render berbeda-beda. */
+     Cuma MENAMPILKAN ULANG angka yang sudah dihitung oleh calc() di
+     tempat lain — TAPI dibaca LANGSUNG dari sumber aslinya (#pj-grandtotal
+     / #cs-grandtotal, dan hitung ulang jumlah baris terisi dari tabel),
+     BUKAN dari salinan #wsm-x-grandtotal / #wsm-x-totalitem.
+     -------------------------------------------------------------
+     KENAPA DIUBAH (bug qty tidak terakumulasi di badge atas):
+     #wsm-x-grandtotal itu sendiri cuma salinan (di-refresh oleh modul
+     terpisah "syncDesktopSummary", lewat listener document "input" yang
+     didaftarkan BELAKANGAN dari listener modul Keranjang ini, sama-sama
+     pakai setTimeout(...,30)). Karena browser menjalankan timer sesuai
+     urutan didaftarkan, syncPosCartSheet() (dipanggil dari refreshActivePos)
+     kepanggil DULUAN daripada syncDesktopSummary() yang mestinya update
+     #wsm-x-grandtotal duluan -> akibatnya badge/total di bar ini sempat
+     membaca angka LAMA (mis. masih harga qty=1) walau baris Keranjang di
+     bawahnya sudah benar (qty=2, sudah terakumulasi). Baca langsung dari
+     #pj-grandtotal/#cs-grandtotal aman karena elemen itu di-update SINKRON
+     oleh calc() (dipicu event "input" sebelum setTimeout manapun jalan),
+     jadi tidak ada lagi jeda/race apa pun. ---- */
   function syncPosCartSheet(sheet){
     const bar = document.querySelector(`[data-pos-sheetbar="${sheet}"]`);
     if(!bar) return;
+    const pfx = sheet === "penjualan" ? "pj" : "cs";
     const countEl = document.getElementById("pos-sheet-count-"+sheet);
     const totalEl = document.getElementById("pos-sheet-total-"+sheet);
-    const srcCount = document.getElementById("wsm-"+sheet+"-totalitem");
-    const srcTotal = document.getElementById("wsm-"+sheet+"-grandtotal");
-    // srcCount isinya teks gabungan "N Produk" (dipakai kartu Ringkasan
-    // Pesanan) — badge di sini cuma lingkaran kecil (26px) buat ANGKA
-    // saja, jadi ambil angkanya lewat regex, jangan salin utuh teksnya
-    // (kalau disalin utuh, kata "Produk" meluber keluar lingkaran).
-    let countNum = "0";
-    if(srcCount){
-      const m = srcCount.textContent.trim().match(/\d+/);
-      if(m) countNum = m[0];
-    }
-    if(countEl) countEl.textContent = countNum;
+    // Jumlah baris produk terisi -> dihitung ulang langsung dari tabel
+    // data asli (sama seperti logika di syncDesktopSummary), bukan dibaca
+    // dari salinan #wsm-x-totalitem yang bisa telat update.
+    let countNum = 0;
+    document.querySelectorAll("#rows-"+sheet+" tr").forEach(tr=>{
+      const sel = tr.querySelector("select.prod");
+      if(sel && sel.value) countNum++;
+    });
+    const srcTotal = document.getElementById(pfx+"-grandtotal");
+    if(countEl) countEl.textContent = String(countNum);
     if(totalEl) totalEl.textContent = (srcTotal && srcTotal.textContent.trim() && srcTotal.textContent.trim() !== "–") ? srcTotal.textContent.trim() : "Rp0";
   }
   // Tap bar = expand/collapse daftar item lengkap. Murni toggle class
