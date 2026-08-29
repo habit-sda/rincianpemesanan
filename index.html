@@ -618,7 +618,7 @@
   .ongkir-simple-box label{display:block;font-size:11.5px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;}
   .ongkir-simple-input{
     width:100%;border:none;background:transparent;text-align:right;
-    font-size:15px;font-weight:700;color:var(--ink);padding:0;font-family:'Roboto Mono',monospace;
+    font-size:18px;font-weight:700;color:var(--ink);padding:0;font-family:'Roboto Mono',monospace;
   }
   .ongkir-simple-input::placeholder{color:var(--ink-soft);font-weight:400;}
   .ongkir-simple-input:focus{outline:none;}
@@ -627,12 +627,13 @@
     display:flex;align-items:center;justify-content:space-between;gap:10px;
     border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;
     background:var(--card);transition:border-color .15s,background-color .15s;
+    margin-bottom:10px;
   }
   .ongkir-simple-row label{font-weight:700;font-size:13px;color:var(--ink);margin:0;white-space:nowrap;}
   .ongkir-simple-row.is-filled{border-color:var(--danger-red);background:#fdecea;}
   .ongkir-simple-inline-input{
-    border:none;background:transparent;text-align:right;font-weight:700;font-size:13.5px;
-    color:var(--ink);width:130px;padding:0;font-family:'Roboto Mono',monospace;
+    border:none;background:transparent;text-align:right;font-weight:700;font-size:16.5px;
+    color:var(--ink);width:150px;padding:0;font-family:'Roboto Mono',monospace;
   }
   .ongkir-simple-inline-input:focus{outline:none;}
   html[data-theme="dark"] .ongkir-simple-box.is-filled,
@@ -1646,6 +1647,12 @@
     }
     .wiz-fieldcard .wiz-section{padding:14px 0;}
     .wiz-fieldcard .wiz-section-label{color:var(--ink);font-weight:600;}
+    /* Font nama ekspedisi di daftar dropdown versi HP -- .wiz-fieldcard
+       di step Pengiriman cuma berisi field Ekspedisi & Rate ongkir (Rate
+       ongkir bukan combobox, jadi selector ini otomatis cuma kena field
+       Ekspedisi saja, tidak nyerempet field lain). Sama besar dgn versi
+       desktop (13.5px + 5 = 18.5px), sesuai permintaan. */
+    .wiz-fieldcard .combo-item{font-size:18.5px;padding:12px 12px;}
     .wiz-fieldcard .wiz-section-ic-badge{
       width:22px;height:22px;border-radius:6px;background:var(--wiz-tint);
       display:flex;align-items:center;justify-content:center;flex-shrink:0;
@@ -4452,16 +4459,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <div class="ongkir-simple-grid">
               <div class="ongkir-simple-box" id="pj-rate-wrap">
                 <label>Ongkir / Kg</label>
-                <input type="text" inputmode="numeric" id="pj-rate" class="rate-input ongkir-simple-input" placeholder="0" value="">
+                <input type="text" inputmode="numeric" id="pj-rate" autocomplete="off" class="rate-input ongkir-simple-input" placeholder="0" value="">
               </div>
               <div class="ongkir-simple-box" id="pj-ongkir-manual-wrap">
                 <label>Ongkir Total (Manual)</label>
-                <input type="text" inputmode="numeric" id="pj-ongkir-manual" class="rate-input ongkir-simple-input" placeholder="0" value="">
+                <input type="text" inputmode="numeric" id="pj-ongkir-manual" autocomplete="off" class="rate-input ongkir-simple-input" placeholder="0" value="">
               </div>
             </div>
             <div class="ongkir-simple-row" id="pj-kelebihan-wrap">
               <label>Kelebihan bayar :</label>
-              <input type="text" inputmode="numeric" id="pj-kelebihan" class="ongkir-simple-inline-input" value="0">
+              <input type="text" inputmode="numeric" id="pj-kelebihan" autocomplete="off" class="ongkir-simple-inline-input" value="0">
             </div>
           </div>
         </div>
@@ -4589,16 +4596,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <div class="ongkir-simple-grid">
               <div class="ongkir-simple-box" id="cs-rate-wrap">
                 <label>Ongkir / Kg</label>
-                <input type="text" inputmode="numeric" id="cs-rate" class="rate-input ongkir-simple-input" placeholder="0" value="">
+                <input type="text" inputmode="numeric" id="cs-rate" autocomplete="off" class="rate-input ongkir-simple-input" placeholder="0" value="">
               </div>
               <div class="ongkir-simple-box" id="cs-ongkir-manual-wrap">
                 <label>Ongkir Total (Manual)</label>
-                <input type="text" inputmode="numeric" id="cs-ongkir-manual" class="rate-input ongkir-simple-input" placeholder="0" value="">
+                <input type="text" inputmode="numeric" id="cs-ongkir-manual" autocomplete="off" class="rate-input ongkir-simple-input" placeholder="0" value="">
               </div>
             </div>
             <div class="ongkir-simple-row" id="cs-kelebihan-wrap">
               <label>Kelebihan bayar :</label>
-              <input type="text" inputmode="numeric" id="cs-kelebihan" class="ongkir-simple-inline-input" value="0">
+              <input type="text" inputmode="numeric" id="cs-kelebihan" autocomplete="off" class="ongkir-simple-inline-input" value="0">
             </div>
           </div>
           <div class="note" id="cs-note">Di sheet Custom: kolom <b>Diskon</b> diisi manual per baris (bukan otomatis), tidak ada aturan minimum 10&nbsp;kg untuk IDTruck, dan subsidi ongkir tidak otomatis (isi manual). Ini sesuai struktur asli filenya.</div>
@@ -4611,7 +4618,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <div class="row"><span class="lbl">Ongkir</span><span class="val" id="cs-ongkir">–</span></div>
             <div class="row">
               <span class="lbl">Diskon Ongkir (manual)</span>
-              <input type="text" inputmode="numeric" id="cs-diskonongkir" value="0" style="max-width:130px;text-align:right;">
+              <input type="text" inputmode="numeric" id="cs-diskonongkir" autocomplete="off" value="0" style="max-width:130px;text-align:right;">
             </div>
             <div class="row total"><span class="lbl">Grand Total</span><span class="val" id="cs-grandtotal">–</span></div>
 
@@ -10328,21 +10335,21 @@ if ("serviceWorker" in navigator) {
           <div class="ongkir-simple-grid">
             <div class="ongkir-simple-box">
               <label>Ongkir / Kg</label>
-              <input type="text" inputmode="numeric" id="ws-rate-${sheet}" class="ongkir-simple-input" placeholder="0">
+              <input type="text" inputmode="numeric" id="ws-rate-${sheet}" autocomplete="off" class="ongkir-simple-input" placeholder="0">
             </div>
             <div class="ongkir-simple-box">
               <label>Ongkir Total (Manual)</label>
-              <input type="text" inputmode="numeric" id="ws-manualval-${sheet}" class="ongkir-simple-input" placeholder="0">
+              <input type="text" inputmode="numeric" id="ws-manualval-${sheet}" autocomplete="off" class="ongkir-simple-input" placeholder="0">
             </div>
           </div>
           <div class="ongkir-simple-row">
             <label>Kelebihan bayar :</label>
-            <input type="text" inputmode="numeric" id="ws-kelebihanval-${sheet}" class="ongkir-simple-inline-input" placeholder="0">
+            <input type="text" inputmode="numeric" id="ws-kelebihanval-${sheet}" autocomplete="off" class="ongkir-simple-inline-input" placeholder="0">
           </div>
           ${sheet==="custom" ? `
           <div class="ongkir-simple-row">
             <label>Diskon Ongkir (Manual) :</label>
-            <input type="text" inputmode="numeric" id="ws-diskonongkirval-${sheet}" class="ongkir-simple-inline-input" placeholder="0">
+            <input type="text" inputmode="numeric" id="ws-diskonongkirval-${sheet}" autocomplete="off" class="ongkir-simple-inline-input" placeholder="0">
           </div>` : ``}
         </div>
         <div class="wiz-cta-bar">
@@ -10365,7 +10372,7 @@ if ("serviceWorker" in navigator) {
           </div>
           <div class="wiz-section">
             <div class="wiz-section-label"><span class="wiz-section-ic-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12.5 3.5H20v7.5L11 20l-8-8 9.5-8.5z" stroke="var(--primary-green)" stroke-width="1.4" stroke-linejoin="round"/><circle cx="15.5" cy="7.5" r="1.3" fill="var(--primary-green)"/></svg></span> Rate ongkir (Rp / kg)</div>
-            <input type="text" inputmode="numeric" id="ws-rate-${sheet}" placeholder="0">
+            <input type="text" inputmode="numeric" id="ws-rate-${sheet}" autocomplete="off" placeholder="0">
           </div>
         </div>
         <div class="wiz-disclose" id="ws-manual-toggle-${sheet}">
@@ -10379,7 +10386,7 @@ if ("serviceWorker" in navigator) {
         <div class="wiz-disclose-body" id="ws-manual-body-${sheet}">
           <div class="wiz-field" style="margin-top:0;">
             <label>Ongkir manual (override hasil hitungan)</label>
-            <input type="text" inputmode="numeric" id="ws-manualval-${sheet}" placeholder="0">
+            <input type="text" inputmode="numeric" id="ws-manualval-${sheet}" autocomplete="off" placeholder="0">
           </div>
         </div>
         <div class="wiz-disclose" id="ws-kelebihan-toggle-${sheet}">
@@ -10393,7 +10400,7 @@ if ("serviceWorker" in navigator) {
         <div class="wiz-disclose-body" id="ws-kelebihan-body-${sheet}">
           <div class="wiz-field" style="margin-top:0;">
             <label>Nominal kelebihan bayar (Rp)</label>
-            <input type="text" inputmode="numeric" id="ws-kelebihanval-${sheet}" placeholder="0">
+            <input type="text" inputmode="numeric" id="ws-kelebihanval-${sheet}" autocomplete="off" placeholder="0">
           </div>
         </div>
         ${sheet==="custom" ? `
@@ -10408,7 +10415,7 @@ if ("serviceWorker" in navigator) {
         <div class="wiz-disclose-body" id="ws-diskonongkir-body-${sheet}">
           <div class="wiz-field" style="margin-top:0;">
             <label>Nominal diskon ongkir (Rp)</label>
-            <input type="text" inputmode="numeric" id="ws-diskonongkirval-${sheet}" placeholder="0">
+            <input type="text" inputmode="numeric" id="ws-diskonongkirval-${sheet}" autocomplete="off" placeholder="0">
           </div>
         </div>` : ``}
         <div class="wiz-cta-bar">
