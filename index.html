@@ -9733,7 +9733,7 @@ if ("serviceWorker" in navigator) {
       const res = await fetch(MASTER_DATA_WORKER_URL + "/parse-order", {
         method: "POST",
         headers: workerHeaders({ "Content-Type": "application/json" }),
-        body: JSON.stringify({ text, productCatalog }),
+        body: JSON.stringify({ text, productCatalog, senderId: getTelegramSenderId() }), // BARU -- dipakai Monitor Utama utk hitung berapa kali tiap CS pakai fitur ini
       });
       const data = await res.json().catch(()=> ({}));
       if(!res.ok || !data.ok){
