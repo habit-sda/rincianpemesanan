@@ -13871,7 +13871,29 @@ if ("serviceWorker" in navigator) {
           }catch(e){
             btn.textContent = labelSebelum;
             btn.dataset.state = stateSebelum;
-            alert("Gagal menyimpan: " + (e.message || e));
+            // BARU -- SEBELUMNYA alert() mentah browser (memblokir seluruh
+            // layar, teksnya teknis & menakutkan buat CS: "Error: KV put()
+            // limit exceeded for the day."). Sekarang pesan ditaruh di
+            // #rekap-status (baris yang sama dipakai buat "28 dari 28
+            // pesanan ditampilkan...") -- tidak memblokir, warnanya merah
+            // biar tetap kelihatan jelas, dan otomatis balik ke teks normal
+            // setelah beberapa detik. Kasus "limit exceeded" dikasih pesan
+            // KHUSUS yang menjelaskan ini BUKAN bug & akan pulih sendiri
+            // (bukan cuma lempar pesan teknis Cloudflare mentah-mentah).
+            const errMsg = (e && e.message) || String(e);
+            const isKvLimit = /limit exceeded/i.test(errMsg);
+            const pesanTampil = isKvLimit
+              ? "⚠️ Gagal menyimpan: jatah tulis data harian sedang penuh (bukan bug) — otomatis pulih sendiri besok pagi jam 07:00 WIB. Perubahan lain (pesanan baru, dst) tetap bisa jalan seperti biasa."
+              : "⚠️ Gagal menyimpan: " + errMsg;
+            const teksSebelum = statusEl.textContent;
+            const warnaSebelum = statusEl.style.color;
+            statusEl.textContent = pesanTampil;
+            statusEl.style.color = "var(--danger-red)";
+            clearTimeout(statusEl._errTimer);
+            statusEl._errTimer = setTimeout(()=>{
+              statusEl.textContent = teksSebelum;
+              statusEl.style.color = warnaSebelum;
+            }, isKvLimit ? 8000 : 5000);
           }finally{
             btn.disabled = false;
           }
