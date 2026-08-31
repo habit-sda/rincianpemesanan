@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v264";
+const CACHE_VERSION = "v269";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -40,9 +40,15 @@ self.addEventListener("install", (event) => {
       // addAll akan gagal total kalau salah satu URL 404 —
       // jadi kita tambahkan satu per satu dan abaikan yang gagal,
       // supaya instalasi tidak batal hanya karena 1 file hilang.
+      // PENTING: cache.add(url) biasa TUNDUK ke HTTP cache browser, jadi
+      // bisa diam-diam menyimpan versi LAMA index.html/asset lain ke cache
+      // baru walau nama cache-nya (CACHE_NAME) sudah berubah — inilah
+      // penyebab "klik Perbarui Sekarang tapi tetap versi lama setelah
+      // reload". Fix: pakai Request dengan {cache:"reload"} supaya fetch
+      // ini SELALU ambil langsung dari server, bukan dari HTTP cache.
       return Promise.all(
         CORE_ASSETS.map((url) =>
-          cache.add(url).catch((err) => {
+          cache.add(new Request(url, { cache: "reload" })).catch((err) => {
             console.log("SW: gagal cache", url, err);
           })
         )
@@ -70,15 +76,19 @@ self.addEventListener("message", (event) => {
 /* ---------- ACTIVATE: bersihkan cache versi lama ---------- */
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => (key.startsWith("nota-halawa-") || key.startsWith("habit-")) && key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
+    caches.keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => (key.startsWith("nota-halawa-") || key.startsWith("habit-")) && key !== CACHE_NAME)
+            .map((key) => caches.delete(key))
+        )
       )
-    )
+      // clients.claim() digabung ke rantai waitUntil yang sama (bukan
+      // dipanggil terpisah di luar) supaya activate dijamin benar-benar
+      // selesai — termasuk claim-nya — sebelum browser boleh mematikan SW.
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 /* ---------- FETCH: cache-first untuk same-origin, ---------- 
    fallback ke network. Untuk request lintas domain (font, cdnjs,
