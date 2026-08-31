@@ -4745,6 +4745,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="md-pin-err" id="md-logistik-err"></div>
         <button class="md-btn primary" id="md-logistik-add" style="margin-top:10px;">+ Tambah Petugas Logistik</button>
       </div>
+      <div class="md-card" id="md-logistik-pengingat-card">
+        <h3>⚠️ Peringatan Logistik: Resi Belum Ada</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Tiap hari, cek pesanan yang SUDAH Lunas 2+ hari lalu tapi belum ada satu pun resi tercatat atas nama customer itu — dikirim ke semua orang di Daftar Logistik di atas. Kalau tidak ada yang perlu diperingatkan hari itu, tidak ada pesan terkirim.
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:12px;">
+          <input type="checkbox" id="md-logistik-pengingat-toggle" style="width:18px; height:18px;">
+          <span>Aktifkan Peringatan Logistik</span>
+        </label>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label for="md-logistik-pengingat-time" style="font-size:13.5px; color:var(--ink-soft);">Jam kirim (WIB)</label>
+          <input type="time" id="md-logistik-pengingat-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
+        </div>
+      </div>
       <div class="md-card md-pinform">
         <h3>Ambang cross-check resi vs ongkir</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -4852,6 +4866,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <input type="checkbox" id="md-toggle-footerinfo">
             <span class="md-switch-track"><span class="md-switch-knob"></span></span>
           </label>
+        </div>
+      </div>
+      <div class="md-card" id="md-resikemarin-card">
+        <h3>📦 Info Resi Kemarin ke CS</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Tiap pagi, tiap CS dapat DM daftar customer MILIKNYA SENDIRI yang resinya sudah di-upload oleh Daftar Logistik kemarin — biar CS tahu tanpa perlu tanya manual. Kalau kemarin tidak ada resi dari Logistik sama sekali, tidak ada DM terkirim.
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:12px;">
+          <input type="checkbox" id="md-resikemarin-toggle" style="width:18px; height:18px;">
+          <span>Aktifkan Info Resi Kemarin</span>
+        </label>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label for="md-resikemarin-time" style="font-size:13.5px; color:var(--ink-soft);">Jam kirim (WIB)</label>
+          <input type="time" id="md-resikemarin-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
         </div>
       </div>
       <div class="md-card">
@@ -5244,7 +5272,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.24.6</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.24.8</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5429,7 +5457,21 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.24.6 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.24.8 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Info Resi Kemarin ke CS</b> — tiap pagi (default 08:45 WIB, jam &amp; on/off diatur di Master Data &gt; Tampilan), tiap CS dapat DM daftar customer MILIKNYA SENDIRI yang resinya sudah di-upload kemarin oleh Daftar Logistik (khusus uploader yang terdaftar di Daftar Logistik, bukan siapa saja).</li>
+            <li><b>Peringatan Logistik sekarang bisa diatur</b> — toggle aktif/nonaktif &amp; jam kirim (sebelumnya hardcode 08:45) dipindah ke Master Data &gt; Ekspedisi, di bawah Daftar Logistik.</li>
+            <li><b>Riwayat resi sekarang ikut mencatat siapa yang upload</b> — sebelumnya cuma nominal/waktu/ekspedisi yang tersimpan. Data lama (sebelum update ini) tidak tercatat pengunggahnya, jadi tidak akan pernah lolos filter "khusus Logistik" di atas.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.24.7</div>
+          <ul>
+            <li><b>Tambah Ongkir di rekap Logistik &amp; /status</b> — field <code>ratePerKg</code>/<code>ongkirManual</code>/<code>ongkirTotal</code> sebelumnya cuma dipakai sesaat (caption resi & riwayat rate), TIDAK ikut tersimpan permanen di data pesanan — jadi tidak bisa ditampilkan ulang. Sekarang disimpan juga di data pesanan, ditampilkan sebagai "Ongkir" (prioritas: Rp ongkir asli pesanan > tarif/kg > input manual). Catatan: cuma terisi utk pesanan yang dibuat SETELAH update ini — data lama belum punya field ini (tampil "-").</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.24.6</div>
           <ul>
             <li><b>Peringatan "ID Telegram Saya" belum diisi saat Tempel Pesanan</b> — sebelumnya kalau field ini kosong, fitur tetap jalan normal TAPI aktivitasnya diam-diam tidak tercatat atas nama siapa pun di rekap per-CS (Monitor Utama) — cuma kehitung di angka total gabungan, bikin bingung kenapa nama tidak muncul. Sekarang muncul peringatan merah di layar SEBELUM diproses.</li>
             <li><b>Petugas Logistik ketik "rekap"/"hasil"/"laporan"/"lapor"/"data"</b> — sekarang otomatis dapat ringkasan pesanan hari ini yang sudah dikonfirmasi Finance, dikelompokkan PER NAMA CS (nama customer, Qty, Berat, ekspedisi per pesanan). Sebelumnya command ini cuma dirancang utk CS/Finance — Logistik dapat pesan generik yang membingungkan.</li>
@@ -6340,7 +6382,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45"};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -6360,6 +6402,10 @@ function loadSettings(){
     if(typeof s.darkModeFeatureEnabled === "boolean") SETTINGS.darkModeFeatureEnabled = s.darkModeFeatureEnabled;
     if(typeof s.footerInfoEnabled === "boolean") SETTINGS.footerInfoEnabled = s.footerInfoEnabled;
     if(typeof s.dailyRecapAutoEnabled === "boolean") SETTINGS.dailyRecapAutoEnabled = s.dailyRecapAutoEnabled;
+    if(typeof s.resiKemarinInfoEnabled === "boolean") SETTINGS.resiKemarinInfoEnabled = s.resiKemarinInfoEnabled;
+    if(typeof s.resiKemarinInfoTime === "string" && s.resiKemarinInfoTime.trim()) SETTINGS.resiKemarinInfoTime = s.resiKemarinInfoTime.trim();
+    if(typeof s.logistikPengingatEnabled === "boolean") SETTINGS.logistikPengingatEnabled = s.logistikPengingatEnabled;
+    if(typeof s.logistikPengingatTime === "string" && s.logistikPengingatTime.trim()) SETTINGS.logistikPengingatTime = s.logistikPengingatTime.trim();
     if(s.stickerReactionsEnabled && typeof s.stickerReactionsEnabled === "object"){
       ["konfirmasi","hoax","deposit","void"].forEach(k=>{
         if(typeof s.stickerReactionsEnabled[k] === "boolean") SETTINGS.stickerReactionsEnabled[k] = s.stickerReactionsEnabled[k];
@@ -11108,6 +11154,42 @@ if ("serviceWorker" in navigator) {
       saveSettings();
       await confirmMasterDataSave(SETTINGS.dailyRecapAutoEnabled ? "Rekap invoice harian otomatis diaktifkan." : "Rekap invoice harian otomatis dimatikan (command manual tetap bisa dipakai).");
     });
+  }
+
+  /* ---------- toggle + jam: Info Resi Kemarin ke CS (Tampilan) ----------
+     SAMA pola dgn dailyRecapAutoEnabled di atas -- murni disimpan ke
+     settings, DIBACA & dicek oleh WORKER (checkResiKemarinInfoCs), tidak
+     ada elemen DOM app lain yang berubah. */
+  const toggleResiKemarin = document.getElementById("md-resikemarin-toggle");
+  const inputResiKemarinTime = document.getElementById("md-resikemarin-time");
+  if(toggleResiKemarin && inputResiKemarinTime){
+    toggleResiKemarin.checked = SETTINGS.resiKemarinInfoEnabled !== false;
+    inputResiKemarinTime.value = SETTINGS.resiKemarinInfoTime || "08:45";
+    const saveResiKemarin = async ()=>{
+      SETTINGS.resiKemarinInfoEnabled = toggleResiKemarin.checked;
+      SETTINGS.resiKemarinInfoTime = inputResiKemarinTime.value || "08:45";
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.resiKemarinInfoEnabled ? `Info Resi Kemarin ke CS diaktifkan, jam ${SETTINGS.resiKemarinInfoTime} WIB.` : "Info Resi Kemarin ke CS dimatikan.");
+    };
+    toggleResiKemarin.addEventListener("change", saveResiKemarin);
+    inputResiKemarinTime.addEventListener("change", saveResiKemarin);
+  }
+
+  /* ---------- toggle + jam: Peringatan Logistik Resi Belum Ada (Ekspedisi) ----------
+     SAMA pola, dibaca WORKER (checkLogistikPengingatResi). */
+  const toggleLogistikPengingat = document.getElementById("md-logistik-pengingat-toggle");
+  const inputLogistikPengingatTime = document.getElementById("md-logistik-pengingat-time");
+  if(toggleLogistikPengingat && inputLogistikPengingatTime){
+    toggleLogistikPengingat.checked = SETTINGS.logistikPengingatEnabled !== false;
+    inputLogistikPengingatTime.value = SETTINGS.logistikPengingatTime || "08:45";
+    const saveLogistikPengingat = async ()=>{
+      SETTINGS.logistikPengingatEnabled = toggleLogistikPengingat.checked;
+      SETTINGS.logistikPengingatTime = inputLogistikPengingatTime.value || "08:45";
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.logistikPengingatEnabled ? `Peringatan Logistik diaktifkan, jam ${SETTINGS.logistikPengingatTime} WIB.` : "Peringatan Logistik dimatikan.");
+    };
+    toggleLogistikPengingat.addEventListener("change", saveLogistikPengingat);
+    inputLogistikPengingatTime.addEventListener("change", saveLogistikPengingat);
   }
 
   const toggleStickerButtons = document.getElementById("md-toggle-stickerbuttons");
