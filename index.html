@@ -4402,10 +4402,21 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <select id="rekap-filter-status" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
         <option value="">Semua Status</option>
       </select>
+      <!-- BARU -- filter per hari (tanggal spesifik), pola SAMA dgn dropdown
+           CS/Status di sampingnya: opsinya diisi ulang otomatis dari data
+           yang benar-benar ada (isiUlangDropdownFilter()), bukan daftar
+           tetap, dan filternya jalan di browser (0 tambahan kuota baca KV). -->
+      <select id="rekap-filter-hari" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
+        <option value="">Semua Hari</option>
+      </select>
       <label style="display:flex; align-items:center; gap:6px; font-size:15px; white-space:nowrap;">
         <input type="checkbox" id="rekap-filter-belumInvoice" style="width:18px; height:18px;"> Belum di-Invoice saja
       </label>
     </div>
+    <!-- BARU -- ringkasan Total Qty per Hari, dari data yang SEDANG TAMPIL
+         (ikut semua filter aktif) -- pola SAMA persis dgn #rekap-cs-summary
+         yang sudah ada (kotak per-CS), cuma dikelompokkan per tanggal. -->
+    <div id="rekap-hari-summary" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px;"></div>
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:14px;">
       <button class="md-btn" id="rekap-sort-btn" style="white-space:nowrap; height:44px;">↓ Terbaru dulu</button>
       <button class="md-btn" id="rekap-refresh-btn" style="white-space:nowrap; height:44px;">🔄 Muat ulang</button>
@@ -13533,13 +13544,30 @@ if ("serviceWorker" in navigator) {
   const sortBtn = document.getElementById("rekap-sort-btn");
   const csFilterEl = document.getElementById("rekap-filter-cs");
   const statusFilterEl = document.getElementById("rekap-filter-status");
+  const hariFilterEl = document.getElementById("rekap-filter-hari"); // BARU -- filter per hari
   const belumInvoiceEl = document.getElementById("rekap-filter-belumInvoice");
   const csSummaryEl = document.getElementById("rekap-cs-summary");
+  const hariSummaryEl = document.getElementById("rekap-hari-summary"); // BARU -- ringkasan total qty per hari
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
   let sortDesc = true; // true = terbaru dulu (default, sama dgn urutan dari server)
 
   function openRekapPesanan(){
+    // BARU -- sambungkan ke toggle "Aktifkan menu Rekap Pesanan" (Master
+    // Data > Tampilan, SETTINGS.rekapPesananEnabled). SEBELUMNYA toggle
+    // itu cuma menyembunyikan tombol menu di sidebar (CSS habit-rekap-
+    // hidden) -- fungsi buka halaman ini sendiri TIDAK pernah dicek ulang,
+    // jadi kalau terpanggil lewat jalur lain (mis. tombol lama yang masih
+    // nempel di DOM, atau dipanggil manual lewat console), halaman tetap
+    // bisa kebuka walau togglenya OFF. Sekarang keduanya benar-benar
+    // konsisten satu sama lain: toggle OFF = halaman ini juga menolak
+    // terbuka, bukan cuma tombolnya yang hilang.
+    if(!SETTINGS.rekapPesananEnabled){
+      if(typeof showToast === "function"){
+        showToast("Menu Rekap Pesanan sedang nonaktif (Master Data > Tampilan).", true);
+      }
+      return;
+    }
     document.body.classList.remove("showing-home");
     document.body.classList.add("showing-rekap");
     window.scrollTo(0,0);
@@ -13555,6 +13583,7 @@ if ("serviceWorker" in navigator) {
   searchEl.addEventListener("input", ()=> renderRekapTable());
   csFilterEl.addEventListener("change", ()=> renderRekapTable());
   statusFilterEl.addEventListener("change", ()=> renderRekapTable());
+  hariFilterEl.addEventListener("change", ()=> renderRekapTable()); // BARU
   belumInvoiceEl.addEventListener("change", ()=> renderRekapTable());
   sortBtn.addEventListener("click", ()=>{
     sortDesc = !sortDesc;
@@ -13576,18 +13605,38 @@ if ("serviceWorker" in navigator) {
     return out;
   }
 
-  // BARU -- isi ulang pilihan dropdown CS & Status dari data yang BARU
-  // diambil (bukan daftar tetap) -- otomatis mengikuti apa pun yang
+  // BARU -- key tanggal (YYYY-MM-DD, zona Jakarta) dari createdAtMs tiap
+  // baris, dipakai buat filter per hari & kelompok ringkasan qty per hari.
+  // Dihitung dari createdAtMs (bukan field "hari"/"tanggalJam" yang sudah
+  // ada -- itu cuma teks nama hari/jam siap-tampil, "hari" berulang tiap
+  // minggu jadi TIDAK unik per tanggal, dan "tanggalJam" tidak reliable
+  // buat di-parse balik). Label tampilan digabung dari r.hari + tanggal.
+  function dateKeyDariRow(r){
+    return new Date(r.createdAtMs).toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+  }
+  function labelHariDariRow(r){
+    const tgl = new Date(r.createdAtMs).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta", day: "2-digit", month: "short" });
+    return `${r.hari}, ${tgl}`;
+  }
+
+  // BARU -- isi ulang pilihan dropdown CS, Status, & Hari dari data yang
+  // BARU diambil (bukan daftar tetap) -- otomatis mengikuti apa pun yang
   // benar-benar ada di 7-25 hari terakhir. Pilihan yang sedang dipilih
-  // dipertahankan kalau masih ada di daftar baru.
+  // dipertahankan kalau masih ada di daftar baru. Dropdown Hari diurutkan
+  // TERBARU dulu (konsisten dengan default sort tabel).
   function isiUlangDropdownFilter(){
     const csSet = [...new Set(allRows.map(r=> r.cs).filter(Boolean))].sort();
     const statusSet = [...new Set(allRows.map(r=> r.status).filter(Boolean))].sort();
-    const prevCs = csFilterEl.value, prevStatus = statusFilterEl.value;
+    const hariMap = new Map(); // dateKey -> label
+    allRows.forEach(r=> hariMap.set(dateKeyDariRow(r), labelHariDariRow(r)));
+    const hariSet = [...hariMap.keys()].sort().reverse();
+    const prevCs = csFilterEl.value, prevStatus = statusFilterEl.value, prevHari = hariFilterEl.value;
     csFilterEl.innerHTML = `<option value="">Semua CS</option>` + csSet.map(c=> `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join("");
     statusFilterEl.innerHTML = `<option value="">Semua Status</option>` + statusSet.map(s=> `<option value="${escHtml(s)}">${escHtml(s)}</option>`).join("");
+    hariFilterEl.innerHTML = `<option value="">Semua Hari</option>` + hariSet.map(dk=> `<option value="${dk}">${escHtml(hariMap.get(dk))}</option>`).join("");
     if(csSet.includes(prevCs)) csFilterEl.value = prevCs;
     if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
+    if(hariSet.includes(prevHari)) hariFilterEl.value = prevHari;
   }
 
   async function fetchAndRenderRekap(){
@@ -13618,11 +13667,13 @@ if ("serviceWorker" in navigator) {
     const keyword = searchEl.value.trim().toLowerCase();
     const csPilih = csFilterEl.value;
     const statusPilih = statusFilterEl.value;
+    const hariPilih = hariFilterEl.value; // BARU -- filter per hari (value = dateKey YYYY-MM-DD)
     const belumInvoiceSaja = belumInvoiceEl.checked;
     let rows = allRows.filter(r=>
       (!keyword || (r.customer||"").toLowerCase().includes(keyword)) &&
       (!csPilih || r.cs === csPilih) &&
       (!statusPilih || r.status === statusPilih) &&
+      (!hariPilih || dateKeyDariRow(r) === hariPilih) &&
       (!belumInvoiceSaja || !r.manualInvoiced)
     );
     rows.sort((a,b)=> sortDesc ? b.createdAtMs - a.createdAtMs : a.createdAtMs - b.createdAtMs);
@@ -13640,6 +13691,32 @@ if ("serviceWorker" in navigator) {
     csSummaryEl.innerHTML = [...perCs.entries()]
       .sort((a,b)=> b[1]-a[1])
       .map(([cs,jml])=> `<div style="background:var(--card); border:1px solid var(--line); border-radius:9px; padding:6px 12px; font-size:14px;"><b>${escHtml(cs)}</b>: ${jml} pesanan</div>`)
+      .join("");
+  }
+
+  // BARU (permintaan: filter per hari + total qty otomatis per hari) --
+  // ringkasan mini "Total Qty per Hari" di atas tabel, dari data yang
+  // SEDANG TAMPIL (ikut semua filter aktif -- CS/Status/keyword/Belum
+  // di-Invoice, BUKAN cuma filter Hari-nya sendiri). Pola & gaya box-nya
+  // SAMA PERSIS dengan renderRingkasanCs() yang sudah ada di atas, cuma
+  // dikelompokkan per tanggal (bukan per CS), dan diurutkan TERBARU dulu.
+  // Kalau filter Hari SEDANG aktif (cuma 1 hari yang mungkin tampil),
+  // ringkasan ini otomatis cuma berisi 1 kotak -- tetap berguna sebagai
+  // konfirmasi cepat "total qty hari itu" tanpa perlu scroll ke baris
+  // TOTAL di paling bawah tabel.
+  function renderRingkasanHari(rows){
+    const perHari = new Map(); // dateKey -> { label, jumlahPesanan, totalQty }
+    rows.forEach(r=>{
+      const dk = dateKeyDariRow(r);
+      const cur = perHari.get(dk) || { label: labelHariDariRow(r), jumlahPesanan: 0, totalQty: 0 };
+      cur.jumlahPesanan += 1;
+      cur.totalQty += (r.totalQty || 0);
+      perHari.set(dk, cur);
+    });
+    if(!perHari.size){ hariSummaryEl.innerHTML = ""; return; }
+    hariSummaryEl.innerHTML = [...perHari.entries()]
+      .sort((a,b)=> b[0].localeCompare(a[0])) // dateKey string, terbaru dulu
+      .map(([, v])=> `<div style="background:var(--card); border:1px solid var(--line); border-radius:9px; padding:6px 12px; font-size:14px;"><b>${escHtml(v.label)}</b>: ${v.jumlahPesanan} pesanan · Qty ${v.totalQty}</div>`)
       .join("");
   }
 
@@ -13662,6 +13739,7 @@ if ("serviceWorker" in navigator) {
   function renderRekapTable(){
     const { rows, kodeList, keyword } = terapkanFilter();
     renderRingkasanCs(rows);
+    renderRingkasanHari(rows);
 
     statusEl.textContent = `${rows.length} dari ${allRows.length} pesanan ditampilkan — diperbarui ${new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}.`;
 
