@@ -13639,10 +13639,10 @@ if ("serviceWorker" in navigator) {
     // tabel -> teks panjang bikin tabel melebar tidak wajar & kolom lain
     // ikut kelihatan berantakan/tidak proporsional.
     let html = "<thead><tr>" +
-      th("No", "38px") + th("Hari", "56px") + th("Tgl/Jam", "92px") + th("CS", "110px") + th("Customer", "170px") +
+      th("No", "38px") + th("Hari", "56px") + th("Tgl/Jam", "92px") + th("CS", "110px") + th("Customer", "240px") +
       kodeList.map(k=> th(escHtml(k), "48px")).join("") +
       th("Qty", "48px") +
-      th("Status") + th("KG", "56px") + th("Ekspedisi", "120px") + th("Resi", "44px") + th("Aksi", "110px") +
+      th("Status", "130px") + th("KG", "56px") + th("Ekspedisi", "120px") + th("Resi", "44px") + th("Aksi", "110px") +
       "</tr></thead><tbody>";
 
     if(!rows.length){
@@ -13672,10 +13672,10 @@ if ("serviceWorker" in navigator) {
       html += `<tr style="${rowBg}">` +
         td(i+1) + td(escHtml(r.hari)) + td(escHtml(r.tanggalJam), "white-space:nowrap;") +
         td(escHtml(r.cs), "white-space:normal; word-break:break-word; max-width:110px;") +
-        td(namaLink, "white-space:normal; max-width:170px;", escHtml(r.customer)) +
+        td(namaLink, "white-space:normal; max-width:240px;", escHtml(r.customer)) +
         kodeList.map(k=> td(r.items && r.items[k] ? r.items[k] : "-", "text-align:center;")).join("") +
         td(r.totalQty || 0, "text-align:center; font-weight:600;") +
-        td(escHtml(ringkasStatus(r.status)), "white-space:nowrap;") + td(escHtml(r.kg), "text-align:center; white-space:nowrap;") +
+        td(escHtml(ringkasStatus(r.status)), "white-space:normal; word-break:break-word; max-width:130px;") + td(escHtml(r.kg), "text-align:center; white-space:nowrap;") +
         td(escHtml(r.ekspedisi), "white-space:normal; word-break:break-word; max-width:120px;") +
         td(r.resi ? "✅" : "❌", "text-align:center;") +
         td(r.manualInvoiced
