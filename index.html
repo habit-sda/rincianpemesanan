@@ -1070,6 +1070,22 @@
       body.printing-rekap #rekap-table-wrap{border:none !important; overflow:visible !important;}
       body.printing-rekap #rekap-table{font-size:11px !important;}
     }
+    /* BARU -- tombol toggle status Invoice ("Belum" <-> "Sudah") di kolom
+       Aksi Rekap Pesanan. 2 state dibedakan warnanya supaya sekilas
+       kelihatan mana yang masih perlu di-invoice tanpa perlu baca teks. */
+    .rekap-invoice-btn{
+      border-radius:7px; font-weight:700; letter-spacing:.01em;
+      transition:filter .15s, opacity .15s; white-space:nowrap;
+    }
+    .rekap-invoice-btn.state-belum{
+      background:#fdecea; color:var(--danger-red); border:1px solid #f3c2bc;
+    }
+    .rekap-invoice-btn.state-belum:hover{ filter:brightness(0.96); }
+    .rekap-invoice-btn.state-sudah{
+      background:var(--primary-green); color:#fff; border:1px solid var(--primary-green);
+    }
+    .rekap-invoice-btn.state-sudah:hover{ filter:brightness(1.08); }
+    .rekap-invoice-btn:disabled{ opacity:.6; cursor:default; }
 
     .home-screen{
       flex-direction:column;gap:22px;padding:calc(18px + env(safe-area-inset-top)) 16px 10px;
@@ -5428,9 +5444,9 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="calc-popup confirm-popup reset-confirm-popup" role="dialog" aria-label="Konfirmasi reset">
       <button id="reset-confirm-close" class="reset-confirm-x" aria-label="Batal">✕</button>
       <div class="confirm-body reset-confirm-body">
-        <div class="reset-confirm-icon">⚠</div>
+        <div id="reset-confirm-icon" class="reset-confirm-icon">⚠</div>
         <p id="reset-confirm-text" class="reset-confirm-title">Kosongkan semua isian di tab ini?</p>
-        <p class="confirm-warning">Tindakan ini tidak bisa dibatalkan.</p>
+        <p id="reset-confirm-warning" class="confirm-warning">Tindakan ini tidak bisa dibatalkan.</p>
       </div>
       <div class="confirm-actionrow reset-confirm-actionrow">
         <button id="reset-confirm-cancel" class="calc-actbtn reset-cancel-btn">Batal</button>
@@ -8726,29 +8742,54 @@ calc("penjualan"); calc("custom");
 (function(){
   const overlay = document.getElementById("reset-confirm-overlay");
   const textEl = document.getElementById("reset-confirm-text");
+  const warningEl = document.getElementById("reset-confirm-warning");
+  const iconEl = document.getElementById("reset-confirm-icon");
   const btnCancel = document.getElementById("reset-confirm-cancel");
   const btnClose = document.getElementById("reset-confirm-close");
   const btnOk = document.getElementById("reset-confirm-ok");
+  // Simpan tampilan DEFAULT (khusus alur Reset) sekali di awal, supaya
+  // jalur generik (showGeneric) bisa balikin lagi ke ini kalau opts-nya
+  // tidak dikasih -- popup ini dipakai bareng utk beberapa konteks
+  // berbeda (Reset, toggle Invoice, dst), jadi tiap konteks bisa punya
+  // ikon/warna/teks tombol sendiri TANPA bikin popup baru terpisah.
+  const DEFAULT_OK_TEXT = btnOk.textContent;
+  const DEFAULT_WARNING = warningEl.textContent;
+  const DEFAULT_ICON = iconEl.textContent;
   let targetTab = null;
-  let pendingCallback = null; // dipakai jalur generik (mis. reset Keranjang Mode Kasir)
+  let pendingCallback = null; // dipakai jalur generik (mis. reset Keranjang Mode Kasir, toggle Invoice)
 
   function openConfirm(tab){
     targetTab = tab;
     pendingCallback = null;
     const namaTab = tab === "penjualan" ? "Penjualan (Grosir)" : "Custom";
     textEl.textContent = `Kosongkan semua isian di tab "${namaTab}"?`;
+    warningEl.textContent = DEFAULT_WARNING;
+    iconEl.textContent = DEFAULT_ICON;
+    iconEl.style.background = ""; iconEl.style.color = "";
+    btnOk.textContent = DEFAULT_OK_TEXT;
+    btnOk.style.background = "";
     overlay.hidden = false;
   }
   function closeConfirm(){ overlay.hidden = true; targetTab = null; pendingCallback = null; }
 
   /* ---- Jalur generik: popup konfirmasi kustom yang sama, dipakai fitur
-     lain (mis. tombol Reset Keranjang di Mode Kasir) supaya seluruh app
-     konsisten pakai 1 komponen popup ini, bukan confirm() bawaan browser
-     yang tampilannya kecil/kurang jelas & bisa diblokir di iframe. ---- */
-  function showGeneric(message, onConfirm){
+     lain (mis. tombol Reset Keranjang di Mode Kasir, toggle status Invoice
+     di Rekap Pesanan) supaya seluruh app konsisten pakai 1 komponen popup
+     ini, bukan confirm() bawaan browser yang tampilannya kecil/kurang
+     jelas & bisa diblokir di iframe. "opts" opsional dipakai kalau
+     konteksnya BUKAN "kosongkan data" (teks tombol/ikon/peringatan beda) --
+     kalau tidak dikasih, semua balik ke tampilan default (perilaku lama,
+     tidak berubah sama sekali). ---- */
+  function showGeneric(message, onConfirm, opts){
     targetTab = null;
     pendingCallback = onConfirm;
     textEl.textContent = message;
+    warningEl.textContent = (opts && opts.warningText) || DEFAULT_WARNING;
+    iconEl.textContent = (opts && opts.icon) || DEFAULT_ICON;
+    iconEl.style.background = (opts && opts.iconBg) || "";
+    iconEl.style.color = (opts && opts.iconColor) || "";
+    btnOk.textContent = (opts && opts.okText) || DEFAULT_OK_TEXT;
+    btnOk.style.background = (opts && opts.okColor) || "";
     overlay.hidden = false;
   }
   window.showResetConfirm = showGeneric;
@@ -13678,9 +13719,7 @@ if ("serviceWorker" in navigator) {
         td(escHtml(ringkasStatus(r.status)), "white-space:normal; word-break:break-word; max-width:130px;") + td(escHtml(r.kg), "text-align:center; white-space:nowrap;") +
         td(escHtml(r.ekspedisi), "white-space:normal; word-break:break-word; max-width:120px;") +
         td(r.resi ? "✅" : "❌", "text-align:center;") +
-        td(r.manualInvoiced
-          ? `<span style="color:var(--primary-green); font-weight:600; white-space:nowrap;">✓ Invoice</span>`
-          : `<button class="md-btn rekap-invoice-btn" data-anchor="${escHtml(r.anchorId)}" style="height:auto; padding:5px 10px; font-size:13px;">Invoice</button>`) +
+        td(`<button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:5px 10px; font-size:13px;">${r.manualInvoiced ? "✓ Sudah" : "Belum"}</button>`) +
         "</tr>";
     });
 
@@ -13704,29 +13743,61 @@ if ("serviceWorker" in navigator) {
     html += "</tbody>";
     tableEl.innerHTML = html;
 
+    // BARU -- tombol Aksi Invoice sekarang TOGGLE 2 arah (Belum <-> Sudah),
+    // bukan cuma 1 arah spt sebelumnya (dulu begitu jadi "Sudah" tidak
+    // bisa dibatalkan lagi dari sini). Setiap kali AKAN berubah arah
+    // (Belum->Sudah maupun Sudah->Belum), WAJIB konfirmasi dulu lewat
+    // popup kustom yang sama dipakai fitur lain (window.showResetConfirm)
+    // -- BUKAN confirm() bawaan browser, karena itu sering diblokir di
+    // dalam iframe/preview sehingga tombolnya terlihat tidak berfungsi.
     tableEl.querySelectorAll(".rekap-invoice-btn").forEach(btn=>{
-      btn.addEventListener("click", async ()=>{
-        btn.disabled = true;
-        btn.textContent = "…";
-        try{
-          const res = await fetch(MASTER_DATA_WORKER_URL + "/rekap-pesanan-invoice-toggle", {
-            method: "POST",
-            headers: workerHeaders({ "Content-Type": "application/json" }),
-            body: JSON.stringify({ anchorId: btn.dataset.anchor }),
-          });
-          const body = await res.json();
-          if(!res.ok || !body.ok) throw new Error(body.error || "Gagal.");
-          if(body.manualInvoiced){
-            const row = allRows.find(r=> r.anchorId === btn.dataset.anchor);
-            if(row) row.manualInvoiced = true;
-            btn.outerHTML = `<span style="color:var(--primary-green); font-weight:600;">✓ Sudah di Invoice</span>`;
-          }else{
-            btn.disabled = false; btn.textContent = "Invoice";
+      btn.addEventListener("click", ()=>{
+        const anchorId = btn.dataset.anchor;
+        const row = allRows.find(r=> r.anchorId === anchorId);
+        const sedangSudah = btn.dataset.state === "sudah";
+        const namaCustomer = (row && row.customer) ? `"${row.customer}"` : "pesanan ini";
+        const pesanKonfirmasi = sedangSudah
+          ? `Batalkan status invoice ${namaCustomer}? Statusnya akan kembali menjadi "Belum".`
+          : `Tandai ${namaCustomer} sudah dibuatkan invoice? Statusnya akan berubah menjadi "Sudah".`;
+        // Tampilan popup disesuaikan arah perubahannya: hijau/centang kalau
+        // MENANDAI sudah invoice, merah/tanda-seru kalau MEMBATALKAN --
+        // supaya sekilas kelihatan ini konfirmasi yang mana tanpa baca teks.
+        const opts = sedangSudah
+          ? { icon: "↩", iconBg: "#fdecea", iconColor: "var(--danger-red)",
+              okText: "Ya, Batalkan", okColor: "var(--danger-red)",
+              warningText: "Status bisa ditandai \"Sudah\" lagi kapan saja kalau berubah pikiran." }
+          : { icon: "✓", iconBg: "#e6f4ea", iconColor: "var(--primary-green)",
+              okText: "Ya, Sudah Invoice", okColor: "var(--primary-green)",
+              warningText: "Status masih bisa dibatalkan lagi kapan saja lewat tombol yang sama." };
+
+        window.showResetConfirm(pesanKonfirmasi, async ()=>{
+          const labelSebelum = btn.textContent;
+          const stateSebelum = btn.dataset.state;
+          btn.disabled = true;
+          btn.textContent = "…";
+          try{
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/rekap-pesanan-invoice-toggle", {
+              method: "POST",
+              headers: workerHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ anchorId }),
+            });
+            const body = await res.json();
+            if(!res.ok || !body.ok) throw new Error(body.error || "Gagal.");
+
+            if(row) row.manualInvoiced = !!body.manualInvoiced;
+            const jadiSudah = !!body.manualInvoiced;
+            btn.dataset.state = jadiSudah ? "sudah" : "belum";
+            btn.classList.remove("state-belum", "state-sudah");
+            btn.classList.add(jadiSudah ? "state-sudah" : "state-belum");
+            btn.textContent = jadiSudah ? "✓ Sudah" : "Belum";
+          }catch(e){
+            btn.textContent = labelSebelum;
+            btn.dataset.state = stateSebelum;
+            alert("Gagal menyimpan: " + (e.message || e));
+          }finally{
+            btn.disabled = false;
           }
-        }catch(e){
-          btn.disabled = false; btn.textContent = "Invoice";
-          alert("Gagal menyimpan: " + (e.message || e));
-        }
+        }, opts);
       });
     });
   }
