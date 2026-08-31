@@ -5244,7 +5244,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.24.5</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.24.6</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5429,7 +5429,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.24.5 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.24.6 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Peringatan "ID Telegram Saya" belum diisi saat Tempel Pesanan</b> — sebelumnya kalau field ini kosong, fitur tetap jalan normal TAPI aktivitasnya diam-diam tidak tercatat atas nama siapa pun di rekap per-CS (Monitor Utama) — cuma kehitung di angka total gabungan, bikin bingung kenapa nama tidak muncul. Sekarang muncul peringatan merah di layar SEBELUM diproses.</li>
+            <li><b>Petugas Logistik ketik "rekap"/"hasil"/"laporan"/"lapor"/"data"</b> — sekarang otomatis dapat ringkasan pesanan hari ini yang sudah dikonfirmasi Finance, dikelompokkan PER NAMA CS (nama customer, Qty, Berat, ekspedisi per pesanan). Sebelumnya command ini cuma dirancang utk CS/Finance — Logistik dapat pesan generik yang membingungkan.</li>
+            <li><b>/status &lt;nama&gt; sekarang ikut tampilkan status resi</b> — pesan kedua otomatis terkirim berisi: status resi (✅ sudah tercatat / ⏳ belum ada riwayat), ekspedisi, jadwal kirim, dan CS yang membuat pesanan itu.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.24.5</div>
           <ul>
             <li><b>Perbaikan bug: popup "Perbarui Sekarang" muncul terus-menerus, tidak pernah sampai ke "Sudah Versi Terbaru"</b> — penyebabnya perbandingan teks versi yang formatnya beda: footer nulis nomor versi tanpa huruf "v" di depan (mis. "2.24.5"), sedangkan Riwayat Update pakai huruf "v" (mis. "v2.24.5"). Kode lama membandingkan dua teks itu apa adanya, jadi walau angkanya sama app tetap mengira selalu ada versi baru. Sekarang perbandingan dilakukan berdasarkan angka versinya saja (bukan teks mentah), jadi prefix "v" tidak lagi bikin salah deteksi.</li>
           </ul>
@@ -9727,7 +9735,17 @@ if ("serviceWorker" in navigator) {
     }
     btn.disabled = true;
     statusEl.style.color = "";
-    statusEl.textContent = "AI sedang membaca pesanan…";
+    // BARU -- peringatan (bukan blokir) kalau "ID Telegram Saya" belum
+    // diisi: fitur Tempel Pesanan TETAP jalan normal, TAPI aktivitasnya
+    // tidak akan tercatat atas nama siapa pun di rekap per-CS (Monitor
+    // Utama), cuma kehitung di angka total gabungan. Ketahuan dari awal,
+    // bukan belakangan pas cek rekap ternyata namanya tidak muncul.
+    if(!getTelegramSenderId()){
+      statusEl.style.color = "var(--danger-red)";
+      statusEl.textContent = "⚠️ \"ID Telegram Saya\" belum diisi (menu ☰ footer) -- lanjut memproses, tapi aktivitasmu TIDAK akan tercatat di rekap per-CS...";
+    }else{
+      statusEl.textContent = "AI sedang membaca pesanan…";
+    }
     try{
       const productCatalog = prodListOf(poSheet).map(p=> ({ name: p.name, alias: p.alias || "" }));
       const res = await fetch(MASTER_DATA_WORKER_URL + "/parse-order", {
