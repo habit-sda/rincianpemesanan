@@ -1963,6 +1963,34 @@
     margin-top:12px;width:100%;height:44px;border-radius:9px;border:1.5px dashed var(--primary-green);
     background:#e3f0fa;color:var(--primary-green);font-weight:700;font-size:13px;cursor:pointer;
   }
+  /* ---------- Mode Edit "Daftar produk" (kunci/buka supaya tidak rawan
+     ke-edit tidak sengaja) ---------- */
+  .md-produk-editbar{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:10px 12px;
+    border-radius:9px;border:1px solid var(--line);background:var(--paper-dark);
+  }
+  .md-produk-editbar-status{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;flex:1;min-width:140px;}
+  .md-produk-editbar-status svg{width:15px;height:15px;flex-shrink:0;}
+  .md-produk-editbar.locked .md-produk-editbar-status{color:var(--ink-soft);}
+  .md-produk-editbar.unlocked .md-produk-editbar-status{color:#b8860b;}
+  .md-produk-editbtn{
+    height:38px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--card);
+    font-weight:700;font-size:12px;cursor:pointer;color:var(--ink);white-space:nowrap;
+  }
+  .md-produk-editbtn.primary{background:var(--primary-green);color:#fff;border:none;}
+  .md-produk-editbtn.ghost{background:transparent;}
+  /* Baris terkunci: input dibuat jelas "read-only" secara visual, dan
+     tombol-tombol aksi (geser urutan, naik/turun, detail, tambah) ikut
+     dinonaktifkan supaya benar-benar tidak bisa diubah tanpa sengaja
+     sampai "Mode Edit" dinyalakan. */
+  #md-produk-list.md-locked .md-row input:disabled,
+  #md-produk-list.md-locked .md-p-name:disabled{
+    background:transparent;color:var(--ink);opacity:.85;cursor:default;-webkit-text-fill-color:var(--ink);
+  }
+  #md-produk-list.md-locked .md-row-handle:disabled,
+  #md-produk-list.md-locked .md-row-detail:disabled,
+  #md-produk-list.md-locked .md-row-move button:disabled{opacity:.25;cursor:default;}
+  #md-produk-add[hidden]{display:none;}
   .md-eksrow{padding:6px 0;border-bottom:1px solid var(--line);}
   .md-eksrow:last-child{border-bottom:none;}
   .md-eksrow input{height:38px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;font-family:inherit;background:var(--card);}
@@ -4786,12 +4814,21 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-card">
         <h3>Daftar produk</h3>
         <div class="md-note" style="margin-bottom:10px;">5 produk pertama (lihat urutan di bawah) otomatis jadi pilihan di tab Penjualan (Grosir); sisanya tersedia di tab Custom. Geser ikon ⠿ atau pakai tombol ▲▼ untuk mengubah urutan.</div>
+        <div class="md-produk-editbar locked" id="md-produk-editbar">
+          <span class="md-produk-editbar-status" id="md-produk-editbar-status">
+            <svg id="md-produk-editbar-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <span id="md-produk-editbar-text">Terkunci — aktifkan Mode Edit untuk mengubah</span>
+          </span>
+          <button type="button" class="md-produk-editbtn primary" id="md-produk-edit-toggle">✏️ Mode Edit</button>
+          <button type="button" class="md-produk-editbtn primary" id="md-produk-edit-save" hidden>💾 Simpan &amp; Kunci</button>
+          <button type="button" class="md-produk-editbtn ghost" id="md-produk-edit-cancel" hidden>Batal</button>
+        </div>
         <div class="md-row md-row-header" id="md-produk-header-row" style="font-size:11.5px;color:var(--ink-soft);font-weight:700;border-bottom:2px solid var(--line);">
           <span></span><span>Nama produk</span><span>Kode Singkat</span><span>Harga</span><span class="md-col-berat">Berat (kg)</span><span class="md-col-satuan">Satuan</span><span></span><span></span>
         </div>
-        <div id="md-produk-list"></div>
-        <button class="md-addrow" id="md-produk-add">+ Tambah produk</button>
-        <div class="md-note">Ubah diskon tier, subsidi ongkir & link gambar per produk lewat ikon 🖼️ "Detail" di setiap baris.</div>
+        <div id="md-produk-list" class="md-locked"></div>
+        <button class="md-addrow" id="md-produk-add" hidden>+ Tambah produk</button>
+        <div class="md-note">Ubah diskon tier, subsidi ongkir &amp; link gambar per produk lewat ikon 🖼️ "Detail" di setiap baris — hanya bisa saat Mode Edit aktif.</div>
       </div>
     </div>
 
@@ -8183,7 +8220,13 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   let isSavingDraft = false;
   async function autosaveDraft(){
     const senderId = getTelegramSenderId();
-    const customerName = nameInput.value.trim();
+    // BARU -- "NEW" di akhir nama (mis. "DESY (INDRAMAYU) NEW") dibuang
+    // otomatis di sini juga, bukan cuma di daftar saran nama. "NEW" cuma
+    // penanda sementara pas CS ngetik (pesanan pertama customer itu) —
+    // begitu benar-benar disimpan/dikirim, tidak perlu ikut kesimpan
+    // permanen (soalnya bikin nama kepanjangan & berantakan di Rekap
+    // Pesanan, invoice, dst).
+    const customerName = stripNewTag(nameInput.value.trim());
     if(!senderId || !MASTER_DATA_WORKER_URL || isSavingDraft) return;
     isSavingDraft = true;
     try{
@@ -8280,7 +8323,9 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   window.__openKirimTelegramModal = openModal;
 
   btnSend.addEventListener("click", async ()=>{
-    const customerName = nameInput.value.trim();
+    // BARU -- sama seperti autosaveDraft(): buang "NEW" sebelum benar-benar
+    // dikirim & tersimpan, supaya tidak nempel permanen di nama customer.
+    const customerName = stripNewTag(nameInput.value.trim());
     const senderId = getTelegramSenderId();
     if(!customerName){
       statusEl.textContent = "Nama customer wajib diisi.";
@@ -11763,7 +11808,13 @@ if ("serviceWorker" in navigator) {
   /* ---------- Master Nama Pelanggan ----------
      Dimuat otomatis begitu tab "Master Nama" dibuka (lihat pemanggilan di
      handler klik .md-tab di bawah). Edit/hapus langsung ke server (bukan
-     ke SETTINGS lokal) supaya semua device lihat daftar yang sama. */
+     ke SETTINGS lokal) supaya semua device lihat daftar yang sama.
+     BARU -- daftar yang dikembalikan GET /customer-names SEKARANG sudah
+     otomatis dibersihkan dari tag " NEW" (+ duplikat lamanya) di sisi
+     worker (lihat getCustomerNameHistory di Worker_RincianPemesanan.js),
+     jadi tab ini TIDAK PERLU strip manual lagi di sini -- nama yang
+     tampil di sini sudah pasti bersih. Ini SENGAJA beda dari Rekap
+     Pesanan, yang memang harus tetap tampilkan "NEW" apa adanya. */
   (function(){
     const listEl = document.getElementById("md-nama-list");
     const searchEl = document.getElementById("md-nama-search");
@@ -12206,6 +12257,8 @@ if ("serviceWorker" in navigator) {
   document.getElementById("md-panel-close").addEventListener("click", ()=> panel.hidden = true);
   function openPanel(){
     panel.hidden = false;
+    mdProdukSnapshot = null;
+    setMdProdukEditMode(false);
     renderProdukList();
     renderEkspedisiList();
     resetHapusForm();
@@ -12277,29 +12330,89 @@ if ("serviceWorker" in navigator) {
   // CATATAN: produk TIDAK bisa dihapus dari sini lagi — hanya lewat tab
   // "Hapus Data" (masukkan kode produknya, mis. P01). Klik badge kode di
   // setiap baris untuk menyalinnya.
+  /* ---- Mode Edit: daftar produk TERKUNCI (read-only) secara default
+     supaya tidak rawan ter-edit tidak sengaja (mis. kepencet pas
+     scroll). Baru bisa diubah setelah tombol "Mode Edit" dinyalakan,
+     dan disarankan ditutup lagi lewat "Simpan & Kunci" setelah selesai.
+     Snapshot data diambil begitu Mode Edit dinyalakan supaya tombol
+     "Batal" bisa mengembalikan seperti semula kalau berubah pikiran. ---- */
+  let mdProdukEditMode = false;
+  let mdProdukSnapshot = null;
+  function setMdProdukEditMode(on){
+    mdProdukEditMode = !!on;
+    const bar = document.getElementById("md-produk-editbar");
+    const text = document.getElementById("md-produk-editbar-text");
+    const icon = document.getElementById("md-produk-editbar-icon");
+    const btnToggle = document.getElementById("md-produk-edit-toggle");
+    const btnSave = document.getElementById("md-produk-edit-save");
+    const btnCancel = document.getElementById("md-produk-edit-cancel");
+    const addBtn = document.getElementById("md-produk-add");
+    if(mdProdukEditMode){
+      bar.classList.remove("locked"); bar.classList.add("unlocked");
+      text.textContent = "Mode Edit aktif — perubahan langsung tersimpan";
+      icon.innerHTML = '<rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 7.6-1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>';
+      btnToggle.hidden = true;
+      btnSave.hidden = false;
+      btnCancel.hidden = false;
+      addBtn.hidden = false;
+    } else {
+      bar.classList.remove("unlocked"); bar.classList.add("locked");
+      text.textContent = "Terkunci — aktifkan Mode Edit untuk mengubah";
+      icon.innerHTML = '<rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>';
+      btnToggle.hidden = false;
+      btnSave.hidden = true;
+      btnCancel.hidden = true;
+      addBtn.hidden = true;
+    }
+  }
+  document.getElementById("md-produk-edit-toggle").addEventListener("click", ()=>{
+    mdProdukSnapshot = JSON.parse(JSON.stringify(PRODUCTS));
+    setMdProdukEditMode(true);
+    renderProdukList();
+  });
+  document.getElementById("md-produk-edit-save").addEventListener("click", ()=>{
+    mdProdukSnapshot = null;
+    setMdProdukEditMode(false);
+    renderProdukList();
+  });
+  document.getElementById("md-produk-edit-cancel").addEventListener("click", ()=>{
+    if(mdProdukSnapshot){
+      const changed = JSON.stringify(PRODUCTS) !== JSON.stringify(mdProdukSnapshot);
+      if(changed && !confirm("Batalkan semua perubahan yang belum di-\"Simpan & Kunci\" pada Daftar produk?")) return;
+      PRODUCTS.length = 0;
+      mdProdukSnapshot.forEach(p=> PRODUCTS.push(p));
+      refreshAfterDataChange();
+    }
+    mdProdukSnapshot = null;
+    setMdProdukEditMode(false);
+    renderProdukList();
+  });
   function renderProdukList(){
     const list = document.getElementById("md-produk-list");
+    const locked = !mdProdukEditMode;
+    list.classList.toggle("md-locked", locked);
+    const dis = locked ? "disabled" : "";
     list.innerHTML = PRODUCTS.map((p,i)=>{
       const divider = i===5 ? `<div class="md-produk-divider">Di bawah ini hanya tampil di Custom</div>` : "";
       return divider + `
       <div class="md-row" data-idx="${i}">
-        <button class="md-row-handle" draggable="true" data-drag-idx="${i}" aria-label="Geser urutan" title="Tahan &amp; geser untuk urutkan">
+        <button class="md-row-handle" draggable="${locked ? "false" : "true"}" ${dis} data-drag-idx="${i}" aria-label="Geser urutan" title="Tahan &amp; geser untuk urutkan">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="6" r="1.4" fill="currentColor"/><circle cx="9" cy="12" r="1.4" fill="currentColor"/><circle cx="9" cy="18" r="1.4" fill="currentColor"/><circle cx="15" cy="6" r="1.4" fill="currentColor"/><circle cx="15" cy="12" r="1.4" fill="currentColor"/><circle cx="15" cy="18" r="1.4" fill="currentColor"/></svg>
         </button>
         <div class="md-p-namewrap">
           <span class="md-kode-badge" data-copy-kode="${p.kode}" title="Klik untuk salin kode">${p.kode}</span>
-          <input type="text" class="md-p-name" value="${p.name}" placeholder="Nama produk">
+          <input type="text" class="md-p-name" ${dis} value="${p.name}" placeholder="Nama produk">
         </div>
-        <input type="text" class="md-p-kodesingkat" value="${p.kodeSingkat || ""}" placeholder="mis. HA" maxlength="12" title="Kode singkat untuk kolom di halaman Rekap Pesanan (mis. HA, HS500g)">
-        <input type="text" inputmode="numeric" class="md-p-harga" value="${(p.harga||0).toLocaleString('id-ID')}" placeholder="Harga">
-        <input type="number" step="0.01" class="md-p-berat md-col-berat" value="${p.berat}" placeholder="Berat">
-        <input type="text" class="md-p-satuan md-col-satuan" value="${p.satuan}" placeholder="Satuan">
-        <button class="md-row-detail" data-detail="${i}" title="Detail: diskon tier, subsidi ongkir & link gambar" aria-label="Detail produk">
+        <input type="text" class="md-p-kodesingkat" ${dis} value="${p.kodeSingkat || ""}" placeholder="mis. HA" maxlength="12" title="Kode singkat untuk kolom di halaman Rekap Pesanan (mis. HA, HS500g)">
+        <input type="text" inputmode="numeric" class="md-p-harga" ${dis} value="${(p.harga||0).toLocaleString('id-ID')}" placeholder="Harga">
+        <input type="number" step="0.01" class="md-p-berat md-col-berat" ${dis} value="${p.berat}" placeholder="Berat">
+        <input type="text" class="md-p-satuan md-col-satuan" ${dis} value="${p.satuan}" placeholder="Satuan">
+        <button class="md-row-detail" ${dis} data-detail="${i}" title="Detail: diskon tier, subsidi ongkir & link gambar" aria-label="Detail produk">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 15.5l4.5-4 3 2.5L16.5 9 20 13" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         </button>
         <div class="md-row-move">
-          <button data-move-up="${i}" aria-label="Naikkan urutan" ${i===0 ? "disabled" : ""}>&#9650;</button>
-          <button data-move-down="${i}" aria-label="Turunkan urutan" ${i===PRODUCTS.length-1 ? "disabled" : ""}>&#9660;</button>
+          <button data-move-up="${i}" aria-label="Naikkan urutan" ${(locked || i===0) ? "disabled" : ""}>&#9650;</button>
+          <button data-move-down="${i}" aria-label="Turunkan urutan" ${(locked || i===PRODUCTS.length-1) ? "disabled" : ""}>&#9660;</button>
         </div>
       </div>
     `;
@@ -12310,17 +12423,18 @@ if ("serviceWorker" in navigator) {
       bindAutoSelect(row.querySelector(".md-p-name"));
       bindAutoSelect(row.querySelector(".md-p-berat"));
       bindAutoSelect(row.querySelector(".md-p-satuan"));
-      row.querySelector(".md-p-name").addEventListener("change", ()=>{ PRODUCTS[idx].name = row.querySelector(".md-p-name").value.trim() || PRODUCTS[idx].name; refreshAfterDataChange(); renderProdukList(); });
-      row.querySelector(".md-p-kodesingkat").addEventListener("change", ()=>{ PRODUCTS[idx].kodeSingkat = row.querySelector(".md-p-kodesingkat").value.trim(); refreshAfterDataChange(); });
-      row.querySelector(".md-p-harga").addEventListener("change", ()=>{ PRODUCTS[idx].harga = parseRp(row.querySelector(".md-p-harga").value); refreshAfterDataChange(); });
-      row.querySelector(".md-p-berat").addEventListener("change", ()=>{ PRODUCTS[idx].berat = parseFloat(row.querySelector(".md-p-berat").value)||0; refreshAfterDataChange(); });
-      row.querySelector(".md-p-satuan").addEventListener("change", ()=>{ PRODUCTS[idx].satuan = row.querySelector(".md-p-satuan").value.trim() || PRODUCTS[idx].satuan; refreshAfterDataChange(); });
+      row.querySelector(".md-p-name").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].name = row.querySelector(".md-p-name").value.trim() || PRODUCTS[idx].name; refreshAfterDataChange(); renderProdukList(); });
+      row.querySelector(".md-p-kodesingkat").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].kodeSingkat = row.querySelector(".md-p-kodesingkat").value.trim(); refreshAfterDataChange(); });
+      row.querySelector(".md-p-harga").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].harga = parseRp(row.querySelector(".md-p-harga").value); refreshAfterDataChange(); });
+      row.querySelector(".md-p-berat").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].berat = parseFloat(row.querySelector(".md-p-berat").value)||0; refreshAfterDataChange(); });
+      row.querySelector(".md-p-satuan").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].satuan = row.querySelector(".md-p-satuan").value.trim() || PRODUCTS[idx].satuan; refreshAfterDataChange(); });
     });
     list.querySelectorAll("[data-detail]").forEach(btn=>{
-      btn.addEventListener("click", ()=> openProdukDetail(+btn.dataset.detail));
+      btn.addEventListener("click", ()=> { if(!mdProdukEditMode) return; openProdukDetail(+btn.dataset.detail); });
     });
     /* ---- Urutan manual: tombol panah (kerja di semua perangkat) ---- */
     function moveProduk(idx, dir){
+      if(!mdProdukEditMode) return;
       const j = idx + dir;
       if(j<0 || j>=PRODUCTS.length) return;
       const tmp = PRODUCTS[idx]; PRODUCTS[idx] = PRODUCTS[j]; PRODUCTS[j] = tmp;
@@ -12337,6 +12451,7 @@ if ("serviceWorker" in navigator) {
     let dragSrcIdx = null;
     list.querySelectorAll(".md-row-handle").forEach(handle=>{
       handle.addEventListener("dragstart", (e)=>{
+        if(!mdProdukEditMode){ e.preventDefault(); return; }
         dragSrcIdx = +handle.dataset.dragIdx;
         const row = handle.closest(".md-row");
         if(row) row.classList.add("dragging");
@@ -12349,9 +12464,9 @@ if ("serviceWorker" in navigator) {
       });
     });
     list.querySelectorAll(".md-row").forEach(row=>{
-      row.addEventListener("dragover", (e)=>{ if(dragSrcIdx!==null) e.preventDefault(); });
+      row.addEventListener("dragover", (e)=>{ if(mdProdukEditMode && dragSrcIdx!==null) e.preventDefault(); });
       row.addEventListener("drop", (e)=>{
-        if(dragSrcIdx===null) return;
+        if(!mdProdukEditMode || dragSrcIdx===null) return;
         e.preventDefault();
         const targetIdx = +row.dataset.idx;
         if(targetIdx===dragSrcIdx) return;
@@ -12365,6 +12480,7 @@ if ("serviceWorker" in navigator) {
     bindKodeBadgeCopy(list);
   }
   document.getElementById("md-produk-add").addEventListener("click", ()=>{
+    if(!mdProdukEditMode) return;
     PRODUCTS.push({kode: nextKode("P"), name:"Produk baru", kodeSingkat:"", harga:0, diskon:[0,0,0], subsidi:[0,0,0], berat:1, satuan:"Pack", gambar:"", isiSachet:0, isiRenteng:0, isiPack:0});
     refreshAfterDataChange();
     renderProdukList();
@@ -13509,18 +13625,24 @@ if ("serviceWorker" in navigator) {
     statusEl.textContent = `${rows.length} dari ${allRows.length} pesanan ditampilkan — diperbarui ${new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}.`;
 
     const th = (t, w)=> `<th style="border:1px solid var(--line); padding:8px 8px; background:var(--card); text-align:left; position:sticky; top:0;${w?` width:${w};`:""}">${t}</th>`;
-    const td = (t, extra)=> `<td style="border:1px solid var(--line); padding:7px 8px;${extra||""}">${t}</td>`;
+    const td = (t, extra, title)=> `<td style="border:1px solid var(--line); padding:7px 8px;${extra||""}"${title ? ` title="${title}"` : ""}>${t}</td>`;
 
     // BARU -- lebar kolom disesuaikan per isinya (sebelumnya semua kolom
     // dapat padding sama rata walau isinya cuma 1-2 karakter, mis. "No"/
     // "Resi" jadi kelihatan bengkak/tidak proporsional). Kolom teks bebas
     // (Customer/Status/Ekspedisi) TIDAK dikasih width tetap -- biar
     // browser yang atur otomatis sesuai isinya.
+    // BARU -- CS, Customer, & Ekspedisi dikasih lebar maksimum tetap +
+    // dibungkus ke baris berikutnya (bukan nowrap) kalau isinya panjang
+    // (mis. handle Telegram panjang, nama customer + kota + "NEW", nama
+    // ekspedisi panjang). Sebelumnya kolom ini ikut aturan nowrap satu
+    // tabel -> teks panjang bikin tabel melebar tidak wajar & kolom lain
+    // ikut kelihatan berantakan/tidak proporsional.
     let html = "<thead><tr>" +
-      th("No", "38px") + th("Hari", "56px") + th("Tgl/Jam", "92px") + th("CS") + th("Customer") +
+      th("No", "38px") + th("Hari", "56px") + th("Tgl/Jam", "92px") + th("CS", "110px") + th("Customer", "170px") +
       kodeList.map(k=> th(escHtml(k), "48px")).join("") +
       th("Qty", "48px") +
-      th("Status") + th("KG", "56px") + th("Ekspedisi") + th("Resi", "44px") + th("Aksi", "110px") +
+      th("Status") + th("KG", "56px") + th("Ekspedisi", "120px") + th("Resi", "44px") + th("Aksi", "110px") +
       "</tr></thead><tbody>";
 
     if(!rows.length){
@@ -13543,12 +13665,18 @@ if ("serviceWorker" in navigator) {
       // BARU -- nama customer jadi link, buka DM ke bot dgn teks
       // "/status <nama>" SUDAH TERISI (Telegram tidak izinkan auto-kirim
       // dari link demi keamanan -- orangnya tetap perlu tap kirim sendiri).
-      const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline;">${escHtml(r.customer)}</a>`;
+      const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline; word-break:break-word;">${escHtml(r.customer)}</a>`;
+      // BARU -- title="..." supaya kalau masih terpotong di layar sempit,
+      // teks lengkapnya tetap bisa dibaca lewat hover (desktop) / tahan
+      // tap (mobile), tanpa perlu melebarkan kolom.
       html += `<tr style="${rowBg}">` +
-        td(i+1) + td(escHtml(r.hari)) + td(escHtml(r.tanggalJam), "white-space:nowrap;") + td(escHtml(r.cs)) + td(namaLink) +
+        td(i+1) + td(escHtml(r.hari)) + td(escHtml(r.tanggalJam), "white-space:nowrap;") +
+        td(escHtml(r.cs), "white-space:normal; word-break:break-word; max-width:110px;") +
+        td(namaLink, "white-space:normal; max-width:170px;", escHtml(r.customer)) +
         kodeList.map(k=> td(r.items && r.items[k] ? r.items[k] : "-", "text-align:center;")).join("") +
         td(r.totalQty || 0, "text-align:center; font-weight:600;") +
-        td(escHtml(ringkasStatus(r.status)), "white-space:nowrap;") + td(escHtml(r.kg), "text-align:center; white-space:nowrap;") + td(escHtml(r.ekspedisi)) +
+        td(escHtml(ringkasStatus(r.status)), "white-space:nowrap;") + td(escHtml(r.kg), "text-align:center; white-space:nowrap;") +
+        td(escHtml(r.ekspedisi), "white-space:normal; word-break:break-word; max-width:120px;") +
         td(r.resi ? "✅" : "❌", "text-align:center;") +
         td(r.manualInvoiced
           ? `<span style="color:var(--primary-green); font-weight:600; white-space:nowrap;">✓ Invoice</span>`
