@@ -5378,7 +5378,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.25.3</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.25.4</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5563,7 +5563,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.25.3 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.25.4 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan tampilan Rekap Pesanan</b> — kolom No/Hari/KG/Resi/Aksi dipersempit (sebelumnya kelihatan bengkak walau isinya cuma 1-2 karakter). Teks status dipersingkat jadi inti-nya saja (mis. "Cicilan" bukan lagi "Cicilan — Rp 500.000 dari Rp 1.500.000, kurang Rp 1.000.000") — rincian lengkap tetap bisa dilihat lewat klik nama customer.</li>
+            <li><b>Peringatan kalau kolom varian tidak muncul</b> — sebelumnya membingungkan karena kolomnya diam-diam tidak ada tanpa penjelasan. Sekarang muncul pesan jelas kalau belum ada "Kode Singkat" diisi di Master Data &gt; Produk.</li>
+            <li><b>Badge angka di sidebar dihapus</b> — atas permintaan, fitur ini dicabut lagi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.25.3</div>
           <ul>
             <li><b>Filter tambahan</b> di Rekap Pesanan — dropdown CS, dropdown Status, dan checkbox "Belum di-Invoice saja" (isi dropdown otomatis mengikuti data yang ada, bukan daftar tetap).</li>
             <li><b>Ekspor CSV</b> — tombol baru, mengunduh data yang SEDANG TAMPIL (ikut semua filter aktif) sebagai file .csv, siap dibuka Excel/Google Sheets.</li>
@@ -13425,26 +13433,6 @@ if ("serviceWorker" in navigator) {
     if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
   }
 
-  // BARU -- badge angka "belum di-Invoice" di sidebar, diperbarui tiap
-  // kali data diambil (baik saat halaman dibuka MAUPUN refresh manual).
-  function perbaruiBadgeSidebar(){
-    const btn = document.getElementById("sb-rekappesanan");
-    if(!btn) return;
-    let badge = btn.querySelector(".rekap-sidebar-badge");
-    const belum = allRows.filter(r=> !r.manualInvoiced).length;
-    if(belum > 0){
-      if(!badge){
-        badge = document.createElement("span");
-        badge.className = "rekap-sidebar-badge";
-        badge.style.cssText = "margin-left:auto; background:#e33; color:#fff; font-size:11px; font-weight:700; border-radius:10px; padding:1px 7px; line-height:1.5;";
-        btn.appendChild(badge);
-      }
-      badge.textContent = belum;
-    }else if(badge){
-      badge.remove();
-    }
-  }
-
   async function fetchAndRenderRekap(){
     if(isLoading) return;
     isLoading = true;
@@ -13457,7 +13445,6 @@ if ("serviceWorker" in navigator) {
       if(!res.ok) throw new Error(body.error || "Gagal memuat data.");
       allRows = body.rows || [];
       isiUlangDropdownFilter();
-      perbaruiBadgeSidebar();
       renderRekapTable();
     }catch(e){
       statusEl.textContent = "Gagal memuat: " + (e.message || e);
@@ -13499,24 +13486,54 @@ if ("serviceWorker" in navigator) {
       .join("");
   }
 
+  // BARU -- ringkas teks status yang panjang (mis. "Cicilan — Rp 500.000
+  // dari Rp 1.500.000, kurang Rp 1.000.000") jadi INTI-nya saja utk tabel
+  // ini (rincian lengkapnya tetap ada kalau klik nama -> /status). Emoji
+  // di depan (🚫⚠️💰💯✍️🤷⬜) DIPERTAHANKAN apa adanya, cuma teksnya dipotong.
+  function ringkasStatus(statusPenuh){
+    const m = (statusPenuh || "").match(/^(\S+)\s*(.*)$/); // pisah emoji dari teksnya
+    const emoji = m ? m[1] : "";
+    let teks = m ? m[2] : (statusPenuh || "");
+    if(/^cicilan/i.test(teks)) teks = "Cicilan";
+    else if(/^belum ada transfer/i.test(teks)) teks = "Belum ada transfer";
+    else if(/perlu dicek manual/i.test(teks)) teks = "Perlu dicek manual";
+    else if(/^kelebihan/i.test(teks)) teks = "Kelebihan/janggal";
+    else if(/^tidak ditemukan/i.test(teks)) teks = "Tidak ditemukan";
+    return `${emoji} ${teks}`.trim();
+  }
+
   function renderRekapTable(){
     const { rows, kodeList, keyword } = terapkanFilter();
     renderRingkasanCs(rows);
 
     statusEl.textContent = `${rows.length} dari ${allRows.length} pesanan ditampilkan — diperbarui ${new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}.`;
 
-    const th = (t)=> `<th style="border:1px solid var(--line); padding:8px 10px; background:var(--card); text-align:left; position:sticky; top:0;">${t}</th>`;
-    const td = (t, extra)=> `<td style="border:1px solid var(--line); padding:8px 10px;${extra||""}">${t}</td>`;
+    const th = (t, w)=> `<th style="border:1px solid var(--line); padding:8px 8px; background:var(--card); text-align:left; position:sticky; top:0;${w?` width:${w};`:""}">${t}</th>`;
+    const td = (t, extra)=> `<td style="border:1px solid var(--line); padding:7px 8px;${extra||""}">${t}</td>`;
 
+    // BARU -- lebar kolom disesuaikan per isinya (sebelumnya semua kolom
+    // dapat padding sama rata walau isinya cuma 1-2 karakter, mis. "No"/
+    // "Resi" jadi kelihatan bengkak/tidak proporsional). Kolom teks bebas
+    // (Customer/Status/Ekspedisi) TIDAK dikasih width tetap -- biar
+    // browser yang atur otomatis sesuai isinya.
     let html = "<thead><tr>" +
-      th("No") + th("Hari") + th("Tanggal/Jam") + th("CS") + th("Customer") +
-      kodeList.map(k=> th(escHtml(k))).join("") +
-      th("Total Qty") +
-      th("Status") + th("KG") + th("Ekspedisi") + th("Resi") + th("Aksi") +
+      th("No", "38px") + th("Hari", "56px") + th("Tgl/Jam", "92px") + th("CS") + th("Customer") +
+      kodeList.map(k=> th(escHtml(k), "48px")).join("") +
+      th("Qty", "48px") +
+      th("Status") + th("KG", "56px") + th("Ekspedisi") + th("Resi", "44px") + th("Aksi", "110px") +
       "</tr></thead><tbody>";
 
     if(!rows.length){
       html += `<tr><td colspan="${11 + kodeList.length}" style="border:1px solid var(--line); padding:16px; text-align:center; color:var(--ink-soft);">${keyword ? "Tidak ada nama yang cocok." : "Belum ada pesanan yang cocok dengan filter."}</td></tr>`;
+    }
+
+    // BARU -- kalau BELUM ADA satu pun produk yang diisi "Kode Singkat" di
+    // Master Data > Produk, kolom varian memang tidak akan pernah muncul
+    // (bukan bug) -- kasih tahu jelas di sini, biar tidak kelihatan
+    // "hilang misterius".
+    if(!kodeList.length){
+      html = html.replace("</tr></thead>",
+        `</tr><tr><td colspan="${11}" style="border:1px solid var(--line); padding:8px 10px; background:#fff8e1; color:#8a6100; font-size:14px;">⚠️ Kolom varian produk belum muncul karena belum ada "Kode Singkat" yang diisi di Master Data &gt; Produk. Isi kolom itu dulu (mis. "HA" untuk Halawa Ayam) supaya kolomnya otomatis muncul di sini.</td></tr></thead>`);
     }
 
     rows.forEach((r, i)=>{
@@ -13528,14 +13545,14 @@ if ("serviceWorker" in navigator) {
       // dari link demi keamanan -- orangnya tetap perlu tap kirim sendiri).
       const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline;">${escHtml(r.customer)}</a>`;
       html += `<tr style="${rowBg}">` +
-        td(i+1) + td(escHtml(r.hari)) + td(escHtml(r.tanggalJam)) + td(escHtml(r.cs)) + td(namaLink) +
+        td(i+1) + td(escHtml(r.hari)) + td(escHtml(r.tanggalJam), "white-space:nowrap;") + td(escHtml(r.cs)) + td(namaLink) +
         kodeList.map(k=> td(r.items && r.items[k] ? r.items[k] : "-", "text-align:center;")).join("") +
         td(r.totalQty || 0, "text-align:center; font-weight:600;") +
-        td(escHtml(r.status)) + td(escHtml(r.kg), "text-align:center;") + td(escHtml(r.ekspedisi)) +
+        td(escHtml(ringkasStatus(r.status)), "white-space:nowrap;") + td(escHtml(r.kg), "text-align:center; white-space:nowrap;") + td(escHtml(r.ekspedisi)) +
         td(r.resi ? "✅" : "❌", "text-align:center;") +
         td(r.manualInvoiced
-          ? `<span style="color:var(--primary-green); font-weight:600;">✓ Sudah di Invoice</span>`
-          : `<button class="md-btn rekap-invoice-btn" data-anchor="${escHtml(r.anchorId)}" style="height:auto; padding:6px 10px; font-size:14px;">Invoice</button>`) +
+          ? `<span style="color:var(--primary-green); font-weight:600; white-space:nowrap;">✓ Invoice</span>`
+          : `<button class="md-btn rekap-invoice-btn" data-anchor="${escHtml(r.anchorId)}" style="height:auto; padding:5px 10px; font-size:13px;">Invoice</button>`) +
         "</tr>";
     });
 
@@ -13575,7 +13592,6 @@ if ("serviceWorker" in navigator) {
             const row = allRows.find(r=> r.anchorId === btn.dataset.anchor);
             if(row) row.manualInvoiced = true;
             btn.outerHTML = `<span style="color:var(--primary-green); font-weight:600;">✓ Sudah di Invoice</span>`;
-            perbaruiBadgeSidebar();
           }else{
             btn.disabled = false; btn.textContent = "Invoice";
           }
