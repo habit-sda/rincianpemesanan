@@ -5038,6 +5038,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <input type="time" id="md-resikemarin-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
         </div>
       </div>
+      <div class="md-card" id="md-accfinance-logistik-card">
+        <h3>📦 Notifikasi "Siap Diproses" ke Logistik</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Begitu Finance klik "Konfirmasi" (bukan Hoax/Deposit/Void), pesan "Pesanan sudah di-ACC Finance, siap diproses" otomatis terkirim ke SEMUA kontak di Daftar Logistik — sekali per pesanan. Matikan kalau tim Logistik sudah punya cara lain memantau pesanan siap kirim, dan tidak perlu notifikasi terpisah ini lagi.
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="md-accfinance-logistik-toggle" style="width:18px; height:18px;">
+          <span>Aktifkan Notifikasi "Siap Diproses" ke Logistik</span>
+        </label>
+      </div>
       <div class="md-card" id="md-nobukti-card">
         <h3>⏰ Peringatan Bukti Transfer Belum Ada</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -6602,7 +6612,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", rekapPesananEnabled:false, rekapPesananHari:7};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -6623,6 +6633,7 @@ function loadSettings(){
     if(typeof s.footerInfoEnabled === "boolean") SETTINGS.footerInfoEnabled = s.footerInfoEnabled;
     if(typeof s.dailyRecapAutoEnabled === "boolean") SETTINGS.dailyRecapAutoEnabled = s.dailyRecapAutoEnabled;
     if(typeof s.resiKemarinInfoEnabled === "boolean") SETTINGS.resiKemarinInfoEnabled = s.resiKemarinInfoEnabled;
+    if(typeof s.accFinanceLogistikNotifEnabled === "boolean") SETTINGS.accFinanceLogistikNotifEnabled = s.accFinanceLogistikNotifEnabled;
     if(typeof s.resiKemarinInfoTime === "string" && s.resiKemarinInfoTime.trim()) SETTINGS.resiKemarinInfoTime = s.resiKemarinInfoTime.trim();
     if(typeof s.logistikPengingatEnabled === "boolean") SETTINGS.logistikPengingatEnabled = s.logistikPengingatEnabled;
     if(typeof s.logistikPengingatTime === "string" && s.logistikPengingatTime.trim()) SETTINGS.logistikPengingatTime = s.logistikPengingatTime.trim();
@@ -11485,6 +11496,20 @@ if ("serviceWorker" in navigator) {
     };
     toggleResiKemarin.addEventListener("change", saveResiKemarin);
     inputResiKemarinTime.addEventListener("change", saveResiKemarin);
+  }
+
+  /* BARU -- toggle notifikasi "Siap Diproses" ke Logistik saat Finance
+     klik Konfirmasi. SAMA pola dgn toggle lain di atas -- murni disimpan
+     ke settings, DIBACA & dicek oleh WORKER, tidak ada elemen DOM app
+     lain yang berubah. */
+  const toggleAccFinanceLogistik = document.getElementById("md-accfinance-logistik-toggle");
+  if(toggleAccFinanceLogistik){
+    toggleAccFinanceLogistik.checked = SETTINGS.accFinanceLogistikNotifEnabled !== false;
+    toggleAccFinanceLogistik.addEventListener("change", async ()=>{
+      SETTINGS.accFinanceLogistikNotifEnabled = toggleAccFinanceLogistik.checked;
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.accFinanceLogistikNotifEnabled ? "Notifikasi \"Siap Diproses\" ke Logistik diaktifkan." : "Notifikasi \"Siap Diproses\" ke Logistik dimatikan.");
+    });
   }
 
   /* ---------- toggle + jam: Peringatan Logistik Resi Belum Ada (Ekspedisi) ----------
