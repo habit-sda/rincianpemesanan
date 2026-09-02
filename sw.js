@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v282";
+const CACHE_VERSION = "v284";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -18,6 +18,23 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    PERINGATAN: user yang lagi isi form/nota bisa ke-reload tiba-tiba begitu
    halaman ini aktif (progres yang belum disimpan bisa hilang) — pakai
    fitur ini seperlunya saja, bukan kebiasaan tiap deploy.
+   v284 -- 3 perubahan: (1) auto-refresh diam-diam (interval 30 detik +
+   refresh saat tab dibuka lagi) di menu Follow Up DIHAPUS TOTAL atas
+   permintaan user -- data sekarang cuma dimuat saat kartu dibuka pertama
+   kali atau saat user sendiri klik tombol "🔄 Muat ulang"; (2) menu Rekap
+   Pesanan sekarang punya batas sesi 2 jam -- kalau halaman dibiarkan
+   terbuka terus-menerus lebih dari 2 jam, auto-refresh otomatis berhenti
+   & muncul popup custom (bukan alert/confirm bawaan browser) minta user
+   klik "🔄 Muat Ulang Sekarang" utk lanjut (hitungan 2 jam mulai dari 0
+   lagi) atau "Nanti" utk nutup popup tanpa refresh; (3) khusus versi
+   mobile, kartu "Rincian Pemesanan" (Penjualan & Custom) sekarang
+   menampilkan bar ringkas "Total Qty" & "Total Berat" di atas daftar
+   produk -- muncul di Mode Tabel (atas daftar kartu) maupun Mode Kasir
+   (atas grid produk), angkanya murni salinan dari total yang sudah
+   dihitung calc() (sumber sama dgn kartu Ringkasan Pesanan desktop),
+   tidak tampil di desktop lebar (≥901px) supaya tidak dobel dengan kartu
+   Ringkasan Pesanan yang sudah ada di sana. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang").
    v279 -- 3 perbaikan: (1) bug body.classList "showing-rekap" &
    "showing-followup" bisa nyangkut AKTIF BERBARENGAN kalau pindah dari
    Follow Up ke Rekap Pesanan (atau sebaliknya) tanpa lewat Beranda dulu --
@@ -47,6 +64,17 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    dipaksa (bukan darurat/keamanan, cuma fitur baru yg belum lama dipakai
    siapa pun) -- pakai alur normal (popup "Perbarui Sekarang") supaya user
    yang lagi isi form tidak tiba-tiba ke-reload dan kehilangan progres.
+   v283 -- kartu Rekap Pesanan sekarang dapat fitur SAMA PERSIS dgn Follow
+   Up (v280-v282): auto-refresh diam-diam tiap 30 detik selama kartu
+   terbuka (berhenti begitu keluar/tab disembunyikan), anti-kedip (tabel
+   TIDAK disentuh kalau data server sama persis dgn yg tampil), info
+   "diperbarui X menit yang lalu" di sebelah tombol "🔄 Muat ulang" (hijau
+   = normal, merah = update terakhir gagal). Worker (Worker_Rincian_
+   Pemesanan.js) juga ikut diperbarui: cache 90 detik Rekap Pesanan
+   sekarang dibuang otomatis begitu ada pesanan baru/edit/toggle invoice
+   (bukan cuma nunggu TTL habis) -- SAMA SEKALI TIDAK menambah kuota tulis
+   KV (Cache API beda layanan total dari KV). SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang").
    v282 -- info "diperbarui X menit yang lalu" di kartu Follow Up
    dipindah ke sebelah tombol "🔄 Muat ulang" (sebelumnya baris terpisah di
    bawah kotak ringkasan). Warnanya juga diganti dari abu-abu (ambigu,

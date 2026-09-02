@@ -306,7 +306,7 @@
   .confirm-actionrow{display:flex;gap:8px;padding:0 16px 16px;}
   .confirm-actionrow button{flex:1;border:none;border-radius:6px;padding:10px 0;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Roboto',sans-serif;}
   .confirm-okbtn{background:var(--danger-red);color:#fff;}
-  #update-apply.confirm-okbtn{background:var(--primary-green);}
+  #update-apply.confirm-okbtn, #rekap-session-reload.confirm-okbtn{background:var(--primary-green);}
 
   /* ---- Popup "Konfirmasi Reset" (dipakai tombol Reset tab & tombol
      Reset Keranjang Mode Kasir) — versi tampilan lebih formal: benar-benar
@@ -933,6 +933,12 @@
      sentuh (HP/tablet), bukan jendela browser desktop yang sekadar
      di-resize pendek. ===== */
   @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
+    /* BARU -- bar "Total Qty"/"Total Berat" (Mode Tabel & Mode Kasir)
+       SENGAJA cuma dimunculkan di sini (breakpoint mobile asli), BUKAN
+       ikut media query gabungan "wiz" yang juga aktif di desktop lebar
+       (≥901px) -- di desktop lebar totalnya sudah ada di kartu "Ringkasan
+       pesanan" (aside), jadi tidak perlu dobel. */
+    .wiz-totals-bar{display:flex;}
     body{padding:16px 10px 60px;}
     header{align-items:flex-start;gap:8px;padding-bottom:10px;margin-bottom:14px;}
     header .sub{font-size:11.5px;}
@@ -1387,6 +1393,26 @@
     }
     .wiz-pcard-wrap{position:relative;overflow:hidden;border-radius:12px;margin-bottom:10px;}
     .wiz-subtle{font-size:12px;color:var(--ink-soft);margin:-10px 0 12px;}
+    /* --- BARU: bar ringkas "Total Qty" & "Total Berat" -- dipakai di 2
+       tempat: (1) atas daftar kartu produk Mode Tabel (renderListStep,
+       sebelum cardsHtml), (2) atas grid produk Mode Kasir (pos-grid-col,
+       sebelum .pos-grid). Sengaja bar tipis 2 kolom (bukan 2 kartu kotak
+       terpisah seperti followup-stat-box) supaya tidak makan tempat &
+       tidak mendorong produk terlalu jauh ke bawah -- cukup 1 baris. Nilai
+       di dalamnya MURNI salinan dari #pj-totalqty/#pj-totalberat (atau
+       #cs-* di Custom) yang sudah dihitung calc() -- tidak ada rumus baru
+       di sini sama sekali, pola sama dengan syncDesktopSummary/
+       syncPosCartSheet yang sudah ada. */
+    .wiz-totals-bar{
+      display:none; /* BARU -- default disembunyikan, cuma dimunculkan khusus versi mobile lewat media query di bawah (bukan di tablet/desktop lebar) */
+      align-items:stretch;gap:0;
+      background:var(--wiz-form-bg,var(--paper));border:1px solid var(--wiz-form-border,var(--line));
+      border-radius:10px;margin:0 0 12px;overflow:hidden;
+    }
+    .wiz-totals-item{flex:1;padding:8px 12px;display:flex;flex-direction:column;gap:2px;min-width:0;}
+    .wiz-totals-lbl{font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.02em;}
+    .wiz-totals-val{font-size:14px;font-weight:700;color:var(--primary-green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .wiz-totals-divider{width:1px;background:var(--line);flex:none;}
     /* --- Form tambah/edit produk, sekarang tampil INLINE di bawah daftar
        produk tersimpan (bukan pindah ke layar terpisah) --- */
     .wiz-inline-form{
@@ -4504,11 +4530,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:14px;">
       <button class="md-btn" id="rekap-sort-btn" style="white-space:nowrap; height:44px;">↓ Terbaru dulu</button>
       <button class="md-btn" id="rekap-refresh-btn" style="white-space:nowrap; height:44px;">🔄 Muat ulang</button>
+      <div id="rekap-status" style="color:var(--primary-green); flex:1 1 200px; min-width:160px;"></div>
       <button class="md-btn" id="rekap-export-csv-btn" style="white-space:nowrap; height:44px;">⬇️ Ekspor CSV</button>
       <button class="md-btn" id="rekap-export-pdf-btn" style="white-space:nowrap; height:44px;">🖨️ Ekspor PDF</button>
     </div>
     <div id="rekap-cs-summary" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px;"></div>
-    <div id="rekap-status" style="color:var(--ink-soft); margin-bottom:10px;"></div>
     <div style="overflow-x:auto; border:1px solid var(--line); border-radius:10px;" id="rekap-table-wrap">
       <table id="rekap-table" style="border-collapse:collapse; width:100%; white-space:nowrap;"></table>
     </div>
@@ -4715,6 +4741,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div class="pos-view" id="pos-view-penjualan" data-possheet="penjualan">
             <div class="pos-grid-col">
               <input type="text" class="pos-search" id="pos-search-penjualan" placeholder="🔍 Cari produk...">
+              <div class="wiz-totals-bar" id="pos-stats-penjualan">
+                <div class="wiz-totals-item"><span class="wiz-totals-lbl">Total Qty</span><span class="wiz-totals-val" id="pos-stats-qty-penjualan">–</span></div>
+                <div class="wiz-totals-divider"></div>
+                <div class="wiz-totals-item"><span class="wiz-totals-lbl">Total Berat</span><span class="wiz-totals-val" id="pos-stats-berat-penjualan">–</span></div>
+              </div>
               <div class="pos-grid" id="pos-grid-penjualan"></div>
             </div>
             <div class="pos-cart-col" data-pos-cartcol="penjualan">
@@ -4852,6 +4883,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div class="pos-view" id="pos-view-custom" data-possheet="custom">
             <div class="pos-grid-col">
               <input type="text" class="pos-search" id="pos-search-custom" placeholder="🔍 Cari produk...">
+              <div class="wiz-totals-bar" id="pos-stats-custom">
+                <div class="wiz-totals-item"><span class="wiz-totals-lbl">Total Qty</span><span class="wiz-totals-val" id="pos-stats-qty-custom">–</span></div>
+                <div class="wiz-totals-divider"></div>
+                <div class="wiz-totals-item"><span class="wiz-totals-lbl">Total Berat</span><span class="wiz-totals-val" id="pos-stats-berat-custom">–</span></div>
+              </div>
               <div class="pos-grid" id="pos-grid-custom"></div>
             </div>
             <div class="pos-cart-col" data-pos-cartcol="custom">
@@ -5630,7 +5666,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.26.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.27.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5815,7 +5851,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.26.2 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.27.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Auto-refresh menu Follow Up dihapus</b> — refresh diam-diam tiap 30 detik & saat tab dibuka lagi sudah tidak ada. Data sekarang cuma dimuat saat kartu Follow Up dibuka pertama kali, atau saat klik manual tombol "🔄 Muat ulang".</li>
+            <li><b>Batas sesi 2 jam di menu Rekap Pesanan</b> — kalau halaman ini dibiarkan terbuka terus lebih dari 2 jam, auto-refresh otomatis berhenti & muncul popup "Halaman Sudah Lama Terbuka" (tampilan sendiri, bukan alert bawaan browser) minta klik "🔄 Muat Ulang Sekarang" untuk lanjut dengan data terbaru.</li>
+            <li><b>Bar "Total Qty" &amp; "Total Berat" di kartu Rincian Pemesanan (khusus HP)</b> — muncul di atas daftar produk, baik di Mode Tabel maupun Mode Kasir, supaya total belanja langsung kelihatan tanpa scroll ke bawah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.26.2</div>
           <ul>
             <li><b>Perbaikan bug: Follow Up tidak bisa dibuka lagi setelah buka Rekap Pesanan</b> — sebelumnya, pindah dari halaman Follow Up ke Rekap Pesanan (atau sebaliknya) tanpa lewat Beranda dulu bikin kedua halaman itu nyangkut aktif berbarengan, jadi salah satunya jadi tidak bisa dibuka lagi. Sekarang sudah saling membersihkan halaman satu sama lain saat berpindah.</li>
             <li><b>Perbaikan bug: kolom kanan tabel Follow Up tidak bisa diakses</b> — kolom "Customer" di tabel Follow Up sekarang dikunci (sticky) di sisi kiri waktu tabel digeser kanan/kiri, jadi kolom Status/Qty Rata²/dll di sisi kanan bisa diakses tanpa kehilangan konteks nama customer-nya.</li>
@@ -6646,6 +6690,34 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="update-popup-body uptodate-popup-body">
         <div class="update-popup-version" id="uptodate-version-label">v0</div>
         <div class="update-popup-sub" style="margin-bottom:0;">Tidak ada pembaruan baru — app kamu sudah versi terkini.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= POPUP HALAMAN REKAP PESANAN SUDAH >2 JAM ================= 
+       Muncul kalau halaman Rekap Pesanan sudah dibuka lebih dari 2 jam
+       terus-menerus tanpa ditutup. Begitu popup ini muncul, auto-refresh
+       diam-diam (30 detik) otomatis DIHENTIKAN dulu -- supaya HP/tab yang
+       dibiarkan lama tidak terus2an nge-hit worker di background. User
+       tinggal klik "Muat Ulang Sekarang" utk ambil data terbaru & lanjut
+       pakai (auto-refresh nyala lagi, hitungan 2 jam mulai dari 0 lagi),
+       atau "Nanti" utk nutup popup tanpa memuat ulang (data yang tampil
+       tetap yang lama sampai di-refresh manual lewat tombol "🔄 Muat
+       ulang" atau popup ini muncul lagi 2 jam kemudian). Popup custom
+       (BUKAN alert/confirm bawaan browser) supaya tampilannya konsisten
+       & ramah dgn popup lain di app ini. -->
+  <div id="rekap-session-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup update-popup" role="dialog" aria-label="Halaman Rekap Pesanan sudah lama terbuka">
+      <div class="calc-head">
+        <span>⏰ Halaman Sudah Lama Terbuka</span>
+        <button id="rekap-session-close" class="calc-close" aria-label="Tutup">✕</button>
+      </div>
+      <div class="update-popup-body">
+        <div class="update-popup-sub" style="margin-bottom:0;">Halaman Rekap Pesanan ini sudah dibuka lebih dari 2 jam, jadi pembaruan otomatis dihentikan sementara supaya data yang tampil tidak salah tanpa disadari. Muat ulang untuk melanjutkan dengan data terbaru.</div>
+      </div>
+      <div class="calc-actionrow">
+        <button id="rekap-session-later" class="calc-actbtn calc-clearbtn">Nanti</button>
+        <button id="rekap-session-reload" class="calc-actbtn confirm-okbtn">🔄 Muat Ulang Sekarang</button>
       </div>
     </div>
   </div>
@@ -10489,6 +10561,7 @@ if ("serviceWorker" in navigator) {
 
   function renderListStep(sheet){
     const host = document.querySelector(`#wiz-${sheet} .wiz-step[data-wstep="list"]`);
+    const pfx = sheet === "penjualan" ? "pj" : "cs"; // BARU -- dipakai baca #pj-totalqty/#pj-totalberat (atau #cs-*) buat bar Total Qty/Berat di atas daftar kartu
     const st = wizState[sheet];
     const trs = trsOf(sheet);
     const filled = trs.map((tr,i)=>({tr,i})).filter(o=> o.tr.querySelector("select.prod").value);
@@ -10660,6 +10733,11 @@ if ("serviceWorker" in navigator) {
     host.innerHTML = `
       <div class="wiz-title">Input Penjualan</div>
       ${filled.length ? `<div class="wiz-subtle">${filled.length} produk tersimpan</div>` : ``}
+      ${filled.length ? `<div class="wiz-totals-bar">
+        <div class="wiz-totals-item"><span class="wiz-totals-lbl">Total Qty</span><span class="wiz-totals-val">${(document.getElementById(pfx+"-totalqty")?.textContent || "–")}</span></div>
+        <div class="wiz-totals-divider"></div>
+        <div class="wiz-totals-item"><span class="wiz-totals-lbl">Total Berat</span><span class="wiz-totals-val">${(document.getElementById(pfx+"-totalberat")?.textContent || "–")}</span></div>
+      </div>` : ``}
       ${cardsHtml}
       ${formHtml}
       ${(!showForm || isDesktopWiz()) ? `
@@ -13487,6 +13565,16 @@ if ("serviceWorker" in navigator) {
     const srcTotal = document.getElementById(pfx+"-grandtotal");
     if(countEl) countEl.textContent = String(countNum);
     if(totalEl) totalEl.textContent = (srcTotal && srcTotal.textContent.trim() && srcTotal.textContent.trim() !== "–") ? srcTotal.textContent.trim() : "Rp0";
+    // BARU -- bar "Total Qty"/"Total Berat" di atas grid produk Mode Kasir
+    // (khusus versi mobile, lihat CSS .wiz-totals-bar) -- sama pola dgn
+    // totalEl di atas: salinan LANGSUNG dari #pj-totalqty/#pj-totalberat
+    // (atau #cs-*) yang sudah dihitung calc(), tidak ada rumus baru.
+    const statsQtyEl = document.getElementById("pos-stats-qty-"+sheet);
+    const statsBeratEl = document.getElementById("pos-stats-berat-"+sheet);
+    const srcQty = document.getElementById(pfx+"-totalqty");
+    const srcBerat = document.getElementById(pfx+"-totalberat");
+    if(statsQtyEl) statsQtyEl.textContent = (srcQty && srcQty.textContent.trim()) ? srcQty.textContent.trim() : "–";
+    if(statsBeratEl) statsBeratEl.textContent = (srcBerat && srcBerat.textContent.trim()) ? srcBerat.textContent.trim() : "–";
   }
   // Tap bar = expand/collapse daftar item lengkap. Murni toggle class
   // CSS (lihat .pos-cart-col.expanded di stylesheet) — tidak menyentuh
@@ -13806,6 +13894,84 @@ if ("serviceWorker" in navigator) {
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
   let sortDesc = true; // true = terbaru dulu (default, sama dgn urutan dari server)
+  // ---- AUTO REFRESH (BARU, pola SAMA PERSIS dgn kartu Follow Up) ----
+  const tableWrapEl = document.getElementById("rekap-table-wrap");
+  const AUTO_REFRESH_MS = 30000; // 30 detik
+  let autoRefreshTimer = null;
+  let statusTickTimer = null; // ticker ringan khusus teks "X menit yang lalu", TIDAK memanggil server
+  let lastRowsSignature = null;
+  let lastFetchedAt = null; // kapan terakhir data BERHASIL diambil dari server
+  // ---- BARU: batas sesi 2 jam ----
+  // Kalau kartu Rekap Pesanan ini dibiarkan terbuka terus-menerus lebih
+  // dari SESSION_LIMIT_MS, auto-refresh diam-diam DIHENTIKAN otomatis &
+  // popup custom (rekap-session-overlay, BUKAN alert/confirm bawaan
+  // browser) muncul minta user klik "Muat Ulang Sekarang". rekapOpenedAt
+  // dicatat ulang tiap kali openRekapPesanan() dipanggil ATAU tiap kali
+  // user klik "Muat Ulang Sekarang" di popup ini -- jadi hitungan 2 jam
+  // selalu mulai dari kapan halaman ini TERAKHIR dimuat/dibuka, bukan
+  // cuma sekali di awal.
+  const SESSION_LIMIT_MS = 2 * 60 * 60 * 1000; // 2 jam
+  let rekapOpenedAt = null;
+  const sessionOverlay = document.getElementById("rekap-session-overlay");
+  function showSessionTimeoutPopup(){
+    if(sessionOverlay) sessionOverlay.hidden = false;
+  }
+  function hideSessionTimeoutPopup(){
+    if(sessionOverlay) sessionOverlay.hidden = true;
+  }
+  if(sessionOverlay){
+    document.getElementById("rekap-session-close").addEventListener("click", hideSessionTimeoutPopup);
+    document.getElementById("rekap-session-later").addEventListener("click", hideSessionTimeoutPopup);
+    sessionOverlay.addEventListener("click", (e)=>{ if(e.target === sessionOverlay) hideSessionTimeoutPopup(); });
+    document.getElementById("rekap-session-reload").addEventListener("click", ()=>{
+      hideSessionTimeoutPopup();
+      rekapOpenedAt = Date.now(); // reset hitungan 2 jam
+      fetchAndRenderRekap();
+      startAutoRefresh(); // nyalakan lagi auto-refresh
+    });
+  }
+  function fmtWaktuLalu(d){
+    if(!d) return "-";
+    const detik = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+    if(detik < 10) return "baru saja";
+    if(detik < 60) return `${detik} detik yang lalu`;
+    const menit = Math.floor(detik / 60);
+    if(menit < 60) return `${menit} menit yang lalu`;
+    const jam = Math.floor(menit / 60);
+    if(jam < 24) return `${jam} jam yang lalu`;
+    const hari = Math.floor(jam / 24);
+    return `${hari} hari yang lalu`;
+  }
+  function updateStatusLine(rowsCount){
+    const count = (typeof rowsCount === "number") ? rowsCount : terapkanFilter().rows.length;
+    statusEl.textContent = `${count} dari ${allRows.length} pesanan ditampilkan — diperbarui ${fmtWaktuLalu(lastFetchedAt)}.`;
+    statusEl.style.color = "var(--primary-green)"; // hijau = status normal/berhasil
+  }
+  function startAutoRefresh(){
+    stopAutoRefresh();
+    autoRefreshTimer = setInterval(()=>{
+      if(document.hidden) return;
+      if(!document.body.classList.contains("showing-rekap")) return;
+      // BARU -- kalau halaman ini sudah dibuka lebih dari 2 jam, matikan
+      // auto-refresh & tampilkan popup minta muat ulang, jangan lanjut
+      // fetch diam-diam seperti biasa.
+      if(rekapOpenedAt && (Date.now() - rekapOpenedAt) >= SESSION_LIMIT_MS){
+        stopAutoRefresh();
+        showSessionTimeoutPopup();
+        return;
+      }
+      fetchAndRenderRekap({ silent:true });
+    }, AUTO_REFRESH_MS);
+    statusTickTimer = setInterval(()=>{
+      if(document.hidden) return;
+      if(!document.body.classList.contains("showing-rekap")) return;
+      updateStatusLine();
+    }, 15000);
+  }
+  function stopAutoRefresh(){
+    if(autoRefreshTimer){ clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+    if(statusTickTimer){ clearInterval(statusTickTimer); statusTickTimer = null; }
+  }
 
   function openRekapPesanan(){
     // BARU -- sambungkan ke toggle "Aktifkan menu Rekap Pesanan" (Master
@@ -13827,13 +13993,32 @@ if ("serviceWorker" in navigator) {
     document.body.classList.remove("showing-followup"); // BARU (fix bug) -- kalau sebelumnya lagi di Follow Up, class-nya wajib dilepas dulu, kalau tidak dua halaman full-page nyangkut aktif berbarengan dan Follow Up jadi tidak bisa dibuka lagi setelahnya.
     document.body.classList.add("showing-rekap");
     window.scrollTo(0,0);
+    rekapOpenedAt = Date.now(); // BARU -- catat kapan halaman ini dibuka, dasar hitungan batas 2 jam
+    hideSessionTimeoutPopup(); // BARU -- jaga2 kalau popup sempat kebuka sebelumnya
     fetchAndRenderRekap();
+    startAutoRefresh(); // BARU
   }
   window.__openRekapPesanan = openRekapPesanan;
   document.getElementById("rekap-back-btn").addEventListener("click", ()=>{
     document.body.classList.remove("showing-rekap");
+    stopAutoRefresh(); // BARU
+    hideSessionTimeoutPopup(); // BARU
     const el = document.querySelector("[data-back]");
     if(el) el.click(); else document.body.classList.add("showing-home");
+  });
+  // BARU -- begitu tab/HP dibuka lagi setelah disembunyikan, langsung cek
+  // sekali (diam-diam), pola SAMA dgn kartu Follow Up -- TAPI cuma kalau
+  // belum lewat batas 2 jam (kalau sudah lewat, biarkan popup yang
+  // muncul dari startAutoRefresh() yang menangani, bukan langsung fetch).
+  document.addEventListener("visibilitychange", ()=>{
+    if(!document.hidden && document.body.classList.contains("showing-rekap")){
+      if(rekapOpenedAt && (Date.now() - rekapOpenedAt) >= SESSION_LIMIT_MS){
+        stopAutoRefresh();
+        showSessionTimeoutPopup();
+        return;
+      }
+      fetchAndRenderRekap({ silent:true });
+    }
   });
   document.getElementById("rekap-refresh-btn").addEventListener("click", fetchAndRenderRekap);
   searchEl.addEventListener("input", ()=> renderRekapTable());
@@ -13895,21 +14080,47 @@ if ("serviceWorker" in navigator) {
     if(hariSet.includes(prevHari)) hariFilterEl.value = prevHari;
   }
 
-  async function fetchAndRenderRekap(){
+  async function fetchAndRenderRekap(opts){
+    const silent = !!(opts && opts.silent);
     if(isLoading) return;
     isLoading = true;
-    statusEl.textContent = "Memuat data…";
+    if(!silent){
+      statusEl.textContent = "Memuat data…";
+      statusEl.style.color = "var(--primary-green)";
+    }
     try{
       const res = await fetch(MASTER_DATA_WORKER_URL + "/rekap-pesanan-7hari", {
         headers: workerHeaders(),
       });
       const body = await res.json();
       if(!res.ok) throw new Error(body.error || "Gagal memuat data.");
-      allRows = body.rows || [];
+      const rowsBaru = body.rows || [];
+      const signatureBaru = JSON.stringify(rowsBaru);
+      lastFetchedAt = new Date();
+      if(silent && signatureBaru === lastRowsSignature){
+        // BARU -- data SAMA PERSIS dgn yg sudah tampil -> tabel TIDAK
+        // disentuh sama sekali (0 kedip), cuma teks waktu yg ikut jalan.
+        updateStatusLine();
+        return;
+      }
+      // BARU -- simpan posisi scroll dulu (horizontal tabel + halaman)
+      // supaya render ulang tidak bikin layar "loncat".
+      const savedScrollLeft = tableWrapEl ? tableWrapEl.scrollLeft : 0;
+      const savedScrollY = window.scrollY;
+      allRows = rowsBaru;
+      lastRowsSignature = signatureBaru;
       isiUlangDropdownFilter();
       renderRekapTable();
+      if(tableWrapEl) tableWrapEl.scrollLeft = savedScrollLeft;
+      window.scrollTo(window.scrollX, savedScrollY);
     }catch(e){
-      statusEl.textContent = "Gagal memuat: " + (e.message || e);
+      // BARU -- auto-refresh diam-diam yang gagal TIDAK menimpa teks lama
+      // (biar tidak mengganggu), tapi warnanya tetap diubah merah sbg
+      // penanda "belum tentu data terbaru". Coba lagi otomatis 30 detik lagi.
+      if(!silent){
+        statusEl.textContent = "Gagal memuat: " + (e.message || e);
+      }
+      statusEl.style.color = "var(--danger-red)";
     }finally{
       isLoading = false;
     }
@@ -13997,7 +14208,7 @@ if ("serviceWorker" in navigator) {
     renderRingkasanCs(rows);
     renderRingkasanHari(rows);
 
-    statusEl.textContent = `${rows.length} dari ${allRows.length} pesanan ditampilkan — diperbarui ${new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}.`;
+    updateStatusLine(rows.length);
 
     const th = (t, w)=> `<th style="border:1px solid var(--line); padding:8px 8px; background:var(--card); text-align:left; position:sticky; top:0;${w?` width:${w};`:""}">${t}</th>`;
     const td = (t, extra, title)=> `<td style="border:1px solid var(--line); padding:7px 8px;${extra||""}"${title ? ` title="${title}"` : ""}>${t}</td>`;
@@ -14214,17 +14425,15 @@ if ("serviceWorker" in navigator) {
   const statsGridEl = document.getElementById("followup-stats-grid");
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
-  // ---- AUTO REFRESH (BARU) ----
-  // Refresh diam-diam tiap AUTO_REFRESH_MS selama kartu Follow Up sedang
-  // terbuka. "Diam-diam" artinya: TIDAK menimpa tabel/scroll kalau isi
-  // data dari server ternyata sama persis dgn yang sudah tampil -- jadi
-  // tidak ada kedip layar tiap auto-refresh jalan (cuma jam "diperbarui
-  // pukul ..." di statusEl yg ikut update). Kalau memang ada perubahan
-  // data, baru tabel di-render ulang, dan posisi scroll (horizontal tabel
-  // + scroll halaman) disimpan & dikembalikan supaya tidak "loncat".
-  const AUTO_REFRESH_MS = 30000; // 30 detik, silakan diubah kalau perlu
+  // ---- AUTO REFRESH: DIMATIKAN (permintaan user) ----
+  // Sebelumnya ada refresh diam-diam tiap 30 detik selama kartu Follow Up
+  // terbuka + refresh diam-diam saat tab dibuka lagi. Fungsi startAutoRefresh/
+  // stopAutoRefresh di bawah masih ada (dead code, sengaja tidak dihapus
+  // total supaya gampang dinyalakan lagi kalau suatu saat dibutuhkan) tapi
+  // TIDAK dipanggil dari mana pun lagi -- lihat openFollowUp().
+  const AUTO_REFRESH_MS = 30000; // sudah tidak dipakai lagi, dibiarkan supaya startAutoRefresh() (dead code) tetap valid kalau dinyalakan lagi
   let autoRefreshTimer = null;
-  let statusTickTimer = null; // BARU -- ticker ringan khusus teks "X menit yang lalu"
+  let statusTickTimer = null;
   let lastRowsSignature = null;
   let lastFetchedAt = null; // BARU -- kapan terakhir data BERHASIL diambil dari server (bukan kapan datanya berubah) -- dasar hitungan "diperbarui X menit yang lalu"
   // BARU -- format selisih waktu jadi teks "X menit yang lalu" ala media
@@ -14291,21 +14500,16 @@ if ("serviceWorker" in navigator) {
     document.body.classList.add("showing-followup");
     window.scrollTo(0,0);
     fetchAndRenderFollowUp();
-    startAutoRefresh(); // BARU -- mulai auto-refresh diam-diam selama kartu ini terbuka
+    // DIHAPUS -- auto-refresh otomatis (interval 30 detik + refresh diam-
+    // diam saat tab dibuka lagi) sengaja DIMATIKAN atas permintaan user.
+    // Data sekarang HANYA dimuat ulang saat kartu ini dibuka pertama kali
+    // atau saat user sendiri klik tombol "🔄 Muat ulang" di bawah.
   }
   window.__openFollowUp = openFollowUp;
   document.getElementById("followup-back-btn").addEventListener("click", ()=>{
     document.body.classList.remove("showing-followup");
-    stopAutoRefresh(); // BARU -- berhenti auto-refresh begitu keluar dari kartu Follow Up
     const el = document.querySelector("[data-back]");
     if(el) el.click(); else document.body.classList.add("showing-home");
-  });
-  // BARU -- begitu tab/HP dibuka lagi setelah disembunyikan, langsung
-  // cek data terbaru sekali (diam-diam), bukan menunggu interval berikutnya.
-  document.addEventListener("visibilitychange", ()=>{
-    if(!document.hidden && document.body.classList.contains("showing-followup")){
-      fetchAndRenderFollowUp({ silent:true });
-    }
   });
   document.getElementById("followup-refresh-btn").addEventListener("click", fetchAndRenderFollowUp);
   searchEl.addEventListener("input", ()=> renderFollowUpTable());
