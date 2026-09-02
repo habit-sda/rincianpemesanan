@@ -4532,9 +4532,9 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </select>
       <button class="md-btn" id="followup-contact-btn" style="white-space:nowrap; height:44px;">📞 Perlu Dihubungi</button>
       <button class="md-btn" id="followup-refresh-btn" style="white-space:nowrap; height:44px;">🔄 Muat ulang</button>
+      <div id="followup-status" style="color:var(--primary-green); flex:1 1 200px; min-width:160px;"></div>
     </div>
     <div class="followup-stats-grid" id="followup-stats-grid"></div>
-    <div id="followup-status" style="color:var(--ink-soft); margin-bottom:10px;"></div>
     <div style="overflow-x:auto; border:1px solid var(--line); border-radius:10px;" id="followup-table-wrap">
       <table id="followup-table" style="border-collapse:collapse; width:100%; white-space:nowrap;"></table>
     </div>
@@ -14224,7 +14224,33 @@ if ("serviceWorker" in navigator) {
   // + scroll halaman) disimpan & dikembalikan supaya tidak "loncat".
   const AUTO_REFRESH_MS = 30000; // 30 detik, silakan diubah kalau perlu
   let autoRefreshTimer = null;
+  let statusTickTimer = null; // BARU -- ticker ringan khusus teks "X menit yang lalu"
   let lastRowsSignature = null;
+  let lastFetchedAt = null; // BARU -- kapan terakhir data BERHASIL diambil dari server (bukan kapan datanya berubah) -- dasar hitungan "diperbarui X menit yang lalu"
+  // BARU -- format selisih waktu jadi teks "X menit yang lalu" ala media
+  // sosial, dipakai statusEl supaya lebih gampang dibaca sekilas drpd jam
+  // digital ("14.32") -- terutama kalau HP dibiarkan lama tanpa disentuh.
+  function fmtWaktuLalu(d){
+    if(!d) return "-";
+    const detik = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+    if(detik < 10) return "baru saja";
+    if(detik < 60) return `${detik} detik yang lalu`;
+    const menit = Math.floor(detik / 60);
+    if(menit < 60) return `${menit} menit yang lalu`;
+    const jam = Math.floor(menit / 60);
+    if(jam < 24) return `${jam} jam yang lalu`;
+    const hari = Math.floor(jam / 24);
+    return `${hari} hari yang lalu`;
+  }
+  // BARU -- satu-satunya tempat yang menulis ke statusEl utk info
+  // jumlah+waktu (dipanggil dari renderFollowUpTable, dari cek "data tidak
+  // berubah" di fetchAndRenderFollowUp, DAN dari statusTickTimer) supaya
+  // formatnya konsisten & lastFetchedAt selalu jadi sumber kebenaran waktu.
+  function updateStatusLine(rowsCount){
+    const count = (typeof rowsCount === "number") ? rowsCount : terapkanFilter().length;
+    statusEl.textContent = `${count} dari ${allRows.length} customer ditampilkan — diperbarui ${fmtWaktuLalu(lastFetchedAt)}.`;
+    statusEl.style.color = "var(--primary-green)"; // BARU -- hijau = status normal/berhasil (sebelumnya abu-abu, ambigu apa lagi memuat/berhasil/gagal)
+  }
   function startAutoRefresh(){
     stopAutoRefresh();
     autoRefreshTimer = setInterval(()=>{
@@ -14234,9 +14260,21 @@ if ("serviceWorker" in navigator) {
       if(!document.body.classList.contains("showing-followup")) return;
       fetchAndRenderFollowUp({ silent:true });
     }, AUTO_REFRESH_MS);
+    // BARU -- ticker ringan KHUSUS teks "diperbarui X menit yang lalu" di
+    // statusEl, supaya jamnya terus jalan walau belum waktunya
+    // auto-refresh berikutnya (atau auto-refresh-nya sempat gagal diam-
+    // diam karena sinyal putus). SAMA SEKALI TIDAK memanggil server --
+    // cuma hitung ulang selisih waktu di HP (lihat fmtWaktuLalu), jadi
+    // tidak nambah beban D1/worker sedikit pun.
+    statusTickTimer = setInterval(()=>{
+      if(document.hidden) return;
+      if(!document.body.classList.contains("showing-followup")) return;
+      updateStatusLine();
+    }, 15000);
   }
   function stopAutoRefresh(){
     if(autoRefreshTimer){ clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+    if(statusTickTimer){ clearInterval(statusTickTimer); statusTickTimer = null; } // BARU
   }
 
   function openFollowUp(){
@@ -14356,7 +14394,10 @@ if ("serviceWorker" in navigator) {
     // (kalau ditimpa, teks status jadi kedip tiap 30 detik walau tabelnya
     // sendiri tidak ikut kedip). Klik manual "Muat ulang" tetap dikasih
     // feedback teks seperti biasa.
-    if(!silent) statusEl.textContent = "Memuat data…";
+    if(!silent){
+      statusEl.textContent = "Memuat data…";
+      statusEl.style.color = "var(--primary-green)"; // BARU -- hijau = status normal (bukan error), termasuk saat masih memuat
+    }
     try{
       const res = await fetch(MASTER_DATA_WORKER_URL + "/followup-repeat-order", {
         headers: workerHeaders(),
@@ -14365,14 +14406,15 @@ if ("serviceWorker" in navigator) {
       if(!res.ok) throw new Error(body.error || "Gagal memuat data.");
       const rowsBaru = body.rows || [];
       const signatureBaru = JSON.stringify(rowsBaru);
+      // BARU -- ditandai di SINI (sebelum cek berubah/tidak) supaya "X
+      // menit yang lalu" mengukur kapan data ini diterima dari server,
+      // bukan kapan tabelnya di-render ulang.
+      lastFetchedAt = new Date();
       if(silent && signatureBaru === lastRowsSignature){
         // BARU -- data dari server SAMA PERSIS dgn yg sudah tampil -> tabel
         // TIDAK disentuh sama sekali (0 DOM diubah = tidak ada kedip),
-        // cuma jam "diperbarui pukul ..." di teks status yg ikut jalan.
-        statusEl.textContent = statusEl.textContent.replace(
-          /diperbarui \d{2}\.\d{2}\.$/,
-          "diperbarui " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}) + "."
-        );
+        // cuma teks "diperbarui X menit yang lalu" yg ikut jalan.
+        updateStatusLine();
         return;
       }
       // BARU -- simpan posisi scroll dulu (horizontal tabel + scroll
@@ -14387,9 +14429,15 @@ if ("serviceWorker" in navigator) {
       window.scrollTo(window.scrollX, savedScrollY);
     }catch(e){
       // BARU -- kalau auto-refresh diam-diam gagal (mis. sinyal HP putus
-      // sebentar), jangan timpa tabel yg sudah tampil dgn pesan error --
-      // biarkan tetap seperti sebelumnya, coba lagi otomatis 30 detik lagi.
-      if(!silent) statusEl.textContent = "Gagal memuat: " + (e.message || e);
+      // sebentar), jangan timpa TEKS tabel yg sudah tampil dgn pesan error
+      // -- biarkan tetap seperti sebelumnya, coba lagi otomatis 30 detik
+      // lagi. TAPI warnanya tetap diubah jadi merah supaya kelihatan kalau
+      // update terakhir gagal (teks lama + waktu lama tetap ditampilkan,
+      // cuma jadi indikasi "ini belum tentu data terbaru").
+      if(!silent){
+        statusEl.textContent = "Gagal memuat: " + (e.message || e);
+      }
+      statusEl.style.color = "var(--danger-red)"; // BARU -- merah = gagal update
     }finally{
       isLoading = false;
     }
@@ -14429,7 +14477,7 @@ if ("serviceWorker" in navigator) {
   function renderFollowUpTable(){
     const rows = terapkanFilter();
     renderStatsGrid(rows);
-    statusEl.textContent = `${rows.length} dari ${allRows.length} customer ditampilkan — diperbarui ${new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}.`;
+    updateStatusLine(rows.length);
 
     const th = (t, w, cls)=> `<th class="${cls||""}" style="border:1px solid var(--line); padding:8px 8px; background:var(--card); text-align:left; position:sticky; top:0;${w?` width:${w};`:""}">${t}</th>`;
     const td = (t, extra, cls)=> `<td class="${cls||""}" style="border:1px solid var(--line); padding:7px 8px;${extra||""}">${t}</td>`;

@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v280";
+const CACHE_VERSION = "v282";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -47,6 +47,22 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    dipaksa (bukan darurat/keamanan, cuma fitur baru yg belum lama dipakai
    siapa pun) -- pakai alur normal (popup "Perbarui Sekarang") supaya user
    yang lagi isi form tidak tiba-tiba ke-reload dan kehilangan progres.
+   v282 -- info "diperbarui X menit yang lalu" di kartu Follow Up
+   dipindah ke sebelah tombol "🔄 Muat ulang" (sebelumnya baris terpisah di
+   bawah kotak ringkasan). Warnanya juga diganti dari abu-abu (ambigu,
+   tidak jelas lagi memuat/berhasil/gagal) jadi HIJAU = status normal
+   (termasuk saat "Memuat data…"), MERAH = update terakhir gagal (kalau
+   auto-refresh diam-diam yang gagal, teks lama tetap ditampilkan tapi
+   warnanya ikut jadi merah sbg penanda "belum tentu data terbaru").
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang").
+   v281 -- teks status kartu Follow Up sekarang tampil "diperbarui X menit
+   yang lalu" (ikut jalan sendiri tiap 15 detik walau tidak ada
+   auto-refresh baru) menggantikan jam digital "diperbarui 14.32" --
+   lebih gampang dibaca sekilas begitu HP dibiarkan lama. Auto-refresh
+   sendiri masih 30 detik seperti v280, tidak berubah. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang").
    v280 -- tambah auto-refresh diam-diam di kartu Follow Up (tiap 30
    detik selama kartu itu terbuka & tab aktif). Anti-kedip: data baru dari
    server dibandingkan dgn yang sudah tampil -- kalau PERSIS SAMA, tabel
