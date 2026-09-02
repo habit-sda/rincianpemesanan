@@ -4402,21 +4402,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <select id="rekap-filter-status" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
         <option value="">Semua Status</option>
       </select>
-      <!-- BARU -- filter per hari (tanggal spesifik), pola SAMA dgn dropdown
-           CS/Status di sampingnya: opsinya diisi ulang otomatis dari data
-           yang benar-benar ada (isiUlangDropdownFilter()), bukan daftar
-           tetap, dan filternya jalan di browser (0 tambahan kuota baca KV). -->
-      <select id="rekap-filter-hari" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
-        <option value="">Semua Hari</option>
-      </select>
       <label style="display:flex; align-items:center; gap:6px; font-size:15px; white-space:nowrap;">
         <input type="checkbox" id="rekap-filter-belumInvoice" style="width:18px; height:18px;"> Belum di-Invoice saja
       </label>
     </div>
-    <!-- BARU -- ringkasan Total Qty per Hari, dari data yang SEDANG TAMPIL
-         (ikut semua filter aktif) -- pola SAMA persis dgn #rekap-cs-summary
-         yang sudah ada (kotak per-CS), cuma dikelompokkan per tanggal. -->
-    <div id="rekap-hari-summary" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px;"></div>
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:14px;">
       <button class="md-btn" id="rekap-sort-btn" style="white-space:nowrap; height:44px;">↓ Terbaru dulu</button>
       <button class="md-btn" id="rekap-refresh-btn" style="white-space:nowrap; height:44px;">🔄 Muat ulang</button>
@@ -5037,16 +5026,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <label for="md-resikemarin-time" style="font-size:13.5px; color:var(--ink-soft);">Jam kirim (WIB)</label>
           <input type="time" id="md-resikemarin-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
         </div>
-      </div>
-      <div class="md-card" id="md-accfinance-logistik-card">
-        <h3>📦 Notifikasi "Siap Diproses" ke Logistik</h3>
-        <div class="md-note" style="margin-bottom:12px;">
-          Begitu Finance klik "Konfirmasi" (bukan Hoax/Deposit/Void), pesan "Pesanan sudah di-ACC Finance, siap diproses" otomatis terkirim ke SEMUA kontak di Daftar Logistik — sekali per pesanan. Matikan kalau tim Logistik sudah punya cara lain memantau pesanan siap kirim, dan tidak perlu notifikasi terpisah ini lagi.
-        </div>
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <input type="checkbox" id="md-accfinance-logistik-toggle" style="width:18px; height:18px;">
-          <span>Aktifkan Notifikasi "Siap Diproses" ke Logistik</span>
-        </label>
       </div>
       <div class="md-card" id="md-nobukti-card">
         <h3>⏰ Peringatan Bukti Transfer Belum Ada</h3>
@@ -6612,7 +6591,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", rekapPesananEnabled:false, rekapPesananHari:7};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -6633,7 +6612,6 @@ function loadSettings(){
     if(typeof s.footerInfoEnabled === "boolean") SETTINGS.footerInfoEnabled = s.footerInfoEnabled;
     if(typeof s.dailyRecapAutoEnabled === "boolean") SETTINGS.dailyRecapAutoEnabled = s.dailyRecapAutoEnabled;
     if(typeof s.resiKemarinInfoEnabled === "boolean") SETTINGS.resiKemarinInfoEnabled = s.resiKemarinInfoEnabled;
-    if(typeof s.accFinanceLogistikNotifEnabled === "boolean") SETTINGS.accFinanceLogistikNotifEnabled = s.accFinanceLogistikNotifEnabled;
     if(typeof s.resiKemarinInfoTime === "string" && s.resiKemarinInfoTime.trim()) SETTINGS.resiKemarinInfoTime = s.resiKemarinInfoTime.trim();
     if(typeof s.logistikPengingatEnabled === "boolean") SETTINGS.logistikPengingatEnabled = s.logistikPengingatEnabled;
     if(typeof s.logistikPengingatTime === "string" && s.logistikPengingatTime.trim()) SETTINGS.logistikPengingatTime = s.logistikPengingatTime.trim();
@@ -11498,20 +11476,6 @@ if ("serviceWorker" in navigator) {
     inputResiKemarinTime.addEventListener("change", saveResiKemarin);
   }
 
-  /* BARU -- toggle notifikasi "Siap Diproses" ke Logistik saat Finance
-     klik Konfirmasi. SAMA pola dgn toggle lain di atas -- murni disimpan
-     ke settings, DIBACA & dicek oleh WORKER, tidak ada elemen DOM app
-     lain yang berubah. */
-  const toggleAccFinanceLogistik = document.getElementById("md-accfinance-logistik-toggle");
-  if(toggleAccFinanceLogistik){
-    toggleAccFinanceLogistik.checked = SETTINGS.accFinanceLogistikNotifEnabled !== false;
-    toggleAccFinanceLogistik.addEventListener("change", async ()=>{
-      SETTINGS.accFinanceLogistikNotifEnabled = toggleAccFinanceLogistik.checked;
-      saveSettings();
-      await confirmMasterDataSave(SETTINGS.accFinanceLogistikNotifEnabled ? "Notifikasi \"Siap Diproses\" ke Logistik diaktifkan." : "Notifikasi \"Siap Diproses\" ke Logistik dimatikan.");
-    });
-  }
-
   /* ---------- toggle + jam: Peringatan Logistik Resi Belum Ada (Ekspedisi) ----------
      SAMA pola, dibaca WORKER (checkLogistikPengingatResi). */
   const toggleLogistikPengingat = document.getElementById("md-logistik-pengingat-toggle");
@@ -13569,30 +13533,13 @@ if ("serviceWorker" in navigator) {
   const sortBtn = document.getElementById("rekap-sort-btn");
   const csFilterEl = document.getElementById("rekap-filter-cs");
   const statusFilterEl = document.getElementById("rekap-filter-status");
-  const hariFilterEl = document.getElementById("rekap-filter-hari"); // BARU -- filter per hari
   const belumInvoiceEl = document.getElementById("rekap-filter-belumInvoice");
   const csSummaryEl = document.getElementById("rekap-cs-summary");
-  const hariSummaryEl = document.getElementById("rekap-hari-summary"); // BARU -- ringkasan total qty per hari
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
   let sortDesc = true; // true = terbaru dulu (default, sama dgn urutan dari server)
 
   function openRekapPesanan(){
-    // BARU -- sambungkan ke toggle "Aktifkan menu Rekap Pesanan" (Master
-    // Data > Tampilan, SETTINGS.rekapPesananEnabled). SEBELUMNYA toggle
-    // itu cuma menyembunyikan tombol menu di sidebar (CSS habit-rekap-
-    // hidden) -- fungsi buka halaman ini sendiri TIDAK pernah dicek ulang,
-    // jadi kalau terpanggil lewat jalur lain (mis. tombol lama yang masih
-    // nempel di DOM, atau dipanggil manual lewat console), halaman tetap
-    // bisa kebuka walau togglenya OFF. Sekarang keduanya benar-benar
-    // konsisten satu sama lain: toggle OFF = halaman ini juga menolak
-    // terbuka, bukan cuma tombolnya yang hilang.
-    if(!SETTINGS.rekapPesananEnabled){
-      if(typeof showToast === "function"){
-        showToast("Menu Rekap Pesanan sedang nonaktif (Master Data > Tampilan).", true);
-      }
-      return;
-    }
     document.body.classList.remove("showing-home");
     document.body.classList.add("showing-rekap");
     window.scrollTo(0,0);
@@ -13608,7 +13555,6 @@ if ("serviceWorker" in navigator) {
   searchEl.addEventListener("input", ()=> renderRekapTable());
   csFilterEl.addEventListener("change", ()=> renderRekapTable());
   statusFilterEl.addEventListener("change", ()=> renderRekapTable());
-  hariFilterEl.addEventListener("change", ()=> renderRekapTable()); // BARU
   belumInvoiceEl.addEventListener("change", ()=> renderRekapTable());
   sortBtn.addEventListener("click", ()=>{
     sortDesc = !sortDesc;
@@ -13630,38 +13576,18 @@ if ("serviceWorker" in navigator) {
     return out;
   }
 
-  // BARU -- key tanggal (YYYY-MM-DD, zona Jakarta) dari createdAtMs tiap
-  // baris, dipakai buat filter per hari & kelompok ringkasan qty per hari.
-  // Dihitung dari createdAtMs (bukan field "hari"/"tanggalJam" yang sudah
-  // ada -- itu cuma teks nama hari/jam siap-tampil, "hari" berulang tiap
-  // minggu jadi TIDAK unik per tanggal, dan "tanggalJam" tidak reliable
-  // buat di-parse balik). Label tampilan digabung dari r.hari + tanggal.
-  function dateKeyDariRow(r){
-    return new Date(r.createdAtMs).toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
-  }
-  function labelHariDariRow(r){
-    const tgl = new Date(r.createdAtMs).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta", day: "2-digit", month: "short" });
-    return `${r.hari}, ${tgl}`;
-  }
-
-  // BARU -- isi ulang pilihan dropdown CS, Status, & Hari dari data yang
-  // BARU diambil (bukan daftar tetap) -- otomatis mengikuti apa pun yang
+  // BARU -- isi ulang pilihan dropdown CS & Status dari data yang BARU
+  // diambil (bukan daftar tetap) -- otomatis mengikuti apa pun yang
   // benar-benar ada di 7-25 hari terakhir. Pilihan yang sedang dipilih
-  // dipertahankan kalau masih ada di daftar baru. Dropdown Hari diurutkan
-  // TERBARU dulu (konsisten dengan default sort tabel).
+  // dipertahankan kalau masih ada di daftar baru.
   function isiUlangDropdownFilter(){
     const csSet = [...new Set(allRows.map(r=> r.cs).filter(Boolean))].sort();
     const statusSet = [...new Set(allRows.map(r=> r.status).filter(Boolean))].sort();
-    const hariMap = new Map(); // dateKey -> label
-    allRows.forEach(r=> hariMap.set(dateKeyDariRow(r), labelHariDariRow(r)));
-    const hariSet = [...hariMap.keys()].sort().reverse();
-    const prevCs = csFilterEl.value, prevStatus = statusFilterEl.value, prevHari = hariFilterEl.value;
+    const prevCs = csFilterEl.value, prevStatus = statusFilterEl.value;
     csFilterEl.innerHTML = `<option value="">Semua CS</option>` + csSet.map(c=> `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join("");
     statusFilterEl.innerHTML = `<option value="">Semua Status</option>` + statusSet.map(s=> `<option value="${escHtml(s)}">${escHtml(s)}</option>`).join("");
-    hariFilterEl.innerHTML = `<option value="">Semua Hari</option>` + hariSet.map(dk=> `<option value="${dk}">${escHtml(hariMap.get(dk))}</option>`).join("");
     if(csSet.includes(prevCs)) csFilterEl.value = prevCs;
     if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
-    if(hariSet.includes(prevHari)) hariFilterEl.value = prevHari;
   }
 
   async function fetchAndRenderRekap(){
@@ -13692,13 +13618,11 @@ if ("serviceWorker" in navigator) {
     const keyword = searchEl.value.trim().toLowerCase();
     const csPilih = csFilterEl.value;
     const statusPilih = statusFilterEl.value;
-    const hariPilih = hariFilterEl.value; // BARU -- filter per hari (value = dateKey YYYY-MM-DD)
     const belumInvoiceSaja = belumInvoiceEl.checked;
     let rows = allRows.filter(r=>
       (!keyword || (r.customer||"").toLowerCase().includes(keyword)) &&
       (!csPilih || r.cs === csPilih) &&
       (!statusPilih || r.status === statusPilih) &&
-      (!hariPilih || dateKeyDariRow(r) === hariPilih) &&
       (!belumInvoiceSaja || !r.manualInvoiced)
     );
     rows.sort((a,b)=> sortDesc ? b.createdAtMs - a.createdAtMs : a.createdAtMs - b.createdAtMs);
@@ -13716,32 +13640,6 @@ if ("serviceWorker" in navigator) {
     csSummaryEl.innerHTML = [...perCs.entries()]
       .sort((a,b)=> b[1]-a[1])
       .map(([cs,jml])=> `<div style="background:var(--card); border:1px solid var(--line); border-radius:9px; padding:6px 12px; font-size:14px;"><b>${escHtml(cs)}</b>: ${jml} pesanan</div>`)
-      .join("");
-  }
-
-  // BARU (permintaan: filter per hari + total qty otomatis per hari) --
-  // ringkasan mini "Total Qty per Hari" di atas tabel, dari data yang
-  // SEDANG TAMPIL (ikut semua filter aktif -- CS/Status/keyword/Belum
-  // di-Invoice, BUKAN cuma filter Hari-nya sendiri). Pola & gaya box-nya
-  // SAMA PERSIS dengan renderRingkasanCs() yang sudah ada di atas, cuma
-  // dikelompokkan per tanggal (bukan per CS), dan diurutkan TERBARU dulu.
-  // Kalau filter Hari SEDANG aktif (cuma 1 hari yang mungkin tampil),
-  // ringkasan ini otomatis cuma berisi 1 kotak -- tetap berguna sebagai
-  // konfirmasi cepat "total qty hari itu" tanpa perlu scroll ke baris
-  // TOTAL di paling bawah tabel.
-  function renderRingkasanHari(rows){
-    const perHari = new Map(); // dateKey -> { label, jumlahPesanan, totalQty }
-    rows.forEach(r=>{
-      const dk = dateKeyDariRow(r);
-      const cur = perHari.get(dk) || { label: labelHariDariRow(r), jumlahPesanan: 0, totalQty: 0 };
-      cur.jumlahPesanan += 1;
-      cur.totalQty += (r.totalQty || 0);
-      perHari.set(dk, cur);
-    });
-    if(!perHari.size){ hariSummaryEl.innerHTML = ""; return; }
-    hariSummaryEl.innerHTML = [...perHari.entries()]
-      .sort((a,b)=> b[0].localeCompare(a[0])) // dateKey string, terbaru dulu
-      .map(([, v])=> `<div style="background:var(--card); border:1px solid var(--line); border-radius:9px; padding:6px 12px; font-size:14px;"><b>${escHtml(v.label)}</b>: ${v.jumlahPesanan} pesanan · Qty ${v.totalQty}</div>`)
       .join("");
   }
 
@@ -13764,7 +13662,6 @@ if ("serviceWorker" in navigator) {
   function renderRekapTable(){
     const { rows, kodeList, keyword } = terapkanFilter();
     renderRingkasanCs(rows);
-    renderRingkasanHari(rows);
 
     statusEl.textContent = `${rows.length} dari ${allRows.length} pesanan ditampilkan — diperbarui ${new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}.`;
 
@@ -13896,29 +13793,7 @@ if ("serviceWorker" in navigator) {
           }catch(e){
             btn.textContent = labelSebelum;
             btn.dataset.state = stateSebelum;
-            // BARU -- SEBELUMNYA alert() mentah browser (memblokir seluruh
-            // layar, teksnya teknis & menakutkan buat CS: "Error: KV put()
-            // limit exceeded for the day."). Sekarang pesan ditaruh di
-            // #rekap-status (baris yang sama dipakai buat "28 dari 28
-            // pesanan ditampilkan...") -- tidak memblokir, warnanya merah
-            // biar tetap kelihatan jelas, dan otomatis balik ke teks normal
-            // setelah beberapa detik. Kasus "limit exceeded" dikasih pesan
-            // KHUSUS yang menjelaskan ini BUKAN bug & akan pulih sendiri
-            // (bukan cuma lempar pesan teknis Cloudflare mentah-mentah).
-            const errMsg = (e && e.message) || String(e);
-            const isKvLimit = /limit exceeded/i.test(errMsg);
-            const pesanTampil = isKvLimit
-              ? "⚠️ Gagal menyimpan: jatah tulis data harian sedang penuh (bukan bug) — otomatis pulih sendiri besok pagi jam 07:00 WIB. Perubahan lain (pesanan baru, dst) tetap bisa jalan seperti biasa."
-              : "⚠️ Gagal menyimpan: " + errMsg;
-            const teksSebelum = statusEl.textContent;
-            const warnaSebelum = statusEl.style.color;
-            statusEl.textContent = pesanTampil;
-            statusEl.style.color = "var(--danger-red)";
-            clearTimeout(statusEl._errTimer);
-            statusEl._errTimer = setTimeout(()=>{
-              statusEl.textContent = teksSebelum;
-              statusEl.style.color = warnaSebelum;
-            }, isKvLimit ? 8000 : 5000);
+            alert("Gagal menyimpan: " + (e.message || e));
           }finally{
             btn.disabled = false;
           }
