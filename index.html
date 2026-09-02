@@ -938,7 +938,7 @@
        ikut media query gabungan "wiz" yang juga aktif di desktop lebar
        (≥901px) -- di desktop lebar totalnya sudah ada di kartu "Ringkasan
        pesanan" (aside), jadi tidak perlu dobel. */
-    .wiz-totals-bar{display:flex;}
+    .wiz-totals-bar{display:flex !important;}
     body{padding:16px 10px 60px;}
     header{align-items:flex-start;gap:8px;padding-bottom:10px;margin-bottom:14px;}
     header .sub{font-size:11.5px;}
@@ -1404,7 +1404,15 @@
        di sini sama sekali, pola sama dengan syncDesktopSummary/
        syncPosCartSheet yang sudah ada. */
     .wiz-totals-bar{
-      display:none; /* BARU -- default disembunyikan, cuma dimunculkan khusus versi mobile lewat media query di bawah (bukan di tablet/desktop lebar) */
+      display:none; /* default disembunyikan (desktop/tablet lebar) -- BARU
+      (v2.27.1) dipaksa !important di aturan media query breakpoint mobile
+      DI ATAS (baris ~941) supaya benar-benar menang, karena sebelumnya
+      2 aturan .wiz-totals-bar ini sama-sama "kekuatan"-nya (1 nama class),
+      dan browser selalu pakai yang paling AKHIR ditulis di file kalau
+      kekuatannya sama -- aturan "sembunyikan" ini (yang TANPA syarat
+      layar) letaknya lebih bawah drpd aturan "tampilkan" di breakpoint
+      mobile, jadi selalu menang & bar-nya nggak pernah kelihatan di HP
+      mana pun. !important di baris ~941 memastikan itu tidak terulang lagi. */
       align-items:stretch;gap:0;
       background:var(--wiz-form-bg,var(--paper));border:1px solid var(--wiz-form-border,var(--line));
       border-radius:10px;margin:0 0 12px;overflow:hidden;
@@ -5666,7 +5674,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.27.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.27.2</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5851,7 +5859,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.27.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.27.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Mode Tabel (HP) — nambah beberapa produk berturut-turut sekarang lebih cepat</b>: setelah klik "Simpan produk", form isi produk langsung terbuka lagi (kosong, siap diisi produk berikutnya) dan layar auto-geser ke situ — tidak perlu geser manual ke bawah cari tombol "+ Tambah produk" lagi tiap kali mau nambah produk baru. Kalau lagi EDIT produk yang sudah tersimpan (bukan nambah baru), perilaku tetap seperti biasa — form tertutup, balik ke daftar. Otomatis berhenti juga kalau slot produk sudah penuh (maks 7).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.27.1</div>
+          <ul>
+            <li><b>Perbaikan bug: bar "Total Qty" &amp; "Total Berat" tidak pernah muncul di HP</b> — akar masalahnya ada 2 aturan CSS bentrok untuk elemen yang sama (satu bilang "tampilkan di HP", satu lagi "sembunyikan selalu") dan yang menang selalu yang "sembunyikan" gara-gara urutan penulisan di file. Sekarang dipaksa menang aturan yang benar — bar-nya sudah kelihatan di Mode Tabel maupun Mode Kasir versi HP.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.27.0</div>
           <ul>
             <li><b>Auto-refresh menu Follow Up dihapus</b> — refresh diam-diam tiap 30 detik & saat tab dibuka lagi sudah tidak ada. Data sekarang cuma dimuat saat kartu Follow Up dibuka pertama kali, atau saat klik manual tombol "🔄 Muat ulang".</li>
             <li><b>Batas sesi 2 jam di menu Rekap Pesanan</b> — kalau halaman ini dibiarkan terbuka terus lebih dari 2 jam, auto-refresh otomatis berhenti & muncul popup "Halaman Sudah Lama Terbuka" (tampilan sendiri, bukan alert bawaan browser) minta klik "🔄 Muat Ulang Sekarang" untuk lanjut dengan data terbaru.</li>
@@ -11062,7 +11082,22 @@ if ("serviceWorker" in navigator) {
       if(sheet==="custom") tr.querySelector("input.diskon").value = readDiskonModeValue("wa-diskonmode-"+sheet, "wa-diskon-"+sheet);
       tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
       tr.querySelector("input.qty").dispatchEvent(new Event("input", {bubbles:true}));
-      closeForm(sheet);
+      // BARU -- kalau ini nambah produk BARU (bukan edit produk yang sudah
+      // tersimpan), langsung buka lagi form kosong utk produk berikutnya &
+      // auto-scroll ke situ (openForm() sudah scrollIntoView sendiri) --
+      // supaya nambah banyak produk berturut-turut TIDAK perlu geser manual
+      // ke tombol "+ Tambah produk" yang makin turun tiap kali daftar
+      // produk tersimpan makin panjang. Field "pilih produk" jadi selalu
+      // di posisi yang sama tiap habis Simpan. Kalau ini EDIT produk yang
+      // sudah ada (originalEditingIdx bukan null) ATAU slot produk sudah
+      // penuh (maks 7), perilaku LAMA dipertahankan -- form ditutup, balik
+      // ke daftar (bukan lanjut nambah).
+      const masihAdaSlotKosong = trs2.some(t=> !t.querySelector("select.prod").value);
+      if(originalEditingIdx === null && masihAdaSlotKosong){
+        openForm(sheet, null);
+      }else{
+        closeForm(sheet);
+      }
     });
     const delBtn = document.getElementById("wa-delete-"+sheet);
     if(delBtn) delBtn.addEventListener("click", ()=>{

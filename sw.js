@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v284";
+const CACHE_VERSION = "v286";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -18,6 +18,23 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    PERINGATAN: user yang lagi isi form/nota bisa ke-reload tiba-tiba begitu
    halaman ini aktif (progres yang belum disimpan bisa hilang) — pakai
    fitur ini seperlunya saja, bukan kebiasaan tiap deploy.
+   v286 -- Mode Tabel (HP): setelah "Simpan produk" (nambah produk BARU,
+   bukan edit), form langsung terbuka lagi kosong & auto-scroll ke situ --
+   supaya nambah beberapa produk berturut-turut tidak perlu geser manual
+   ke tombol "+ Tambah produk" yang makin turun. SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan, murni kenyamanan input) -- pakai alur normal
+   (popup "Perbarui Sekarang") supaya user yang lagi isi form tidak
+   tiba-tiba ke-reload dan kehilangan progres.
+   v285 -- perbaikan bug: bar "Total Qty"/"Total Berat" (Mode Tabel & Mode
+   Kasir, khusus HP) yang ditambahkan di v284 ternyata TIDAK PERNAH muncul
+   di HP mana pun -- ada 2 aturan CSS bentrok utk elemen yang sama (satu
+   "tampilkan di HP", satu "sembunyikan selalu"), dan yang menang selalu
+   yang "sembunyikan" gara-gara urutan penulisan di file (2 aturan itu
+   sama "kekuatan"-nya, jadi yang paling akhir ditulis yang menang, bukan
+   yang paling relevan). Ditambal dgn !important di aturan mobile-nya.
+   DIPAKSA AKTIF (masuk Set di bawah) -- ini murni perbaikan bug tampilan
+   yang baru dirilis kemarin (v284), belum banyak dipakai orang, jadi
+   aman langsung dipaksa tanpa perlu approval popup dulu.
    v284 -- 3 perubahan: (1) auto-refresh diam-diam (interval 30 detik +
    refresh saat tab dibuka lagi) di menu Follow Up DIHAPUS TOTAL atas
    permintaan user -- data sekarang cuma dimuat saat kartu dibuka pertama
