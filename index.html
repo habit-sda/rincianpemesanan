@@ -14207,12 +14207,37 @@ if ("serviceWorker" in navigator) {
 (function(){
   const statusEl = document.getElementById("followup-status");
   const tableEl = document.getElementById("followup-table");
+  const tableWrapEl = document.getElementById("followup-table-wrap");
   const searchEl = document.getElementById("followup-search");
   const csFilterEl = document.getElementById("followup-filter-cs");
   const statusFilterEl = document.getElementById("followup-filter-status");
   const statsGridEl = document.getElementById("followup-stats-grid");
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
+  // ---- AUTO REFRESH (BARU) ----
+  // Refresh diam-diam tiap AUTO_REFRESH_MS selama kartu Follow Up sedang
+  // terbuka. "Diam-diam" artinya: TIDAK menimpa tabel/scroll kalau isi
+  // data dari server ternyata sama persis dgn yang sudah tampil -- jadi
+  // tidak ada kedip layar tiap auto-refresh jalan (cuma jam "diperbarui
+  // pukul ..." di statusEl yg ikut update). Kalau memang ada perubahan
+  // data, baru tabel di-render ulang, dan posisi scroll (horizontal tabel
+  // + scroll halaman) disimpan & dikembalikan supaya tidak "loncat".
+  const AUTO_REFRESH_MS = 30000; // 30 detik, silakan diubah kalau perlu
+  let autoRefreshTimer = null;
+  let lastRowsSignature = null;
+  function startAutoRefresh(){
+    stopAutoRefresh();
+    autoRefreshTimer = setInterval(()=>{
+      // jaga-jaga: kalau halaman lagi disembunyikan (tab lain) atau kartu
+      // Follow Up sudah tidak terbuka, jangan buang kuota/hits ke worker.
+      if(document.hidden) return;
+      if(!document.body.classList.contains("showing-followup")) return;
+      fetchAndRenderFollowUp({ silent:true });
+    }, AUTO_REFRESH_MS);
+  }
+  function stopAutoRefresh(){
+    if(autoRefreshTimer){ clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+  }
 
   function openFollowUp(){
     // BARU -- sambungkan ke toggle "Aktifkan menu Follow Up" (Master Data
@@ -14228,12 +14253,21 @@ if ("serviceWorker" in navigator) {
     document.body.classList.add("showing-followup");
     window.scrollTo(0,0);
     fetchAndRenderFollowUp();
+    startAutoRefresh(); // BARU -- mulai auto-refresh diam-diam selama kartu ini terbuka
   }
   window.__openFollowUp = openFollowUp;
   document.getElementById("followup-back-btn").addEventListener("click", ()=>{
     document.body.classList.remove("showing-followup");
+    stopAutoRefresh(); // BARU -- berhenti auto-refresh begitu keluar dari kartu Follow Up
     const el = document.querySelector("[data-back]");
     if(el) el.click(); else document.body.classList.add("showing-home");
+  });
+  // BARU -- begitu tab/HP dibuka lagi setelah disembunyikan, langsung
+  // cek data terbaru sekali (diam-diam), bukan menunggu interval berikutnya.
+  document.addEventListener("visibilitychange", ()=>{
+    if(!document.hidden && document.body.classList.contains("showing-followup")){
+      fetchAndRenderFollowUp({ silent:true });
+    }
   });
   document.getElementById("followup-refresh-btn").addEventListener("click", fetchAndRenderFollowUp);
   searchEl.addEventListener("input", ()=> renderFollowUpTable());
@@ -14314,21 +14348,48 @@ if ("serviceWorker" in navigator) {
     if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
   }
 
-  async function fetchAndRenderFollowUp(){
+  async function fetchAndRenderFollowUp(opts){
+    const silent = !!(opts && opts.silent);
     if(isLoading) return;
     isLoading = true;
-    statusEl.textContent = "Memuat data…";
+    // BARU -- auto-refresh diam-diam TIDAK menimpa status "Memuat data…"
+    // (kalau ditimpa, teks status jadi kedip tiap 30 detik walau tabelnya
+    // sendiri tidak ikut kedip). Klik manual "Muat ulang" tetap dikasih
+    // feedback teks seperti biasa.
+    if(!silent) statusEl.textContent = "Memuat data…";
     try{
       const res = await fetch(MASTER_DATA_WORKER_URL + "/followup-repeat-order", {
         headers: workerHeaders(),
       });
       const body = await res.json();
       if(!res.ok) throw new Error(body.error || "Gagal memuat data.");
-      allRows = body.rows || [];
+      const rowsBaru = body.rows || [];
+      const signatureBaru = JSON.stringify(rowsBaru);
+      if(silent && signatureBaru === lastRowsSignature){
+        // BARU -- data dari server SAMA PERSIS dgn yg sudah tampil -> tabel
+        // TIDAK disentuh sama sekali (0 DOM diubah = tidak ada kedip),
+        // cuma jam "diperbarui pukul ..." di teks status yg ikut jalan.
+        statusEl.textContent = statusEl.textContent.replace(
+          /diperbarui \d{2}\.\d{2}\.$/,
+          "diperbarui " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}) + "."
+        );
+        return;
+      }
+      // BARU -- simpan posisi scroll dulu (horizontal tabel + scroll
+      // halaman) supaya render ulang tidak bikin layar "loncat".
+      const savedScrollLeft = tableWrapEl ? tableWrapEl.scrollLeft : 0;
+      const savedScrollY = window.scrollY;
+      allRows = rowsBaru;
+      lastRowsSignature = signatureBaru;
       isiUlangDropdownFilter();
       renderFollowUpTable();
+      if(tableWrapEl) tableWrapEl.scrollLeft = savedScrollLeft;
+      window.scrollTo(window.scrollX, savedScrollY);
     }catch(e){
-      statusEl.textContent = "Gagal memuat: " + (e.message || e);
+      // BARU -- kalau auto-refresh diam-diam gagal (mis. sinyal HP putus
+      // sebentar), jangan timpa tabel yg sudah tampil dgn pesan error --
+      // biarkan tetap seperti sebelumnya, coba lagi otomatis 30 detik lagi.
+      if(!silent) statusEl.textContent = "Gagal memuat: " + (e.message || e);
     }finally{
       isLoading = false;
     }

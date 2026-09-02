@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v279";
+const CACHE_VERSION = "v280";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -47,6 +47,18 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    dipaksa (bukan darurat/keamanan, cuma fitur baru yg belum lama dipakai
    siapa pun) -- pakai alur normal (popup "Perbarui Sekarang") supaya user
    yang lagi isi form tidak tiba-tiba ke-reload dan kehilangan progres.
+   v280 -- tambah auto-refresh diam-diam di kartu Follow Up (tiap 30
+   detik selama kartu itu terbuka & tab aktif). Anti-kedip: data baru dari
+   server dibandingkan dgn yang sudah tampil -- kalau PERSIS SAMA, tabel
+   sama sekali tidak disentuh (0 elemen DOM diubah), cuma jam "diperbarui
+   pukul .." di teks status yg jalan. Kalau memang ada perubahan data,
+   baru tabel di-render ulang, dan posisi scroll (geser tabel ke
+   kanan/kiri + scroll halaman) disimpan lalu dikembalikan supaya
+   layar tidak "loncat". Auto-refresh otomatis berhenti begitu keluar dari
+   kartu Follow Up (tombol Kembali) atau saat tab disembunyikan, dan
+   langsung cek sekali lagi begitu tab dibuka lagi. SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang").
    v276 lama sudah dikeluarkan dari Set ini (update itu sudah tersebar
    duluan). ---- */
 const FORCE_ACTIVATE_VERSIONS = new Set([]);
