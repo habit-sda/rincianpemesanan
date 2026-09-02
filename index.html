@@ -1060,6 +1060,39 @@
     body.showing-rekap .panel,
     body.showing-rekap details.region{display:none !important;}
     body.showing-rekap #rekap-fullpage{display:block;}
+    /* BARU -- halaman penuh "Follow Up" (F.O/Repeat Order), pola SAMA
+       persis dgn showing-rekap di atas. */
+    #followup-fullpage{display:none;}
+    body.showing-followup .home-screen,
+    body.showing-followup .tabs,
+    body.showing-followup .toolbar,
+    body.showing-followup .panel,
+    body.showing-followup details.region{display:none !important;}
+    body.showing-followup #followup-fullpage{display:block;}
+    .followup-stats-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px;}
+    @media(max-width:700px){.followup-stats-grid{grid-template-columns:1fr 1fr;}}
+    .followup-stat-box{background:var(--paper, #f7f8f6); border:1px solid var(--line); border-radius:10px; padding:12px 10px; text-align:center;}
+    .followup-stat-box .num{font-size:22px; font-weight:800; color:var(--primary-green);}
+    .followup-stat-box .lbl{font-size:11px; color:var(--ink-soft); margin-top:2px;}
+    .fu-badge{display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap;}
+    .fu-badge.r{background:#fdecea; color:var(--danger-red, #c00000);}
+    .fu-badge.o{background:#fff2e0; color:#7b3f00;}
+    .fu-badge.y{background:#fffde7; color:#7b6000;}
+    .fu-badge.b{background:#e3f0fb; color:#1f4e78;}
+    .fu-badge.g{background:#e6f4ea; color:var(--primary-green);}
+    .fu-badge.gr{background:#ececec; color:#555;}
+    /* PERBAIKAN BUG -- overlay ini punya "display:flex" di inline style
+       (dipakai supaya kontennya center pas TAMPIL), tapi itu bikin atribut
+       "hidden" bawaan browser ([hidden]{display:none} di UA stylesheet)
+       KALAH SPESIFISITAS lawan inline style, jadi overlay bisa nyangkut
+       tetap tampil / muncul duluan walau sudah di-hidden lewat JS. Pola
+       fix-nya SAMA PERSIS dgn .calc-overlay[hidden] & .md-overlay[hidden]
+       yang sudah ada di file ini -- override eksplisit pakai selector
+       [hidden] supaya menang lagi dari inline style. */
+    #followup-detail-overlay[hidden],
+    #followup-contact-overlay[hidden]{display:none !important;}
+    #followup-table tbody tr{cursor:pointer;}
+    #followup-table tbody tr:hover{background:var(--paper, #f7f8f6);}
     /* BARU -- mode cetak/PDF: begitu window.print() dipanggil, sembunyikan
        SEMUA elemen kecuali tabel rekap -- browser "Save as PDF" di dialog
        print jadi otomatis rapi (cuma tabel, tanpa sidebar/tombol/filter). */
@@ -4227,6 +4260,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18M8 4v16" stroke="currentColor" stroke-width="1.4"/></svg>
       Rekap Pesanan
     </button>
+    <button type="button" class="habit-sidebar-link habit-followup-hidden" id="sb-followup" hidden>
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17 20v-1.6a3.4 3.4 0 0 0-3.4-3.4H8.4A3.4 3.4 0 0 0 5 18.4V20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10.7" cy="7.5" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M16 8.2c1.1.2 2 1.1 2 2.3M19 4.5c1.3.3 2.3 1.5 2.3 2.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Follow Up
+    </button>
     <button type="button" class="habit-sidebar-link" id="sb-kalkulator">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 7h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8.3" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="15.7" cy="12" r="1" fill="currentColor"/><circle cx="8.3" cy="15.6" r="1" fill="currentColor"/><circle cx="12" cy="15.6" r="1" fill="currentColor"/><circle cx="15.7" cy="15.6" r="1" fill="currentColor"/></svg>
       Kalkulator
@@ -4402,10 +4439,21 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <select id="rekap-filter-status" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
         <option value="">Semua Status</option>
       </select>
+      <!-- BARU -- filter per hari (tanggal spesifik), pola SAMA dgn dropdown
+           CS/Status di sampingnya: opsinya diisi ulang otomatis dari data
+           yang benar-benar ada (isiUlangDropdownFilter()), bukan daftar
+           tetap, dan filternya jalan di browser (0 tambahan kuota baca KV). -->
+      <select id="rekap-filter-hari" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
+        <option value="">Semua Hari</option>
+      </select>
       <label style="display:flex; align-items:center; gap:6px; font-size:15px; white-space:nowrap;">
         <input type="checkbox" id="rekap-filter-belumInvoice" style="width:18px; height:18px;"> Belum di-Invoice saja
       </label>
     </div>
+    <!-- BARU -- ringkasan Total Qty per Hari, dari data yang SEDANG TAMPIL
+         (ikut semua filter aktif) -- pola SAMA persis dgn #rekap-cs-summary
+         yang sudah ada (kotak per-CS), cuma dikelompokkan per tanggal. -->
+    <div id="rekap-hari-summary" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px;"></div>
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:14px;">
       <button class="md-btn" id="rekap-sort-btn" style="white-space:nowrap; height:44px;">↓ Terbaru dulu</button>
       <button class="md-btn" id="rekap-refresh-btn" style="white-space:nowrap; height:44px;">🔄 Muat ulang</button>
@@ -4416,6 +4464,60 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div id="rekap-status" style="color:var(--ink-soft); margin-bottom:10px;"></div>
     <div style="overflow-x:auto; border:1px solid var(--line); border-radius:10px;" id="rekap-table-wrap">
       <table id="rekap-table" style="border-collapse:collapse; width:100%; white-space:nowrap;"></table>
+    </div>
+  </div>
+
+  <!-- BARU -- "Follow Up" (F.O/Repeat Order): pola repeat-order per
+       customer dari pesanan yang PERNAH 100% Lunas (permanen di D1,
+       tidak ikut kadaluarsa 25 hari seperti Rekap Pesanan). -->
+  <div id="followup-fullpage" hidden style="font-size:16px;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+      <button type="button" id="followup-back-btn" class="tab-btn" style="flex:0 0 auto;">← Kembali</button>
+      <div style="flex:1; color:var(--ink-soft);">Dihitung dari pesanan yang PERNAH 100% Lunas. Pesanan yang belum Lunas tetap dicatat tapi tidak ikut dihitung ke pola.</div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:10px 0 14px;">
+      <input type="text" id="followup-search" placeholder="Cari nama customer…" style="flex:1; min-width:220px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 14px; font-size:16px;">
+      <select id="followup-filter-cs" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
+        <option value="">Semua CS</option>
+      </select>
+      <select id="followup-filter-status" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
+        <option value="">Semua Status</option>
+      </select>
+      <button class="md-btn" id="followup-contact-btn" style="white-space:nowrap; height:44px;">📞 Perlu Dihubungi</button>
+      <button class="md-btn" id="followup-refresh-btn" style="white-space:nowrap; height:44px;">🔄 Muat ulang</button>
+    </div>
+    <div class="followup-stats-grid" id="followup-stats-grid"></div>
+    <div id="followup-status" style="color:var(--ink-soft); margin-bottom:10px;"></div>
+    <div style="overflow-x:auto; border:1px solid var(--line); border-radius:10px;" id="followup-table-wrap">
+      <table id="followup-table" style="border-collapse:collapse; width:100%; white-space:nowrap;"></table>
+    </div>
+  </div>
+
+  <!-- Detail 1 customer (klik baris di tabel Follow Up) -->
+  <div id="followup-detail-overlay" hidden style="position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px;">
+    <div id="followup-detail-modal" style="background:var(--paper,#fff); border-radius:14px; max-width:480px; width:100%; max-height:85vh; overflow-y:auto; padding:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px;">
+        <div>
+          <div id="followup-detail-nama" style="font-size:18px; font-weight:800;"></div>
+          <div id="followup-detail-cs" style="font-size:12px; color:var(--ink-soft); margin-top:2px;"></div>
+        </div>
+        <button type="button" id="followup-detail-close" class="tab-btn" style="flex:0 0 auto;">✕</button>
+      </div>
+      <div id="followup-detail-body" style="font-size:14px; line-height:1.7;"></div>
+    </div>
+  </div>
+
+  <!-- Popup "Perlu Dihubungi" (customer sisa 1-3 hari lagi) -->
+  <div id="followup-contact-overlay" hidden style="position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px;">
+    <div id="followup-contact-modal" style="background:var(--paper,#fff); border-radius:14px; max-width:480px; width:100%; max-height:85vh; overflow-y:auto; padding:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px;">
+        <div>
+          <div style="font-size:16px; font-weight:800;">🟠 Segera Perlu Dihubungi</div>
+          <div id="followup-contact-sub" style="font-size:12px; color:var(--ink-soft); margin-top:2px;"></div>
+        </div>
+        <button type="button" id="followup-contact-close" class="tab-btn" style="flex:0 0 auto;">✕</button>
+      </div>
+      <div id="followup-contact-list" style="display:flex; flex-direction:column; gap:8px;"></div>
     </div>
   </div>
 
@@ -4972,6 +5074,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
       </div>
       <div class="md-card">
+        <h3>Menu "Follow Up"</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17 20v-1.6a3.4 3.4 0 0 0-3.4-3.4H8.4A3.4 3.4 0 0 0 5 18.4V20" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/><circle cx="10.7" cy="7.5" r="3" stroke="var(--primary-green)" stroke-width="1.6"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Aktifkan menu "Follow Up" di sidebar</div>
+            <div class="md-togglerow-sub">Pola repeat-order per customer (rata-rata jarak antar order, prediksi order berikutnya, siapa yang perlu segera dihubungi) — dihitung dari pesanan yang PERNAH 100% Lunas, disimpan permanen (tidak ikut kadaluarsa 25 hari seperti Rekap Pesanan). Pesanan yang belum Lunas tetap dicatat sebagai riwayat tapi tidak ikut dihitung ke pola. Ditaruh di sidebar tepat di bawah menu Rekap Pesanan.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-followup">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card">
         <h3>Mode Gelap</h3>
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 12.7A6.5 6.5 0 1 1 11.3 6a5 5 0 0 0 6.7 6.7z" stroke="var(--primary-green)" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
@@ -5026,6 +5142,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <label for="md-resikemarin-time" style="font-size:13.5px; color:var(--ink-soft);">Jam kirim (WIB)</label>
           <input type="time" id="md-resikemarin-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
         </div>
+      </div>
+      <div class="md-card" id="md-accfinance-logistik-card">
+        <h3>📦 Notifikasi "Siap Diproses" ke Logistik</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Begitu Finance klik "Konfirmasi" (bukan Hoax/Deposit/Void), pesan "Pesanan sudah di-ACC Finance, siap diproses" otomatis terkirim ke SEMUA kontak di Daftar Logistik — sekali per pesanan. Matikan kalau tim Logistik sudah punya cara lain memantau pesanan siap kirim, dan tidak perlu notifikasi terpisah ini lagi.
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="md-accfinance-logistik-toggle" style="width:18px; height:18px;">
+          <span>Aktifkan Notifikasi "Siap Diproses" ke Logistik</span>
+        </label>
       </div>
       <div class="md-card" id="md-nobukti-card">
         <h3>⏰ Peringatan Bukti Transfer Belum Ada</h3>
@@ -5431,7 +5557,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.25.4</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.26.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5616,7 +5742,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.25.4 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.26.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Menu baru "Follow Up"</b> (sidebar, tepat di bawah "Rekap Pesanan") — pola repeat-order per customer: rata-rata jarak antar order, prediksi order berikutnya, dan status (Jatuh Tempo/Segera/Minggu Ini/Belum Perlu) supaya mudah tahu siapa yang perlu segera dihubungi. Tombol "📞 Perlu Dihubungi" menampilkan daftar customer yang jatuh tempo 1-3 hari lagi. Klik nama customer untuk lihat riwayat order lengkapnya.</li>
+            <li><b>Sumber data permanen, beda dengan Rekap Pesanan</b> — dihitung dari pesanan yang PERNAH 100% Lunas, disimpan permanen (tidak ikut kadaluarsa 25 hari seperti data Rekap Pesanan). Pesanan yang belum Lunas (Cicilan/Kelebihan) tetap dicatat sebagai riwayat, tapi tidak ikut dihitung ke pola repeat-order.</li>
+            <li><b>Diatur aktif/nonaktif</b> di Master Data &gt; Tampilan, sama seperti menu Rekap Pesanan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.25.4</div>
           <ul>
             <li><b>Perbaikan tampilan Rekap Pesanan</b> — kolom No/Hari/KG/Resi/Aksi dipersempit (sebelumnya kelihatan bengkak walau isinya cuma 1-2 karakter). Teks status dipersingkat jadi inti-nya saja (mis. "Cicilan" bukan lagi "Cicilan — Rp 500.000 dari Rp 1.500.000, kurang Rp 1.000.000") — rincian lengkap tetap bisa dilihat lewat klik nama customer.</li>
             <li><b>Peringatan kalau kolom varian tidak muncul</b> — sebelumnya membingungkan karena kolomnya diam-diam tidak ada tanpa penjelasan. Sekarang muncul pesan jelas kalau belum ada "Kode Singkat" diisi di Master Data &gt; Produk.</li>
@@ -6591,7 +6725,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", rekapPesananEnabled:false, rekapPesananHari:7};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -6612,12 +6746,14 @@ function loadSettings(){
     if(typeof s.footerInfoEnabled === "boolean") SETTINGS.footerInfoEnabled = s.footerInfoEnabled;
     if(typeof s.dailyRecapAutoEnabled === "boolean") SETTINGS.dailyRecapAutoEnabled = s.dailyRecapAutoEnabled;
     if(typeof s.resiKemarinInfoEnabled === "boolean") SETTINGS.resiKemarinInfoEnabled = s.resiKemarinInfoEnabled;
+    if(typeof s.accFinanceLogistikNotifEnabled === "boolean") SETTINGS.accFinanceLogistikNotifEnabled = s.accFinanceLogistikNotifEnabled;
     if(typeof s.resiKemarinInfoTime === "string" && s.resiKemarinInfoTime.trim()) SETTINGS.resiKemarinInfoTime = s.resiKemarinInfoTime.trim();
     if(typeof s.logistikPengingatEnabled === "boolean") SETTINGS.logistikPengingatEnabled = s.logistikPengingatEnabled;
     if(typeof s.logistikPengingatTime === "string" && s.logistikPengingatTime.trim()) SETTINGS.logistikPengingatTime = s.logistikPengingatTime.trim();
     if(typeof s.noBuktiTransferReminderEnabled === "boolean") SETTINGS.noBuktiTransferReminderEnabled = s.noBuktiTransferReminderEnabled;
     if(typeof s.rekapPesananEnabled === "boolean") SETTINGS.rekapPesananEnabled = s.rekapPesananEnabled;
     if(typeof s.rekapPesananHari === "number" && s.rekapPesananHari >= 1 && s.rekapPesananHari <= 25) SETTINGS.rekapPesananHari = s.rekapPesananHari;
+    if(typeof s.followUpEnabled === "boolean") SETTINGS.followUpEnabled = s.followUpEnabled;
     if(typeof s.noBuktiTransferReminderTime === "string" && s.noBuktiTransferReminderTime.trim()) SETTINGS.noBuktiTransferReminderTime = s.noBuktiTransferReminderTime.trim();
     if(s.stickerReactionsEnabled && typeof s.stickerReactionsEnabled === "object"){
       ["konfirmasi","hoax","deposit","void"].forEach(k=>{
@@ -6648,6 +6784,12 @@ function applySettingsToDom(){
   // Master Data yang lain).
   document.querySelectorAll(".habit-rekap-hidden").forEach(el=>{
     el.hidden = !SETTINGS.rekapPesananEnabled;
+  });
+  // BARU -- toggle menu sidebar "Follow Up" (F.O/Repeat Order), pola SAMA
+  // dgn "Rekap Pesanan" di atas (habit-followup-hidden, class terpisah
+  // sendiri supaya on/off-nya independen dari menu lain).
+  document.querySelectorAll(".habit-followup-hidden").forEach(el=>{
+    el.hidden = !SETTINGS.followUpEnabled;
   });
   // Blok "PT. Halawa Bintang Utama · rekening · masa berlaku" di footer —
   // murni tampil/sembunyi, tidak menyentuh footer "Habit · versi · Cek
@@ -9812,6 +9954,7 @@ if ("serviceWorker" in navigator) {
     body.classList.add("showing-home");
     body.classList.remove("nota-confirmed");
     body.classList.remove("showing-rekap"); // BARU -- keluar dari halaman Rekap Pesanan kalau balik ke Beranda dari mana pun
+    body.classList.remove("showing-followup"); // BARU -- keluar dari halaman Follow Up kalau balik ke Beranda dari mana pun
     window.scrollTo(0,0);
   }
   function applyWizStep(sheet, step){
@@ -9854,6 +9997,7 @@ if ("serviceWorker" in navigator) {
   function openTab(tab){
     body.classList.remove("showing-home");
     body.classList.remove("showing-rekap"); // BARU -- keluar dari Rekap Pesanan kalau langsung klik Penjualan/Custom dari sidebar
+    body.classList.remove("showing-followup"); // BARU -- keluar dari Follow Up kalau langsung klik Penjualan/Custom dari sidebar
     const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
     if(btn) btn.click();
     wizGo(tab, "list");
@@ -11414,6 +11558,17 @@ if ("serviceWorker" in navigator) {
     });
   }
 
+  const toggleFollowUp = document.getElementById("md-toggle-followup");
+  if(toggleFollowUp){
+    toggleFollowUp.checked = SETTINGS.followUpEnabled;
+    toggleFollowUp.addEventListener("change", async ()=>{
+      SETTINGS.followUpEnabled = toggleFollowUp.checked;
+      saveSettings();
+      applySettingsToDom();
+      await confirmMasterDataSave(SETTINGS.followUpEnabled ? "Menu Follow Up diaktifkan di sidebar." : "Menu Follow Up disembunyikan dari sidebar.");
+    });
+  }
+
   const toggleStickyFormBtns = document.getElementById("md-toggle-stickyformbtns");
   if(toggleStickyFormBtns){
     toggleStickyFormBtns.checked = SETTINGS.stickyFormButtonsEnabled;
@@ -11474,6 +11629,20 @@ if ("serviceWorker" in navigator) {
     };
     toggleResiKemarin.addEventListener("change", saveResiKemarin);
     inputResiKemarinTime.addEventListener("change", saveResiKemarin);
+  }
+
+  /* BARU -- toggle notifikasi "Siap Diproses" ke Logistik saat Finance
+     klik Konfirmasi. SAMA pola dgn toggle lain di atas -- murni disimpan
+     ke settings, DIBACA & dicek oleh WORKER, tidak ada elemen DOM app
+     lain yang berubah. */
+  const toggleAccFinanceLogistik = document.getElementById("md-accfinance-logistik-toggle");
+  if(toggleAccFinanceLogistik){
+    toggleAccFinanceLogistik.checked = SETTINGS.accFinanceLogistikNotifEnabled !== false;
+    toggleAccFinanceLogistik.addEventListener("change", async ()=>{
+      SETTINGS.accFinanceLogistikNotifEnabled = toggleAccFinanceLogistik.checked;
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.accFinanceLogistikNotifEnabled ? "Notifikasi \"Siap Diproses\" ke Logistik diaktifkan." : "Notifikasi \"Siap Diproses\" ke Logistik dimatikan.");
+    });
   }
 
   /* ---------- toggle + jam: Peringatan Logistik Resi Belum Ada (Ekspedisi) ----------
@@ -13376,6 +13545,10 @@ if ("serviceWorker" in navigator) {
   if(sbRekapPesanan) sbRekapPesanan.addEventListener("click", ()=>{
     if(window.__openRekapPesanan) window.__openRekapPesanan();
   });
+  const sbFollowUp = byId("sb-followup");
+  if(sbFollowUp) sbFollowUp.addEventListener("click", ()=>{
+    if(window.__openFollowUp) window.__openFollowUp();
+  });
 
   /* ---- highlight menu aktif — dibaca dari state DOM yang sudah ada,
      bukan state baru. Dijalankan ulang tiap ada klik di halaman (murah,
@@ -13384,20 +13557,24 @@ if ("serviceWorker" in navigator) {
   function syncSidebarActive(){
     const showingHome = document.body.classList.contains("showing-home");
     const showingRekap = document.body.classList.contains("showing-rekap");
+    const showingFollowUp = document.body.classList.contains("showing-followup");
     const activeTabBtn = document.querySelector(".tab-btn.active[data-tab]");
     const activeTab = activeTabBtn ? activeTabBtn.dataset.tab : null;
 
     if(sbBeranda) sbBeranda.classList.toggle("active", showingHome);
-    if(sbPenjualan) sbPenjualan.classList.toggle("active", !showingHome && !showingRekap && activeTab === "penjualan");
-    if(sbCustom) sbCustom.classList.toggle("active", !showingHome && !showingRekap && activeTab === "custom");
+    if(sbPenjualan) sbPenjualan.classList.toggle("active", !showingHome && !showingRekap && !showingFollowUp && activeTab === "penjualan");
+    if(sbCustom) sbCustom.classList.toggle("active", !showingHome && !showingRekap && !showingFollowUp && activeTab === "custom");
     const sbRekap = document.getElementById("sb-rekappesanan");
     if(sbRekap) sbRekap.classList.toggle("active", showingRekap);
+    const sbFU = document.getElementById("sb-followup");
+    if(sbFU) sbFU.classList.toggle("active", showingFollowUp);
 
     // Judul di header (cuma teks, tidak menyentuh logika apa pun) ikut
     // berubah sesuai menu yang lagi aktif — mengikuti gambar acuan.
     const headerH1 = document.querySelector("header h1");
     if(headerH1){
       if(showingRekap) headerH1.textContent = "Rekap Pesanan";
+      else if(showingFollowUp) headerH1.textContent = "Follow Up";
       else if(showingHome) headerH1.textContent = "Beranda";
       else if(activeTab === "penjualan") headerH1.textContent = "Penjualan (Grosir)";
       else if(activeTab === "custom") headerH1.textContent = "Custom";
@@ -13533,13 +13710,30 @@ if ("serviceWorker" in navigator) {
   const sortBtn = document.getElementById("rekap-sort-btn");
   const csFilterEl = document.getElementById("rekap-filter-cs");
   const statusFilterEl = document.getElementById("rekap-filter-status");
+  const hariFilterEl = document.getElementById("rekap-filter-hari"); // BARU -- filter per hari
   const belumInvoiceEl = document.getElementById("rekap-filter-belumInvoice");
   const csSummaryEl = document.getElementById("rekap-cs-summary");
+  const hariSummaryEl = document.getElementById("rekap-hari-summary"); // BARU -- ringkasan total qty per hari
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
   let sortDesc = true; // true = terbaru dulu (default, sama dgn urutan dari server)
 
   function openRekapPesanan(){
+    // BARU -- sambungkan ke toggle "Aktifkan menu Rekap Pesanan" (Master
+    // Data > Tampilan, SETTINGS.rekapPesananEnabled). SEBELUMNYA toggle
+    // itu cuma menyembunyikan tombol menu di sidebar (CSS habit-rekap-
+    // hidden) -- fungsi buka halaman ini sendiri TIDAK pernah dicek ulang,
+    // jadi kalau terpanggil lewat jalur lain (mis. tombol lama yang masih
+    // nempel di DOM, atau dipanggil manual lewat console), halaman tetap
+    // bisa kebuka walau togglenya OFF. Sekarang keduanya benar-benar
+    // konsisten satu sama lain: toggle OFF = halaman ini juga menolak
+    // terbuka, bukan cuma tombolnya yang hilang.
+    if(!SETTINGS.rekapPesananEnabled){
+      if(typeof showToast === "function"){
+        showToast("Menu Rekap Pesanan sedang nonaktif (Master Data > Tampilan).", true);
+      }
+      return;
+    }
     document.body.classList.remove("showing-home");
     document.body.classList.add("showing-rekap");
     window.scrollTo(0,0);
@@ -13555,6 +13749,7 @@ if ("serviceWorker" in navigator) {
   searchEl.addEventListener("input", ()=> renderRekapTable());
   csFilterEl.addEventListener("change", ()=> renderRekapTable());
   statusFilterEl.addEventListener("change", ()=> renderRekapTable());
+  hariFilterEl.addEventListener("change", ()=> renderRekapTable()); // BARU
   belumInvoiceEl.addEventListener("change", ()=> renderRekapTable());
   sortBtn.addEventListener("click", ()=>{
     sortDesc = !sortDesc;
@@ -13576,18 +13771,38 @@ if ("serviceWorker" in navigator) {
     return out;
   }
 
-  // BARU -- isi ulang pilihan dropdown CS & Status dari data yang BARU
-  // diambil (bukan daftar tetap) -- otomatis mengikuti apa pun yang
+  // BARU -- key tanggal (YYYY-MM-DD, zona Jakarta) dari createdAtMs tiap
+  // baris, dipakai buat filter per hari & kelompok ringkasan qty per hari.
+  // Dihitung dari createdAtMs (bukan field "hari"/"tanggalJam" yang sudah
+  // ada -- itu cuma teks nama hari/jam siap-tampil, "hari" berulang tiap
+  // minggu jadi TIDAK unik per tanggal, dan "tanggalJam" tidak reliable
+  // buat di-parse balik). Label tampilan digabung dari r.hari + tanggal.
+  function dateKeyDariRow(r){
+    return new Date(r.createdAtMs).toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+  }
+  function labelHariDariRow(r){
+    const tgl = new Date(r.createdAtMs).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta", day: "2-digit", month: "short" });
+    return `${r.hari}, ${tgl}`;
+  }
+
+  // BARU -- isi ulang pilihan dropdown CS, Status, & Hari dari data yang
+  // BARU diambil (bukan daftar tetap) -- otomatis mengikuti apa pun yang
   // benar-benar ada di 7-25 hari terakhir. Pilihan yang sedang dipilih
-  // dipertahankan kalau masih ada di daftar baru.
+  // dipertahankan kalau masih ada di daftar baru. Dropdown Hari diurutkan
+  // TERBARU dulu (konsisten dengan default sort tabel).
   function isiUlangDropdownFilter(){
     const csSet = [...new Set(allRows.map(r=> r.cs).filter(Boolean))].sort();
     const statusSet = [...new Set(allRows.map(r=> r.status).filter(Boolean))].sort();
-    const prevCs = csFilterEl.value, prevStatus = statusFilterEl.value;
+    const hariMap = new Map(); // dateKey -> label
+    allRows.forEach(r=> hariMap.set(dateKeyDariRow(r), labelHariDariRow(r)));
+    const hariSet = [...hariMap.keys()].sort().reverse();
+    const prevCs = csFilterEl.value, prevStatus = statusFilterEl.value, prevHari = hariFilterEl.value;
     csFilterEl.innerHTML = `<option value="">Semua CS</option>` + csSet.map(c=> `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join("");
     statusFilterEl.innerHTML = `<option value="">Semua Status</option>` + statusSet.map(s=> `<option value="${escHtml(s)}">${escHtml(s)}</option>`).join("");
+    hariFilterEl.innerHTML = `<option value="">Semua Hari</option>` + hariSet.map(dk=> `<option value="${dk}">${escHtml(hariMap.get(dk))}</option>`).join("");
     if(csSet.includes(prevCs)) csFilterEl.value = prevCs;
     if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
+    if(hariSet.includes(prevHari)) hariFilterEl.value = prevHari;
   }
 
   async function fetchAndRenderRekap(){
@@ -13618,11 +13833,13 @@ if ("serviceWorker" in navigator) {
     const keyword = searchEl.value.trim().toLowerCase();
     const csPilih = csFilterEl.value;
     const statusPilih = statusFilterEl.value;
+    const hariPilih = hariFilterEl.value; // BARU -- filter per hari (value = dateKey YYYY-MM-DD)
     const belumInvoiceSaja = belumInvoiceEl.checked;
     let rows = allRows.filter(r=>
       (!keyword || (r.customer||"").toLowerCase().includes(keyword)) &&
       (!csPilih || r.cs === csPilih) &&
       (!statusPilih || r.status === statusPilih) &&
+      (!hariPilih || dateKeyDariRow(r) === hariPilih) &&
       (!belumInvoiceSaja || !r.manualInvoiced)
     );
     rows.sort((a,b)=> sortDesc ? b.createdAtMs - a.createdAtMs : a.createdAtMs - b.createdAtMs);
@@ -13640,6 +13857,32 @@ if ("serviceWorker" in navigator) {
     csSummaryEl.innerHTML = [...perCs.entries()]
       .sort((a,b)=> b[1]-a[1])
       .map(([cs,jml])=> `<div style="background:var(--card); border:1px solid var(--line); border-radius:9px; padding:6px 12px; font-size:14px;"><b>${escHtml(cs)}</b>: ${jml} pesanan</div>`)
+      .join("");
+  }
+
+  // BARU (permintaan: filter per hari + total qty otomatis per hari) --
+  // ringkasan mini "Total Qty per Hari" di atas tabel, dari data yang
+  // SEDANG TAMPIL (ikut semua filter aktif -- CS/Status/keyword/Belum
+  // di-Invoice, BUKAN cuma filter Hari-nya sendiri). Pola & gaya box-nya
+  // SAMA PERSIS dengan renderRingkasanCs() yang sudah ada di atas, cuma
+  // dikelompokkan per tanggal (bukan per CS), dan diurutkan TERBARU dulu.
+  // Kalau filter Hari SEDANG aktif (cuma 1 hari yang mungkin tampil),
+  // ringkasan ini otomatis cuma berisi 1 kotak -- tetap berguna sebagai
+  // konfirmasi cepat "total qty hari itu" tanpa perlu scroll ke baris
+  // TOTAL di paling bawah tabel.
+  function renderRingkasanHari(rows){
+    const perHari = new Map(); // dateKey -> { label, jumlahPesanan, totalQty }
+    rows.forEach(r=>{
+      const dk = dateKeyDariRow(r);
+      const cur = perHari.get(dk) || { label: labelHariDariRow(r), jumlahPesanan: 0, totalQty: 0 };
+      cur.jumlahPesanan += 1;
+      cur.totalQty += (r.totalQty || 0);
+      perHari.set(dk, cur);
+    });
+    if(!perHari.size){ hariSummaryEl.innerHTML = ""; return; }
+    hariSummaryEl.innerHTML = [...perHari.entries()]
+      .sort((a,b)=> b[0].localeCompare(a[0])) // dateKey string, terbaru dulu
+      .map(([, v])=> `<div style="background:var(--card); border:1px solid var(--line); border-radius:9px; padding:6px 12px; font-size:14px;"><b>${escHtml(v.label)}</b>: ${v.jumlahPesanan} pesanan · Qty ${v.totalQty}</div>`)
       .join("");
   }
 
@@ -13662,6 +13905,7 @@ if ("serviceWorker" in navigator) {
   function renderRekapTable(){
     const { rows, kodeList, keyword } = terapkanFilter();
     renderRingkasanCs(rows);
+    renderRingkasanHari(rows);
 
     statusEl.textContent = `${rows.length} dari ${allRows.length} pesanan ditampilkan — diperbarui ${new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}.`;
 
@@ -13793,7 +14037,29 @@ if ("serviceWorker" in navigator) {
           }catch(e){
             btn.textContent = labelSebelum;
             btn.dataset.state = stateSebelum;
-            alert("Gagal menyimpan: " + (e.message || e));
+            // BARU -- SEBELUMNYA alert() mentah browser (memblokir seluruh
+            // layar, teksnya teknis & menakutkan buat CS: "Error: KV put()
+            // limit exceeded for the day."). Sekarang pesan ditaruh di
+            // #rekap-status (baris yang sama dipakai buat "28 dari 28
+            // pesanan ditampilkan...") -- tidak memblokir, warnanya merah
+            // biar tetap kelihatan jelas, dan otomatis balik ke teks normal
+            // setelah beberapa detik. Kasus "limit exceeded" dikasih pesan
+            // KHUSUS yang menjelaskan ini BUKAN bug & akan pulih sendiri
+            // (bukan cuma lempar pesan teknis Cloudflare mentah-mentah).
+            const errMsg = (e && e.message) || String(e);
+            const isKvLimit = /limit exceeded/i.test(errMsg);
+            const pesanTampil = isKvLimit
+              ? "⚠️ Gagal menyimpan: jatah tulis data harian sedang penuh (bukan bug) — otomatis pulih sendiri besok pagi jam 07:00 WIB. Perubahan lain (pesanan baru, dst) tetap bisa jalan seperti biasa."
+              : "⚠️ Gagal menyimpan: " + errMsg;
+            const teksSebelum = statusEl.textContent;
+            const warnaSebelum = statusEl.style.color;
+            statusEl.textContent = pesanTampil;
+            statusEl.style.color = "var(--danger-red)";
+            clearTimeout(statusEl._errTimer);
+            statusEl._errTimer = setTimeout(()=>{
+              statusEl.textContent = teksSebelum;
+              statusEl.style.color = warnaSebelum;
+            }, isKvLimit ? 8000 : 5000);
           }finally{
             btn.disabled = false;
           }
@@ -13834,6 +14100,228 @@ if ("serviceWorker" in navigator) {
     window.print();
   });
   window.addEventListener("afterprint", ()=> document.body.classList.remove("printing-rekap"));
+})();
+</script>
+
+<script>
+/* ============================================================
+   FOLLOW UP (F.O / REPEAT ORDER) -- halaman penuh, pola SAMA dgn Rekap
+   Pesanan di atas (body.classList showing-followup). Datanya dari
+   /followup-repeat-order (D1, permanen -- lihat computeFollowUpData di
+   Worker), BUKAN dari KV seperti Rekap Pesanan (yg cuma nyimpen 25 hari)
+   -- jadi bisa lihat pola repeat-order customer lintas bulan. Cuma
+   pesanan yang PERNAH 100% Lunas yang ikut dihitung ke pola; pesanan yang
+   belum Lunas tetap tercatat di server (jumlahBelumLunas) tapi TIDAK ikut
+   dihitung rata-rata/prediksi.
+   ============================================================ */
+(function(){
+  const statusEl = document.getElementById("followup-status");
+  const tableEl = document.getElementById("followup-table");
+  const searchEl = document.getElementById("followup-search");
+  const csFilterEl = document.getElementById("followup-filter-cs");
+  const statusFilterEl = document.getElementById("followup-filter-status");
+  const statsGridEl = document.getElementById("followup-stats-grid");
+  let isLoading = false;
+  let allRows = []; // hasil mentah dari server (belum difilter)
+
+  function openFollowUp(){
+    // BARU -- sambungkan ke toggle "Aktifkan menu Follow Up" (Master Data
+    // > Tampilan, SETTINGS.followUpEnabled), pola SAMA dgn openRekapPesanan.
+    if(!SETTINGS.followUpEnabled){
+      if(typeof showToast === "function"){
+        showToast("Menu Follow Up sedang nonaktif (Master Data > Tampilan).", true);
+      }
+      return;
+    }
+    document.body.classList.remove("showing-home");
+    document.body.classList.add("showing-followup");
+    window.scrollTo(0,0);
+    fetchAndRenderFollowUp();
+  }
+  window.__openFollowUp = openFollowUp;
+  document.getElementById("followup-back-btn").addEventListener("click", ()=>{
+    document.body.classList.remove("showing-followup");
+    const el = document.querySelector("[data-back]");
+    if(el) el.click(); else document.body.classList.add("showing-home");
+  });
+  document.getElementById("followup-refresh-btn").addEventListener("click", fetchAndRenderFollowUp);
+  searchEl.addEventListener("input", ()=> renderFollowUpTable());
+  csFilterEl.addEventListener("change", ()=> renderFollowUpTable());
+  statusFilterEl.addEventListener("change", ()=> renderFollowUpTable());
+
+  // Format hari/bulan yang ramah dibaca (sama logika dgn versi Excel di
+  // RepeatOrder_Calculator.html) -- mis. 45 hari -> "1 bulan 15 hari".
+  function fmtHari(n){
+    if(n===null||n===undefined||isNaN(n)) return "-";
+    const r = Math.round(n);
+    const sign = r<0 ? "-" : "";
+    const abs = Math.abs(r);
+    if(abs<30) return `${r} hari`;
+    const bln = Math.floor(abs/30), sisa = abs%30;
+    return `${sign}${bln} bulan${sisa>0 ? " "+sisa+" hari" : ""}`;
+  }
+  function fmtTgl(iso){
+    if(!iso) return "-";
+    return new Date(iso).toLocaleDateString("id-ID", { day:"2-digit", month:"short", year:"numeric" });
+  }
+
+  function isiUlangDropdownFilter(){
+    const csSet = [...new Set(allRows.map(r=> r.cs).filter(Boolean))].sort();
+    const statusSet = [...new Set(allRows.map(r=> r.status).filter(Boolean))];
+    const prevCs = csFilterEl.value, prevStatus = statusFilterEl.value;
+    csFilterEl.innerHTML = `<option value="">Semua CS</option>` + csSet.map(c=> `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join("");
+    statusFilterEl.innerHTML = `<option value="">Semua Status</option>` + statusSet.map(s=> `<option value="${escHtml(s)}">${escHtml(s)}</option>`).join("");
+    if(csSet.includes(prevCs)) csFilterEl.value = prevCs;
+    if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
+  }
+
+  async function fetchAndRenderFollowUp(){
+    if(isLoading) return;
+    isLoading = true;
+    statusEl.textContent = "Memuat data…";
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/followup-repeat-order", {
+        headers: workerHeaders(),
+      });
+      const body = await res.json();
+      if(!res.ok) throw new Error(body.error || "Gagal memuat data.");
+      allRows = body.rows || [];
+      isiUlangDropdownFilter();
+      renderFollowUpTable();
+    }catch(e){
+      statusEl.textContent = "Gagal memuat: " + (e.message || e);
+    }finally{
+      isLoading = false;
+    }
+  }
+
+  // Semua filter dijalankan di sisi BROWSER dari data yang sudah diambil
+  // (allRows) -- ganti kata kunci/filter TIDAK memanggil server lagi.
+  function terapkanFilter(){
+    const keyword = searchEl.value.trim().toLowerCase();
+    const csPilih = csFilterEl.value;
+    const statusPilih = statusFilterEl.value;
+    return allRows.filter(r=>
+      (!keyword || (r.customer||"").toLowerCase().includes(keyword)) &&
+      (!csPilih || r.cs === csPilih) &&
+      (!statusPilih || r.status === statusPilih)
+    );
+  }
+
+  function renderStatsGrid(rows){
+    const total = rows.length;
+    const jatuh = rows.filter(r=> r.sisa!==null && r.sisa<0).length;
+    const minggu = rows.filter(r=> r.sisa!==null && r.sisa>=0 && r.sisa<=7).length;
+    const belumCukup = rows.filter(r=> r.sisa===null).length;
+    statsGridEl.innerHTML =
+      `<div class="followup-stat-box"><div class="num">${total}</div><div class="lbl">Total Customer</div></div>` +
+      `<div class="followup-stat-box"><div class="num" style="color:var(--danger-red);">${jatuh}</div><div class="lbl">🔴 Jatuh Tempo</div></div>` +
+      `<div class="followup-stat-box"><div class="num" style="color:#7b6000;">${minggu}</div><div class="lbl">🟡 Follow Up Minggu Ini</div></div>` +
+      `<div class="followup-stat-box"><div class="num" style="color:#555;">${belumCukup}</div><div class="lbl">⚪ Belum Cukup Data</div></div>`;
+  }
+
+  function renderFollowUpTable(){
+    const rows = terapkanFilter();
+    renderStatsGrid(rows);
+    statusEl.textContent = `${rows.length} dari ${allRows.length} customer ditampilkan — diperbarui ${new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}.`;
+
+    const th = (t, w)=> `<th style="border:1px solid var(--line); padding:8px 8px; background:var(--card); text-align:left; position:sticky; top:0;${w?` width:${w};`:""}">${t}</th>`;
+    const td = (t, extra)=> `<td style="border:1px solid var(--line); padding:7px 8px;${extra||""}">${t}</td>`;
+
+    let html = "<thead><tr>" +
+      th("Customer", "220px") + th("CS", "100px") + th("Order Lunas", "70px") + th("Belum Lunas", "80px") +
+      th("Order Pertama", "100px") + th("Order Terakhir", "100px") + th("Rata Jarak", "90px") +
+      th("Prediksi Berikutnya", "110px") + th("Sisa", "90px") + th("Status", "140px") + th("Qty Rata²", "70px") +
+      "</tr></thead><tbody>";
+
+    if(!rows.length){
+      html += `<tr><td colspan="11" style="border:1px solid var(--line); padding:16px; text-align:center; color:var(--ink-soft);">Belum ada customer dengan riwayat pesanan Lunas yang cocok dengan filter.</td></tr>`;
+    }
+
+    rows.forEach(r=>{
+      html += `<tr data-customer="${escHtml(r.customer)}">` +
+        td(escHtml(r.customer), "font-weight:600; white-space:normal; word-break:break-word;") +
+        td(escHtml(r.cs || "-")) +
+        td(r.jumlahOrder, "text-align:center;") +
+        td(r.jumlahBelumLunas || 0, "text-align:center; color:var(--ink-soft);") +
+        td(fmtTgl(r.first)) + td(fmtTgl(r.last)) +
+        td(r.medGap!==null ? fmtHari(r.medGap) : "-") +
+        td(r.pred ? fmtTgl(r.pred) : "-") +
+        td(r.sisa!==null ? fmtHari(r.sisa) : "-") +
+        td(`<span class="fu-badge ${r.cls}">${escHtml(r.status)}</span>`) +
+        td(r.avgQty, "text-align:center;") +
+        "</tr>";
+    });
+    html += "</tbody>";
+    tableEl.innerHTML = html;
+
+    tableEl.querySelectorAll("tbody tr[data-customer]").forEach(tr=>{
+      tr.addEventListener("click", ()=> bukaDetailCustomer(tr.dataset.customer));
+    });
+  }
+
+  // ---- Detail 1 customer (modal) ----
+  const detailOverlay = document.getElementById("followup-detail-overlay");
+  function bukaDetailCustomer(nama){
+    const r = allRows.find(x=> x.customer === nama);
+    if(!r) return;
+    document.getElementById("followup-detail-nama").textContent = r.customer;
+    document.getElementById("followup-detail-cs").textContent = `CS paling sering: ${r.cs || "-"}`;
+    const riwayatHtml = (r.riwayat || []).slice().reverse().map(h=>
+      `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--line);"><span>${fmtTgl(h.tanggal)}</span><span>Qty ${h.qty}</span></div>`
+    ).join("") || `<div style="color:var(--ink-soft);">Belum ada riwayat.</div>`;
+    document.getElementById("followup-detail-body").innerHTML = `
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+        <span class="fu-badge ${r.cls}" style="font-size:13px; padding:6px 14px;">${escHtml(r.status)}</span>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+        <div><div style="color:var(--ink-soft); font-size:12px;">Order Lunas</div><div style="font-weight:700;">${r.jumlahOrder}</div></div>
+        <div><div style="color:var(--ink-soft); font-size:12px;">Belum Lunas</div><div style="font-weight:700;">${r.jumlahBelumLunas || 0}</div></div>
+        <div><div style="color:var(--ink-soft); font-size:12px;">Order Pertama</div><div style="font-weight:700;">${fmtTgl(r.first)}</div></div>
+        <div><div style="color:var(--ink-soft); font-size:12px;">Order Terakhir</div><div style="font-weight:700;">${fmtTgl(r.last)}</div></div>
+        <div><div style="color:var(--ink-soft); font-size:12px;">Rata² Jarak Order</div><div style="font-weight:700;">${r.avgGap!==null ? fmtHari(r.avgGap) : "-"}</div></div>
+        <div><div style="color:var(--ink-soft); font-size:12px;">Prediksi Berikutnya</div><div style="font-weight:700;">${r.pred ? fmtTgl(r.pred) : "Belum cukup data"}</div></div>
+      </div>
+      <div style="font-weight:700; font-size:13px; margin-bottom:6px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.5px;">Riwayat Order Lunas</div>
+      ${riwayatHtml}
+    `;
+    detailOverlay.hidden = false;
+  }
+  document.getElementById("followup-detail-close").addEventListener("click", ()=> detailOverlay.hidden = true);
+  detailOverlay.addEventListener("click", (e)=>{ if(e.target === detailOverlay) detailOverlay.hidden = true; });
+
+  // ---- Popup "Perlu Dihubungi" (customer dgn status Segera, sisa 1-3 hari) ----
+  const contactOverlay = document.getElementById("followup-contact-overlay");
+  function bukaPopupKontak(){
+    const list = allRows.filter(r=> r.cls === "o").sort((a,b)=> (a.sisa??99999) - (b.sisa??99999));
+    document.getElementById("followup-contact-sub").textContent = list.length
+      ? `${list.length} customer perlu segera dihubungi (1-3 hari lagi)`
+      : "Tidak ada customer yang segera jatuh tempo (1-3 hari)";
+    const box = document.getElementById("followup-contact-list");
+    if(!list.length){
+      box.innerHTML = `<div style="text-align:center; padding:24px; color:var(--ink-soft);">🎉 Tidak ada customer yang segera perlu dihubungi</div>`;
+    }else{
+      box.innerHTML = list.map(r=>
+        `<div data-customer="${escHtml(r.customer)}" style="display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid var(--line); border-radius:9px; padding:10px 12px; cursor:pointer;">
+          <div>
+            <div style="font-weight:700;">${escHtml(r.customer)}</div>
+            <div style="font-size:12px; color:var(--ink-soft);">${escHtml(r.cs || "-")} • Terakhir order ${fmtTgl(r.last)}</div>
+          </div>
+          <div style="color:#c36a00; font-weight:700; white-space:nowrap;">🟠 ${fmtHari(r.sisa)} lagi</div>
+        </div>`
+      ).join("");
+      box.querySelectorAll("[data-customer]").forEach(el=>{
+        el.addEventListener("click", ()=>{
+          contactOverlay.hidden = true;
+          bukaDetailCustomer(el.dataset.customer);
+        });
+      });
+    }
+    contactOverlay.hidden = false;
+  }
+  document.getElementById("followup-contact-btn").addEventListener("click", bukaPopupKontak);
+  document.getElementById("followup-contact-close").addEventListener("click", ()=> contactOverlay.hidden = true);
+  contactOverlay.addEventListener("click", (e)=>{ if(e.target === contactOverlay) contactOverlay.hidden = true; });
 })();
 </script>
 

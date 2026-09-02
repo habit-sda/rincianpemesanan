@@ -4,26 +4,31 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v275";
+const CACHE_VERSION = "v277";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
    (skipWaiting otomatis) TANPA menunggu user klik "Perbarui Sekarang" di
    popup — begitu aktif, index.html otomatis reload halaman (lihat listener
    "controllerchange" di index.html). BUKAN perubahan perilaku permanen —
-   versi yang TIDAK dimasukkan ke daftar ini (seperti v275 sekarang) otomatis
+   versi yang TIDAK dimasukkan ke daftar ini (seperti v277 sekarang) otomatis
    pakai alur normal (popup persetujuan / auto-patch diam-diam seperti
    biasa). Kalau suatu saat butuh paksa update lagi, tambahkan versi barunya
    ke Set ini.
    PERINGATAN: user yang lagi isi form/nota bisa ke-reload tiba-tiba begitu
    halaman ini aktif (progres yang belum disimpan bisa hilang) — pakai
    fitur ini seperlunya saja, bukan kebiasaan tiap deploy.
-   v275 -- perbaikan kuota KV + filter/ringkasan per-hari di Rekap Pesanan +
-   sinkron toggle Tampilan. SENGAJA TIDAK dipaksa (bukan darurat/keamanan) --
-   pakai alur normal (popup "Perbarui Sekarang") supaya user yang lagi isi
-   form tidak tiba-tiba ke-reload dan kehilangan progres. v234 lama juga
-   sudah dikeluarkan dari Set ini (update itu sudah lama tersebar ke semua
-   pengguna, tidak perlu dipertahankan selamanya di sini). ---- */
+   v277 -- perbaikan bug popup Follow Up ("Segera Perlu Dihubungi" & detail
+   customer) nyangkut tetap tampil / tidak konsisten ke-hidden -- overlay-nya
+   punya atribut "hidden" BARENGAN inline style="display:flex", yang bikin
+   [hidden]{display:none} bawaan browser kalah spesifisitas lawan inline
+   style. Ditambal dgn override CSS eksplisit (pola sama dgn
+   .calc-overlay[hidden]/.md-overlay[hidden] yg sudah ada). SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan, cuma fitur baru yg belum lama dipakai
+   siapa pun) -- pakai alur normal (popup "Perbarui Sekarang") supaya user
+   yang lagi isi form tidak tiba-tiba ke-reload dan kehilangan progres.
+   v276 lama sudah dikeluarkan dari Set ini (update itu sudah tersebar
+   duluan). ---- */
 const FORCE_ACTIVATE_VERSIONS = new Set([]);
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
 const CORE_ASSETS = [
