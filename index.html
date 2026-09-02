@@ -938,7 +938,7 @@
        ikut media query gabungan "wiz" yang juga aktif di desktop lebar
        (≥901px) -- di desktop lebar totalnya sudah ada di kartu "Ringkasan
        pesanan" (aside), jadi tidak perlu dobel. */
-    .wiz-totals-bar{display:flex !important;}
+    .wiz-totals-bar{display:flex;}
     body{padding:16px 10px 60px;}
     header{align-items:flex-start;gap:8px;padding-bottom:10px;margin-bottom:14px;}
     header .sub{font-size:11.5px;}
@@ -1404,15 +1404,7 @@
        di sini sama sekali, pola sama dengan syncDesktopSummary/
        syncPosCartSheet yang sudah ada. */
     .wiz-totals-bar{
-      display:none; /* default disembunyikan (desktop/tablet lebar) -- BARU
-      (v2.27.1) dipaksa !important di aturan media query breakpoint mobile
-      DI ATAS (baris ~941) supaya benar-benar menang, karena sebelumnya
-      2 aturan .wiz-totals-bar ini sama-sama "kekuatan"-nya (1 nama class),
-      dan browser selalu pakai yang paling AKHIR ditulis di file kalau
-      kekuatannya sama -- aturan "sembunyikan" ini (yang TANPA syarat
-      layar) letaknya lebih bawah drpd aturan "tampilkan" di breakpoint
-      mobile, jadi selalu menang & bar-nya nggak pernah kelihatan di HP
-      mana pun. !important di baris ~941 memastikan itu tidak terulang lagi. */
+      display:none; /* BARU -- default disembunyikan, cuma dimunculkan khusus versi mobile lewat media query di bawah (bukan di tablet/desktop lebar) */
       align-items:stretch;gap:0;
       background:var(--wiz-form-bg,var(--paper));border:1px solid var(--wiz-form-border,var(--line));
       border-radius:10px;margin:0 0 12px;overflow:hidden;
@@ -5674,7 +5666,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.27.2</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.28.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5859,15 +5851,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.27.2 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.28.0 <span class="changelog-tag">Sekarang</span></div>
           <ul>
-            <li><b>Mode Tabel (HP) — nambah beberapa produk berturut-turut sekarang lebih cepat</b>: setelah klik "Simpan produk", form isi produk langsung terbuka lagi (kosong, siap diisi produk berikutnya) dan layar auto-geser ke situ — tidak perlu geser manual ke bawah cari tombol "+ Tambah produk" lagi tiap kali mau nambah produk baru. Kalau lagi EDIT produk yang sudah tersimpan (bukan nambah baru), perilaku tetap seperti biasa — form tertutup, balik ke daftar. Otomatis berhenti juga kalau slot produk sudah penuh (maks 7).</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.27.1</div>
-          <ul>
-            <li><b>Perbaikan bug: bar "Total Qty" &amp; "Total Berat" tidak pernah muncul di HP</b> — akar masalahnya ada 2 aturan CSS bentrok untuk elemen yang sama (satu bilang "tampilkan di HP", satu lagi "sembunyikan selalu") dan yang menang selalu yang "sembunyikan" gara-gara urutan penulisan di file. Sekarang dipaksa menang aturan yang benar — bar-nya sudah kelihatan di Mode Tabel maupun Mode Kasir versi HP.</li>
+            <li><b>Muat otomatis di menu Follow Up dihapus total</b> — sebelumnya, membuka kartu Follow Up otomatis mengambil data dari server sekali. Sekarang tabel/statistik TETAP KOSONG (ada pesan "Data belum dimuat") sampai user sendiri menekan tombol "🔄 Muat ulang" — tidak ada lagi panggilan ke server hanya karena membuka halaman ini.</li>
+            <li><b>Warna Grafik Riwayat di Follow Up diseragamkan jadi hijau</b> — ketiga mode grafik (Qty per Order, Jarak Antar Order, Kumulatif Qty) sekarang sama-sama nuansa hijau (sebelumnya biru/cokelat/hijau tua campur), dan label angka di atas batang/garis dibuat lebih tebal &amp; kotak putih di baliknya lebih pekat supaya lebih jelas dibaca.</li>
           </ul>
         </div>
         <div class="changelog-item">
@@ -11082,22 +11069,7 @@ if ("serviceWorker" in navigator) {
       if(sheet==="custom") tr.querySelector("input.diskon").value = readDiskonModeValue("wa-diskonmode-"+sheet, "wa-diskon-"+sheet);
       tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
       tr.querySelector("input.qty").dispatchEvent(new Event("input", {bubbles:true}));
-      // BARU -- kalau ini nambah produk BARU (bukan edit produk yang sudah
-      // tersimpan), langsung buka lagi form kosong utk produk berikutnya &
-      // auto-scroll ke situ (openForm() sudah scrollIntoView sendiri) --
-      // supaya nambah banyak produk berturut-turut TIDAK perlu geser manual
-      // ke tombol "+ Tambah produk" yang makin turun tiap kali daftar
-      // produk tersimpan makin panjang. Field "pilih produk" jadi selalu
-      // di posisi yang sama tiap habis Simpan. Kalau ini EDIT produk yang
-      // sudah ada (originalEditingIdx bukan null) ATAU slot produk sudah
-      // penuh (maks 7), perilaku LAMA dipertahankan -- form ditutup, balik
-      // ke daftar (bukan lanjut nambah).
-      const masihAdaSlotKosong = trs2.some(t=> !t.querySelector("select.prod").value);
-      if(originalEditingIdx === null && masihAdaSlotKosong){
-        openForm(sheet, null);
-      }else{
-        closeForm(sheet);
-      }
+      closeForm(sheet);
     });
     const delBtn = document.getElementById("wa-delete-"+sheet);
     if(delBtn) delBtn.addEventListener("click", ()=>{
@@ -12346,7 +12318,14 @@ if ("serviceWorker" in navigator) {
         return;
       }
       if(e.target.classList.contains("md-nama-del-btn")){
-        if(!confirm(`Hapus "${name}" dari daftar rekomendasi nama? Rincian Pemesanan yang sudah terkirim TIDAK ikut berubah.`)) return;
+        // PENTING -- sejak fitur ini ditambahkan, hapus di sini JUGA
+        // menghapus PERMANEN riwayat pesanan Lunas customer ini yang
+        // dipakai menu Follow Up (pola repeat-order/grafik riwayat) --
+        // BUKAN cuma dari daftar rekomendasi nama. Rincian Pemesanan
+        // (Rekap Pesanan) yang sudah terkirim tetap TIDAK berubah, tapi
+        // data Follow Up customer ini akan mulai dari NOL lagi kalau dia
+        // order lagi nanti. Makanya konfirmasinya ditulis tegas.
+        if(!confirm(`Hapus "${name}"?\n\nIni akan:\n- Menghapus "${name}" dari daftar rekomendasi nama.\n- Menghapus PERMANEN riwayat pesanan customer ini di menu Follow Up (pola repeat-order, grafik riwayat) -- TIDAK BISA dikembalikan.\n\nRincian Pemesanan/Rekap Pesanan yang sudah terkirim TIDAK ikut berubah/hilang.`)) return;
         try{
           const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
             method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
@@ -12356,6 +12335,10 @@ if ("serviceWorker" in navigator) {
           if(!res.ok || data.error) throw new Error(data.error || "Gagal menghapus.");
           allNames = data.names;
           render();
+          const jumlah = Number(data.deletedRows) || 0;
+          if(jumlah > 0){
+            alert(`"${name}" dihapus. ${jumlah} baris riwayat Follow Up customer ini ikut dihapus permanen.`);
+          }
         }catch(err){
           alert("Gagal menghapus nama: " + String(err.message || err));
         }
@@ -14534,11 +14517,20 @@ if ("serviceWorker" in navigator) {
     document.body.classList.remove("showing-rekap"); // BARU (fix bug) -- kalau sebelumnya lagi di Rekap Pesanan, class-nya wajib dilepas dulu, kalau tidak dua halaman full-page nyangkut aktif berbarengan dan salah satunya jadi tidak bisa dibuka lagi setelahnya.
     document.body.classList.add("showing-followup");
     window.scrollTo(0,0);
-    fetchAndRenderFollowUp();
-    // DIHAPUS -- auto-refresh otomatis (interval 30 detik + refresh diam-
-    // diam saat tab dibuka lagi) sengaja DIMATIKAN atas permintaan user.
-    // Data sekarang HANYA dimuat ulang saat kartu ini dibuka pertama kali
-    // atau saat user sendiri klik tombol "🔄 Muat ulang" di bawah.
+    // DIHAPUS (permintaan user) -- muat otomatis begitu kartu ini dibuka
+    // SUDAH TIDAK ADA lagi (sebelumnya fetchAndRenderFollowUp() dipanggil
+    // di sini). Sekarang tabel/statistik TETAP KOSONG sampai user sendiri
+    // menekan tombol "🔄 Muat ulang" di bawah -- sama sekali tidak ada
+    // panggilan ke server saat kartu Follow Up dibuka.
+    if(!allRows.length){
+      statusEl.textContent = "Data belum dimuat — tekan \"🔄 Muat ulang\" untuk mengambil data terbaru.";
+      statusEl.style.color = "var(--ink-soft)";
+      tableEl.innerHTML = "";
+      statsGridEl.innerHTML = "";
+    }
+    // Auto-refresh diam-diam (interval 30 detik + refresh saat tab dibuka
+    // lagi) sudah DIMATIKAN sejak sebelumnya (lihat startAutoRefresh/
+    // stopAutoRefresh, dead code, tidak dipanggil dari mana pun).
   }
   window.__openFollowUp = openFollowUp;
   document.getElementById("followup-back-btn").addEventListener("click", ()=>{
@@ -14898,18 +14890,18 @@ if ("serviceWorker" in navigator) {
     if(fuChartMode === "qty"){
       labels = hist.map(h=> fmtTgl(h.d.toISOString()));
       values = hist.map(h=> h.q);
-      unitLbl = "pcs"; color = "#2E75B6"; isLine = false;
+      unitLbl = "pcs"; color = "#1B7A43"; isLine = false; // BARU -- seragam hijau (dulu biru #2E75B6)
     }else if(fuChartMode === "gap"){
       const gaps = [];
       for(let i=1;i<hist.length;i++) gaps.push(fuDDiff(hist[i-1].d, hist[i].d));
       labels = hist.slice(1).map(h=> fmtTgl(h.d.toISOString()));
       values = gaps;
-      unitLbl = "hari"; color = "#7B3F00"; isLine = false;
+      unitLbl = "hari"; color = "#4E9F3D"; isLine = false; // BARU -- seragam hijau (dulu cokelat #7B3F00)
     }else{
       let c = 0;
       labels = hist.map(h=> fmtTgl(h.d.toISOString()));
       values = hist.map(h=> { c += h.q; return c; });
-      unitLbl = "pcs kumulatif"; color = "#375623"; isLine = true;
+      unitLbl = "pcs kumulatif"; color = "#00623A"; isLine = true; // BARU -- hijau tua murni (dulu #375623, agak ke arah olive/cokelat)
     }
     fuDrawChart(document.getElementById("followup-chart-canvas"), labels, values, color, unitLbl, isLine);
 
@@ -14995,16 +14987,23 @@ if ("serviceWorker" in navigator) {
     }
 
     if(n<=25){
-      ctx.font = "700 11px Segoe UI, Arial"; ctx.textAlign = "center";
+      // BARU -- angka dibuat lebih jelas terbaca: font sedikit lebih besar,
+      // kotak putih di belakangnya lebih pekat + ada garis tepi tipis
+      // (sebelumnya rgba(255,255,255,.85) tanpa tepi, agak nge-blur kalau
+      // menimpa garis grid), teks tetap gelap pekat penuh supaya kontras
+      // maksimal terlepas dari warna grafik (hijau) di baliknya.
+      ctx.font = "700 12px Segoe UI, Arial"; ctx.textAlign = "center";
       values.forEach((v,i)=>{
         const x = xFor(i);
-        let y = yFor(v)-10;
-        if(y < padT+10) y = yFor(v)+16;
+        let y = yFor(v)-11;
+        if(y < padT+11) y = yFor(v)+18;
         const txt = unitLbl==="hari" ? fmtHari(v) : fmtNumID(v);
         const tw = ctx.measureText(txt).width;
-        ctx.fillStyle = "rgba(255,255,255,.85)";
-        ctx.fillRect(x-tw/2-4, y-11, tw+8, 15);
-        ctx.fillStyle = "#1a1a2e";
+        ctx.fillStyle = "rgba(255,255,255,.97)";
+        ctx.fillRect(x-tw/2-5, y-12, tw+10, 17);
+        ctx.strokeStyle = "rgba(0,0,0,.12)"; ctx.lineWidth = 1;
+        ctx.strokeRect(x-tw/2-5, y-12, tw+10, 17);
+        ctx.fillStyle = "#0d1b12";
         ctx.fillText(txt, x, y);
       });
     }

@@ -18,23 +18,29 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    PERINGATAN: user yang lagi isi form/nota bisa ke-reload tiba-tiba begitu
    halaman ini aktif (progres yang belum disimpan bisa hilang) — pakai
    fitur ini seperlunya saja, bukan kebiasaan tiap deploy.
-   v286 -- Mode Tabel (HP): setelah "Simpan produk" (nambah produk BARU,
-   bukan edit), form langsung terbuka lagi kosong & auto-scroll ke situ --
-   supaya nambah beberapa produk berturut-turut tidak perlu geser manual
-   ke tombol "+ Tambah produk" yang makin turun. SENGAJA TIDAK dipaksa
-   (bukan darurat/keamanan, murni kenyamanan input) -- pakai alur normal
-   (popup "Perbarui Sekarang") supaya user yang lagi isi form tidak
-   tiba-tiba ke-reload dan kehilangan progres.
-   v285 -- perbaikan bug: bar "Total Qty"/"Total Berat" (Mode Tabel & Mode
-   Kasir, khusus HP) yang ditambahkan di v284 ternyata TIDAK PERNAH muncul
-   di HP mana pun -- ada 2 aturan CSS bentrok utk elemen yang sama (satu
-   "tampilkan di HP", satu "sembunyikan selalu"), dan yang menang selalu
-   yang "sembunyikan" gara-gara urutan penulisan di file (2 aturan itu
-   sama "kekuatan"-nya, jadi yang paling akhir ditulis yang menang, bukan
-   yang paling relevan). Ditambal dgn !important di aturan mobile-nya.
-   DIPAKSA AKTIF (masuk Set di bawah) -- ini murni perbaikan bug tampilan
-   yang baru dirilis kemarin (v284), belum banyak dipakai orang, jadi
-   aman langsung dipaksa tanpa perlu approval popup dulu.
+   v286 -- Master Data Customer: tombol "🗑️ Hapus" nama customer sekarang
+   BENERAN BERFUNGSI (sebelumnya endpoint /customer-names/delete belum
+   ada di worker, jadi tombol ini gagal/error). Sekarang hapus 1 nama di
+   sini JUGA menghapus PERMANEN riwayat pesanan Lunas customer itu di
+   menu Follow Up (pola repeat-order/grafik riwayat) -- supaya customer
+   yang dihapus dari Master Data langsung hilang juga dari Follow Up,
+   sesuai permintaan user. Rincian Pemesanan/Rekap Pesanan yang sudah
+   terkirim TIDAK ikut berubah/terhapus -- yang dihapus cuma catatan
+   Follow Up-nya. Popup konfirmasi hapus juga diperjelas supaya user
+   sadar ini tindakan permanen sebelum klik. SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang").
+   v285 -- 2 perubahan: (1) menu Follow Up -- muat otomatis begitu kartu
+   ini dibuka DIHAPUS TOTAL atas permintaan user; sekarang tabel/statistik
+   tetap kosong (ada pesan "Data belum dimuat") sampai user sendiri klik
+   tombol "🔄 Muat ulang" -- tidak ada lagi panggilan ke server hanya
+   karena membuka halaman Follow Up; (2) popup "Grafik Riwayat" (Follow
+   Up) -- warna ketiga mode grafik (Qty per Order / Jarak Antar Order /
+   Kumulatif Qty) diseragamkan jadi nuansa hijau (sebelumnya campur biru/
+   cokelat/hijau tua), dan label angka di atas batang/garis dibuat lebih
+   jelas terbaca (kotak putih di baliknya lebih pekat + garis tepi tipis).
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang").
    v284 -- 3 perubahan: (1) auto-refresh diam-diam (interval 30 detik +
    refresh saat tab dibuka lagi) di menu Follow Up DIHAPUS TOTAL atas
    permintaan user -- data sekarang cuma dimuat saat kartu dibuka pertama
