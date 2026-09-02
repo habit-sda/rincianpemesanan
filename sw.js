@@ -4,20 +4,40 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v277";
+const CACHE_VERSION = "v279";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
    (skipWaiting otomatis) TANPA menunggu user klik "Perbarui Sekarang" di
    popup — begitu aktif, index.html otomatis reload halaman (lihat listener
    "controllerchange" di index.html). BUKAN perubahan perilaku permanen —
-   versi yang TIDAK dimasukkan ke daftar ini (seperti v277 sekarang) otomatis
+   versi yang TIDAK dimasukkan ke daftar ini (seperti v279 sekarang) otomatis
    pakai alur normal (popup persetujuan / auto-patch diam-diam seperti
    biasa). Kalau suatu saat butuh paksa update lagi, tambahkan versi barunya
    ke Set ini.
    PERINGATAN: user yang lagi isi form/nota bisa ke-reload tiba-tiba begitu
    halaman ini aktif (progres yang belum disimpan bisa hilang) — pakai
    fitur ini seperlunya saja, bukan kebiasaan tiap deploy.
+   v279 -- 3 perbaikan: (1) bug body.classList "showing-rekap" &
+   "showing-followup" bisa nyangkut AKTIF BERBARENGAN kalau pindah dari
+   Follow Up ke Rekap Pesanan (atau sebaliknya) tanpa lewat Beranda dulu --
+   sekarang openRekapPesanan()/openFollowUp() saling melepas class
+   halaman lain sebelum mengaktifkan class-nya sendiri, jadi Follow Up
+   tidak lagi macet tidak bisa dibuka lagi setelah buka Rekap Pesanan;
+   (2) kolom "Customer" di tabel Follow Up sekarang sticky (dikunci) di
+   sisi kiri waktu tabel digeser kanan/kiri, pola sama dgn kolom Customer
+   di RepeatOrder_Calculator.html -- kolom kanan (Status, Qty Rata², dst)
+   sekarang bisa diakses tanpa kehilangan konteks nama customer-nya;
+   (3) judul kolom "Aksi" di tabel Rekap Pesanan diganti jadi "Invoice"
+   (isinya tetap tombol toggle Sudah/Belum di Invoice, tidak berubah).
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang").
+   v278 -- menu Follow Up dilengkapi supaya fiturnya identik dgn
+   RepeatOrder_Calculator.html: popup detail customer sekarang ada Bagian
+   A/B/C (parameter, prediksi 8 order berikutnya, prediksi stok bulan ini),
+   tombol "Grafik Riwayat" (chart qty/gap/kumulatif), dan kotak ringkasan
+   ke-5 "Est. Qty Stok Bulan Ini". SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang").
    v277 -- perbaikan bug popup Follow Up ("Segera Perlu Dihubungi" & detail
    customer) nyangkut tetap tampil / tidak konsisten ke-hidden -- overlay-nya
    punya atribut "hidden" BARENGAN inline style="display:flex", yang bikin

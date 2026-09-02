@@ -1069,7 +1069,7 @@
     body.showing-followup .panel,
     body.showing-followup details.region{display:none !important;}
     body.showing-followup #followup-fullpage{display:block;}
-    .followup-stats-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px;}
+    .followup-stats-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:14px;}
     @media(max-width:700px){.followup-stats-grid{grid-template-columns:1fr 1fr;}}
     .followup-stat-box{background:var(--paper, #f7f8f6); border:1px solid var(--line); border-radius:10px; padding:12px 10px; text-align:center;}
     .followup-stat-box .num{font-size:22px; font-weight:800; color:var(--primary-green);}
@@ -1081,6 +1081,42 @@
     .fu-badge.b{background:#e3f0fb; color:#1f4e78;}
     .fu-badge.g{background:#e6f4ea; color:var(--primary-green);}
     .fu-badge.gr{background:#ececec; color:#555;}
+    /* BARU -- kartu "Bagian A/B/C" di popup detail Follow Up, pola SAMA
+       dgn tab "Detail Customer" di RepeatOrder_Calculator.html, supaya
+       fiturnya identik (parameter, prediksi 8 order, prediksi stok). */
+    .fu-bagian{border-radius:8px; overflow:hidden; margin-top:14px; border:1px solid var(--line);}
+    .fu-bagian .fu-bag-hdr{background:var(--primary-green); color:#fff; padding:8px 15px; font-size:11px; font-weight:700; letter-spacing:.5px;}
+    .fu-bagian .fu-bag-hdr span{opacity:.75; font-weight:400; font-size:10px; margin-left:6px;}
+    .fu-ptbl{width:100%; border-collapse:collapse;}
+    .fu-ptbl tr:nth-child(even){background:var(--paper, #f7f8f6);}
+    .fu-ptbl td{padding:8px 12px; font-size:12.5px; border-bottom:1px solid var(--line);}
+    .fu-ptbl td:first-child{font-weight:600; color:var(--ink-soft); width:52%;}
+    .fu-ptbl td:last-child{font-weight:700; text-align:right;}
+    .fu-ptbl tr.hl td:last-child{color:var(--primary-green); font-size:14px;}
+    .fu-ptbl2-wrap{overflow-x:auto;}
+    .fu-ptbl2{width:100%; border-collapse:collapse; min-width:520px;}
+    .fu-ptbl2 thead tr{background:var(--primary-green);}
+    .fu-ptbl2 thead th{padding:7px 8px; font-size:10.5px; font-weight:700; color:#fff; text-align:center; white-space:nowrap;}
+    .fu-ptbl2 tbody td{padding:7px 8px; font-size:11.5px; border-bottom:1px solid var(--line); text-align:center; white-space:nowrap;}
+    .fu-stok-grid{display:grid; grid-template-columns:1fr 1fr 1fr; border-top:1px solid var(--line);}
+    .fu-stok-item{padding:13px 14px; border-right:1px solid var(--line);}
+    .fu-stok-item:last-child{border-right:none;}
+    .fu-stok-item .s-label{font-size:10.5px; color:var(--ink-soft); margin-bottom:3px;}
+    .fu-stok-item .s-val{font-size:19px; font-weight:800; color:var(--primary-green);}
+    .fu-stok-item .s-unit{font-size:9.5px; color:var(--ink-soft); margin-top:1px;}
+    @media(max-width:540px){.fu-stok-grid{grid-template-columns:1fr;} .fu-stok-item{border-right:none; border-bottom:1px solid var(--line);}}
+    /* BARU -- popup grafik riwayat pembelian (tombol "📈 Grafik Riwayat"
+       di detail customer), pola SAMA dgn #chart-overlay di
+       RepeatOrder_Calculator.html. */
+    #followup-chart-overlay{position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:10000; display:flex; align-items:center; justify-content:center; padding:16px;}
+    #followup-chart-overlay[hidden]{display:none !important;}
+    #followup-chart-modal{background:var(--paper,#fff); border-radius:14px; max-width:820px; width:100%; max-height:88vh; overflow:auto; padding:20px 22px;}
+    .fu-chart-tabs{display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap;}
+    .fu-chart-tab{padding:6px 14px; font-size:11px; font-weight:700; border-radius:20px; border:1px solid var(--line); background:var(--paper, #f7f8f6); color:var(--ink-soft); cursor:pointer;}
+    .fu-chart-tab.active{background:var(--primary-green); color:#fff; border-color:var(--primary-green);}
+    #followup-chart-canvas-wrap{position:relative; height:320px;}
+    .fu-chart-stats{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:14px;}
+    @media(max-width:640px){.fu-chart-stats{grid-template-columns:1fr 1fr;}}
     /* PERBAIKAN BUG -- overlay ini punya "display:flex" di inline style
        (dipakai supaya kontennya center pas TAMPIL), tapi itu bikin atribut
        "hidden" bawaan browser ([hidden]{display:none} di UA stylesheet)
@@ -1093,6 +1129,17 @@
     #followup-contact-overlay[hidden]{display:none !important;}
     #followup-table tbody tr{cursor:pointer;}
     #followup-table tbody tr:hover{background:var(--paper, #f7f8f6);}
+    /* BARU (fix bug) -- kolom "Customer" dikunci (sticky) di sisi kiri
+       supaya tetap terlihat waktu tabel digeser kanan/kiri (tabelnya lebar,
+       kolom kanan seperti Status/Qty Rata² sebelumnya susah diakses tanpa
+       kehilangan konteks nama customer-nya). Pola sama dgn .nm di
+       RepeatOrder_Calculator.html. z-index th.nm > td.nm supaya pojok
+       kiri-atas (sticky ganda: top & left) tidak ketiban baris body saat
+       discroll. */
+    #followup-table th.nm{position:sticky; left:0; z-index:3;}
+    #followup-table td.nm{position:sticky; left:0; z-index:1; background:var(--paper,#fff); box-shadow:2px 0 4px -2px rgba(0,0,0,.18);}
+    #followup-table tbody tr:nth-child(even) td.nm{background:var(--card, #f7f8f6);}
+    #followup-table tbody tr:hover td.nm{background:var(--paper, #f7f8f6);}
     /* BARU -- mode cetak/PDF: begitu window.print() dipanggil, sembunyikan
        SEMUA elemen kecuali tabel rekap -- browser "Save as PDF" di dialog
        print jadi otomatis rapi (cuma tabel, tanpa sidebar/tombol/filter). */
@@ -4495,15 +4542,41 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
 
   <!-- Detail 1 customer (klik baris di tabel Follow Up) -->
   <div id="followup-detail-overlay" hidden style="position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px;">
-    <div id="followup-detail-modal" style="background:var(--paper,#fff); border-radius:14px; max-width:480px; width:100%; max-height:85vh; overflow-y:auto; padding:20px;">
+    <div id="followup-detail-modal" style="background:var(--paper,#fff); border-radius:14px; max-width:640px; width:100%; max-height:88vh; overflow-y:auto; padding:20px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px;">
         <div>
           <div id="followup-detail-nama" style="font-size:18px; font-weight:800;"></div>
           <div id="followup-detail-cs" style="font-size:12px; color:var(--ink-soft); margin-top:2px;"></div>
         </div>
-        <button type="button" id="followup-detail-close" class="tab-btn" style="flex:0 0 auto;">✕</button>
+        <div style="display:flex; gap:8px; align-items:center; flex:0 0 auto;">
+          <button type="button" id="followup-chart-btn" class="md-btn" style="white-space:nowrap;">📈 Grafik Riwayat</button>
+          <button type="button" id="followup-detail-close" class="tab-btn">✕</button>
+        </div>
       </div>
       <div id="followup-detail-body" style="font-size:14px; line-height:1.7;"></div>
+    </div>
+  </div>
+
+  <!-- Grafik riwayat pembelian 1 customer (tombol "📈 Grafik Riwayat" di
+       popup detail), fitur identik dgn #chart-overlay di
+       RepeatOrder_Calculator.html: 3 mode (Qty per Order / Jarak Antar
+       Order / Kumulatif Qty), digambar manual di <canvas> tanpa lib luar. -->
+  <div id="followup-chart-overlay" hidden onclick="if(event.target===this && window.__closeFollowUpChart) window.__closeFollowUpChart();">
+    <div id="followup-chart-modal">
+      <div class="chart-hdr" style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:14px;">
+        <div>
+          <div id="followup-chart-title" style="font-size:16px; font-weight:800;">📈 Riwayat Pembelian</div>
+          <div id="followup-chart-sub" style="font-size:11px; color:var(--ink-soft); margin-top:2px;"></div>
+        </div>
+        <button type="button" id="followup-chart-close" class="tab-btn" style="flex:0 0 auto;">✕</button>
+      </div>
+      <div class="fu-chart-tabs">
+        <div class="fu-chart-tab active" data-m="qty">Qty per Order</div>
+        <div class="fu-chart-tab" data-m="gap">Jarak Antar Order (hari)</div>
+        <div class="fu-chart-tab" data-m="cum">Kumulatif Qty</div>
+      </div>
+      <div id="followup-chart-canvas-wrap"><canvas id="followup-chart-canvas"></canvas></div>
+      <div class="fu-chart-stats" id="followup-chart-stats"></div>
     </div>
   </div>
 
@@ -5742,7 +5815,23 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.26.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.26.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug: Follow Up tidak bisa dibuka lagi setelah buka Rekap Pesanan</b> — sebelumnya, pindah dari halaman Follow Up ke Rekap Pesanan (atau sebaliknya) tanpa lewat Beranda dulu bikin kedua halaman itu nyangkut aktif berbarengan, jadi salah satunya jadi tidak bisa dibuka lagi. Sekarang sudah saling membersihkan halaman satu sama lain saat berpindah.</li>
+            <li><b>Perbaikan bug: kolom kanan tabel Follow Up tidak bisa diakses</b> — kolom "Customer" di tabel Follow Up sekarang dikunci (sticky) di sisi kiri waktu tabel digeser kanan/kiri, jadi kolom Status/Qty Rata²/dll di sisi kanan bisa diakses tanpa kehilangan konteks nama customer-nya.</li>
+            <li><b>Judul kolom "Aksi" di tabel Rekap Pesanan diganti jadi "Invoice"</b> — isi kolomnya (tombol toggle Sudah/Belum di Invoice) tidak berubah, cuma judul kolomnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.26.1</div>
+          <ul>
+            <li><b>Menu "Follow Up" sekarang fiturnya identik dengan RepeatOrder_Calculator.html</b> — popup detail customer dirombak jadi Bagian A (Parameter &amp; Asumsi), Bagian B (Prediksi 8 Order Berikutnya, bukan cuma 1), dan Bagian C (Prediksi Kebutuhan Stok Bulan Ini), persis pola tab "Detail Customer" di kalkulator Excel-nya.</li>
+            <li><b>Tombol baru "📈 Grafik Riwayat"</b> di popup detail customer — buka grafik dengan 3 mode (Qty per Order, Jarak Antar Order, Kumulatif Qty) digambar langsung di layar, tanpa perlu Excel.</li>
+            <li><b>Kotak ringkasan ke-5: "📦 Est. Qty Stok Bulan Ini"</b> ditambahkan di bagian atas halaman Follow Up, total estimasi qty yang perlu disiapkan bulan berjalan dari semua customer yang tampil (sesuai filter aktif) — sebelumnya cuma ada 4 kotak.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.26.0</div>
           <ul>
             <li><b>Menu baru "Follow Up"</b> (sidebar, tepat di bawah "Rekap Pesanan") — pola repeat-order per customer: rata-rata jarak antar order, prediksi order berikutnya, dan status (Jatuh Tempo/Segera/Minggu Ini/Belum Perlu) supaya mudah tahu siapa yang perlu segera dihubungi. Tombol "📞 Perlu Dihubungi" menampilkan daftar customer yang jatuh tempo 1-3 hari lagi. Klik nama customer untuk lihat riwayat order lengkapnya.</li>
             <li><b>Sumber data permanen, beda dengan Rekap Pesanan</b> — dihitung dari pesanan yang PERNAH 100% Lunas, disimpan permanen (tidak ikut kadaluarsa 25 hari seperti data Rekap Pesanan). Pesanan yang belum Lunas (Cicilan/Kelebihan) tetap dicatat sebagai riwayat, tapi tidak ikut dihitung ke pola repeat-order.</li>
@@ -13735,6 +13824,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
     document.body.classList.remove("showing-home");
+    document.body.classList.remove("showing-followup"); // BARU (fix bug) -- kalau sebelumnya lagi di Follow Up, class-nya wajib dilepas dulu, kalau tidak dua halaman full-page nyangkut aktif berbarengan dan Follow Up jadi tidak bisa dibuka lagi setelahnya.
     document.body.classList.add("showing-rekap");
     window.scrollTo(0,0);
     fetchAndRenderRekap();
@@ -13927,7 +14017,7 @@ if ("serviceWorker" in navigator) {
       th("No", "38px") + th("Hari", "56px") + th("Tgl/Jam", "92px") + th("CS", "110px") + th("Customer", "240px") +
       kodeList.map(k=> th(escHtml(k), "48px")).join("") +
       th("Qty", "48px") +
-      th("Status", "130px") + th("KG", "56px") + th("Ekspedisi", "120px") + th("Resi", "44px") + th("Aksi", "110px") +
+      th("Status", "130px") + th("KG", "56px") + th("Ekspedisi", "120px") + th("Resi", "44px") + th("Invoice", "110px") +
       "</tr></thead><tbody>";
 
     if(!rows.length){
@@ -14134,6 +14224,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
     document.body.classList.remove("showing-home");
+    document.body.classList.remove("showing-rekap"); // BARU (fix bug) -- kalau sebelumnya lagi di Rekap Pesanan, class-nya wajib dilepas dulu, kalau tidak dua halaman full-page nyangkut aktif berbarengan dan salah satunya jadi tidak bisa dibuka lagi setelahnya.
     document.body.classList.add("showing-followup");
     window.scrollTo(0,0);
     fetchAndRenderFollowUp();
@@ -14163,6 +14254,54 @@ if ("serviceWorker" in navigator) {
   function fmtTgl(iso){
     if(!iso) return "-";
     return new Date(iso).toLocaleDateString("id-ID", { day:"2-digit", month:"short", year:"numeric" });
+  }
+  // ---- Helper angka/tanggal, pola SAMA dgn RepeatOrder_Calculator.html
+  // (dipakai utk hitung Bagian B/C & grafik riwayat secara identik). ----
+  function fuDDiff(a,b){ return Math.round((new Date(b) - new Date(a)) / 86400000); }
+  function fuAddD(d,n){ const r = new Date(d); r.setDate(r.getDate()+n); return r; }
+  function fuAvg(a){ return a.reduce((s,v)=>s+v,0) / a.length; }
+  function fuR1(v){ return Math.round(v*10) / 10; }
+  function fmtNumID(v){ return Number(v).toLocaleString("id-ID"); }
+
+  // Prediksi 8 order berikutnya + prediksi kebutuhan stok bulan ini,
+  // dihitung PERSIS seperti fungsi process() di RepeatOrder_Calculator.html
+  // (Bagian B & C), tapi berbasis data dari server (medGap, avgQty, last)
+  // dan tanggal HARI INI di perangkat customer (bukan tanggal acuan Excel).
+  function fuHitungPrediksi(r, TODAY){
+    const bStart = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
+    const bEnd = new Date(TODAY.getFullYear(), TODAY.getMonth()+1, 0);
+    const last = r.last ? new Date(r.last) : null;
+    const medGap = r.medGap;
+    const avgQty = r.avgQty || 0;
+
+    const p8 = [];
+    if(last && medGap){
+      let d = new Date(last);
+      for(let k=0;k<8;k++){
+        d = fuAddD(d, Math.round(medGap));
+        const s = fuDDiff(TODAY, d);
+        let st;
+        if(s<0) st = "⏰ Sudah Lewat";
+        else if(s===0) st = "🔴 HARI INI!";
+        else if(s<=3) st = "🟠 Segera";
+        else if(s<=7) st = "🟡 Minggu Ini";
+        else if(new Date(d) >= bStart && new Date(d) <= bEnd) st = "🎯 Bulan Ini";
+        else st = "📅 Akan Datang";
+        p8.push({ d: new Date(d), s, st });
+      }
+    }
+
+    let nBln = 0;
+    if(last && medGap){
+      let d = new Date(last);
+      for(let i=0;i<20;i++){
+        d = fuAddD(d, Math.round(medGap));
+        if(d > bEnd) break;
+        if(d >= bStart) nBln++;
+      }
+    }
+    const estBln = Math.round(nBln * avgQty);
+    return { p8, nBln, estBln, bulanLabel: TODAY.toLocaleDateString("id-ID", { month:"long", year:"numeric" }) };
   }
 
   function isiUlangDropdownFilter(){
@@ -14209,15 +14348,21 @@ if ("serviceWorker" in navigator) {
   }
 
   function renderStatsGrid(rows){
+    const TODAY = new Date();
     const total = rows.length;
     const jatuh = rows.filter(r=> r.sisa!==null && r.sisa<0).length;
     const minggu = rows.filter(r=> r.sisa!==null && r.sisa>=0 && r.sisa<=7).length;
     const belumCukup = rows.filter(r=> r.sisa===null).length;
+    // BARU -- kotak ke-5 "Est. Qty Stok Bulan Ini", pola SAMA dgn
+    // stats-grid di RepeatOrder_Calculator.html (total estBln semua
+    // customer yang tampil).
+    const totQty = rows.reduce((s,r)=> s + fuHitungPrediksi(r, TODAY).estBln, 0);
     statsGridEl.innerHTML =
       `<div class="followup-stat-box"><div class="num">${total}</div><div class="lbl">Total Customer</div></div>` +
       `<div class="followup-stat-box"><div class="num" style="color:var(--danger-red);">${jatuh}</div><div class="lbl">🔴 Jatuh Tempo</div></div>` +
       `<div class="followup-stat-box"><div class="num" style="color:#7b6000;">${minggu}</div><div class="lbl">🟡 Follow Up Minggu Ini</div></div>` +
-      `<div class="followup-stat-box"><div class="num" style="color:#555;">${belumCukup}</div><div class="lbl">⚪ Belum Cukup Data</div></div>`;
+      `<div class="followup-stat-box"><div class="num" style="color:#555;">${belumCukup}</div><div class="lbl">⚪ Belum Cukup Data</div></div>` +
+      `<div class="followup-stat-box"><div class="num">${fmtNumID(totQty)}</div><div class="lbl">📦 Est. Qty Stok Bulan Ini</div></div>`;
   }
 
   function renderFollowUpTable(){
@@ -14225,11 +14370,11 @@ if ("serviceWorker" in navigator) {
     renderStatsGrid(rows);
     statusEl.textContent = `${rows.length} dari ${allRows.length} customer ditampilkan — diperbarui ${new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}.`;
 
-    const th = (t, w)=> `<th style="border:1px solid var(--line); padding:8px 8px; background:var(--card); text-align:left; position:sticky; top:0;${w?` width:${w};`:""}">${t}</th>`;
-    const td = (t, extra)=> `<td style="border:1px solid var(--line); padding:7px 8px;${extra||""}">${t}</td>`;
+    const th = (t, w, cls)=> `<th class="${cls||""}" style="border:1px solid var(--line); padding:8px 8px; background:var(--card); text-align:left; position:sticky; top:0;${w?` width:${w};`:""}">${t}</th>`;
+    const td = (t, extra, cls)=> `<td class="${cls||""}" style="border:1px solid var(--line); padding:7px 8px;${extra||""}">${t}</td>`;
 
     let html = "<thead><tr>" +
-      th("Customer", "220px") + th("CS", "100px") + th("Order Lunas", "70px") + th("Belum Lunas", "80px") +
+      th("Customer", "220px", "nm") + th("CS", "100px") + th("Order Lunas", "70px") + th("Belum Lunas", "80px") +
       th("Order Pertama", "100px") + th("Order Terakhir", "100px") + th("Rata Jarak", "90px") +
       th("Prediksi Berikutnya", "110px") + th("Sisa", "90px") + th("Status", "140px") + th("Qty Rata²", "70px") +
       "</tr></thead><tbody>";
@@ -14240,7 +14385,7 @@ if ("serviceWorker" in navigator) {
 
     rows.forEach(r=>{
       html += `<tr data-customer="${escHtml(r.customer)}">` +
-        td(escHtml(r.customer), "font-weight:600; white-space:normal; word-break:break-word;") +
+        td(escHtml(r.customer), "font-weight:600; white-space:normal; word-break:break-word;", "nm") +
         td(escHtml(r.cs || "-")) +
         td(r.jumlahOrder, "text-align:center;") +
         td(r.jumlahBelumLunas || 0, "text-align:center; color:var(--ink-soft);") +
@@ -14261,34 +14406,278 @@ if ("serviceWorker" in navigator) {
   }
 
   // ---- Detail 1 customer (modal) ----
+  // BARU -- sekarang menampilkan Bagian A/B/C persis seperti tab "Detail
+  // Customer" di RepeatOrder_Calculator.html (bukan cuma ringkasan +
+  // riwayat seperti sebelumnya), supaya fiturnya identik.
   const detailOverlay = document.getElementById("followup-detail-overlay");
+  let CUR_FU = null; // customer yang sedang dibuka di popup detail (dipakai tombol Grafik Riwayat)
+
   function bukaDetailCustomer(nama){
     const r = allRows.find(x=> x.customer === nama);
     if(!r) return;
+    CUR_FU = r;
+    const TODAY = new Date();
+    const { p8, nBln, estBln, bulanLabel } = fuHitungPrediksi(r, TODAY);
+
     document.getElementById("followup-detail-nama").textContent = r.customer;
     document.getElementById("followup-detail-cs").textContent = `CS paling sering: ${r.cs || "-"}`;
+
     const riwayatHtml = (r.riwayat || []).slice().reverse().map(h=>
       `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--line);"><span>${fmtTgl(h.tanggal)}</span><span>Qty ${h.qty}</span></div>`
     ).join("") || `<div style="color:var(--ink-soft);">Belum ada riwayat.</div>`;
+
+    // BAGIAN A -- Parameter & Asumsi
+    const rowsA = [
+      ["Hari Ini (acuan)", fmtTgl(TODAY.toISOString()), true],
+      ["Jumlah Order Lunas", `${r.jumlahOrder} kali`, false],
+      ["Belum Lunas", `${r.jumlahBelumLunas || 0} kali`, false],
+      ["Tanggal Order Pertama", fmtTgl(r.first), false],
+      ["Tanggal Order Terakhir", fmtTgl(r.last), false],
+      ["Rata-Rata Gap (hari)", r.avgGap!==null ? fmtHari(r.avgGap) : "-", false],
+      ["Median Gap (hari) ⭐", r.medGap!==null ? fmtHari(r.medGap) : "-", true],
+      ["Rata-Rata Qty/Order", `${r.avgQty}`, false],
+    ];
+    const tblAHtml = rowsA.map(([l,v,hl])=>
+      `<tr class="${hl?"hl":""}"><td>${l}</td><td>${v}</td></tr>`
+    ).join("");
+
+    // BAGIAN B -- Prediksi 8 order berikutnya
+    let tblBHtml;
+    if(!p8.length){
+      tblBHtml = `<tr><td colspan="5" style="text-align:center; padding:16px; color:var(--ink-soft);">— Data belum cukup (perlu minimal 2 order Lunas)</td></tr>`;
+    }else{
+      tblBHtml = p8.map((p,k)=>{
+        const s = p.s;
+        const sf = s<0?"#fdecea":s===0?"#fdecea":s<=3?"#fff2e0":s<=7?"#fffde7":"#e6f4ea";
+        const tc = s<0?"#c00000":s<=3?"#7b3f00":s<=7?"#7b6000":"var(--primary-green)";
+        const rumus = k===0 ? "= Tgl_Terakhir + Median_Gap" : `= Prediksi_Ke${k} + Median_Gap`;
+        return `<tr>
+          <td style="font-weight:700;">Ke-${k+1}</td>
+          <td>${fmtTgl(p.d.toISOString())}</td>
+          <td style="color:${tc}; font-weight:600;">${fmtHari(s)}</td>
+          <td><span style="background:${sf}; color:${tc}; border-radius:20px; padding:2px 10px; font-size:10.5px; font-weight:700;">${p.st}</span></td>
+          <td style="font-size:9.5px; color:#999; font-family:monospace;">${rumus}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    // BAGIAN C -- Prediksi kebutuhan stok bulan ini
+    const bagianCHtml = `
+      <div class="fu-stok-grid">
+        <div class="fu-stok-item"><div class="s-label">Jumlah order prediksi ${bulanLabel}</div><div class="s-val">${nBln}</div><div class="s-unit">kali order</div></div>
+        <div class="fu-stok-item" style="background:#fffde7;"><div class="s-label">Estimasi total qty bulan ini</div><div class="s-val" style="font-size:24px;">${fmtNumID(estBln)}</div><div class="s-unit">pcs / unit</div></div>
+        <div class="fu-stok-item"><div class="s-label">Rata-rata qty per order</div><div class="s-val">${r.avgQty}</div><div class="s-unit">pcs per order</div></div>
+      </div>`;
+
     document.getElementById("followup-detail-body").innerHTML = `
       <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
         <span class="fu-badge ${r.cls}" style="font-size:13px; padding:6px 14px;">${escHtml(r.status)}</span>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
-        <div><div style="color:var(--ink-soft); font-size:12px;">Order Lunas</div><div style="font-weight:700;">${r.jumlahOrder}</div></div>
-        <div><div style="color:var(--ink-soft); font-size:12px;">Belum Lunas</div><div style="font-weight:700;">${r.jumlahBelumLunas || 0}</div></div>
-        <div><div style="color:var(--ink-soft); font-size:12px;">Order Pertama</div><div style="font-weight:700;">${fmtTgl(r.first)}</div></div>
-        <div><div style="color:var(--ink-soft); font-size:12px;">Order Terakhir</div><div style="font-weight:700;">${fmtTgl(r.last)}</div></div>
-        <div><div style="color:var(--ink-soft); font-size:12px;">Rata² Jarak Order</div><div style="font-weight:700;">${r.avgGap!==null ? fmtHari(r.avgGap) : "-"}</div></div>
-        <div><div style="color:var(--ink-soft); font-size:12px;">Prediksi Berikutnya</div><div style="font-weight:700;">${r.pred ? fmtTgl(r.pred) : "Belum cukup data"}</div></div>
+
+      <div class="fu-bagian">
+        <div class="fu-bag-hdr">▌ BAGIAN A — PARAMETER &amp; ASUMSI <span>Data historis customer</span></div>
+        <table class="fu-ptbl">${tblAHtml}</table>
       </div>
-      <div style="font-weight:700; font-size:13px; margin-bottom:6px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.5px;">Riwayat Order Lunas</div>
+
+      <div class="fu-bagian">
+        <div class="fu-bag-hdr">▌ BAGIAN B — PREDIKSI 8 ORDER BERIKUTNYA <span>Berdasarkan median gap</span></div>
+        <div class="fu-ptbl2-wrap">
+          <table class="fu-ptbl2">
+            <thead><tr><th>Prediksi Ke-</th><th>Perkiraan Tanggal</th><th>Hari dari Sekarang</th><th>Status</th><th>Rumus</th></tr></thead>
+            <tbody>${tblBHtml}</tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="fu-bagian">
+        <div class="fu-bag-hdr">▌ BAGIAN C — PREDIKSI KEBUTUHAN STOK BULAN INI</div>
+        ${bagianCHtml}
+      </div>
+
+      <div style="font-weight:700; font-size:13px; margin:14px 0 6px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.5px;">Riwayat Order Lunas</div>
       ${riwayatHtml}
     `;
     detailOverlay.hidden = false;
   }
-  document.getElementById("followup-detail-close").addEventListener("click", ()=> detailOverlay.hidden = true);
-  detailOverlay.addEventListener("click", (e)=>{ if(e.target === detailOverlay) detailOverlay.hidden = true; });
+  function tutupDetailCustomer(){
+    detailOverlay.hidden = true;
+    if(window.__closeFollowUpChart) window.__closeFollowUpChart(); // ikut tutup grafik kalau lagi terbuka
+  }
+  document.getElementById("followup-detail-close").addEventListener("click", tutupDetailCustomer);
+  detailOverlay.addEventListener("click", (e)=>{ if(e.target === detailOverlay) tutupDetailCustomer(); });
+  document.addEventListener("keydown", (e)=>{ if(e.key==="Escape" && !detailOverlay.hidden && fuChartOverlayHiddenOrMissing()) tutupDetailCustomer(); });
+  function fuChartOverlayHiddenOrMissing(){
+    const ov = document.getElementById("followup-chart-overlay");
+    return !ov || ov.hidden;
+  }
+
+  // ---- Grafik Riwayat (popup terpisah dari detail), fitur identik dgn
+  // openChart()/renderChart()/drawChart() di RepeatOrder_Calculator.html:
+  // 3 mode (Qty per Order / Jarak Antar Order / Kumulatif Qty), digambar
+  // manual ke <canvas> tanpa library luar. ----
+  const fuChartOverlay = document.getElementById("followup-chart-overlay");
+  let fuChartMode = "qty";
+
+  function fuOpenChart(){
+    if(!CUR_FU) return;
+    fuChartMode = "qty";
+    document.querySelectorAll(".fu-chart-tab").forEach(t=> t.classList.toggle("active", t.dataset.m==="qty"));
+    fuChartOverlay.hidden = false;
+    fuRenderChart();
+  }
+  function fuCloseChart(){ fuChartOverlay.hidden = true; }
+  window.__closeFollowUpChart = fuCloseChart;
+  document.getElementById("followup-chart-btn").addEventListener("click", fuOpenChart);
+  document.getElementById("followup-chart-close").addEventListener("click", fuCloseChart);
+  document.querySelectorAll(".fu-chart-tab").forEach(tab=>{
+    tab.addEventListener("click", ()=>{
+      fuChartMode = tab.dataset.m;
+      document.querySelectorAll(".fu-chart-tab").forEach(t=> t.classList.toggle("active", t===tab));
+      fuRenderChart();
+    });
+  });
+  document.addEventListener("keydown", (e)=>{ if(e.key==="Escape" && !fuChartOverlay.hidden) fuCloseChart(); });
+  window.addEventListener("resize", ()=>{ if(!fuChartOverlay.hidden) fuRenderChart(); });
+
+  function fuRenderChart(){
+    const r = CUR_FU;
+    if(!r) return;
+    const hist = (r.riwayat || []).map(h=> ({ d: new Date(h.tanggal), q: h.qty })).sort((a,b)=> a.d - b.d);
+    document.getElementById("followup-chart-title").textContent = `📈 Riwayat Pembelian — ${r.customer}`;
+    document.getElementById("followup-chart-sub").textContent = `${hist.length} order tercatat${hist.length ? " • " + fmtTgl(hist[0].d.toISOString()) + " s/d " + fmtTgl(hist[hist.length-1].d.toISOString()) : ""}`;
+
+    let labels, values, unitLbl, color, isLine;
+    if(fuChartMode === "qty"){
+      labels = hist.map(h=> fmtTgl(h.d.toISOString()));
+      values = hist.map(h=> h.q);
+      unitLbl = "pcs"; color = "#2E75B6"; isLine = false;
+    }else if(fuChartMode === "gap"){
+      const gaps = [];
+      for(let i=1;i<hist.length;i++) gaps.push(fuDDiff(hist[i-1].d, hist[i].d));
+      labels = hist.slice(1).map(h=> fmtTgl(h.d.toISOString()));
+      values = gaps;
+      unitLbl = "hari"; color = "#7B3F00"; isLine = false;
+    }else{
+      let c = 0;
+      labels = hist.map(h=> fmtTgl(h.d.toISOString()));
+      values = hist.map(h=> { c += h.q; return c; });
+      unitLbl = "pcs kumulatif"; color = "#375623"; isLine = true;
+    }
+    fuDrawChart(document.getElementById("followup-chart-canvas"), labels, values, color, unitLbl, isLine);
+
+    const qtys = hist.map(h=> h.q);
+    const gaps2 = [];
+    for(let i=1;i<hist.length;i++) gaps2.push(fuDDiff(hist[i-1].d, hist[i].d));
+    const totQ = qtys.reduce((s,v)=>s+v,0);
+    const avgQ = qtys.length ? fuR1(fuAvg(qtys)) : 0;
+    document.getElementById("followup-chart-stats").innerHTML =
+      `<div class="followup-stat-box"><div class="num">${hist.length}</div><div class="lbl">Total Order</div></div>` +
+      `<div class="followup-stat-box"><div class="num">${fmtNumID(totQ)}</div><div class="lbl">Total Qty Dibeli</div></div>` +
+      `<div class="followup-stat-box"><div class="num">${fmtNumID(avgQ)}</div><div class="lbl">Rata-rata Qty/Order</div></div>` +
+      `<div class="followup-stat-box"><div class="num">${gaps2.length ? fmtHari(fuAvg(gaps2)) : "-"}</div><div class="lbl">Rata-rata Gap</div></div>`;
+  }
+
+  // Manual canvas chart renderer (tanpa lib luar), pola SAMA dgn
+  // drawChart() di RepeatOrder_Calculator.html.
+  function fuDrawChart(canvas, labels, values, color, unitLbl, isLine){
+    const wrap = canvas.parentElement;
+    const dpr = window.devicePixelRatio || 1;
+    const cw = wrap.clientWidth, ch = wrap.clientHeight || 320;
+    canvas.width = cw*dpr; canvas.height = ch*dpr;
+    canvas.style.width = cw+"px"; canvas.style.height = ch+"px";
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,cw,ch);
+
+    if(!values.length){
+      ctx.fillStyle = "#6b7a99"; ctx.font = "13px Segoe UI, Arial"; ctx.textAlign = "center";
+      ctx.fillText("Belum ada data untuk ditampilkan", cw/2, ch/2);
+      return;
+    }
+
+    const padL=48, padR=34, padT=20, padB=54;
+    const plotW = cw-padL-padR, plotH = ch-padT-padB;
+    const maxV = Math.max(...values, 1), minV = Math.min(0, ...values);
+    const range = (maxV-minV) || 1;
+    const n = values.length;
+    const xFor = i=> padL + (n<=1 ? plotW/2 : (i/(n-1))*plotW);
+    const yFor = v=> padT + plotH - ((v-minV)/range)*plotH;
+
+    ctx.strokeStyle = "#eef2f7"; ctx.fillStyle = "#6b7a99"; ctx.font = "10px Segoe UI, Arial"; ctx.textAlign = "right";
+    const steps = 4;
+    for(let s=0;s<=steps;s++){
+      const v = minV + (range*s/steps);
+      const y = yFor(v);
+      ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(cw-padR,y); ctx.stroke();
+      ctx.fillText(fmtNumID(Math.round(v)), padL-6, y+3);
+    }
+
+    ctx.strokeStyle = "#c8d8ec";
+    ctx.beginPath(); ctx.moveTo(padL, yFor(0)); ctx.lineTo(cw-padR, yFor(0)); ctx.stroke();
+
+    if(isLine){
+      ctx.beginPath();
+      values.forEach((v,i)=>{ const x=xFor(i), y=yFor(v); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+      ctx.lineTo(xFor(n-1), yFor(minV)); ctx.lineTo(xFor(0), yFor(minV)); ctx.closePath();
+      ctx.fillStyle = color+"22"; ctx.fill();
+
+      ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.2; ctx.lineJoin = "round";
+      values.forEach((v,i)=>{ const x=xFor(i), y=yFor(v); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+      ctx.stroke();
+
+      ctx.fillStyle = color;
+      values.forEach((v,i)=>{ const x=xFor(i), y=yFor(v); ctx.beginPath(); ctx.arc(x,y,3,0,7); ctx.fill(); });
+    }else{
+      const barW = Math.max(6, Math.min(46, plotW/n*0.55));
+      ctx.fillStyle = color;
+      values.forEach((v,i)=>{
+        const x = xFor(i)-barW/2, y = yFor(Math.max(v,0)), y0 = yFor(Math.min(v,0));
+        const h = Math.max(1, Math.abs(y0-y));
+        const top = Math.min(y,y0);
+        ctx.beginPath();
+        const rad = Math.min(5, barW/2);
+        ctx.moveTo(x, top+h);
+        ctx.lineTo(x, top+rad);
+        ctx.quadraticCurveTo(x, top, x+rad, top);
+        ctx.lineTo(x+barW-rad, top);
+        ctx.quadraticCurveTo(x+barW, top, x+barW, top+rad);
+        ctx.lineTo(x+barW, top+h);
+        ctx.closePath(); ctx.fill();
+      });
+    }
+
+    if(n<=25){
+      ctx.font = "700 11px Segoe UI, Arial"; ctx.textAlign = "center";
+      values.forEach((v,i)=>{
+        const x = xFor(i);
+        let y = yFor(v)-10;
+        if(y < padT+10) y = yFor(v)+16;
+        const txt = unitLbl==="hari" ? fmtHari(v) : fmtNumID(v);
+        const tw = ctx.measureText(txt).width;
+        ctx.fillStyle = "rgba(255,255,255,.85)";
+        ctx.fillRect(x-tw/2-4, y-11, tw+8, 15);
+        ctx.fillStyle = "#1a1a2e";
+        ctx.fillText(txt, x, y);
+      });
+    }
+
+    ctx.fillStyle = "#6b7a99"; ctx.font = "10px Segoe UI, Arial";
+    const maxLabels = Math.min(n, Math.floor(plotW/44) || 1);
+    const step = Math.max(1, Math.ceil(n/maxLabels));
+    labels.forEach((l,i)=>{
+      if(i%step!==0 && i!==n-1) return;
+      const x = xFor(i);
+      ctx.save();
+      ctx.translate(x, ch-padB+14);
+      if(n>10){ ctx.rotate(-0.55); ctx.textAlign = "right"; }
+      else{ ctx.rotate(0); ctx.textAlign = i===0 ? "left" : (i===n-1 ? "right" : "center"); }
+      ctx.fillText(l, 0, 0);
+      ctx.restore();
+    });
+
+    ctx.fillStyle = "#9aa8c0"; ctx.font = "10px Segoe UI, Arial"; ctx.textAlign = "left";
+    ctx.fillText(`satuan: ${unitLbl}`, padL, 14);
+  }
 
   // ---- Popup "Perlu Dihubungi" (customer dgn status Segera, sisa 1-3 hari) ----
   const contactOverlay = document.getElementById("followup-contact-overlay");
