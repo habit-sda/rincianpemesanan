@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v286";
+const CACHE_VERSION = "v287";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -126,6 +126,15 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    langsung cek sekali lagi begitu tab dibuka lagi. SENGAJA TIDAK dipaksa
    (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
    Sekarang").
+   v287 -- kartu "Peringatan Bukti Transfer Belum Ada" (Master Data ->
+   Tampilan) sekarang punya pengaturan "Hari Aktif" -- 7 checkbox
+   Senin..Minggu yang bisa diisi manual, menentukan hari apa saja
+   peringatan ini boleh terkirim (default semua hari kalau belum pernah
+   diatur, migrasi mundur aman). Hari yang tidak dicentang bukan berarti
+   pesanan yang lewat 7 hari di hari itu hilang -- pesannya cuma menunggu
+   sampai hari aktif berikutnya baru terkirim (worker sudah disesuaikan).
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang").
    v276 lama sudah dikeluarkan dari Set ini (update itu sudah tersebar
    duluan). ---- */
 const FORCE_ACTIVATE_VERSIONS = new Set([]);

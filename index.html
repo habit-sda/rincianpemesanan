@@ -938,7 +938,7 @@
        ikut media query gabungan "wiz" yang juga aktif di desktop lebar
        (≥901px) -- di desktop lebar totalnya sudah ada di kartu "Ringkasan
        pesanan" (aside), jadi tidak perlu dobel. */
-    .wiz-totals-bar{display:flex;}
+    .wiz-totals-bar{display:flex !important;}
     body{padding:16px 10px 60px;}
     header{align-items:flex-start;gap:8px;padding-bottom:10px;margin-bottom:14px;}
     header .sub{font-size:11.5px;}
@@ -1404,7 +1404,15 @@
        di sini sama sekali, pola sama dengan syncDesktopSummary/
        syncPosCartSheet yang sudah ada. */
     .wiz-totals-bar{
-      display:none; /* BARU -- default disembunyikan, cuma dimunculkan khusus versi mobile lewat media query di bawah (bukan di tablet/desktop lebar) */
+      display:none; /* default disembunyikan (desktop/tablet lebar) -- BARU
+      (v2.27.1) dipaksa !important di aturan media query breakpoint mobile
+      DI ATAS (baris ~941) supaya benar-benar menang, karena sebelumnya
+      2 aturan .wiz-totals-bar ini sama-sama "kekuatan"-nya (1 nama class),
+      dan browser selalu pakai yang paling AKHIR ditulis di file kalau
+      kekuatannya sama -- aturan "sembunyikan" ini (yang TANPA syarat
+      layar) letaknya lebih bawah drpd aturan "tampilkan" di breakpoint
+      mobile, jadi selalu menang & bar-nya nggak pernah kelihatan di HP
+      mana pun. !important di baris ~941 memastikan itu tidak terulang lagi. */
       align-items:stretch;gap:0;
       background:var(--wiz-form-bg,var(--paper));border:1px solid var(--wiz-form-border,var(--line));
       border-radius:10px;margin:0 0 12px;overflow:hidden;
@@ -5271,9 +5279,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <input type="checkbox" id="md-nobukti-toggle" style="width:18px; height:18px;">
           <span>Aktifkan Peringatan Bukti Transfer Belum Ada</span>
         </label>
-        <div style="display:flex; align-items:center; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
           <label for="md-nobukti-time" style="font-size:13.5px; color:var(--ink-soft);">Jam kirim (WIB)</label>
           <input type="time" id="md-nobukti-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
+        </div>
+        <div style="font-size:13.5px; color:var(--ink-soft); margin-bottom:8px;">Hari Aktif</div>
+        <div class="md-note" style="margin-bottom:8px;">Pilih hari di mana peringatan ini boleh dikirim. Hari yang tidak dicentang: pesanan tetap dihitung lewat 7 hari seperti biasa, tapi pesannya baru terkirim menunggu hari aktif berikutnya (bukan hilang/terlewat).</div>
+        <div id="md-nobukti-days" style="display:flex; flex-wrap:wrap; gap:6px;">
+          <label style="display:flex; align-items:center; gap:5px; border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px;"><input type="checkbox" class="md-nobukti-day" value="1" style="width:16px; height:16px;"><span>Senin</span></label>
+          <label style="display:flex; align-items:center; gap:5px; border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px;"><input type="checkbox" class="md-nobukti-day" value="2" style="width:16px; height:16px;"><span>Selasa</span></label>
+          <label style="display:flex; align-items:center; gap:5px; border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px;"><input type="checkbox" class="md-nobukti-day" value="3" style="width:16px; height:16px;"><span>Rabu</span></label>
+          <label style="display:flex; align-items:center; gap:5px; border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px;"><input type="checkbox" class="md-nobukti-day" value="4" style="width:16px; height:16px;"><span>Kamis</span></label>
+          <label style="display:flex; align-items:center; gap:5px; border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px;"><input type="checkbox" class="md-nobukti-day" value="5" style="width:16px; height:16px;"><span>Jumat</span></label>
+          <label style="display:flex; align-items:center; gap:5px; border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px;"><input type="checkbox" class="md-nobukti-day" value="6" style="width:16px; height:16px;"><span>Sabtu</span></label>
+          <label style="display:flex; align-items:center; gap:5px; border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px;"><input type="checkbox" class="md-nobukti-day" value="0" style="width:16px; height:16px;"><span>Minggu</span></label>
         </div>
       </div>
       <div class="md-card">
@@ -5666,7 +5685,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.28.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.28.2</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5728,6 +5747,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <input type="text" id="kt-customer-name" class="kt-input" placeholder="Isi nama customer" autocomplete="off" style="text-transform:uppercase;">
           <div id="kt-name-suggest" hidden style="position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:220px;overflow-y:auto;"></div>
         </div>
+        <!-- BARU -- saran ekspedisi berdasarkan riwayat customer ini (GET
+             /customer-rate). CUMA muncul kalau ekspedisi tercatat di
+             riwayat BEDA dari yang sedang dipilih di form -- kalau sudah
+             sama, elemen ini tetap hidden (tidak mengganggu). Klik untuk
+             pakai (BUKAN otomatis mengganti ekspedisinya sendiri). -->
+        <p id="kt-ekspedisi-suggest" class="kt-hint" hidden style="margin-top:8px;background:#eaf6ee;border:1px solid var(--primary-green);border-radius:8px;padding:8px 10px;color:var(--ink);cursor:pointer;"></p>
         <label style="display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
           <input type="checkbox" id="kt-revisi-check" style="margin-top:2px;">
           <span>Revisi Pemesanan — hapus rincian pemesanan <b>lama</b> atas nama customer ini (nama harus persis sama), diganti rincian baru yang ini.</span>
@@ -5851,7 +5876,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.28.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.28.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Saran ekspedisi otomatis di popup "Kirim ke Grup Telegram"</b> — begitu nama customer diketik/dipilih, sistem cek ekspedisi yang biasa dipakai customer itu (dari riwayat /ongkir). Kalau BEDA dengan ekspedisi yang sedang dipilih di form, muncul saran kecil "💡 Customer ini biasanya pakai ekspedisi X (sekarang: Y)" yang bisa diklik untuk pakai — kalau sudah sama, tidak ada saran yang muncul sama sekali. Murni saran, TIDAK PERNAH otomatis mengganti pilihan ekspedisi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.28.1</div>
+          <ul>
+            <li><b>Gabungan dari cabang pengembangan terpisah</b> — 2 perbaikan berikut sempat dikerjakan di file terpisah dari fitur-fitur v2.28.0 di atas, sekarang digabung jadi satu: (1) fix bug bar "Total Qty"/"Total Berat" yang tidak pernah muncul di HP (2 aturan CSS bentrok, sekarang dipaksa menang yang benar); (2) Mode Tabel (HP) — setelah "Simpan produk" (nambah baru, bukan edit), form langsung terbuka lagi kosong & auto-scroll ke situ, supaya nambah beberapa produk berturut-turut tidak perlu geser manual cari tombol "+ Tambah produk" lagi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.28.0</div>
           <ul>
             <li><b>Muat otomatis di menu Follow Up dihapus total</b> — sebelumnya, membuka kartu Follow Up otomatis mengambil data dari server sekali. Sekarang tabel/statistik TETAP KOSONG (ada pesan "Data belum dimuat") sampai user sendiri menekan tombol "🔄 Muat ulang" — tidak ada lagi panggilan ke server hanya karena membuka halaman ini.</li>
             <li><b>Warna Grafik Riwayat di Follow Up diseragamkan jadi hijau</b> — ketiga mode grafik (Qty per Order, Jarak Antar Order, Kumulatif Qty) sekarang sama-sama nuansa hijau (sebelumnya biru/cokelat/hijau tua campur), dan label angka di atas batang/garis dibuat lebih tebal &amp; kotak putih di baliknya lebih pekat supaya lebih jelas dibaca.</li>
@@ -8389,6 +8426,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   const overlay = document.getElementById("kt-overlay");
   const nameInput = document.getElementById("kt-customer-name");
   const suggestBox = document.getElementById("kt-name-suggest");
+  const ekspedisiSuggestEl = document.getElementById("kt-ekspedisi-suggest");
   const statusEl = document.getElementById("kt-status");
   const senderPreview = document.getElementById("kt-sender-preview");
   const btnEditSender = document.getElementById("kt-edit-sender");
@@ -8445,8 +8483,61 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         nameInput.value = matches[i];
         hideSuggestions();
         updateSendBtnState();
+        checkEkspedisiSuggestion(); // BARU -- nama dipilih dari daftar, langsung cek saran ekspedisinya
       });
     });
+  }
+
+  /* ---------- BARU -- Saran Ekspedisi berdasarkan riwayat customer ----------
+     Begitu nama customer di popup ini cocok dengan customer yang sudah
+     punya riwayat ekspedisi (GET /customer-rate, sumber SAMA dengan
+     caption resi/DM /ongkir), dibandingkan dengan ekspedisi yang SEDANG
+     dipilih di form (pj-ekspedisi/cs-ekspedisi, tergantung tab aktif):
+       - Kalau SAMA (atau belum ada riwayat sama sekali) -> tidak
+         menampilkan apa pun, tidak mengganggu.
+       - Kalau BEDA -> tampilkan saran kecil, bisa diklik utk PAKAI.
+         TIDAK PERNAH otomatis mengganti pilihan ekspedisi sendiri --
+         murni saran, keputusan tetap di tangan user. ---------- */
+  let ekspedisiSuggestTimer = null;
+  function hideEkspedisiSuggest(){
+    ekspedisiSuggestEl.hidden = true;
+    ekspedisiSuggestEl.textContent = "";
+    ekspedisiSuggestEl.onclick = null;
+  }
+  function getActiveShipFieldsElsePfx(){
+    const tabBtn = document.querySelector(".tab-btn.active");
+    const tab = tabBtn ? tabBtn.dataset.tab : "penjualan";
+    return tab === "penjualan" ? "pj" : "cs";
+  }
+  async function checkEkspedisiSuggestion(){
+    hideEkspedisiSuggest();
+    const customerName = stripNewTag(nameInput.value.trim());
+    if(customerName.length < 3 || !MASTER_DATA_WORKER_URL) return;
+    const pfx = getActiveShipFieldsElsePfx();
+    const eksSelect = document.getElementById(pfx + "-ekspedisi");
+    if(!eksSelect) return;
+    const currentVal = (eksSelect.value || "").trim();
+    let suggested = "";
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-rate?name=" + encodeURIComponent(customerName), { headers: workerHeaders() });
+      const body = await res.json().catch(()=> ({}));
+      suggested = (body.ekspedisi || "").trim();
+    }catch(e){ return; } // gagal ambil -> diam saja, tidak mengganggu alur kirim
+    if(!suggested) return; // belum ada riwayat ekspedisi customer ini
+    // Sudah sama (case-insensitive) -> sesuai permintaan, JANGAN sarankan.
+    if(currentVal && suggested.toLowerCase() === currentVal.toLowerCase()) return;
+    // Pastikan nama ekspedisi yang disarankan masih ada di daftar pilihan
+    // saat ini (bisa saja sudah dihapus/diganti nama di Master Data) --
+    // kalau tidak ketemu, jangan sarankan sesuatu yang tidak bisa dipilih.
+    const matchedOption = Array.from(eksSelect.options).find(o=> o.value.trim().toLowerCase() === suggested.toLowerCase());
+    if(!matchedOption) return;
+    ekspedisiSuggestEl.innerHTML = `💡 Customer ini biasanya pakai ekspedisi <b>${escHtml(matchedOption.value)}</b>${currentVal ? ` (sekarang: ${escHtml(currentVal)})` : ""}. <u>Klik untuk pakai</u>`;
+    ekspedisiSuggestEl.hidden = false;
+    ekspedisiSuggestEl.onclick = ()=>{
+      eksSelect.value = matchedOption.value;
+      eksSelect.dispatchEvent(new Event("change", {bubbles:true}));
+      hideEkspedisiSuggest();
+    };
   }
 
   function refreshSenderPreview(){
@@ -8590,11 +8681,16 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     nameInput.setSelectionRange(pos, pos);
     renderSuggestions(nameInput.value);
     scheduleAutosave();
+    // BARU -- cek saran ekspedisi, di-debounce 500ms (jangan tiap huruf)
+    clearTimeout(ekspedisiSuggestTimer);
+    ekspedisiSuggestTimer = setTimeout(checkEkspedisiSuggestion, 500);
   });
   nameInput.addEventListener("blur", ()=>{
     setTimeout(hideSuggestions, 120);
     clearTimeout(draftTimer);
     autosaveDraft();
+    clearTimeout(ekspedisiSuggestTimer);
+    checkEkspedisiSuggestion(); // BARU -- cek sekali lagi begitu selesai ngetik (blur)
   });
   nameInput.addEventListener("focus", ()=> renderSuggestions(nameInput.value));
 
@@ -8618,6 +8714,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     refreshSenderPreview();
     updateSendBtnState();
     hideSuggestions();
+    hideEkspedisiSuggest(); // BARU -- reset dulu, cek ulang di bawah setelah nama ada isinya
     if(revisiCheck) revisiCheck.checked = false;
     resetRevisiPicker();
     overlay.hidden = false;
@@ -8628,10 +8725,14 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // (gambar nota) tetap ada dan bisa diselesaikan lewat DM bot (bot
     // akan nanya nama-nya di situ kalau belum diisi).
     scheduleAutosave();
+    // BARU -- kalau nama customer sudah keisi duluan (mis. draft lama
+    // dipulihkan), langsung cek saran ekspedisinya juga.
+    if(nameInput.value.trim()) checkEkspedisiSuggestion();
   }
   function closeModal(){
     if(isSending) return; // sedang proses kirim, jangan bisa ditutup
     overlay.hidden = true;
+    hideEkspedisiSuggest(); // BARU -- bersihkan biar tidak nyangkut ke sesi berikutnya
   }
 
   // btnOpen (#btn-kirim-telegram) SUDAH DIHAPUS dari toolbar — dulu tombol
@@ -11069,7 +11170,22 @@ if ("serviceWorker" in navigator) {
       if(sheet==="custom") tr.querySelector("input.diskon").value = readDiskonModeValue("wa-diskonmode-"+sheet, "wa-diskon-"+sheet);
       tr.querySelector("select.prod").dispatchEvent(new Event("change", {bubbles:true}));
       tr.querySelector("input.qty").dispatchEvent(new Event("input", {bubbles:true}));
-      closeForm(sheet);
+      // BARU -- kalau ini nambah produk BARU (bukan edit produk yang sudah
+      // tersimpan), langsung buka lagi form kosong utk produk berikutnya &
+      // auto-scroll ke situ (openForm() sudah scrollIntoView sendiri) --
+      // supaya nambah banyak produk berturut-turut TIDAK perlu geser manual
+      // ke tombol "+ Tambah produk" yang makin turun tiap kali daftar
+      // produk tersimpan makin panjang. Field "pilih produk" jadi selalu
+      // di posisi yang sama tiap habis Simpan. Kalau ini EDIT produk yang
+      // sudah ada (originalEditingIdx bukan null) ATAU slot produk sudah
+      // penuh (maks 7), perilaku LAMA dipertahankan -- form ditutup, balik
+      // ke daftar (bukan lanjut nambah).
+      const masihAdaSlotKosong = trs2.some(t=> !t.querySelector("select.prod").value);
+      if(originalEditingIdx === null && masihAdaSlotKosong){
+        openForm(sheet, null);
+      }else{
+        closeForm(sheet);
+      }
     });
     const delBtn = document.getElementById("wa-delete-"+sheet);
     if(delBtn) delBtn.addEventListener("click", ()=>{
@@ -11843,17 +11959,35 @@ if ("serviceWorker" in navigator) {
      pesanan itu lewat 7 hari DAN jam sekarang >= jam ini. */
   const toggleNoBukti = document.getElementById("md-nobukti-toggle");
   const inputNoBuktiTime = document.getElementById("md-nobukti-time");
+  const noBuktiDayBoxes = Array.from(document.querySelectorAll(".md-nobukti-day"));
+  const DAY_LABELS = {0:"Minggu",1:"Senin",2:"Selasa",3:"Rabu",4:"Kamis",5:"Jumat",6:"Sabtu"};
   if(toggleNoBukti && inputNoBuktiTime){
     toggleNoBukti.checked = SETTINGS.noBuktiTransferReminderEnabled !== false;
     inputNoBuktiTime.value = SETTINGS.noBuktiTransferReminderTime || "08:45";
+    // BARU -- hari aktif (default SEMUA hari, supaya perilaku lama yang
+    // belum pernah atur hari tetap sama persis seperti sebelumnya).
+    const savedDays = Array.isArray(SETTINGS.noBuktiTransferReminderDays) && SETTINGS.noBuktiTransferReminderDays.length
+      ? SETTINGS.noBuktiTransferReminderDays : [0,1,2,3,4,5,6];
+    noBuktiDayBoxes.forEach(box=>{ box.checked = savedDays.includes(Number(box.value)); });
     const saveNoBukti = async ()=>{
       SETTINGS.noBuktiTransferReminderEnabled = toggleNoBukti.checked;
       SETTINGS.noBuktiTransferReminderTime = inputNoBuktiTime.value || "08:45";
+      let checkedDays = noBuktiDayBoxes.filter(b=>b.checked).map(b=>Number(b.value));
+      if(checkedDays.length === 0){
+        // Tidak boleh kosong total (peringatan jadi tidak pernah terkirim
+        // tanpa disadari) -- kalau user tidak sengaja uncheck semua,
+        // kembalikan ke centang semua hari & beri tahu lewat pesan konfirmasi.
+        checkedDays = [0,1,2,3,4,5,6];
+        noBuktiDayBoxes.forEach(box=>{ box.checked = true; });
+      }
+      SETTINGS.noBuktiTransferReminderDays = checkedDays;
       saveSettings();
-      await confirmMasterDataSave(SETTINGS.noBuktiTransferReminderEnabled ? `Peringatan Bukti Transfer Belum Ada diaktifkan, jam ${SETTINGS.noBuktiTransferReminderTime} WIB.` : "Peringatan Bukti Transfer Belum Ada dimatikan.");
+      const daysLabel = checkedDays.length === 7 ? "semua hari" : checkedDays.slice().sort().map(d=>DAY_LABELS[d]).join(", ");
+      await confirmMasterDataSave(SETTINGS.noBuktiTransferReminderEnabled ? `Peringatan Bukti Transfer Belum Ada diaktifkan, jam ${SETTINGS.noBuktiTransferReminderTime} WIB, hari: ${daysLabel}.` : "Peringatan Bukti Transfer Belum Ada dimatikan.");
     };
     toggleNoBukti.addEventListener("change", saveNoBukti);
     inputNoBuktiTime.addEventListener("change", saveNoBukti);
+    noBuktiDayBoxes.forEach(box=> box.addEventListener("change", saveNoBukti));
   }
 
   const toggleStickerButtons = document.getElementById("md-toggle-stickerbuttons");
