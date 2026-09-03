@@ -1075,11 +1075,24 @@
     body.showing-followup .panel,
     body.showing-followup details.region{display:none !important;}
     body.showing-followup #followup-fullpage{display:block;}
-    .followup-stats-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:14px;}
-    @media(max-width:700px){.followup-stats-grid{grid-template-columns:1fr 1fr;}}
-    .followup-stat-box{background:var(--paper, #f7f8f6); border:1px solid var(--line); border-radius:10px; padding:12px 10px; text-align:center;}
+    .followup-stats-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:14px;}
+    @media(max-width:700px){.followup-stats-grid{grid-template-columns:1fr 1fr 1fr;}}
+    .followup-stat-box{background:var(--paper, #f7f8f6); border:2px solid var(--line); border-radius:10px; padding:12px 10px; text-align:center;}
     .followup-stat-box .num{font-size:22px; font-weight:800; color:var(--primary-green);}
     .followup-stat-box .lbl{font-size:11px; color:var(--ink-soft); margin-top:2px;}
+    /* BARU -- kartu ringkasan Follow Up yang bisa diklik utk filter tabel
+       cepat (Total Customer / Jatuh Tempo / Hari Ini / Minggu Ini / Belum
+       Cukup Data). Cuma box dgn class "clickable" yg dikasih cursor &
+       highlight -- kotak "Est. Qty Stok Bulan Ini" (angka jumlah, bukan
+       kategori) sengaja TIDAK dibuat clickable. */
+    .followup-stat-box.clickable{cursor:pointer; user-select:none; transition:box-shadow .15s ease, border-color .15s ease, transform .08s ease;}
+    .followup-stat-box.clickable:hover{border-color:var(--primary-green);}
+    .followup-stat-box.clickable:active{transform:scale(0.96);}
+    .followup-stat-box.clickable.active{border-color:var(--primary-green); background:#eaf7ee; box-shadow:0 0 0 1px var(--primary-green);}
+    .followup-stat-box.clickable.active .lbl{color:var(--primary-green); font-weight:700;}
+    .followup-quickfilter-chip{display:none; align-items:center; gap:8px; flex-wrap:wrap; margin:-6px 0 14px; font-size:13px; color:var(--primary-green); background:#eaf7ee; border:1px solid var(--primary-green); border-radius:20px; padding:6px 14px; width:fit-content;}
+    .followup-quickfilter-chip.show{display:flex;}
+    .followup-quickfilter-chip button{border:none; background:none; color:var(--primary-green); font-weight:700; cursor:pointer; font-size:13px; padding:0; text-decoration:underline;}
     .fu-badge{display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap;}
     .fu-badge.r{background:#fdecea; color:var(--danger-red, #c00000);}
     .fu-badge.o{background:#fff2e0; color:#7b3f00;}
@@ -4569,6 +4582,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="followup-status" style="color:var(--primary-green); flex:1 1 200px; min-width:160px;"></div>
     </div>
     <div class="followup-stats-grid" id="followup-stats-grid"></div>
+    <div class="followup-quickfilter-chip" id="followup-quickfilter-chip">
+      <span id="followup-quickfilter-chip-text"></span>
+      <button type="button" id="followup-quickfilter-clear">✕ Hapus filter</button>
+    </div>
     <div style="overflow-x:auto; border:1px solid var(--line); border-radius:10px;" id="followup-table-wrap">
       <table id="followup-table" style="border-collapse:collapse; width:100%; white-space:nowrap;"></table>
     </div>
@@ -5272,13 +5289,18 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="md-card" id="md-nobukti-card">
         <h3>⏰ Peringatan Bukti Transfer Belum Ada</h3>
-        <div class="md-note" style="margin-bottom:12px;">
-          Pesanan yang sudah dibuat lebih dari 7 hari tapi belum ada satu pun bukti transfer yang masuk, dikirim SEKALI sebagai DM pengingat ke CS pembuat pesanan itu (bukan ke grup). Jam kirim di sini cuma menentukan JAM PALING CEPAT pesan boleh terkirim hari itu — kalau pesanan baru lewat 7 hari setelah jam ini, pesan tetap menunggu sampai jam ini besoknya, bukan langsung terkirim saat itu juga.
+        <div class="md-note" style="margin-bottom:12px;" id="md-nobukti-note">
+          Pesanan yang sudah dibuat lebih dari <b id="md-nobukti-note-days">7</b> hari tapi belum ada satu pun bukti transfer yang masuk, dikirim SEKALI sebagai DM pengingat ke CS pembuat pesanan itu (bukan ke grup). Jam kirim di sini cuma menentukan JAM PALING CEPAT pesan boleh terkirim hari itu — kalau pesanan baru lewat <span id="md-nobukti-note-days2">7</span> hari setelah jam ini, pesan tetap menunggu sampai jam ini besoknya, bukan langsung terkirim saat itu juga.
         </div>
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:12px;">
           <input type="checkbox" id="md-nobukti-toggle" style="width:18px; height:18px;">
           <span>Aktifkan Peringatan Bukti Transfer Belum Ada</span>
         </label>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+          <label for="md-nobukti-threshold" style="font-size:13.5px; color:var(--ink-soft);">Kirim setelah pesanan lewat</label>
+          <input type="number" id="md-nobukti-threshold" min="1" max="90" step="1" style="height:40px; width:70px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card); text-align:center;">
+          <span style="font-size:13.5px; color:var(--ink-soft);">hari</span>
+        </div>
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
           <label for="md-nobukti-time" style="font-size:13.5px; color:var(--ink-soft);">Jam kirim (WIB)</label>
           <input type="time" id="md-nobukti-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
@@ -5685,7 +5707,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.28.2</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.29.2</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -5876,7 +5898,26 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.28.2 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.29.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Bot sekarang paham balasan "sudah" di DM Petugas Logistik</b> — untuk pesan "⚠️ Peringatan: pesanan sudah LUNAS 2+ hari, belum ada resi tercatat". Balas DM itu dengan ketik "sudah" dan bot langsung menandai pesanan-pesanan di daftar tersebut sebagai beres (resi dianggap sudah dikirim, walau belum sempat tercatat otomatis) supaya tidak diingatkan lagi. Kalau tidak ada peringatan yang sedang menunggu, atau pengirimnya bukan Petugas Logistik, kata "sudah" tidak diapa-apakan dan tetap diproses seperti biasa (tidak mengganggu percakapan lain).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.29.1</div>
+          <ul>
+            <li><b>Ambang hari "Peringatan Bukti Transfer Belum Ada" sekarang bisa diatur manual</b> (Master Data &gt; Tampilan) — sebelumnya selalu tetap 7 hari, sekarang bisa diganti mis. 3 hari atau 2 hari. Teks penjelasan kartu ini juga ikut mengikuti angka yang diatur. Default tetap 7 hari kalau belum pernah diubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.29.0</div>
+          <ul>
+            <li><b>Kartu ringkasan Follow Up sekarang bisa diklik untuk filter cepat</b> — klik kartu "🔴 Jatuh Tempo", "🟠 Follow Up Hari Ini", "🟡 Follow Up Minggu Ini", "⚪ Belum Cukup Data", atau "Total Customer" langsung menyaring tabel di bawahnya sesuai kartu itu. Kartu yang sedang aktif ditandai (border &amp; latar hijau), dan muncul chip "Filter aktif: …" dengan tombol "✕ Hapus filter" untuk kembali menampilkan semua. Klik kartu yang sama sekali lagi juga otomatis mematikan filternya.</li>
+            <li><b>Kartu baru "🟠 Follow Up Hari Ini"</b> ditambahkan di sebelah kiri kartu "🟡 Follow Up Minggu Ini" — menghitung customer yang jadwal Follow Up-nya jatuh persis hari ini (sisa 0 hari).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.28.2</div>
           <ul>
             <li><b>Saran ekspedisi otomatis di popup "Kirim ke Grup Telegram"</b> — begitu nama customer diketik/dipilih, sistem cek ekspedisi yang biasa dipakai customer itu (dari riwayat /ongkir). Kalau BEDA dengan ekspedisi yang sedang dipilih di form, muncul saran kecil "💡 Customer ini biasanya pakai ekspedisi X (sekarang: Y)" yang bisa diklik untuk pakai — kalau sudah sama, tidak ada saran yang muncul sama sekali. Murni saran, TIDAK PERNAH otomatis mengganti pilihan ekspedisi.</li>
           </ul>
@@ -11959,11 +12000,20 @@ if ("serviceWorker" in navigator) {
      pesanan itu lewat 7 hari DAN jam sekarang >= jam ini. */
   const toggleNoBukti = document.getElementById("md-nobukti-toggle");
   const inputNoBuktiTime = document.getElementById("md-nobukti-time");
+  const inputNoBuktiThreshold = document.getElementById("md-nobukti-threshold");
+  const noteNoBuktiDaysEls = [document.getElementById("md-nobukti-note-days"), document.getElementById("md-nobukti-note-days2")];
   const noBuktiDayBoxes = Array.from(document.querySelectorAll(".md-nobukti-day"));
   const DAY_LABELS = {0:"Minggu",1:"Senin",2:"Selasa",3:"Rabu",4:"Kamis",5:"Jumat",6:"Sabtu"};
   if(toggleNoBukti && inputNoBuktiTime){
     toggleNoBukti.checked = SETTINGS.noBuktiTransferReminderEnabled !== false;
     inputNoBuktiTime.value = SETTINGS.noBuktiTransferReminderTime || "08:45";
+    // BARU -- ambang jumlah hari (sebelumnya hardcode 7 hari), bisa diatur
+    // manual mis. 3 hari/2 hari. Default TETAP 7 kalau belum pernah diatur
+    // / nilainya tidak valid, supaya perilaku lama tidak berubah.
+    const savedThreshold = Number(SETTINGS.noBuktiTransferReminderThresholdDays) > 0
+      ? Number(SETTINGS.noBuktiTransferReminderThresholdDays) : 7;
+    inputNoBuktiThreshold.value = savedThreshold;
+    noteNoBuktiDaysEls.forEach(el=>{ if(el) el.textContent = savedThreshold; });
     // BARU -- hari aktif (default SEMUA hari, supaya perilaku lama yang
     // belum pernah atur hari tetap sama persis seperti sebelumnya).
     const savedDays = Array.isArray(SETTINGS.noBuktiTransferReminderDays) && SETTINGS.noBuktiTransferReminderDays.length
@@ -11972,6 +12022,14 @@ if ("serviceWorker" in navigator) {
     const saveNoBukti = async ()=>{
       SETTINGS.noBuktiTransferReminderEnabled = toggleNoBukti.checked;
       SETTINGS.noBuktiTransferReminderTime = inputNoBuktiTime.value || "08:45";
+      // Validasi ambang hari: harus bulat & minimal 1 hari -- kalau
+      // kosong/tidak valid, kembalikan ke 7 (default lama) supaya
+      // pengingat tidak diam-diam mati gara-gara nilai aneh.
+      let thresholdDays = Math.round(Number(inputNoBuktiThreshold.value));
+      if(!thresholdDays || thresholdDays < 1) thresholdDays = 7;
+      inputNoBuktiThreshold.value = thresholdDays;
+      noteNoBuktiDaysEls.forEach(el=>{ if(el) el.textContent = thresholdDays; });
+      SETTINGS.noBuktiTransferReminderThresholdDays = thresholdDays;
       let checkedDays = noBuktiDayBoxes.filter(b=>b.checked).map(b=>Number(b.value));
       if(checkedDays.length === 0){
         // Tidak boleh kosong total (peringatan jadi tidak pernah terkirim
@@ -11983,10 +12041,11 @@ if ("serviceWorker" in navigator) {
       SETTINGS.noBuktiTransferReminderDays = checkedDays;
       saveSettings();
       const daysLabel = checkedDays.length === 7 ? "semua hari" : checkedDays.slice().sort().map(d=>DAY_LABELS[d]).join(", ");
-      await confirmMasterDataSave(SETTINGS.noBuktiTransferReminderEnabled ? `Peringatan Bukti Transfer Belum Ada diaktifkan, jam ${SETTINGS.noBuktiTransferReminderTime} WIB, hari: ${daysLabel}.` : "Peringatan Bukti Transfer Belum Ada dimatikan.");
+      await confirmMasterDataSave(SETTINGS.noBuktiTransferReminderEnabled ? `Peringatan Bukti Transfer Belum Ada diaktifkan, kirim setelah lewat ${thresholdDays} hari, jam ${SETTINGS.noBuktiTransferReminderTime} WIB, hari: ${daysLabel}.` : "Peringatan Bukti Transfer Belum Ada dimatikan.");
     };
     toggleNoBukti.addEventListener("change", saveNoBukti);
     inputNoBuktiTime.addEventListener("change", saveNoBukti);
+    inputNoBuktiThreshold.addEventListener("change", saveNoBukti);
     noBuktiDayBoxes.forEach(box=> box.addEventListener("change", saveNoBukti));
   }
 
@@ -14575,8 +14634,52 @@ if ("serviceWorker" in navigator) {
   const csFilterEl = document.getElementById("followup-filter-cs");
   const statusFilterEl = document.getElementById("followup-filter-status");
   const statsGridEl = document.getElementById("followup-stats-grid");
+  const quickFilterChipEl = document.getElementById("followup-quickfilter-chip");
+  const quickFilterChipTextEl = document.getElementById("followup-quickfilter-chip-text");
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
+  // BARU -- filter cepat dari klik kartu ringkasan (Total Customer/Jatuh
+  // Tempo/Hari Ini/Minggu Ini/Belum Cukup Data). null = tidak ada filter
+  // cepat aktif (tampilkan semua, sama seperti klik "Total Customer").
+  // Ini TERPISAH dari dropdown "Semua Status" (statusFilterEl) yang sudah
+  // ada -- keduanya bisa aktif berbarengan (kartu mempersempit lagi hasil
+  // dari keyword/CS/dropdown status).
+  let quickFilter = null;
+  const QUICK_FILTER_LABEL = {
+    jatuh: "🔴 Jatuh Tempo",
+    hariIni: "🟠 Follow Up Hari Ini",
+    minggu: "🟡 Follow Up Minggu Ini",
+    belumCukup: "⚪ Belum Cukup Data"
+  };
+  function cocokQuickFilter(r){
+    if(!quickFilter) return true;
+    if(quickFilter === "jatuh") return r.sisa!==null && r.sisa<0;
+    if(quickFilter === "hariIni") return r.sisa!==null && r.sisa===0;
+    if(quickFilter === "minggu") return r.sisa!==null && r.sisa>=0 && r.sisa<=7;
+    if(quickFilter === "belumCukup") return r.sisa===null;
+    return true;
+  }
+  function updateQuickFilterChip(){
+    if(quickFilter && QUICK_FILTER_LABEL[quickFilter]){
+      quickFilterChipTextEl.textContent = "Filter aktif: " + QUICK_FILTER_LABEL[quickFilter];
+      quickFilterChipEl.classList.add("show");
+    }else{
+      quickFilterChipEl.classList.remove("show");
+    }
+  }
+  function setQuickFilter(key){
+    quickFilter = (quickFilter === key) ? null : key; // klik kartu yg sama lagi -> matikan filter
+    renderFollowUpTable();
+  }
+  statsGridEl.addEventListener("click", (e)=>{
+    const box = e.target.closest(".followup-stat-box.clickable");
+    if(!box) return;
+    setQuickFilter(box.dataset.filter === "total" ? null : box.dataset.filter);
+  });
+  document.getElementById("followup-quickfilter-clear").addEventListener("click", ()=>{
+    quickFilter = null;
+    renderFollowUpTable();
+  });
   // ---- AUTO REFRESH: DIMATIKAN (permintaan user) ----
   // Sebelumnya ada refresh diam-diam tiap 30 detik selama kartu Follow Up
   // terbuka + refresh diam-diam saat tab dibuka lagi. Fungsi startAutoRefresh/
@@ -14810,7 +14913,12 @@ if ("serviceWorker" in navigator) {
 
   // Semua filter dijalankan di sisi BROWSER dari data yang sudah diambil
   // (allRows) -- ganti kata kunci/filter TIDAK memanggil server lagi.
-  function terapkanFilter(){
+  // BARU -- dipecah jadi 2 fungsi: terapkanFilterDasar() (keyword + CS +
+  // dropdown status, TANPA filter cepat dari kartu) dipakai utk hitung
+  // angka di kartu ringkasan (supaya angka di kartu-kartu lain tetap
+  // tampil stabil walau salah satu kartu sedang aktif diklik), sedangkan
+  // terapkanFilter() (dasar + filter cepat) dipakai utk isi tabel.
+  function terapkanFilterDasar(){
     const keyword = searchEl.value.trim().toLowerCase();
     const csPilih = csFilterEl.value;
     const statusPilih = statusFilterEl.value;
@@ -14820,28 +14928,47 @@ if ("serviceWorker" in navigator) {
       (!statusPilih || r.status === statusPilih)
     );
   }
+  function terapkanFilter(){
+    return terapkanFilterDasar().filter(cocokQuickFilter);
+  }
 
-  function renderStatsGrid(rows){
+  function renderStatsGrid(rowsDasar){
     const TODAY = new Date();
-    const total = rows.length;
-    const jatuh = rows.filter(r=> r.sisa!==null && r.sisa<0).length;
-    const minggu = rows.filter(r=> r.sisa!==null && r.sisa>=0 && r.sisa<=7).length;
-    const belumCukup = rows.filter(r=> r.sisa===null).length;
-    // BARU -- kotak ke-5 "Est. Qty Stok Bulan Ini", pola SAMA dgn
+    const total = rowsDasar.length;
+    const jatuh = rowsDasar.filter(r=> r.sisa!==null && r.sisa<0).length;
+    // BARU -- kartu "Follow Up Hari Ini" (sisa hari === 0), diletakkan di
+    // sebelah kiri "Follow Up Minggu Ini". Sengaja tumpang tindih dgn
+    // hitungan "Minggu Ini" (0-7 hari, termasuk hari ini) -- keduanya
+    // memang dimaksudkan sbg sorotan yg beririsan, bukan kategori eksklusif.
+    const hariIni = rowsDasar.filter(r=> r.sisa!==null && r.sisa===0).length;
+    const minggu = rowsDasar.filter(r=> r.sisa!==null && r.sisa>=0 && r.sisa<=7).length;
+    const belumCukup = rowsDasar.filter(r=> r.sisa===null).length;
+    // BARU -- kotak ke-6 "Est. Qty Stok Bulan Ini", pola SAMA dgn
     // stats-grid di RepeatOrder_Calculator.html (total estBln semua
     // customer yang tampil).
-    const totQty = rows.reduce((s,r)=> s + fuHitungPrediksi(r, TODAY).estBln, 0);
+    const totQty = rowsDasar.reduce((s,r)=> s + fuHitungPrediksi(r, TODAY).estBln, 0);
+    // BARU -- kartu klik utk filter cepat tabel di bawahnya. key "total"
+    // = reset (tampilkan semua lagi, sama seperti tidak ada filter aktif).
+    const box = (key, num, lbl, color)=>{
+      const isActive = (key==="total") ? (quickFilter===null) : (quickFilter===key);
+      return `<div class="followup-stat-box clickable${isActive?" active":""}" data-filter="${key}">` +
+        `<div class="num"${color?` style="color:${color};"`:""}>${num}</div>` +
+        `<div class="lbl">${lbl}</div></div>`;
+    };
     statsGridEl.innerHTML =
-      `<div class="followup-stat-box"><div class="num">${total}</div><div class="lbl">Total Customer</div></div>` +
-      `<div class="followup-stat-box"><div class="num" style="color:var(--danger-red);">${jatuh}</div><div class="lbl">🔴 Jatuh Tempo</div></div>` +
-      `<div class="followup-stat-box"><div class="num" style="color:#7b6000;">${minggu}</div><div class="lbl">🟡 Follow Up Minggu Ini</div></div>` +
-      `<div class="followup-stat-box"><div class="num" style="color:#555;">${belumCukup}</div><div class="lbl">⚪ Belum Cukup Data</div></div>` +
+      box("total", total, "Total Customer") +
+      box("jatuh", jatuh, "🔴 Jatuh Tempo", "var(--danger-red)") +
+      box("hariIni", hariIni, "🟠 Follow Up Hari Ini", "#c46b00") +
+      box("minggu", minggu, "🟡 Follow Up Minggu Ini", "#7b6000") +
+      box("belumCukup", belumCukup, "⚪ Belum Cukup Data", "#555") +
       `<div class="followup-stat-box"><div class="num">${fmtNumID(totQty)}</div><div class="lbl">📦 Est. Qty Stok Bulan Ini</div></div>`;
+    updateQuickFilterChip();
   }
 
   function renderFollowUpTable(){
-    const rows = terapkanFilter();
-    renderStatsGrid(rows);
+    const rowsDasar = terapkanFilterDasar();
+    const rows = rowsDasar.filter(cocokQuickFilter);
+    renderStatsGrid(rowsDasar);
     updateStatusLine(rows.length);
 
     const th = (t, w, cls)=> `<th class="${cls||""}" style="border:1px solid var(--line); padding:8px 8px; background:var(--card); text-align:left; position:sticky; top:0;${w?` width:${w};`:""}">${t}</th>`;

@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v287";
+const CACHE_VERSION = "v290";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -135,6 +135,29 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    sampai hari aktif berikutnya baru terkirim (worker sudah disesuaikan).
    SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
    (popup "Perbarui Sekarang").
+   v288 -- kartu ringkasan di menu Follow Up (Total Customer/Jatuh Tempo/
+   Follow Up Minggu Ini/Belum Cukup Data/Est. Qty Stok Bulan Ini) sekarang
+   BISA DIKLIK untuk filter cepat tabel di bawahnya, kartu yang aktif
+   ditandai (border+latar hijau) plus chip "Filter aktif: … / ✕ Hapus
+   filter". Tambah juga kartu baru "🟠 Follow Up Hari Ini" (sisa 0 hari) di
+   sebelah kiri kartu "🟡 Follow Up Minggu Ini". SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang").
+   v289 -- kartu "Peringatan Bukti Transfer Belum Ada" (Master Data ->
+   Tampilan) sekarang punya input angka "Kirim setelah pesanan lewat .. hari"
+   -- sebelumnya ambang batasnya selalu tetap 7 hari (hardcode), sekarang
+   bisa diganti manual (mis. 3 hari, 2 hari) lewat Master Data, dibaca
+   Worker_Rincian_Pemesanan.js (checkAllOrderReminders). Default tetap 7
+   hari kalau belum pernah diatur -- migrasi mundur aman. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang").
+   v290 -- bot Telegram sekarang paham balasan "sudah" di DM Petugas
+   Logistik utk konfirmasi manual resi sudah dikirim (menjawab peringatan
+   "pesanan sudah LUNAS 2+ hari, belum ada resi tercatat") -- lihat
+   handleDmLogistikPengingatSudah di Worker_Rincian_Pemesanan.js. Murni
+   perubahan sisi Worker + teks changelog, tidak ada perubahan tampilan
+   index.html lain. SENGAJA TIDAK dipaksa (bukan darurat/keamanan) --
+   pakai alur normal (popup "Perbarui Sekarang").
    v276 lama sudah dikeluarkan dari Set ini (update itu sudah tersebar
    duluan). ---- */
 const FORCE_ACTIVATE_VERSIONS = new Set([]);
