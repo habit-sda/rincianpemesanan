@@ -5221,6 +5221,33 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           </label>
         </div>
       </div>
+      <div class="md-card" id="md-followup-notif-card">
+        <h3>📞 Notifikasi Follow Up ke CS</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Tiap pagi, tiap CS dapat DM daftar customer MILIKNYA SENDIRI yang jadwal Follow Up-nya (prediksi order berikutnya, dari menu "Follow Up" di atas) jatuh PERSIS hari ini — biar CS tahu siapa yang perlu segera dihubungi tanpa perlu buka menu Follow Up manual tiap hari. Kalau hari ini tidak ada customer yang jadwalnya jatuh hari ini, tidak ada DM terkirim. Customer yang order-nya pernah dicatat sebelum CS-nya tersimpan sebagai ID Telegram (order lama) tidak akan pernah ikut DM ini walau tetap tampil di tabel Follow Up.
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:12px;">
+          <input type="checkbox" id="md-followup-notif-toggle" style="width:18px; height:18px;">
+          <span>Aktifkan Notifikasi Follow Up ke CS</span>
+        </label>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label for="md-followup-notif-time" style="font-size:13.5px; color:var(--ink-soft);">Jam kirim (WIB)</label>
+          <input type="time" id="md-followup-notif-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
+        </div>
+      </div>
+      <div class="md-card" id="md-cslist-card">
+        <h3>Daftar CS</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Dipakai KHUSUS oleh Notifikasi Follow Up di atas — begitu aktif &amp; sudah lewat jam kirim, pesan "Jadwal Follow Up hari ini" (daftar SEMUA customer yang jadwalnya jatuh hari ini, bukan per orang) dikirim ke SEMUA orang di daftar ini sekaligus, gaya sama seperti Daftar Logistik. Isi Telegram ID numerik (bisa didapat lewat bot seperti @userinfobot). Orang yang kebetulan juga terdaftar di Daftar Logistik (tab Ekspedisi) TIDAK akan ikut dikirimi DM ini, walau ditambahkan di sini.
+        </div>
+        <div id="md-cslist-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input type="text" id="md-cslist-name" placeholder="Nama (mis. Fulan)" style="flex:1; min-width:120px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+          <input type="text" inputmode="numeric" id="md-cslist-id" placeholder="Telegram ID (angka)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+        </div>
+        <div class="md-pin-err" id="md-cslist-err"></div>
+        <button class="md-btn primary" id="md-cslist-add" style="margin-top:10px;">+ Tambah CS</button>
+      </div>
       <div class="md-card">
         <h3>Mode Gelap</h3>
         <div class="md-togglerow">
@@ -6971,7 +6998,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", csList:[]};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -7000,6 +7027,8 @@ function loadSettings(){
     if(typeof s.rekapPesananEnabled === "boolean") SETTINGS.rekapPesananEnabled = s.rekapPesananEnabled;
     if(typeof s.rekapPesananHari === "number" && s.rekapPesananHari >= 1 && s.rekapPesananHari <= 25) SETTINGS.rekapPesananHari = s.rekapPesananHari;
     if(typeof s.followUpEnabled === "boolean") SETTINGS.followUpEnabled = s.followUpEnabled;
+    if(typeof s.followUpNotifEnabled === "boolean") SETTINGS.followUpNotifEnabled = s.followUpNotifEnabled;
+    if(typeof s.followUpNotifTime === "string" && s.followUpNotifTime.trim()) SETTINGS.followUpNotifTime = s.followUpNotifTime.trim();
     if(typeof s.noBuktiTransferReminderTime === "string" && s.noBuktiTransferReminderTime.trim()) SETTINGS.noBuktiTransferReminderTime = s.noBuktiTransferReminderTime.trim();
     if(s.stickerReactionsEnabled && typeof s.stickerReactionsEnabled === "object"){
       ["konfirmasi","hoax","deposit","void"].forEach(k=>{
@@ -7009,6 +7038,7 @@ function loadSettings(){
     if(s.stickerCollapsedLabelStyle === "text" || s.stickerCollapsedLabelStyle === "icon") SETTINGS.stickerCollapsedLabelStyle = s.stickerCollapsedLabelStyle;
     if(Array.isArray(s.financeList)) SETTINGS.financeList = s.financeList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
     if(Array.isArray(s.logistikList)) SETTINGS.logistikList = s.logistikList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
+    if(Array.isArray(s.csList)) SETTINGS.csList = s.csList.filter(f=> f && typeof f.name === "string" && typeof f.telegramId === "string");
     if(typeof s.resiCrossCheckThresholdPercent === "number" && s.resiCrossCheckThresholdPercent > 0) SETTINGS.resiCrossCheckThresholdPercent = s.resiCrossCheckThresholdPercent;
     if(typeof s.resiCrossCheckReactionEnabled === "boolean") SETTINGS.resiCrossCheckReactionEnabled = s.resiCrossCheckReactionEnabled;
     if(typeof s.resiNoNameReminderEnabled === "boolean") SETTINGS.resiNoNameReminderEnabled = s.resiNoNameReminderEnabled;
@@ -11786,6 +11816,7 @@ if ("serviceWorker" in navigator) {
     if(window.__refreshAutocompleteFields) window.__refreshAutocompleteFields();
     if(window.__renderFinanceList) window.__renderFinanceList();
     if(window.__renderLogistikList) window.__renderLogistikList();
+    if(window.__renderCsList) window.__renderCsList();
     // Simpan snapshot versi server yang baru saja kita tahu — jadi acuan
     // buat pushMasterDataToServer() nanti (lihat komentar di fungsi itu).
     window.__lastServerSnapshot = JSON.parse(JSON.stringify({ products: PRODUCTS, ekspedisi: EKSPEDISI, settings: SETTINGS }));
@@ -11898,6 +11929,28 @@ if ("serviceWorker" in navigator) {
       applySettingsToDom();
       await confirmMasterDataSave(SETTINGS.followUpEnabled ? "Menu Follow Up diaktifkan di sidebar." : "Menu Follow Up disembunyikan dari sidebar.");
     });
+  }
+
+  /* ---------- toggle + jam: Notifikasi Follow Up ke CS (Tampilan) ----------
+     SAMA pola dgn toggle+jam lain di atas (mis. Info Resi Kemarin) -- murni
+     disimpan ke settings.followUpNotifEnabled/followUpNotifTime, DIBACA &
+     dicek oleh WORKER (checkFollowUpDmNotif), tidak ada elemen DOM app lain
+     yang berubah. BARU -- sebelumnya toggle ini TIDAK ADA sama sekali di
+     UI walau workernya sudah baca field ini, jadi followUpNotifEnabled
+     selalu undefined/"belum pernah diset" dan DM-nya tidak mungkin aktif. */
+  const toggleFollowUpNotif = document.getElementById("md-followup-notif-toggle");
+  const inputFollowUpNotifTime = document.getElementById("md-followup-notif-time");
+  if(toggleFollowUpNotif && inputFollowUpNotifTime){
+    toggleFollowUpNotif.checked = SETTINGS.followUpNotifEnabled === true;
+    inputFollowUpNotifTime.value = SETTINGS.followUpNotifTime || "08:00";
+    const saveFollowUpNotif = async ()=>{
+      SETTINGS.followUpNotifEnabled = toggleFollowUpNotif.checked;
+      SETTINGS.followUpNotifTime = inputFollowUpNotifTime.value || "08:00";
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.followUpNotifEnabled ? `Notifikasi Follow Up ke CS diaktifkan, jam ${SETTINGS.followUpNotifTime} WIB.` : "Notifikasi Follow Up ke CS dimatikan.");
+    };
+    toggleFollowUpNotif.addEventListener("change", saveFollowUpNotif);
+    inputFollowUpNotifTime.addEventListener("change", saveFollowUpNotif);
   }
 
   const toggleStickyFormBtns = document.getElementById("md-toggle-stickyformbtns");
@@ -12667,6 +12720,62 @@ if ("serviceWorker" in navigator) {
 
     renderLogistikList();
     window.__renderLogistikList = renderLogistikList; // dipanggil ulang setelah pull data server
+  })();
+
+  /* ---------- Daftar CS (1 daftar utama, gaya SAMA dgn Daftar Logistik --
+     dipakai worker buat broadcast 1 pesan "Jadwal Follow Up hari ini" ke
+     SEMUA orang di sini, MINUS siapa pun yang juga ada di Daftar
+     Logistik -- lihat checkFollowUpDmNotif). */
+  (function(){
+    const listEl = document.getElementById("md-cslist-list");
+    const nameInput = document.getElementById("md-cslist-name");
+    const idInput = document.getElementById("md-cslist-id");
+    const errEl = document.getElementById("md-cslist-err");
+    const btnAdd = document.getElementById("md-cslist-add");
+    if(!listEl || !btnAdd) return;
+
+    function renderCsList(){
+      if(!Array.isArray(SETTINGS.csList) || !SETTINGS.csList.length){
+        listEl.innerHTML = `<div class="md-note" style="margin:0;">Belum ada CS yang ditambahkan.</div>`;
+        return;
+      }
+      listEl.innerHTML = SETTINGS.csList.map((f, i)=> `
+        <div style="display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:9px; padding:9px 12px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:110px;">
+            <div style="font-weight:700; font-size:13.5px; color:var(--ink);">${(f.name||"").replace(/</g,"&lt;")}</div>
+            <div style="font-size:11.5px; color:var(--ink-soft);">ID: ${(f.telegramId||"").replace(/</g,"&lt;")}</div>
+          </div>
+          <button type="button" class="md-btn danger md-cslist-del-btn" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
+        </div>
+      `).join("");
+      listEl.querySelectorAll(".md-cslist-del-btn").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const idx = parseInt(btn.dataset.idx, 10);
+          SETTINGS.csList.splice(idx, 1);
+          saveSettings();
+          renderCsList();
+          await confirmMasterDataSave("CS dihapus dari daftar.");
+        });
+      });
+    }
+
+    btnAdd.addEventListener("click", async ()=>{
+      const name = nameInput.value.trim();
+      const telegramId = idInput.value.trim();
+      errEl.textContent = "";
+      if(!name){ errEl.textContent = "Nama wajib diisi."; return; }
+      if(!/^\d+$/.test(telegramId)){ errEl.textContent = "Telegram ID harus berupa angka (bukan username)."; return; }
+      if(!Array.isArray(SETTINGS.csList)) SETTINGS.csList = [];
+      if(SETTINGS.csList.some(f=> f.telegramId === telegramId)){ errEl.textContent = "Telegram ID ini sudah ada di daftar."; return; }
+      SETTINGS.csList.push({ name, telegramId });
+      saveSettings();
+      nameInput.value = ""; idInput.value = "";
+      renderCsList();
+      await confirmMasterDataSave("CS \"" + name + "\" ditambahkan.");
+    });
+
+    renderCsList();
+    window.__renderCsList = renderCsList; // dipanggil ulang setelah pull data server
   })();
 
   /* ---------- link Bantuan (Tampilan) ---------- */
