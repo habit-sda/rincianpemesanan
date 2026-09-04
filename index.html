@@ -4540,6 +4540,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <select id="rekap-filter-hari" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
         <option value="">Semua Hari</option>
       </select>
+      <!-- BARU -- filter per nama ekspedisi, pola SAMA dgn dropdown CS/
+           Status/Hari di sampingnya: opsinya diisi ulang otomatis dari data
+           yang benar-benar ada (isiUlangDropdownFilter()), filternya jalan
+           di browser. Saat filter ini AKTIF (bukan "Semua Ekspedisi"),
+           kartu ringkasan #rekap-ekspedisi-summary di bawah ikut muncul. -->
+      <select id="rekap-filter-ekspedisi" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
+        <option value="">Semua Ekspedisi</option>
+      </select>
       <label style="display:flex; align-items:center; gap:6px; font-size:15px; white-space:nowrap;">
         <input type="checkbox" id="rekap-filter-belumInvoice" style="width:18px; height:18px;"> Belum di-Invoice saja
       </label>
@@ -4548,6 +4556,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
          (ikut semua filter aktif) -- pola SAMA persis dgn #rekap-cs-summary
          yang sudah ada (kotak per-CS), cuma dikelompokkan per tanggal. -->
     <div id="rekap-hari-summary" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px;"></div>
+    <!-- BARU -- kartu ringkasan khusus filter Ekspedisi: jumlah customer,
+         total KG, & total Ongkir. HANYA dirender/tampil saat filter
+         Ekspedisi di atas sedang AKTIF (lihat renderRingkasanEkspedisi()). -->
+    <div id="rekap-ekspedisi-summary" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px;"></div>
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:14px;">
       <button class="md-btn" id="rekap-sort-btn" style="white-space:nowrap; height:44px;">↓ Terbaru dulu</button>
       <button class="md-btn" id="rekap-refresh-btn" style="white-space:nowrap; height:44px;">🔄 Muat ulang</button>
@@ -14208,9 +14220,11 @@ if ("serviceWorker" in navigator) {
   const csFilterEl = document.getElementById("rekap-filter-cs");
   const statusFilterEl = document.getElementById("rekap-filter-status");
   const hariFilterEl = document.getElementById("rekap-filter-hari"); // BARU -- filter per hari
+  const ekspedisiFilterEl = document.getElementById("rekap-filter-ekspedisi"); // BARU -- filter per ekspedisi
   const belumInvoiceEl = document.getElementById("rekap-filter-belumInvoice");
   const csSummaryEl = document.getElementById("rekap-cs-summary");
   const hariSummaryEl = document.getElementById("rekap-hari-summary"); // BARU -- ringkasan total qty per hari
+  const ekspedisiSummaryEl = document.getElementById("rekap-ekspedisi-summary"); // BARU -- kartu ringkasan per ekspedisi
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
   let sortDesc = true; // true = terbaru dulu (default, sama dgn urutan dari server)
@@ -14345,6 +14359,7 @@ if ("serviceWorker" in navigator) {
   csFilterEl.addEventListener("change", ()=> renderRekapTable());
   statusFilterEl.addEventListener("change", ()=> renderRekapTable());
   hariFilterEl.addEventListener("change", ()=> renderRekapTable()); // BARU
+  ekspedisiFilterEl.addEventListener("change", ()=> renderRekapTable()); // BARU
   belumInvoiceEl.addEventListener("change", ()=> renderRekapTable());
   sortBtn.addEventListener("click", ()=>{
     sortDesc = !sortDesc;
@@ -14391,13 +14406,19 @@ if ("serviceWorker" in navigator) {
     const hariMap = new Map(); // dateKey -> label
     allRows.forEach(r=> hariMap.set(dateKeyDariRow(r), labelHariDariRow(r)));
     const hariSet = [...hariMap.keys()].sort().reverse();
-    const prevCs = csFilterEl.value, prevStatus = statusFilterEl.value, prevHari = hariFilterEl.value;
+    // BARU -- daftar nama ekspedisi yang BENAR-BENAR ada di data (bukan
+    // daftar tetap EKSPEDISI di Master Data, supaya ekspedisi yang tidak
+    // pernah dipakai dalam jendela hari ini tidak nongol sbg opsi kosong).
+    const ekspedisiSet = [...new Set(allRows.map(r=> r.ekspedisi).filter(v=> v && v !== "-"))].sort();
+    const prevCs = csFilterEl.value, prevStatus = statusFilterEl.value, prevHari = hariFilterEl.value, prevEkspedisi = ekspedisiFilterEl.value;
     csFilterEl.innerHTML = `<option value="">Semua CS</option>` + csSet.map(c=> `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join("");
     statusFilterEl.innerHTML = `<option value="">Semua Status</option>` + statusSet.map(s=> `<option value="${escHtml(s)}">${escHtml(s)}</option>`).join("");
     hariFilterEl.innerHTML = `<option value="">Semua Hari</option>` + hariSet.map(dk=> `<option value="${dk}">${escHtml(hariMap.get(dk))}</option>`).join("");
+    ekspedisiFilterEl.innerHTML = `<option value="">Semua Ekspedisi</option>` + ekspedisiSet.map(e=> `<option value="${escHtml(e)}">${escHtml(e)}</option>`).join("");
     if(csSet.includes(prevCs)) csFilterEl.value = prevCs;
     if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
     if(hariSet.includes(prevHari)) hariFilterEl.value = prevHari;
+    if(ekspedisiSet.includes(prevEkspedisi)) ekspedisiFilterEl.value = prevEkspedisi;
   }
 
   async function fetchAndRenderRekap(opts){
@@ -14455,16 +14476,18 @@ if ("serviceWorker" in navigator) {
     const csPilih = csFilterEl.value;
     const statusPilih = statusFilterEl.value;
     const hariPilih = hariFilterEl.value; // BARU -- filter per hari (value = dateKey YYYY-MM-DD)
+    const ekspedisiPilih = ekspedisiFilterEl.value; // BARU -- filter per ekspedisi
     const belumInvoiceSaja = belumInvoiceEl.checked;
     let rows = allRows.filter(r=>
       (!keyword || (r.customer||"").toLowerCase().includes(keyword)) &&
       (!csPilih || r.cs === csPilih) &&
       (!statusPilih || r.status === statusPilih) &&
       (!hariPilih || dateKeyDariRow(r) === hariPilih) &&
+      (!ekspedisiPilih || r.ekspedisi === ekspedisiPilih) &&
       (!belumInvoiceSaja || !r.manualInvoiced)
     );
     rows.sort((a,b)=> sortDesc ? b.createdAtMs - a.createdAtMs : a.createdAtMs - b.createdAtMs);
-    return { rows, kodeList, keyword };
+    return { rows, kodeList, keyword, ekspedisiPilih };
   }
 
   // BARU -- ringkasan mini per-CS di atas tabel, dari data yang SEDANG
@@ -14507,6 +14530,36 @@ if ("serviceWorker" in navigator) {
       .join("");
   }
 
+  // BARU (permintaan: filter per ekspedisi + kartu ringkasan) -- kartu
+  // ringkasan khusus saat filter Ekspedisi SEDANG AKTIF (dipilih salah satu
+  // nama, bukan "Semua Ekspedisi"): jumlah customer yang pakai ekspedisi
+  // itu, total KG, & total Ongkir -- dari data yang SEDANG TAMPIL (rows
+  // sudah ikut semua filter lain juga: search/CS/Status/Hari/Belum-Invoice,
+  // BUKAN cuma filter Ekspedisi-nya sendiri). Kartu ini disembunyikan total
+  // (innerHTML dikosongkan) kalau filter Ekspedisi = "Semua Ekspedisi",
+  // supaya tidak double dengan baris TOTAL di tabel yang sudah ada.
+  // "Qty customer" = jumlah NAMA CUSTOMER UNIK (bukan jumlah baris/pesanan
+  // -- 1 customer yang order 2x dgn ekspedisi yang sama cuma dihitung 1),
+  // dicocokkan case-insensitive supaya "Budi"/"budi" tidak ganda.
+  // Total Ongkir dijumlah dari r.ongkirNum (field BARU dari Worker,
+  // estimasiOngkirRupiah() -- prioritas ongkirTotal > ongkirManual >
+  // ratePerKg x berat). Pesanan lama yang belum punya field ini otomatis
+  // ongkirNum-nya 0, jadi tidak bikin salah hitung, cuma totalnya kurang
+  // representatif utk pesanan lama itu (dicatat di label kartu).
+  function renderRingkasanEkspedisi(rows, ekspedisiPilih){
+    if(!ekspedisiPilih){ ekspedisiSummaryEl.innerHTML = ""; return; }
+    const customerSet = new Set(rows.map(r=> (r.customer||"").trim().toLowerCase()).filter(Boolean));
+    const totalKg = rows.reduce((s,r)=> s + (r.kgNum||0), 0);
+    const totalOngkir = rows.reduce((s,r)=> s + (r.ongkirNum||0), 0);
+    const adaOngkirKosong = rows.some(r=> !r.ongkirNum);
+    const kartu = (label, nilai)=> `<div style="background:var(--card); border:1px solid var(--primary-green); border-radius:9px; padding:8px 14px; font-size:14px;"><b>${escHtml(label)}</b>: ${nilai}</div>`;
+    ekspedisiSummaryEl.innerHTML =
+      `<div style="width:100%; font-size:13px; color:var(--ink-soft);">📦 Ringkasan ekspedisi "${escHtml(ekspedisiPilih)}"${adaOngkirKosong ? " — beberapa pesanan lama belum punya data Ongkir, dihitung 0" : ""}:</div>` +
+      kartu("Qty Customer", customerSet.size) +
+      kartu("Total KG", Math.round(totalKg*100)/100) +
+      kartu("Total Ongkir", rupiah(totalOngkir)); // rupiah() = fungsi format Rp global yang sudah ada di app ini
+  }
+
   // BARU -- ringkas teks status yang panjang (mis. "Cicilan — Rp 500.000
   // dari Rp 1.500.000, kurang Rp 1.000.000") jadi INTI-nya saja utk tabel
   // ini (rincian lengkapnya tetap ada kalau klik nama -> /status). Emoji
@@ -14524,9 +14577,10 @@ if ("serviceWorker" in navigator) {
   }
 
   function renderRekapTable(){
-    const { rows, kodeList, keyword } = terapkanFilter();
+    const { rows, kodeList, keyword, ekspedisiPilih } = terapkanFilter();
     renderRingkasanCs(rows);
     renderRingkasanHari(rows);
+    renderRingkasanEkspedisi(rows, ekspedisiPilih); // BARU
 
     updateStatusLine(rows.length);
 
@@ -14694,13 +14748,13 @@ if ("serviceWorker" in navigator) {
   document.getElementById("rekap-export-csv-btn").addEventListener("click", ()=>{
     const { rows, kodeList } = terapkanFilter();
     if(!rows.length){ alert("Tidak ada data untuk diekspor."); return; }
-    const header = ["No","Hari","Tanggal/Jam","CS","Customer", ...kodeList, "Total Qty","Status","KG","Ekspedisi","Resi","Sudah di Invoice"];
+    const header = ["No","Hari","Tanggal/Jam","CS","Customer", ...kodeList, "Total Qty","Status","KG","Ekspedisi","Ongkir","Resi","Sudah di Invoice"];
     const csvEscape = (v)=> `"${String(v).replace(/"/g,'""')}"`;
     const lines = [header.map(csvEscape).join(",")];
     rows.forEach((r,i)=>{
       const row = [i+1, r.hari, r.tanggalJam, r.cs, r.customer,
         ...kodeList.map(k=> (r.items && r.items[k]) || 0),
-        r.totalQty||0, r.status, r.kg, r.ekspedisi, r.resi ? "Ya" : "Tidak", r.manualInvoiced ? "Ya" : "Tidak"];
+        r.totalQty||0, r.status, r.kg, r.ekspedisi, r.ongkirNum ? rupiah(r.ongkirNum) : "-", r.resi ? "Ya" : "Tidak", r.manualInvoiced ? "Ya" : "Tidak"];
       lines.push(row.map(csvEscape).join(","));
     });
     const blob = new Blob(["\uFEFF" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" }); // \uFEFF -- BOM, biar Excel baca huruf non-ASCII (é, dst) dgn benar

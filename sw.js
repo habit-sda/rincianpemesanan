@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v292";
+const CACHE_VERSION = "v293";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -18,6 +18,20 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    PERINGATAN: user yang lagi isi form/nota bisa ke-reload tiba-tiba begitu
    halaman ini aktif (progres yang belum disimpan bisa hilang) — pakai
    fitur ini seperlunya saja, bukan kebiasaan tiap deploy.
+   v293 -- menu Rekap Pesanan sekarang punya filter "Ekspedisi" (dropdown
+   baru, pola sama dgn filter CS/Status/Hari yang sudah ada) -- pilih 1
+   nama ekspedisi, tabel otomatis ikut tersaring. Saat filter ini aktif,
+   muncul kartu ringkasan baru: Qty Customer (jumlah nama unik), Total
+   KG, & Total Ongkir dari pesanan yang sedang tampil. Worker_Rincian_
+   Pemesanan.js juga ikut diperbarui: tiap baris Rekap Pesanan sekarang
+   ikut kirim nilai Ongkir (Rp) hasil estimasi (ongkirTotal > ongkirManual
+   > ratePerKg x berat) -- TIDAK menambah kuota baca/tulis KV sama sekali
+   (angka ini dihitung dari data pesanan yang memang sudah kebaca, bukan
+   query terpisah). Kolom Ongkir ikut ditambahkan di ekspor CSV. Pesanan
+   lama (sebelum update ini) belum punya data Ongkir tersimpan, jadi
+   dihitung 0 -- ditandai di kartu ringkasan, bukan bug. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang").
    v286 -- Master Data Customer: tombol "🗑️ Hapus" nama customer sekarang
    BENERAN BERFUNGSI (sebelumnya endpoint /customer-names/delete belum
    ada di worker, jadi tombol ini gagal/error). Sekarang hapus 1 nama di
