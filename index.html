@@ -8522,9 +8522,11 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   let pendingRevisiTargetMessageId = null; // diisi kalau user sudah pilih dari daftar kandidat (ronde ke-2)
 
   /* ---------- Rekomendasi Nama Customer (riwayat dari server) ----------
-     Muncul begitu CS ketik minimal 3 huruf. Kalau ada kata "NEW" di
-     belakang nama (mis. "DESY (INDRAMAYU) NEW"), kata itu dibuang dari
-     rekomendasi — soalnya "NEW" cuma berlaku 1x buat pesanan pertama. */
+     BARU (permintaan "ubah sugesti jika ketik 1 huruf") -- SEBELUMNYA
+     baru muncul mulai 3 huruf, sekarang muncul mulai 1 huruf saja. Kalau
+     ada kata "NEW" di belakang nama (mis. "DESY (INDRAMAYU) NEW"), kata
+     itu dibuang dari rekomendasi — soalnya "NEW" cuma berlaku 1x buat
+     pesanan pertama. */
   let nameHistory = [];
   async function loadNameHistory(){
     if(!MASTER_DATA_WORKER_URL) return;
@@ -8543,7 +8545,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   }
   function renderSuggestions(query){
     const q = query.trim().toUpperCase();
-    if(q.length < 3){ hideSuggestions(); return; }
+    if(q.length < 1){ hideSuggestions(); return; }
     const seen = new Set();
     const matches = [];
     for(const raw of nameHistory){

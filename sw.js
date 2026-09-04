@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v293";
+const CACHE_VERSION = "v294";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
@@ -18,6 +18,13 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    PERINGATAN: user yang lagi isi form/nota bisa ke-reload tiba-tiba begitu
    halaman ini aktif (progres yang belum disimpan bisa hilang) — pakai
    fitur ini seperlunya saja, bukan kebiasaan tiap deploy.
+   v294 -- fitur "Kirim Bukti Nota ke grup Telegram": daftar sugesti nama
+   customer (riwayat dari server) sekarang muncul begitu ketik 1 huruf
+   saja (SEBELUMNYA baru muncul mulai 3 huruf). Perilaku lain tidak
+   berubah (tetap cocokkan ke riwayat nama, tetap buang tag "NEW" di
+   akhir nama, tetap maksimal 6 hasil ditampilkan). SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang").
    v293 -- menu Rekap Pesanan sekarang punya filter "Ekspedisi" (dropdown
    baru, pola sama dgn filter CS/Status/Hari yang sudah ada) -- pilih 1
    nama ekspedisi, tabel otomatis ikut tersaring. Saat filter ini aktif,
