@@ -4,8 +4,29 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v294";
+const CACHE_VERSION = "v296";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v296 -- index.html digabung ulang dari 2 jalur perubahan yang sempat
+   berkembang terpisah: (1) kartu "Kesehatan Durable Object (Dedupe)" di
+   Master Data -- status DO ORDER_LOCKS, pesan error asli, fallback ke KV,
+   dari sisi user; digabung dgn (2) tampilan KARTU mobile utk Rekap
+   Pesanan & Follow Up + pintu masuk "Aksi cepat" di Beranda (v295, lihat
+   catatan di bawah). Murni penggabungan, tidak ada fitur yang saling
+   menimpa/terhapus. SENGAJA TIDAK dipaksa (bukan darurat/keamanan) --
+   pakai alur normal (popup "Perbarui Sekarang"). */
+/* v295 -- menu "Rekap Pesanan" & "Follow Up" sekarang punya tampilan KARTU
+   khusus layar mobile (sebelumnya cuma tabel dgn scroll horizontal spt di
+   desktop, jadi kedua menu ini efektif tidak kepakai di HP karena memang
+   belum ada pintu masuknya di sana). Ditambahkan juga 2 tombol baru di
+   Beranda > "Aksi cepat" (khusus tampil di mobile, DISEMBUNYIKAN lagi di
+   desktop lewat CSS supaya tidak dobel dgn menu yang sudah ada di
+   sidebar) sebagai pintu masuk ke kedua menu ini di HP -- sebelumnya
+   sama sekali tidak bisa dibuka dari mobile karena sidebar cuma muncul
+   di layar ≥901px. Data yang ditampilkan di kartu SAMA PERSIS dgn tabel
+   (dibaca dari fungsi render yang sama), termasuk tombol toggle Invoice
+   di Rekap Pesanan & tombol "Hubungi" cepat di Follow Up. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
 /* ---- PAKSA UPDATE (SEKALI PAKAI) ----
    Versi yang tercantum di sini akan langsung aktif sendiri begitu ter-install
    (skipWaiting otomatis) TANPA menunggu user klik "Perbarui Sekarang" di
