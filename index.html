@@ -5808,6 +5808,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <input type="text" id="kt-customer-name" class="kt-input" placeholder="Isi nama customer" autocomplete="off" style="text-transform:uppercase;">
           <div id="kt-name-suggest" hidden style="position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:220px;overflow-y:auto;"></div>
         </div>
+        <!-- BARU (permintaan "peringatan customer sudah terdaftar") --
+             CUMA peringatan (tidak memblokir kirim), muncul kalau nama yang
+             sedang diketik punya kemiripan tinggi (9 karakter berurutan yang
+             sama) dengan salah satu nama di riwayat Master Nama Pelanggan. -->
+        <p id="kt-name-duplicate-warning" class="kt-hint" hidden style="margin-top:8px;background:#fff6e0;border:1px solid #e0a800;border-radius:8px;padding:8px 10px;color:var(--ink);"></p>
         <!-- BARU -- saran ekspedisi berdasarkan riwayat customer ini (GET
              /customer-rate). CUMA muncul kalau ekspedisi tercatat di
              riwayat BEDA dari yang sedang dipilih di form -- kalau sudah
@@ -8543,6 +8548,51 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     suggestBox.hidden = true;
     suggestBox.innerHTML = "";
   }
+
+  /* ---------- BARU (permintaan "peringatan customer sudah terdaftar")
+     ---------- Beda dari renderSuggestions (yang mensyaratkan seluruh
+     query jadi substring nama riwayat, cocok utk autocomplete biasa),
+     cek ini lebih longgar: kalau ADA 9 karakter BERURUTAN yang identik
+     (case-insensitive) antara nama yang sedang diketik dengan SALAH SATU
+     nama di riwayat Master Nama Pelanggan, dianggap "kemungkinan sudah
+     terdaftar" -- menangkap kasus customer yang sama tapi diketik agak
+     beda (spasi tambahan, kata di awal/akhir beda) yang tidak akan
+     ketemu dgn cek "includes" biasa. HANYA peringatan, TIDAK memblokir
+     apa pun (tidak menonaktifkan tombol kirim, dsb). ---------- */
+  const dupWarningEl = document.getElementById("kt-name-duplicate-warning");
+  const DUP_MATCH_LEN = 9;
+  function hasIdenticalRun(a, b, len){
+    if(a.length < len || b.length < len) return false;
+    for(let i = 0; i + len <= a.length; i++){
+      if(b.indexOf(a.slice(i, i + len)) !== -1) return true;
+    }
+    return false;
+  }
+  function findRegisteredNameMatch(query){
+    // Spasi berlebih dirapikan dulu (mis. "BU   WIWIK" vs "BU WIWIK")
+    // supaya perbedaan spasi tidak bikin jendela 9-karakternya geser dan
+    // gagal ketemu padahal isinya sama.
+    const q = query.trim().toUpperCase().replace(/\s+/g, " ");
+    if(q.length < DUP_MATCH_LEN) return null;
+    for(const raw of nameHistory){
+      const clean = stripNewTag(raw).toUpperCase().replace(/\s+/g, " ");
+      if(!clean) continue;
+      if(hasIdenticalRun(q, clean, DUP_MATCH_LEN)) return stripNewTag(raw);
+    }
+    return null;
+  }
+  function hideDuplicateWarning(){
+    if(!dupWarningEl) return;
+    dupWarningEl.hidden = true;
+    dupWarningEl.textContent = "";
+  }
+  function checkDuplicateNameWarning(query){
+    if(!dupWarningEl) return;
+    const matched = findRegisteredNameMatch(query);
+    if(!matched){ hideDuplicateWarning(); return; }
+    dupWarningEl.innerHTML = `⚠️ Customer ini kemungkinan <b>sudah terdaftar</b> sebagai "${escHtml(matched)}" -- cek dulu sebelum lanjut (cuma peringatan, tidak menghalangi kirim).`;
+    dupWarningEl.hidden = false;
+  }
   function renderSuggestions(query){
     const q = query.trim().toUpperCase();
     if(q.length < 1){ hideSuggestions(); return; }
@@ -8568,6 +8618,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         nameInput.value = matches[i];
         hideSuggestions();
         updateSendBtnState();
+        checkDuplicateNameWarning(nameInput.value); // BARU -- nama dipilih dari daftar (persis nama lama), wajar langsung kena peringatan
         checkEkspedisiSuggestion(); // BARU -- nama dipilih dari daftar, langsung cek saran ekspedisinya
       });
     });
@@ -8765,6 +8816,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     nameInput.value = nameInput.value.toUpperCase();
     nameInput.setSelectionRange(pos, pos);
     renderSuggestions(nameInput.value);
+    checkDuplicateNameWarning(nameInput.value);
     scheduleAutosave();
     // BARU -- cek saran ekspedisi, di-debounce 500ms (jangan tiap huruf)
     clearTimeout(ekspedisiSuggestTimer);
@@ -8777,7 +8829,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     clearTimeout(ekspedisiSuggestTimer);
     checkEkspedisiSuggestion(); // BARU -- cek sekali lagi begitu selesai ngetik (blur)
   });
-  nameInput.addEventListener("focus", ()=> renderSuggestions(nameInput.value));
+  nameInput.addEventListener("focus", ()=>{ renderSuggestions(nameInput.value); checkDuplicateNameWarning(nameInput.value); });
 
   let isSending = false;
   function updateSendBtnState(){
@@ -8799,6 +8851,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     refreshSenderPreview();
     updateSendBtnState();
     hideSuggestions();
+    hideDuplicateWarning(); // BARU -- reset dulu, popup baru dibuka blm tentu relevan lagi
     hideEkspedisiSuggest(); // BARU -- reset dulu, cek ulang di bawah setelah nama ada isinya
     if(revisiCheck) revisiCheck.checked = false;
     resetRevisiPicker();
@@ -8915,7 +8968,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       showMsg("Bukti untuk \"" + customerName + "\" terkirim ke grup Telegram.");
       clearTimeout(draftTimer);
       resetRevisiPicker();
-      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); }, 900);
+      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); hideDuplicateWarning(); }, 900);
     }catch(e){
       statusEl.textContent = "Gagal mengirim: " + (e.message || e);
       statusEl.style.color = "var(--danger-red)";
