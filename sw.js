@@ -4,8 +4,51 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v302";
+const CACHE_VERSION = "v305";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v305 -- Optimasi performa: html2canvas (library ~200KB, sebelumnya
+   di-load BLOCKING lewat <script src> di <head> -- diunduh & di-parse
+   di SETIAP app dibuka walau cuma dipakai saat generate gambar
+   nota/kwitansi) sekarang LAZY-LOAD lewat ensureHtml2Canvas() -- baru
+   diunduh persis pas pertama kali dipakai, dipanggil paralel dengan
+   kerja lain (pre-cache foto produk, susun HTML nota) supaya tidak
+   nambah jeda terasa. Ditambah <link rel="preconnect"> ke
+   cdnjs.cloudflare.com & fonts.gstatic.com supaya koneksi ke domain
+   eksternal itu sudah "disiapkan" browser lebih awal, bukan nunggu
+   DNS+TLS baru pas file-nya dibutuhkan. Efeknya kerasa di app dibuka
+   PERTAMA kali / abis update -- Beranda & pindah antar menu SUDAH
+   ringan dari sananya (cuma toggle CSS antar panel, bukan render
+   ulang), jadi ini murni percepat proses paling awal (download+parse
+   sebelum app siap dipakai sama sekali). SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Versi Baru
+   Tersedia"). */
+/* v304 -- Nama aplikasi diganti dari "Habit" jadi "Rp" DI SEBAGIAN
+   tempat saja (bukan rebranding total): judul tab browser, teks logo
+   Beranda, judul file saat share Rincian Pemesanan/Kwitansi, dan
+   field "name"/"short_name"/"description" di manifest.json (penentu
+   nama saat di-install di Android/Chrome/desktop -- utk iOS sudah
+   lebih dulu "Rp" sejak versi 2.24, lihat Riwayat Update). SENGAJA
+   TETAP "Habit" (permintaan eksplisit, tidak ikut diganti): judul +
+   logo di sidebar (blok "Habit / Halawa Bintang Utama" atas sidebar),
+   dan footer utama tempat gestur PIN rahasia disentuh 3x -- termasuk
+   keterangannya di Master Data. Juga TIDAK diganti (murni identifier
+   internal, tidak pernah tampil ke user): nama file
+   habit-logo.png/habit-hero.png, nama class CSS habit-sidebar-*, dan
+   prefix cache "habit-" di CACHE_NAME (variabel ini). SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Versi
+   Baru Tersedia"). */
+/* v303 -- App Shortcuts: 2 pintasan baru "Penjualan (Grosir)" & "Custom"
+   yang muncul saat long-press ikon app di homescreen Android/Chrome
+   (dibaca dari manifest.json field "shortcuts", url ?shortcut=penjualan
+   / ?shortcut=custom). index.html menambahkan loader kecil di akhir
+   file (sebelum </body>) yang tinggal memicu klik tombol [data-open-tab]
+   yang SUDAH ADA di Beranda -- tidak ada logic navigasi baru. Ikon
+   pintasan (icon-grosir-192.png, icon-custom-192.png) identik dengan
+   ikon lingkaran hijau/biru di kartu Beranda, ditambahkan ke
+   CORE_ASSETS supaya ikut ke-cache offline. Tidak berlaku di iOS Safari
+   (keterbatasan WebKit, tidak mendukung shortcut PWA). SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Versi
+   Baru Tersedia"). */
 /* v302 -- Kunci-Edit di 6 bagian Master Data (Ekspedisi&Logistik,
    Tampilan, Rumus, Keamanan, Finance, Master Nama Pelanggan), pola sama
    spt "Daftar Produk" -- terkunci default, wajib "Mode Edit" dulu utk
@@ -255,7 +298,9 @@ const CORE_ASSETS = [
   "./icon-180x180.png",
   "./icon-32x32.png",
   "./habit-logo.png",
-  "./habit-hero.png"
+  "./habit-hero.png",
+  "./icon-grosir-192.png",
+  "./icon-custom-192.png"
 ];
 /* ---------- INSTALL: simpan app-shell ke cache ---------- */
 self.addEventListener("install", (event) => {

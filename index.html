@@ -119,10 +119,18 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
-<title>Habit — Rincian Pemesanan (Halawa Bintang Utama)</title>
+<title>Rp — Rincian Pemesanan (Halawa Bintang Utama)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<!-- html2canvas SENGAJA TIDAK di-load di sini lagi (dulu blocking <script src>,
+     ~200KB kepaksa didownload+parse setiap kali app dibuka, padahal cuma
+     dipakai saat generate gambar nota/kwitansi). Sekarang di-load lazy lewat
+     ensureHtml2Canvas() -- lihat definisinya di dekat renderCanvas() --
+     baru diunduh persis sebelum dipakai pertama kali. Cache-first sw.js
+     tetap menyimpan file ini setelah unduhan pertama, jadi pemakaian
+     berikutnya tetap instan dari cache, bukan network lagi. -->
 <style>
   :root{
     /* Fallback 100vh biasa untuk browser normal / sebelum script Telegram
@@ -4426,7 +4434,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       Kwitansi
     </button>
   </nav>
-  <div class="habit-sidebar-version">Habit · versi <span id="sb-app-version">2.24.9</span></div>
+  <div class="habit-sidebar-version">Rp · versi <span id="sb-app-version">2.24.9</span></div>
 </aside>
 <div class="wrap">
 
@@ -4453,7 +4461,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div class="home-topbar">
       <div class="home-logo">
         <img src="habit-logo.png" alt="">
-        <span class="home-logo-text">Habit</span>
+        <span class="home-logo-text">Rp</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <button type="button" id="btn-theme-open-mobile" class="theme-header-btn theme-feature-ui" hidden aria-label="Ganti tema tampilan">
@@ -8535,8 +8543,28 @@ function getTabProductImageUrls(tab){
 }
 
 let _renderCanvasQueue = Promise.resolve();
+/* ---- Lazy-load html2canvas (sekitar 200KB) -- cuma diunduh SEKALI, PERSIS
+   sebelum pertama kali dibutuhkan (generate gambar nota/kwitansi), bukan
+   lagi di setiap app dibuka. Dipanggil PARALEL dengan kerja lain yang
+   tidak butuh html2canvas (pre-cache foto produk, membangun HTML nota)
+   supaya waktu tunggunya tumpang-tindih, baru benar2 di-await tepat
+   sebelum baris html2canvas(...) dipanggil. ---- */
+let _html2canvasLoading = null;
+function ensureHtml2Canvas(){
+  if(typeof window.html2canvas === "function") return Promise.resolve();
+  if(_html2canvasLoading) return _html2canvasLoading;
+  _html2canvasLoading = new Promise((resolve, reject)=>{
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+    s.onload = () => resolve();
+    s.onerror = () => { _html2canvasLoading = null; reject(new Error("Gagal memuat html2canvas -- cek koneksi internet")); };
+    document.head.appendChild(s);
+  });
+  return _html2canvasLoading;
+}
 function renderCanvas(){
   const run = async () => {
+    const html2canvasReady = ensureHtml2Canvas(); // mulai unduh paralel, belum diblokir
     const tab = document.querySelector(".tab-btn.active").dataset.tab;
     const holder = document.getElementById("print-holder");
     const useV2 = getNotaDesignPref() === "baru";
@@ -8551,6 +8579,7 @@ function renderCanvas(){
     // jeda layout ini cukup dipersingkat (dari 50ms) tanpa bikin nota
     // kepotong/salah ukur.
     await new Promise(r=>setTimeout(r, 16));
+    await html2canvasReady; // baru ditunggu tepat sebelum dipakai di bawah
     const target = holder.querySelector(useV2 ? ".pnota2-v3" : ".pnota");
     const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:1, useCORS:true, logging:false});
     holder.innerHTML = "";
@@ -8594,7 +8623,7 @@ document.getElementById("btn-share").addEventListener("click", async ()=>{
     const file = new File([blob], `nota-halawa-${tab}-${Date.now()}.png`, {type:"image/png"});
 
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file], title:"Rincian Pemesanan (Habit)"});
+      await navigator.share({files:[file], title:"Rincian Pemesanan (Rp)"});
       showMsg("Dialog share terbuka — pilih WhatsApp/chat tujuan.");
     } else if(navigator.share){
       // sebagian browser lama punya navigator.share tapi tidak dukung file
@@ -10197,9 +10226,11 @@ document.addEventListener("keydown", (e)=>{
     // supaya tidak tumpang tindih kalau kebetulan ada proses render lain
     // yang memakai #print-holder di waktu bersamaan.
     const run = async () => {
+      const html2canvasReady = ensureHtml2Canvas(); // mulai unduh paralel, belum diblokir
       const holder = document.getElementById("print-holder");
       holder.innerHTML = buildPrintKwitansi(data);
       await new Promise(r=>setTimeout(r, 50));
+      await html2canvasReady; // baru ditunggu tepat sebelum dipakai di bawah
       const target = holder.querySelector(".pkwitansi");
       const canvas = await html2canvas(target, {backgroundColor:"#ffffff", scale:2, useCORS:true});
       holder.innerHTML = "";
@@ -10271,7 +10302,7 @@ document.addEventListener("keydown", (e)=>{
       const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
       const file = new File([blob], `kwitansi-${(data.nama||"tanpa-nama").replace(/[^a-z0-9]+/gi,"-")}-${Date.now()}.png`, {type:"image/png"});
       if(navigator.canShare && navigator.canShare({files:[file]})){
-        await navigator.share({files:[file], title:"Kwitansi (Habit)"});
+        await navigator.share({files:[file], title:"Kwitansi (Rp)"});
         statusEl.textContent = "Dialog share terbuka — pilih WhatsApp/chat tujuan."; statusEl.style.color = "var(--primary-green)";
       } else {
         downloadKwitansiCanvas(canvas, data.nama);
@@ -16312,6 +16343,31 @@ if ("serviceWorker" in navigator) {
       syncBackButtonVisibility();
     }catch(e){
       console.log("Telegram BackButton init dilewati:", e);
+    }
+  })();
+</script>
+
+<script>
+  /* ============================================================
+     PINTASAN APP SHORTCUTS (long-press ikon di homescreen HP)
+     Cuma 2: Penjualan (Grosir) & Custom -- dibaca dari query string
+     ?shortcut=... yang dikirim manifest.json (field "shortcuts").
+     SENGAJA ditaruh di paling akhir file (sebelum </body>) supaya
+     tombol [data-open-tab] (yang memicu openTab()) dijamin sudah
+     terpasang duluan. Tidak menyentuh logic navigasi yang sudah ada
+     sama sekali -- cuma memicu klik tombol yang SUDAH ADA di Beranda,
+     persis pola yang dipakai blok tombol Back Telegram di atasnya.
+     ============================================================ */
+  (function(){
+    try{
+      const shortcut = new URLSearchParams(location.search).get("shortcut");
+      if(shortcut !== "penjualan" && shortcut !== "custom") return;
+      setTimeout(function(){
+        const btn = document.querySelector('[data-open-tab="'+shortcut+'"]');
+        if(btn) btn.click();
+      }, 50); // delay kecil -- pastikan semua event listener sempat terpasang
+    }catch(e){
+      console.log("Pintasan shortcut dilewati:", e);
     }
   })();
 </script>

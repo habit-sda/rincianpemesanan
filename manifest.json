@@ -1,7 +1,7 @@
 {
-  "name": "Habit — Halawa Bintang Utama",
-  "short_name": "Habit",
-  "description": "Habit — kalkulator nota pesanan Halawa Bintang Utama.",
+  "name": "Rp — Halawa Bintang Utama",
+  "short_name": "Rp",
+  "description": "Rp — kalkulator nota pesanan Halawa Bintang Utama.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -92,6 +92,26 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Penjualan (Grosir)",
+      "short_name": "Grosir",
+      "description": "Harga & diskon otomatis mengikuti jumlah pesanan",
+      "url": "./index.html?shortcut=penjualan",
+      "icons": [
+        { "src": "icon-grosir-192.png", "sizes": "192x192", "type": "image/png" }
+      ]
+    },
+    {
+      "name": "Custom",
+      "short_name": "Custom",
+      "description": "Isi item bebas satu per satu, diskon diatur manual",
+      "url": "./index.html?shortcut=custom",
+      "icons": [
+        { "src": "icon-custom-192.png", "sizes": "192x192", "type": "image/png" }
+      ]
     }
   ]
 }
