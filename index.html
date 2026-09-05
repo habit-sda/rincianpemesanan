@@ -1100,6 +1100,41 @@
     .fu-badge.b{background:#e3f0fb; color:#1f4e78;}
     .fu-badge.g{background:#e6f4ea; color:var(--primary-green);}
     .fu-badge.gr{background:#ececec; color:#555;}
+
+    /* ============================================================
+       BARU -- versi KARTU (bukan tabel) khusus layar mobile (≤700px)
+       utk "Rekap Pesanan" & "Follow Up". Tabel aslinya (dgn scroll
+       horizontal) tetap dipakai apa adanya di desktop; di mobile tabel
+       disembunyikan & kartu ini yang tampil, datanya SAMA PERSIS (dibaca
+       dari render function yang sama), cuma tata letaknya beda supaya
+       tidak perlu geser kanan-kiri di layar sempit.
+       ============================================================ */
+    .rekap-mobile-cards, .followup-mobile-cards{display:none;}
+    @media(max-width:700px){
+      #rekap-table-wrap{display:none;}
+      #followup-table-wrap{display:none;}
+      .rekap-mobile-cards, .followup-mobile-cards{display:flex; flex-direction:column; gap:10px;}
+    }
+    .rc-card{border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--paper, #fff);}
+    .rc-card.void{background:#fdecea;}
+    .rc-card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+    .rc-card-nama{font-weight:700; font-size:15px;}
+    .rc-card-sub{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+    .rc-card-mid{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:10px; padding-top:8px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-soft);}
+    .rc-card-mid b{color:var(--ink);}
+    .rc-card-bottom{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:8px;}
+
+    /* BARU -- kartu Follow Up mobile: gabungan Desain "stat + CTA Perlu
+       Dihubungi" (bagian atas halaman, sudah ada lewat #followup-stats-grid
+       & #followup-contact-btn, TIDAK diubah) dengan Desain "kartu +
+       tombol hubungi cepat" (kartu per customer ini). */
+    .fc-card{display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--paper, #fff); cursor:pointer;}
+    .fc-card.urgent{border-color:#f0997b;}
+    .fc-avatar{width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; background:var(--primary-green); flex-shrink:0;}
+    .fc-info{flex:1; min-width:0;}
+    .fc-nama{font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .fc-sub{font-size:12px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .fc-hubungi{flex-shrink:0; width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:var(--paper,#fff); display:flex; align-items:center; justify-content:center; font-size:16px; text-decoration:none;}
     /* BARU -- kartu "Bagian A/B/C" di popup detail Follow Up, pola SAMA
        dgn tab "Detail Customer" di RepeatOrder_Calculator.html, supaya
        fiturnya identik (parameter, prediksi 8 order, prediksi stok). */
@@ -1273,6 +1308,18 @@
     .home-actionrow.tgid .home-actionrow-label{color:#546e7a;}
     .home-actionrow.kwitansi .home-actionrow-icon{background:#c9860a;}
     .home-actionrow.kwitansi .home-actionrow-label{color:#c9860a;}
+    .home-actionrow.rekap .home-actionrow-icon{background:#0f6e56;}
+    .home-actionrow.rekap .home-actionrow-label{color:#0f6e56;}
+    .home-actionrow.followup .home-actionrow-icon{background:#1976d2;}
+    .home-actionrow.followup .home-actionrow-label{color:#1976d2;}
+    /* BARU -- "Rekap Pesanan" & "Follow Up" di "Aksi cepat" KHUSUS mobile
+       (di desktop menu ini sudah ada di sidebar kiri, jadi tidak perlu
+       dobel). !important supaya tetap tersembunyi di desktop walau toggle
+       Master Data > Tampilan sedang aktif (yang cuma urus tampil/tidaknya
+       DI MOBILE, bukan ikut memaksa muncul di desktop). */
+    @media (min-width:901px){
+      #home-link-rekap, #home-link-followup{display:none !important;}
+    }
     .home-actionrow.reset{border:1.5px solid #f2b3ab;}
     .home-actionrow.reset .home-actionrow-icon{background:var(--danger-red);}
     .home-actionrow.reset .home-actionrow-label{color:var(--danger-red);}
@@ -4491,6 +4538,25 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <span class="home-actionrow-textwrap"><span class="home-actionrow-label">Kwitansi</span></span>
             <span class="home-actionrow-arrow">›</span>
           </button>
+          <!-- BARU -- akses "Rekap Pesanan" & "Follow Up" utk versi mobile (sidebar
+               desktop tidak muncul di layar sempit, jadi menu ini butuh pintu masuk
+               sendiri di Beranda). Class habit-rekap-hidden/habit-followup-hidden
+               SAMA dgn yang dipakai tombol sidebar -- otomatis ikut disembunyikan
+               kalau menunya dimatikan lewat Master Data > Tampilan. -->
+          <button type="button" class="home-actionrow rekap habit-rekap-hidden" id="home-link-rekap" hidden>
+            <span class="home-actionrow-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4" width="17" height="16" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M7 8.5h10M7 12h10M7 15.5h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <span class="home-actionrow-textwrap"><span class="home-actionrow-label">Rekap Pesanan</span></span>
+            <span class="home-actionrow-arrow">›</span>
+          </button>
+          <button type="button" class="home-actionrow followup habit-followup-hidden" id="home-link-followup" hidden>
+            <span class="home-actionrow-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.3" stroke="#fff" stroke-width="1.5"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M16 4.5l1.2 1.2L20 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="home-actionrow-textwrap"><span class="home-actionrow-label">Follow Up</span></span>
+            <span class="home-actionrow-arrow">›</span>
+          </button>
           <button type="button" class="home-actionrow reset" id="home-link-reset">
             <span class="home-actionrow-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -4571,6 +4637,9 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div style="overflow-x:auto; border:1px solid var(--line); border-radius:10px;" id="rekap-table-wrap">
       <table id="rekap-table" style="border-collapse:collapse; width:100%; white-space:nowrap;"></table>
     </div>
+    <!-- BARU -- versi kartu utk layar mobile (≤700px), tabel di atas disembunyikan
+         lewat CSS & kartu ini yang ditampilkan gantinya (lihat .rekap-mobile-cards). -->
+    <div id="rekap-cards" class="rekap-mobile-cards"></div>
   </div>
 
   <!-- BARU -- "Follow Up" (F.O/Repeat Order): pola repeat-order per
@@ -4601,6 +4670,9 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <div style="overflow-x:auto; border:1px solid var(--line); border-radius:10px;" id="followup-table-wrap">
       <table id="followup-table" style="border-collapse:collapse; width:100%; white-space:nowrap;"></table>
     </div>
+    <!-- BARU -- versi kartu utk layar mobile (≤700px), tabel di atas disembunyikan
+         lewat CSS & kartu ini yang ditampilkan gantinya (lihat .followup-mobile-cards). -->
+    <div id="followup-cards" class="followup-mobile-cards"></div>
   </div>
 
   <!-- Detail 1 customer (klik baris di tabel Follow Up) -->
@@ -10431,6 +10503,18 @@ if ("serviceWorker" in navigator) {
   if(homeResetLink) homeResetLink.addEventListener("click", ()=>{
     const b = document.getElementById("btn-reset"); if(b) b.click();
   });
+  // BARU -- pintu masuk "Rekap Pesanan" & "Follow Up" di Beranda mobile,
+  // manggil fungsi global yang SAMA dgn tombol sidebar desktop
+  // (window.__openRekapPesanan / window.__openFollowUp), jadi tidak ada
+  // logic buka-halaman yang diduplikasi.
+  const homeRekapLink = document.getElementById("home-link-rekap");
+  if(homeRekapLink) homeRekapLink.addEventListener("click", ()=>{
+    if(window.__openRekapPesanan) window.__openRekapPesanan();
+  });
+  const homeFollowUpLink = document.getElementById("home-link-followup");
+  if(homeFollowUpLink) homeFollowUpLink.addEventListener("click", ()=>{
+    if(window.__openFollowUp) window.__openFollowUp();
+  });
 
   function trsOf(sheet){ return [...document.querySelectorAll("#rows-"+sheet+" tr")]; }
   function prodListOf(sheet){ return sheet==="penjualan" ? PRODUCTS_PENJUALAN : PRODUCTS; }
@@ -14321,6 +14405,7 @@ if ("serviceWorker" in navigator) {
   const fullpage = document.getElementById("rekap-fullpage");
   const statusEl = document.getElementById("rekap-status");
   const tableEl = document.getElementById("rekap-table");
+  const cardsEl = document.getElementById("rekap-cards"); // BARU -- kontainer kartu versi mobile
   const searchEl = document.getElementById("rekap-search");
   const sortBtn = document.getElementById("rekap-sort-btn");
   const csFilterEl = document.getElementById("rekap-filter-cs");
@@ -14682,6 +14767,46 @@ if ("serviceWorker" in navigator) {
     return `${emoji} ${teks}`.trim();
   }
 
+  // BARU -- versi KARTU dari tabel Rekap Pesanan, khusus dipakai di layar
+  // mobile (≤700px, lihat CSS .rekap-mobile-cards). Datanya SAMA PERSIS
+  // dgn tabel (dipanggil dgn rows & kodeList yang sudah difilter/di-sort
+  // yang sama), cuma tata letaknya kartu per pesanan (bukan baris tabel
+  // yang perlu discroll ke samping). Tombol Invoice pakai class & data
+  // attribute yang SAMA dgn tombol di tabel (rekap-invoice-btn / data-
+  // anchor / data-state) supaya listener toggle-nya bisa dipakai bareng
+  // (lihat fullpage.querySelectorAll(".rekap-invoice-btn") di bawah).
+  function renderRekapCards(rows, kodeList){
+    if(!cardsEl) return;
+    if(!rows.length){
+      cardsEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--ink-soft);">Belum ada pesanan yang cocok dengan filter.</div>`;
+      return;
+    }
+    cardsEl.innerHTML = rows.map(r=>{
+      const isVoid = /void|hoax/i.test(r.status);
+      const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline;">${escHtml(r.customer)}</a>`;
+      const varianRingkas = kodeList
+        .map(k=> (r.items && r.items[k]) ? `${escHtml(k)} ${r.items[k]}` : null)
+        .filter(Boolean).join(", ") || "-";
+      return `<div class="rc-card${isVoid?" void":""}">
+        <div class="rc-card-top">
+          <div>
+            <div class="rc-card-nama">${namaLink}</div>
+            <div class="rc-card-sub">${escHtml(r.cs || "-")} &middot; ${escHtml(r.hari)}, ${escHtml(r.tanggalJam)}</div>
+          </div>
+          <span class="fu-badge ${isVoid ? "r" : "g"}">${escHtml(ringkasStatus(r.status))}</span>
+        </div>
+        <div style="font-size:13px; margin-top:8px;">${varianRingkas} &middot; Qty <b>${r.totalQty||0}</b></div>
+        <div class="rc-card-mid">
+          <span><b>${r.resi ? "✅ Resi ada" : "❌ Belum resi"}</b></span>
+          <span>${escHtml(r.ekspedisi || "-")}${r.kg ? " &middot; " + escHtml(r.kg) + " kg" : ""}</span>
+        </div>
+        <div class="rc-card-bottom">
+          <button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:6px 12px; font-size:13px; width:100%;">${r.manualInvoiced ? "✓ Sudah di Invoice" : "Belum di Invoice"}</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
   function renderRekapTable(){
     const { rows, kodeList, keyword, ekspedisiPilih } = terapkanFilter();
     renderRingkasanCs(rows);
@@ -14767,6 +14892,7 @@ if ("serviceWorker" in navigator) {
 
     html += "</tbody>";
     tableEl.innerHTML = html;
+    renderRekapCards(rows, kodeList); // BARU -- versi kartu utk layar mobile, data SAMA persis dgn tabel di atas
 
     // BARU -- tombol Aksi Invoice sekarang TOGGLE 2 arah (Belum <-> Sudah),
     // bukan cuma 1 arah spt sebelumnya (dulu begitu jadi "Sudah" tidak
@@ -14775,7 +14901,10 @@ if ("serviceWorker" in navigator) {
     // popup kustom yang sama dipakai fitur lain (window.showResetConfirm)
     // -- BUKAN confirm() bawaan browser, karena itu sering diblokir di
     // dalam iframe/preview sehingga tombolnya terlihat tidak berfungsi.
-    tableEl.querySelectorAll(".rekap-invoice-btn").forEach(btn=>{
+    // BARU -- query dari `fullpage` (bukan cuma `tableEl`), supaya tombol
+    // invoice di KARTU mobile (#rekap-cards) ikut kepasang listener yang
+    // sama persis dgn di tabel desktop, tanpa duplikasi logic.
+    fullpage.querySelectorAll(".rekap-invoice-btn").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const anchorId = btn.dataset.anchor;
         const row = allRows.find(r=> r.anchorId === anchorId);
@@ -14903,6 +15032,8 @@ if ("serviceWorker" in navigator) {
   const csFilterEl = document.getElementById("followup-filter-cs");
   const statusFilterEl = document.getElementById("followup-filter-status");
   const statsGridEl = document.getElementById("followup-stats-grid");
+  const cardsEl = document.getElementById("followup-cards"); // BARU -- kontainer kartu versi mobile
+  const BOT_USERNAME = "Rp_habit_bot"; // SAMA dgn di script Rekap Pesanan -- dipakai tombol "Hubungi" di kartu mobile
   const quickFilterChipEl = document.getElementById("followup-quickfilter-chip");
   const quickFilterChipTextEl = document.getElementById("followup-quickfilter-chip-text");
   let isLoading = false;
@@ -15032,6 +15163,7 @@ if ("serviceWorker" in navigator) {
       statusEl.textContent = "Data belum dimuat — tekan \"🔄 Muat ulang\" untuk mengambil data terbaru.";
       statusEl.style.color = "var(--ink-soft)";
       tableEl.innerHTML = "";
+      if(cardsEl) cardsEl.innerHTML = ""; // BARU -- ikut dikosongkan bareng tabel
       statsGridEl.innerHTML = "";
     }
     // Auto-refresh diam-diam (interval 30 detik + refresh saat tab dibuka
@@ -15234,6 +15366,38 @@ if ("serviceWorker" in navigator) {
     updateQuickFilterChip();
   }
 
+  // BARU -- versi KARTU dari tabel Follow Up, khusus layar mobile (≤700px,
+  // lihat CSS .followup-mobile-cards). Melengkapi (bukan menggantikan)
+  // stat-card & tombol "📞 Perlu Dihubungi" yang sudah ada di atas halaman
+  // ini (Desain 1) -- kartu di bawah menambahkan tombol "Hubungi" cepat
+  // per customer & tap kartu buka detail lengkap (Desain 2). Data SAMA
+  // PERSIS dgn tabel (rows yang sudah difilter/quick-filter yang sama).
+  const FU_AVATAR_BG = { r:"var(--danger-red, #c00000)", o:"#c46b00", y:"#7b6000", b:"#1976d2", g:"var(--primary-green)", gr:"#888" };
+  function renderFollowUpCards(rows){
+    if(!cardsEl) return;
+    if(!rows.length){
+      cardsEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--ink-soft);">Belum ada customer dengan riwayat pesanan Lunas yang cocok dengan filter.</div>`;
+      return;
+    }
+    cardsEl.innerHTML = rows.map(r=>{
+      const initial = (r.customer||"?").trim().slice(0,2).toUpperCase();
+      const urgent = r.cls === "r" || r.cls === "o";
+      const sisaTeks = r.sisa!==null ? `${fmtHari(r.sisa)} lagi` : "Belum cukup data";
+      return `<div class="fc-card${urgent?" urgent":""}" data-customer="${escHtml(r.customer)}">
+        <div class="fc-avatar" style="background:${FU_AVATAR_BG[r.cls] || "var(--primary-green)"};">${escHtml(initial)}</div>
+        <div class="fc-info">
+          <div class="fc-nama">${escHtml(r.customer)}</div>
+          <div class="fc-sub">${escHtml(r.cs || "-")} &middot; ${sisaTeks}</div>
+        </div>
+        <span class="fu-badge ${r.cls}" style="flex-shrink:0;">${escHtml(r.status)}</span>
+        <a class="fc-hubungi" href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" aria-label="Hubungi ${escHtml(r.customer)}" onclick="event.stopPropagation();">📞</a>
+      </div>`;
+    }).join("");
+    cardsEl.querySelectorAll(".fc-card[data-customer]").forEach(card=>{
+      card.addEventListener("click", ()=> bukaDetailCustomer(card.dataset.customer));
+    });
+  }
+
   function renderFollowUpTable(){
     const rowsDasar = terapkanFilterDasar();
     const rows = rowsDasar.filter(cocokQuickFilter);
@@ -15269,6 +15433,7 @@ if ("serviceWorker" in navigator) {
     });
     html += "</tbody>";
     tableEl.innerHTML = html;
+    renderFollowUpCards(rows); // BARU -- versi kartu utk layar mobile, data SAMA persis dgn tabel di atas
 
     tableEl.querySelectorAll("tbody tr[data-customer]").forEach(tr=>{
       tr.addEventListener("click", ()=> bukaDetailCustomer(tr.dataset.customer));
