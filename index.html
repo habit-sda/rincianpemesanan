@@ -5200,6 +5200,22 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="md-pin-err" id="md-logistik-err"></div>
         <button class="md-btn primary" id="md-logistik-add" style="margin-top:10px;">+ Tambah Petugas Logistik</button>
       </div>
+      <div class="md-card" id="md-resi-topik-card">
+        <h3>🗂️ Topik Grup Resi</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Kalau grup resi Anda punya 2 topik terpisah (mis. "Tagihan" & "Resi Aja"), isi ID masing-masing di sini. Ganti grup nanti? Cukup update angkanya di sini, tidak perlu ubah kode. Kosongkan kalau grup tidak pakai topik.
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:160px;">
+            <label for="md-resi-topik-tagihan" style="font-size:13px; color:var(--ink-soft); display:block; margin-bottom:4px;">ID Topik "Tagihan"</label>
+            <input type="text" inputmode="numeric" id="md-resi-topik-tagihan" placeholder="mis. 3" style="width:100%; height:42px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+          </div>
+          <div style="flex:1; min-width:160px;">
+            <label for="md-resi-topik-aja" style="font-size:13px; color:var(--ink-soft); display:block; margin-bottom:4px;">ID Topik "Resi Aja"</label>
+            <input type="text" inputmode="numeric" id="md-resi-topik-aja" placeholder="mis. 1" style="width:100%; height:42px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+          </div>
+        </div>
+      </div>
       <div class="md-card" id="md-logistik-pengingat-card">
         <h3>⚠️ Peringatan Logistik: Resi Belum Ada</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -7111,7 +7127,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", csList:[]};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", csList:[], resiTagihanTopicId:"", resiAjaTopicId:""};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -7136,6 +7152,8 @@ function loadSettings(){
     if(typeof s.resiKemarinInfoTime === "string" && s.resiKemarinInfoTime.trim()) SETTINGS.resiKemarinInfoTime = s.resiKemarinInfoTime.trim();
     if(typeof s.logistikPengingatEnabled === "boolean") SETTINGS.logistikPengingatEnabled = s.logistikPengingatEnabled;
     if(typeof s.logistikPengingatTime === "string" && s.logistikPengingatTime.trim()) SETTINGS.logistikPengingatTime = s.logistikPengingatTime.trim();
+    if(typeof s.resiTagihanTopicId === "string") SETTINGS.resiTagihanTopicId = s.resiTagihanTopicId.trim();
+    if(typeof s.resiAjaTopicId === "string") SETTINGS.resiAjaTopicId = s.resiAjaTopicId.trim();
     if(typeof s.noBuktiTransferReminderEnabled === "boolean") SETTINGS.noBuktiTransferReminderEnabled = s.noBuktiTransferReminderEnabled;
     if(typeof s.rekapPesananEnabled === "boolean") SETTINGS.rekapPesananEnabled = s.rekapPesananEnabled;
     if(typeof s.rekapPesananHari === "number" && s.rekapPesananHari >= 1 && s.rekapPesananHari <= 25) SETTINGS.rekapPesananHari = s.rekapPesananHari;
@@ -12256,6 +12274,24 @@ if ("serviceWorker" in navigator) {
     };
     toggleLogistikPengingat.addEventListener("change", saveLogistikPengingat);
     inputLogistikPengingatTime.addEventListener("change", saveLogistikPengingat);
+  }
+
+  /* ---------- Topik Grup Resi (Tagihan / Resi Aja) ----------
+     Dibaca WORKER (processTelegramUpdate routing) -- fleksibel diubah di
+     sini tiap kali ganti grup, tidak perlu ubah kode/env var. */
+  const inputResiTopikTagihan = document.getElementById("md-resi-topik-tagihan");
+  const inputResiTopikAja = document.getElementById("md-resi-topik-aja");
+  if(inputResiTopikTagihan && inputResiTopikAja){
+    inputResiTopikTagihan.value = SETTINGS.resiTagihanTopicId || "";
+    inputResiTopikAja.value = SETTINGS.resiAjaTopicId || "";
+    const saveResiTopik = async ()=>{
+      SETTINGS.resiTagihanTopicId = inputResiTopikTagihan.value.trim();
+      SETTINGS.resiAjaTopicId = inputResiTopikAja.value.trim();
+      saveSettings();
+      await confirmMasterDataSave("Pengaturan Topik Grup Resi disimpan.");
+    };
+    inputResiTopikTagihan.addEventListener("change", saveResiTopik);
+    inputResiTopikAja.addEventListener("change", saveResiTopik);
   }
 
   /* ---------- toggle + jam: Peringatan Bukti Transfer Belum Ada (Tampilan) ----------

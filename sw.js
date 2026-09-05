@@ -4,8 +4,15 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v298";
+const CACHE_VERSION = "v299";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v299 -- Master Data > kartu baru "🗂️ Topik Grup Resi": ID topik
+   "Tagihan" & "Resi Aja" sekarang diatur di sini (bukan cuma env var
+   Cloudflare) -- fleksibel diubah tiap kali ganti grup, tidak perlu
+   sentuh kode. Dipasangkan dgn perubahan worker.js (routing pesan grup
+   resi baca settings ini, plus fitur pelacakan tagihan ekspedisi belum
+   dibayar via D1 -- 0 dampak ke kuota KV). SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Versi Baru Tersedia"). */
 /* v298 -- perbaikan bug: tombol back fisik/gesture HP langsung menutup
    aplikasi saat lagi buka menu "Rekap Pesanan"/"Follow Up" (kedua
    halaman itu sebelumnya tidak pernah menambah entri riwayat browser
