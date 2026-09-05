@@ -2181,6 +2181,18 @@
   #md-produk-list.md-locked .md-row-detail:disabled,
   #md-produk-list.md-locked .md-row-move button:disabled{opacity:.25;cursor:default;}
   #md-produk-add[hidden]{display:none;}
+  /* ---------- PERATURAN: KUNCI-EDIT GENERIK (dipakai SEMUA bagian
+     Master Data lain selain Daftar Produk di atas, yang punya pola
+     sendiri krn strukturnya beda/array+drag-reorder). Reuse class
+     .md-produk-editbar/-status/-editbtn di atas apa adanya (murni
+     presentasi, tidak spesifik ke Produk) -- cuma perlu 1 aturan BARU
+     ini utk tampilan terkunci yang generik (bukan per-id spt Produk). ---------- */
+  .md-lockwrap.md-locked input:disabled,
+  .md-lockwrap.md-locked select:disabled,
+  .md-lockwrap.md-locked textarea:disabled{
+    background:transparent;color:var(--ink);opacity:.85;cursor:default;-webkit-text-fill-color:var(--ink);
+  }
+  .md-lockwrap.md-locked button.md-lockable:disabled{opacity:.25;cursor:default;}
   .md-eksrow{padding:6px 0;border-bottom:1px solid var(--line);}
   .md-eksrow:last-child{border-bottom:none;}
   .md-eksrow input{height:38px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;font-family:inherit;background:var(--card);}
@@ -5180,12 +5192,21 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
 
     <div class="md-section" id="md-sec-ekspedisi">
+      <div class="md-produk-editbar locked" id="md-ekspedisi-editbar">
+        <div class="md-produk-editbar-status" id="md-ekspedisi-editbar-status">
+          <svg id="md-ekspedisi-editbar-icon" viewBox="0 0 24 24" fill="none" width="15" height="15"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span id="md-ekspedisi-editbar-text">Terkunci — aktifkan Mode Edit untuk mengubah</span>
+        </div>
+        <button type="button" class="md-produk-editbtn" id="md-ekspedisi-edit-toggle">✏️ Mode Edit</button>
+        <button type="button" class="md-produk-editbtn primary" id="md-ekspedisi-edit-save" hidden>💾 Simpan &amp; Kunci</button>
+      </div>
+      <div class="md-lockwrap md-locked" id="md-ekspedisi-lockwrap">
       <div class="md-card">
         <h3>Daftar ekspedisi</h3>
         <div class="md-note" style="margin-bottom:10px;">Ketuk ikon 🧮 di tiap baris untuk atur rumus pembulatan berat, minimum charge &amp; skema subsidi ongkir khusus ekspedisi itu.</div>
-        <input type="text" id="md-ekspedisi-search" class="kt-input" placeholder="🔍 Cari nama ekspedisi..." autocomplete="off" style="margin-bottom:10px;">
+        <input type="text" id="md-ekspedisi-search" class="kt-input md-lock-exempt" placeholder="🔍 Cari nama ekspedisi..." autocomplete="off" style="margin-bottom:10px;">
         <div id="md-ekspedisi-list"></div>
-        <button class="md-addrow" id="md-ekspedisi-add">+ Tambah ekspedisi</button>
+        <button class="md-addrow md-lockable" id="md-ekspedisi-add">+ Tambah ekspedisi</button>
       </div>
       <div class="md-card" id="md-logistik-card">
         <h3>Daftar Logistik</h3>
@@ -5198,7 +5219,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <input type="text" inputmode="numeric" id="md-logistik-id" placeholder="Telegram ID (angka)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
         </div>
         <div class="md-pin-err" id="md-logistik-err"></div>
-        <button class="md-btn primary" id="md-logistik-add" style="margin-top:10px;">+ Tambah Petugas Logistik</button>
+        <button class="md-btn primary md-lockable" id="md-logistik-add" style="margin-top:10px;">+ Tambah Petugas Logistik</button>
       </div>
       <div class="md-card" id="md-resi-topik-card">
         <h3>🗂️ Topik Grup Resi</h3>
@@ -5242,7 +5263,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <label>Selisih dianggap perlu dicek kalau lebih dari (%)</label>
         <input type="number" inputmode="numeric" id="md-resi-threshold" min="1" max="100" style="max-width:140px;">
         <div class="md-pin-err" id="md-resi-threshold-err"></div>
-        <button class="md-btn primary" id="md-resi-threshold-save">Simpan ambang</button>
+        <button class="md-btn primary md-lockable" id="md-resi-threshold-save">Simpan ambang</button>
       </div>
       <div class="md-card">
         <h3>Reaksi otomatis foto resi (nominal)</h3>
@@ -5272,6 +5293,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           </label>
         </div>
       </div>
+      </div>
     </div>
 
     <div class="md-section" id="md-sec-hapus">
@@ -5297,6 +5319,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
 
     <div class="md-section" id="md-sec-tampilan">
+      <div class="md-produk-editbar locked" id="md-tampilan-editbar">
+        <div class="md-produk-editbar-status" id="md-tampilan-editbar-status">
+          <svg id="md-tampilan-editbar-icon" viewBox="0 0 24 24" fill="none" width="15" height="15"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span id="md-tampilan-editbar-text">Terkunci — aktifkan Mode Edit untuk mengubah</span>
+        </div>
+        <button type="button" class="md-produk-editbtn" id="md-tampilan-edit-toggle">✏️ Mode Edit</button>
+        <button type="button" class="md-produk-editbtn primary" id="md-tampilan-edit-save" hidden>💾 Simpan &amp; Kunci</button>
+      </div>
+      <div class="md-lockwrap md-locked" id="md-tampilan-lockwrap">
       <div class="md-card">
         <h3>Menu "Rekap Pesanan"</h3>
         <div class="md-togglerow">
@@ -5377,7 +5408,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <input type="text" inputmode="numeric" id="md-cslist-id" placeholder="Telegram ID (angka)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
         </div>
         <div class="md-pin-err" id="md-cslist-err"></div>
-        <button class="md-btn primary" id="md-cslist-add" style="margin-top:10px;">+ Tambah CS</button>
+        <button class="md-btn primary md-lockable" id="md-cslist-add" style="margin-top:10px;">+ Tambah CS</button>
       </div>
       <div class="md-card">
         <h3>Mode Gelap</h3>
@@ -5551,9 +5582,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           </label>
         </div>
       </div>
+      </div>
     </div>
 
     <div class="md-section" id="md-sec-rumus">
+      <div class="md-produk-editbar locked" id="md-rumus-editbar">
+        <div class="md-produk-editbar-status" id="md-rumus-editbar-status">
+          <svg id="md-rumus-editbar-icon" viewBox="0 0 24 24" fill="none" width="15" height="15"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span id="md-rumus-editbar-text">Terkunci — aktifkan Mode Edit untuk mengubah</span>
+        </div>
+        <button type="button" class="md-produk-editbtn" id="md-rumus-edit-toggle">✏️ Mode Edit</button>
+        <button type="button" class="md-produk-editbtn primary" id="md-rumus-edit-save" hidden>💾 Simpan &amp; Kunci</button>
+      </div>
+      <div class="md-lockwrap md-locked" id="md-rumus-lockwrap">
       <div class="md-card md-pinform">
         <h3>Batas tier diskon Grosir</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -5585,9 +5626,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           (selalu "Reseller" apa pun jumlah pesanannya) — bukan bug baru, sengaja direplikasi apa adanya.
         </div>
       </div>
+      </div>
     </div>
 
     <div class="md-section" id="md-sec-keamanan">
+      <div class="md-produk-editbar locked" id="md-keamanan-editbar">
+        <div class="md-produk-editbar-status" id="md-keamanan-editbar-status">
+          <svg id="md-keamanan-editbar-icon" viewBox="0 0 24 24" fill="none" width="15" height="15"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span id="md-keamanan-editbar-text">Terkunci — aktifkan Mode Edit untuk mengubah</span>
+        </div>
+        <button type="button" class="md-produk-editbtn" id="md-keamanan-edit-toggle">✏️ Mode Edit</button>
+        <button type="button" class="md-produk-editbtn primary" id="md-keamanan-edit-save" hidden>💾 Simpan &amp; Kunci</button>
+      </div>
+      <div class="md-lockwrap md-locked" id="md-keamanan-lockwrap">
       <div class="md-card md-pinform">
         <h3>Ubah PIN</h3>
         <label>PIN saat ini</label>
@@ -5598,14 +5649,24 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <input type="password" inputmode="numeric" maxlength="6" id="md-pin-new2">
         <div class="md-pin-err" id="md-pin-change-err"></div>
         <div>
-          <button class="md-btn primary" id="md-pin-save">Simpan PIN baru</button>
-          <button class="md-btn danger" id="md-pin-reset-btn">Reset ke PIN bawaan</button>
+          <button class="md-btn primary md-lockable" id="md-pin-save">Simpan PIN baru</button>
+          <button class="md-btn danger md-lockable" id="md-pin-reset-btn">Reset ke PIN bawaan</button>
         </div>
         <div class="md-note">Kalau PIN lupa, gunakan tombol "Lupa PIN?" di layar buka Master Data — otomatis kembali ke PIN bawaan (hubungi pengelola sistem kalau tidak tahu PIN bawaannya).</div>
+      </div>
       </div>
     </div>
 
     <div class="md-section" id="md-sec-finance">
+      <div class="md-produk-editbar locked" id="md-finance-editbar">
+        <div class="md-produk-editbar-status" id="md-finance-editbar-status">
+          <svg id="md-finance-editbar-icon" viewBox="0 0 24 24" fill="none" width="15" height="15"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span id="md-finance-editbar-text">Terkunci — aktifkan Mode Edit untuk mengubah</span>
+        </div>
+        <button type="button" class="md-produk-editbtn" id="md-finance-edit-toggle">✏️ Mode Edit</button>
+        <button type="button" class="md-produk-editbtn primary" id="md-finance-edit-save" hidden>💾 Simpan &amp; Kunci</button>
+      </div>
+      <div class="md-lockwrap md-locked" id="md-finance-lockwrap">
       <div class="md-card" id="md-finance-card">
         <h3>Daftar Finance</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -5619,7 +5680,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <input type="text" id="md-finance-ttd" placeholder="Link Tanda Tangan (URL gambar, opsional)" style="width:100%; box-sizing:border-box; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card); margin-top:8px;">
         <div class="md-note" style="margin-top:6px;">Tempel link gambar tanda tangan (bukan unggah file) — dipakai otomatis saat Finance ini dipilih di popup Kwitansi. Bisa dikosongkan dulu lalu diisi/diubah belakangan lewat kolom di tiap baris daftar di bawah.</div>
         <div class="md-pin-err" id="md-finance-err"></div>
-        <button class="md-btn primary" id="md-finance-add" style="margin-top:10px;">+ Tambah Finance</button>
+        <button class="md-btn primary md-lockable" id="md-finance-add" style="margin-top:10px;">+ Tambah Finance</button>
       </div>
       <div class="md-card">
         <h3>Rekap Invoice Harian Otomatis (DM ke CS &amp; Finance)</h3>
@@ -5725,14 +5786,25 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <label class="md-radio-chip"><input type="radio" name="md-stk-labelstyle" id="md-stk-labelstyle-icon" value="icon"> Emoji saja (⚡)</label>
         </div>
       </div>
+      </div>
     </div>
 
     <div class="md-section" id="md-sec-namacustomer">
+      <div class="md-produk-editbar locked" id="md-namacustomer-editbar">
+        <div class="md-produk-editbar-status" id="md-namacustomer-editbar-status">
+          <svg id="md-namacustomer-editbar-icon" viewBox="0 0 24 24" fill="none" width="15" height="15"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span id="md-namacustomer-editbar-text">Terkunci — aktifkan Mode Edit untuk mengubah</span>
+        </div>
+        <button type="button" class="md-produk-editbtn" id="md-namacustomer-edit-toggle">✏️ Mode Edit</button>
+        <button type="button" class="md-produk-editbtn primary" id="md-namacustomer-edit-save" hidden>💾 Simpan &amp; Kunci</button>
+      </div>
+      <div class="md-lockwrap md-locked" id="md-namacustomer-lockwrap">
       <div class="md-card">
         <h3>Master Nama Pelanggan</h3>
         <div class="md-note" style="margin-bottom:12px;">Daftar nama yang muncul sebagai rekomendasi otomatis di field "Nama Customer" (popup Kirim ke Grup Telegram). Mengganti/menghapus nama di sini <b>HANYA</b> mengubah daftar rekomendasi ini — Rincian Pemesanan, riwayat ongkir, dan riwayat resi yang sudah terkirim sebelumnya tidak ikut berubah. Daftar ini permanen (tidak pernah terhapus otomatis oleh sistem manapun) — hapus di sini kalau memang perlu dibersihkan manual (mis. salah ketik/duplikat).</div>
-        <input type="text" id="md-nama-search" placeholder="Cari nama..." style="width:100%;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;margin-bottom:12px;">
+        <input type="text" id="md-nama-search" class="md-lock-exempt" placeholder="Cari nama..." style="width:100%;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;margin-bottom:12px;">
         <div id="md-nama-list"></div>
+      </div>
       </div>
     </div>
 
@@ -5865,7 +5937,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.31.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.32.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6061,7 +6133,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.31.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.32.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Kunci-Edit di Master Data</b> — 6 bagian (Ekspedisi &amp; Logistik, Tampilan, Rumus, Keamanan, Finance, Master Nama Pelanggan) sekarang terkunci (read-only) secara default, sama seperti "Daftar Produk" yang sudah lebih dulu begitu — supaya tidak ada perubahan tidak sengaja (mis. kepencet pas scroll di HP). Tekan "✏️ Mode Edit" dulu buat mengubah, lalu "💾 Simpan &amp; Kunci" setelah selesai. Bagian "Hapus Data" tidak ikut dikunci (sudah punya perlindungan sendiri — wajib ketik kode persis + konfirmasi).</li>
+            <li><b>Kode singkat produk (mis. HA, HS) sekarang selalu huruf besar</b> — otomatis berubah huruf besar sambil mengetik di Master Data → Produk, dan dipastikan konsisten di data yang dikirim ke bot &amp; kolom Rekap Pesanan (walau produk lama sempat tersimpan huruf kecil/campuran).</li>
+            <li>Kartu ringkasan ekspedisi: "Qty Customer" diganti jadi "Total Customer" (lebih jelas maksudnya).</li>
+            <li><b>Cadangan otomatis untuk "Render Nota Lewat Server"</b> — kalau render di server gagal (mis. kuota Browserless bulanan habis, atau layanannya lagi bermasalah), tombol "Kirim" di app otomatis mencoba ulang pakai render di HP (cara lama) — CS tidak perlu lagi matikan toggle-nya manual atau klik Kirim berkali-kali.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.31.0</div>
           <ul>
             <li><b>Opsi baru: "Render Nota Lewat Server"</b> (Master Data → Tampilan) — kalau diaktifkan, gambar "Rincian pemesanan" tidak lagi digambar di HP CS (html2canvas), tapi lewat server (Browserless.io, Chrome asli). Efeknya: HP CS tidak perlu lagi menunggu proses menggambar nota, terutama terasa di HP yang agak lambat. Nonaktif secara default (cara lama tetap berjalan seperti biasa) — cuma berlaku kalau desain nota aktif "baru" dan Worker sudah dipasangi secret <code>BROWSERLESS_TOKEN</code>.</li>
             <li><b>Draft autosave jadi lebih ringan</b> saat opsi di atas aktif — draft yang tersimpan sambil CS mengetik nama sekarang cuma berisi data pesanan (teks kecil), bukan gambar penuh — gambar baru dirender sekali, pas benar-benar dikirim.</li>
@@ -7823,7 +7904,12 @@ function collectOrderItems(tab){
       const qty = parseFloat(qtyEl.value) || 0;
       if(qty <= 0) return null;
       const p = findProduct(sel.value);
-      return { nama: sel.value, kodeSingkat: (p && p.kodeSingkat) || "", qty };
+      // BARU -- huruf besar dipaksakan di sini juga (pertahanan lapis
+      // kedua) -- kalau produk lama masih tersimpan huruf kecil/campuran
+      // (dari SEBELUM perbaikan Master Data > Produk), data yang dikirim
+      // ke bot/server tetap konsisten huruf besar, tanpa CS perlu buka
+      // & simpan ulang tiap produk satu-satu dulu.
+      return { nama: sel.value, kodeSingkat: ((p && p.kodeSingkat) || "").toUpperCase(), qty };
     })
     .filter(Boolean);
 }
@@ -9087,36 +9173,69 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     try{
       const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, totalQtyLabel, totalBeratLabel, items, imageDataUrl, notaData } = await collectNotaPayload();
 
+      // BARU -- dipisah jadi fungsi kecil supaya bisa dipanggil 2x kalau
+      // perlu (percobaan pertama + fallback), tanpa duplikat daftar
+      // field yang panjang.
+      const buildSendBuktiBody = (imageVal, notaDataVal) => ({
+        image: imageVal,
+        notaData: notaDataVal,
+        customerName,
+        senderId,
+        tabLabel,
+        topicId: getTelegramTopicId(),
+        grandTotal: grandTotalNum,
+        ratePerKg: ratePerKgNum,
+        ongkirManual: ongkirManualNum,
+        ongkirTotal: ongkirTotalNum,
+        ekspedisi: ekspedisiName,
+        deliveryDate,
+        kelebihanBayarSebelumnya: kelebihanNum,
+        totalQtyLabel,
+        totalBeratLabel,
+        items,
+        isRevisi: !!(revisiCheck && revisiCheck.checked),
+        revisiTargetMessageId: pendingRevisiTargetMessageId,
+      });
+
       // BARU -- teks status beda tergantung jalurnya, supaya CS tahu apa
       // yang sedang terjadi (render di server itu ada jeda jaringan
       // tambahan yang tidak kelihatan progress-nya di HP, beda dgn
       // render di HP yang minimal ada animasi/progress lokal).
       statusEl.textContent = notaData ? "Mengirim data pesanan (nota dirender di server)…" : "Mengirim ke grup Telegram…";
-      const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
+      let res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
         method: "POST",
         headers: workerHeaders({ "Content-Type": "application/json" }),
-        body: JSON.stringify({
-          image: imageDataUrl,
-          notaData,
-          customerName,
-          senderId,
-          tabLabel,
-          topicId: getTelegramTopicId(),
-          grandTotal: grandTotalNum,
-          ratePerKg: ratePerKgNum,
-          ongkirManual: ongkirManualNum,
-          ongkirTotal: ongkirTotalNum,
-          ekspedisi: ekspedisiName,
-          deliveryDate,
-          kelebihanBayarSebelumnya: kelebihanNum,
-          totalQtyLabel,
-          totalBeratLabel,
-          items,
-          isRevisi: !!(revisiCheck && revisiCheck.checked),
-          revisiTargetMessageId: pendingRevisiTargetMessageId,
-        }),
+        body: JSON.stringify(buildSendBuktiBody(imageDataUrl, notaData)),
       });
-      const body = await res.json().catch(()=>({}));
+      let body = await res.json().catch(()=>({}));
+
+      // BARU -- fallback OTOMATIS: kalau render di SERVER gagal (kuota
+      // Browserless habis, sedang down, dll -- ditandai `renderFailed:
+      // true` dari Worker), langsung render ULANG di HP (html2canvas,
+      // cara lama) lalu kirim ulang -- CS TIDAK PERLU matiin toggle
+      // "Render Nota Lewat Server" atau klik Kirim lagi secara manual.
+      // Kalau gagalnya karena hal LAIN (mis. nama duplikat, rincian lama
+      // masih ada), TIDAK dicoba ulang di sini -- lanjut apa adanya ke
+      // penanganan error/konfirmasi biasa di bawah.
+      if(!res.ok && body.renderFailed){
+        statusEl.textContent = "Render di server gagal, mencoba render di HP…";
+        let fallbackImage;
+        try{
+          const canvas = await renderCanvas();
+          fallbackImage = canvas.toDataURL("image/png");
+        }catch(fallbackErr){
+          statusEl.textContent = "Render di server MAUPUN di HP sama-sama gagal: " + (fallbackErr && fallbackErr.message ? fallbackErr.message : String(fallbackErr));
+          statusEl.style.color = "var(--danger-red)";
+          return;
+        }
+        statusEl.textContent = "Mengirim ke grup Telegram…";
+        res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
+          method: "POST",
+          headers: workerHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify(buildSendBuktiBody(fallbackImage, null)),
+        });
+        body = await res.json().catch(()=>({}));
+      }
 
       // ---- Fitur Revisi Pemesanan: server minta user PILIH salah satu dari
       // beberapa rincian lama yang masih aktif, sebelum benar-benar kirim. ----
@@ -12980,6 +13099,7 @@ if ("serviceWorker" in navigator) {
       if(!listEl) return;
       if(!Array.isArray(SETTINGS.financeList) || !SETTINGS.financeList.length){
         listEl.innerHTML = `<div class="md-note" style="margin:0;">Belum ada Finance yang ditambahkan.</div>`;
+        reapplyMdLock("finance");
         return;
       }
       listEl.innerHTML = SETTINGS.financeList.map((f, i)=> `
@@ -12992,7 +13112,7 @@ if ("serviceWorker" in navigator) {
             <div style="font-size:11.5px; color:var(--ink-soft);">ID: ${(f.telegramId||"").replace(/</g,"&lt;")}</div>
           </div>
           <input type="text" class="md-finance-ttd-edit" data-idx="${i}" value="${(f.ttdUrl||"").replace(/"/g,"&quot;")}" placeholder="Link Tanda Tangan (URL)" style="flex:1.4; min-width:170px; height:38px; border:1px solid var(--line); border-radius:8px; padding:0 10px; font-size:12.5px; background:var(--card);">
-          <button type="button" class="md-btn danger md-finance-del-btn" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
+          <button type="button" class="md-btn danger md-finance-del-btn md-lockable" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
         </div>
       `).join("");
       listEl.querySelectorAll(".md-finance-del-btn").forEach(btn=>{
@@ -13015,6 +13135,7 @@ if ("serviceWorker" in navigator) {
           await confirmMasterDataSave("Tanda tangan \"" + (f.name||"") + "\" diperbarui.");
         });
       });
+      reapplyMdLock("finance");
     }
 
     btnAdd.addEventListener("click", async ()=>{
@@ -13051,6 +13172,7 @@ if ("serviceWorker" in navigator) {
     function renderLogistikList(){
       if(!Array.isArray(SETTINGS.logistikList) || !SETTINGS.logistikList.length){
         listEl.innerHTML = `<div class="md-note" style="margin:0;">Belum ada petugas logistik yang ditambahkan.</div>`;
+        reapplyMdLock("ekspedisi"); // BARU -- ikut disegarkan juga di cabang kosong ini
         return;
       }
       listEl.innerHTML = SETTINGS.logistikList.map((f, i)=> `
@@ -13059,7 +13181,7 @@ if ("serviceWorker" in navigator) {
             <div style="font-weight:700; font-size:13.5px; color:var(--ink);">${(f.name||"").replace(/</g,"&lt;")}</div>
             <div style="font-size:11.5px; color:var(--ink-soft);">ID: ${(f.telegramId||"").replace(/</g,"&lt;")}</div>
           </div>
-          <button type="button" class="md-btn danger md-logistik-del-btn" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
+          <button type="button" class="md-btn danger md-logistik-del-btn md-lockable" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
         </div>
       `).join("");
       listEl.querySelectorAll(".md-logistik-del-btn").forEach(btn=>{
@@ -13071,6 +13193,7 @@ if ("serviceWorker" in navigator) {
           await confirmMasterDataSave("Petugas logistik dihapus dari daftar.");
         });
       });
+      reapplyMdLock("ekspedisi"); // BARU -- daftar Petugas Logistik ikut section "ekspedisi"
     }
 
     btnAdd.addEventListener("click", async ()=>{
@@ -13107,6 +13230,7 @@ if ("serviceWorker" in navigator) {
     function renderCsList(){
       if(!Array.isArray(SETTINGS.csList) || !SETTINGS.csList.length){
         listEl.innerHTML = `<div class="md-note" style="margin:0;">Belum ada CS yang ditambahkan.</div>`;
+        reapplyMdLock("tampilan");
         return;
       }
       listEl.innerHTML = SETTINGS.csList.map((f, i)=> `
@@ -13115,7 +13239,7 @@ if ("serviceWorker" in navigator) {
             <div style="font-weight:700; font-size:13.5px; color:var(--ink);">${(f.name||"").replace(/</g,"&lt;")}</div>
             <div style="font-size:11.5px; color:var(--ink-soft);">ID: ${(f.telegramId||"").replace(/</g,"&lt;")}</div>
           </div>
-          <button type="button" class="md-btn danger md-cslist-del-btn" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
+          <button type="button" class="md-btn danger md-cslist-del-btn md-lockable" data-idx="${i}" style="padding:6px 12px; font-size:12.5px;">Hapus</button>
         </div>
       `).join("");
       listEl.querySelectorAll(".md-cslist-del-btn").forEach(btn=>{
@@ -13127,6 +13251,7 @@ if ("serviceWorker" in navigator) {
           await confirmMasterDataSave("CS dihapus dari daftar.");
         });
       });
+      reapplyMdLock("tampilan");
     }
 
     btnAdd.addEventListener("click", async ()=>{
@@ -13326,6 +13451,12 @@ if ("serviceWorker" in navigator) {
     panel.hidden = false;
     mdProdukSnapshot = null;
     setMdProdukEditMode(false);
+    if(ekspedisiEditLock) ekspedisiEditLock.setMode(false);
+    if(tampilanEditLock) tampilanEditLock.setMode(false);
+    if(rumusEditLock) rumusEditLock.setMode(false);
+    if(keamananEditLock) keamananEditLock.setMode(false);
+    if(financeEditLock) financeEditLock.setMode(false);
+    if(namacustomerEditLock) namacustomerEditLock.setMode(false);
     renderProdukList();
     renderEkspedisiList();
     resetHapusForm();
@@ -13397,6 +13528,93 @@ if ("serviceWorker" in navigator) {
   // CATATAN: produk TIDAK bisa dihapus dari sini lagi — hanya lewat tab
   // "Hapus Data" (masukkan kode produknya, mis. P01). Klik badge kode di
   // setiap baris untuk menyalinnya.
+  // ============================================================
+  // PERATURAN: KUNCI-EDIT UNTUK SEMUA INPUT DI MASTER DATA
+  // ============================================================
+  // Setiap bagian Master Data yang punya input yang bisa diubah user
+  // WAJIB terkunci (disabled) secara default -- baru bisa diedit
+  // setelah user menekan "Mode Edit", supaya tidak ada perubahan tidak
+  // sengaja (mis. kepencet pas scroll di HP). Karena elemen HTML
+  // `disabled` SAMA SEKALI tidak bisa memicu event apa pun (klik/ketik/
+  // ganti), mengunci lewat atribut ini SUDAH CUKUP -- handler "change"
+  // masing-masing field TIDAK PERLU diubah/ditambah guard manual,
+  // otomatis tidak bisa terpicu selama terkunci.
+  //
+  // BAGIAN BARU manapun di Master Data yang punya input WAJIB pakai
+  // helper ini (setupSectionEditLock), BUKAN bikin variabel mode-edit
+  // sendiri secara manual (itu pola lama, cuma dipertahankan apa adanya
+  // di "Daftar Produk" [mdProdukEditMode di bawah] krn strukturnya beda
+  // -- array + drag-reorder + snapshot/Batal yang mengembalikan urutan).
+  //
+  // Cara pakai: taruh markup bar ini PERSIS di atas isi section (ganti
+  // SEC dgn id section, mis. "ekspedisi"):
+  //   <div class="md-produk-editbar locked" id="md-SEC-editbar">
+  //     <div class="md-produk-editbar-status" id="md-SEC-editbar-status">
+  //       <svg id="md-SEC-editbar-icon" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+  //       <span id="md-SEC-editbar-text">Terkunci — aktifkan Mode Edit untuk mengubah</span>
+  //     </div>
+  //     <button type="button" class="md-produk-editbtn" id="md-SEC-edit-toggle">✏️ Mode Edit</button>
+  //     <button type="button" class="md-produk-editbtn primary" id="md-SEC-edit-save" hidden>💾 Simpan &amp; Kunci</button>
+  //   </div>
+  //   <div class="md-lockwrap md-locked" id="md-SEC-lockwrap"> ...isi section (input/select/textarea)... </div>
+  // Lalu panggil sekali di script init: setupSectionEditLock("SEC");
+  // BARU -- fungsi berdiri sendiri (bukan bagian dari closure setup di
+  // bawah) supaya bisa dipanggil ULANG dari MANA SAJA (mis. dari dalam
+  // renderEkspedisiList()/renderLogistikList() dkk, setiap kali daftar
+  // di-render ulang -- baris/input yang BARU dibuat lewat innerHTML
+  // TIDAK otomatis kebawa status terkunci/tidaknya, WAJIB "disegarkan"
+  // manual tiap render ulang, kalau tidak input baru selalu ikut
+  // ke-enable walau section-nya lagi terkunci).
+  function reapplyMdLock(sectionKey){
+    const wrap = document.getElementById(`md-${sectionKey}-lockwrap`);
+    if(!wrap) return;
+    const editMode = !wrap.classList.contains("md-locked");
+    wrap.querySelectorAll("input, select, textarea").forEach(el=>{
+      if(el.classList.contains("md-lock-exempt")) return;
+      el.disabled = !editMode;
+    });
+    wrap.querySelectorAll("button.md-lockable").forEach(el=>{ el.disabled = !editMode; });
+  }
+  function setupSectionEditLock(sectionKey, opts){
+    opts = opts || {};
+    const bar = document.getElementById(`md-${sectionKey}-editbar`);
+    const statusText = document.getElementById(`md-${sectionKey}-editbar-text`);
+    const statusIcon = document.getElementById(`md-${sectionKey}-editbar-icon`);
+    const btnToggle = document.getElementById(`md-${sectionKey}-edit-toggle`);
+    const btnSave = document.getElementById(`md-${sectionKey}-edit-save`);
+    const wrap = document.getElementById(`md-${sectionKey}-lockwrap`);
+    if(!bar || !btnToggle || !btnSave || !wrap) return null; // markup belum ada -> lewati dgn aman, tidak error
+    let editMode = false;
+    function setMode(on){
+      editMode = !!on;
+      wrap.classList.toggle("md-locked", !editMode);
+      bar.classList.toggle("locked", !editMode);
+      bar.classList.toggle("unlocked", editMode);
+      if(statusText) statusText.textContent = editMode ? "Mode Edit aktif — perubahan langsung tersimpan" : "Terkunci — aktifkan Mode Edit untuk mengubah";
+      if(statusIcon) statusIcon.innerHTML = editMode
+        ? '<rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 7.6-1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>'
+        : '<rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>';
+      btnToggle.hidden = editMode;
+      btnSave.hidden = !editMode;
+      reapplyMdLock(sectionKey);
+    }
+    btnToggle.addEventListener("click", ()=>{ setMode(true); if(opts.onEnter) opts.onEnter(); });
+    btnSave.addEventListener("click", ()=>{ setMode(false); if(opts.onExit) opts.onExit(); });
+    setMode(false); // mulai terkunci
+    return { setMode, isEditMode: ()=> editMode, refreshDisabled: ()=> reapplyMdLock(sectionKey) };
+  }
+  // BARU -- dipanggil SEKALI saja di sini (bukan tiap panel Master Data
+  // dibuka -- lihat pemanggilan setMode(false) terpisah di dalam fungsi
+  // buka-panel, pola SAMA seperti setMdProdukEditMode). Manggil
+  // setupSectionEditLock() berulang-ulang akan numpuk event listener
+  // dobel di tombol yang sama -- WAJIB cuma sekali per section.
+  const ekspedisiEditLock = setupSectionEditLock("ekspedisi");
+  const tampilanEditLock = setupSectionEditLock("tampilan");
+  const rumusEditLock = setupSectionEditLock("rumus");
+  const keamananEditLock = setupSectionEditLock("keamanan");
+  const financeEditLock = setupSectionEditLock("finance");
+  const namacustomerEditLock = setupSectionEditLock("namacustomer");
+
   /* ---- Mode Edit: daftar produk TERKUNCI (read-only) secara default
      supaya tidak rawan ter-edit tidak sengaja (mis. kepencet pas
      scroll). Baru bisa diubah setelah tombol "Mode Edit" dinyalakan,
@@ -13470,7 +13688,7 @@ if ("serviceWorker" in navigator) {
           <span class="md-kode-badge" data-copy-kode="${p.kode}" title="Klik untuk salin kode">${p.kode}</span>
           <input type="text" class="md-p-name" ${dis} value="${p.name}" placeholder="Nama produk">
         </div>
-        <input type="text" class="md-p-kodesingkat" ${dis} value="${p.kodeSingkat || ""}" placeholder="mis. HA" maxlength="12" title="Kode singkat untuk kolom di halaman Rekap Pesanan (mis. HA, HS500g)">
+        <input type="text" class="md-p-kodesingkat" ${dis} value="${(p.kodeSingkat || "").toUpperCase()}" placeholder="mis. HA" maxlength="12" style="text-transform:uppercase;" title="Kode singkat untuk kolom di halaman Rekap Pesanan (mis. HA, HS500g) — selalu disimpan huruf besar">
         <input type="text" inputmode="numeric" class="md-p-harga" ${dis} value="${(p.harga||0).toLocaleString('id-ID')}" placeholder="Harga">
         <input type="number" step="0.01" class="md-p-berat md-col-berat" ${dis} value="${p.berat}" placeholder="Berat">
         <input type="text" class="md-p-satuan md-col-satuan" ${dis} value="${p.satuan}" placeholder="Satuan">
@@ -13491,7 +13709,18 @@ if ("serviceWorker" in navigator) {
       bindAutoSelect(row.querySelector(".md-p-berat"));
       bindAutoSelect(row.querySelector(".md-p-satuan"));
       row.querySelector(".md-p-name").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].name = row.querySelector(".md-p-name").value.trim() || PRODUCTS[idx].name; refreshAfterDataChange(); renderProdukList(); });
-      row.querySelector(".md-p-kodesingkat").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].kodeSingkat = row.querySelector(".md-p-kodesingkat").value.trim(); refreshAfterDataChange(); });
+      // BARU (permintaan "kode singkatan pakai huruf besar semua") -- huruf
+      // besar OTOMATIS sambil mengetik (pola sama dgn nama customer di
+      // popup Kirim ke Telegram), BUKAN cuma pas selesai/blur -- supaya
+      // yang tersimpan & tersalin dari sini SELALU huruf besar, konsisten
+      // dgn kolom Rekap Pesanan & data yang dikirim ke bot.
+      const kodeSingkatInput = row.querySelector(".md-p-kodesingkat");
+      kodeSingkatInput.addEventListener("input", ()=>{
+        const pos = kodeSingkatInput.selectionStart;
+        kodeSingkatInput.value = kodeSingkatInput.value.toUpperCase();
+        kodeSingkatInput.setSelectionRange(pos, pos);
+      });
+      kodeSingkatInput.addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].kodeSingkat = kodeSingkatInput.value.trim().toUpperCase(); refreshAfterDataChange(); });
       row.querySelector(".md-p-harga").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].harga = parseRp(row.querySelector(".md-p-harga").value); refreshAfterDataChange(); });
       row.querySelector(".md-p-berat").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].berat = parseFloat(row.querySelector(".md-p-berat").value)||0; refreshAfterDataChange(); });
       row.querySelector(".md-p-satuan").addEventListener("change", ()=>{ if(!mdProdukEditMode) return; PRODUCTS[idx].satuan = row.querySelector(".md-p-satuan").value.trim() || PRODUCTS[idx].satuan; refreshAfterDataChange(); });
@@ -13680,7 +13909,7 @@ if ("serviceWorker" in navigator) {
           <div class="md-e-namewrap">
             <span class="md-kode-badge" data-copy-kode="${e.kode}" title="Klik untuk salin kode">${e.kode}</span>
             <input type="text" class="md-e-name" data-idx="${i}" value="${e.name}">
-            <button class="md-row-detail" data-eksp-detail="${i}" title="Atur rumus: pembulatan berat, minimum charge & subsidi ongkir" aria-label="Rumus ekspedisi">
+            <button class="md-row-detail md-lockable" data-eksp-detail="${i}" title="Atur rumus: pembulatan berat, minimum charge & subsidi ongkir" aria-label="Rumus ekspedisi">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h5M8 17h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </button>
           </div>
@@ -13700,6 +13929,7 @@ if ("serviceWorker" in navigator) {
       btn.addEventListener("click", ()=> openEkspedisiDetail(+btn.dataset.ekspDetail));
     });
     bindKodeBadgeCopy(list);
+    reapplyMdLock("ekspedisi"); // BARU -- input/tombol yang baru dirender ikut kunci status terkini
   }
   const ekspedisiSearchInput = document.getElementById("md-ekspedisi-search");
   if(ekspedisiSearchInput) ekspedisiSearchInput.addEventListener("input", renderEkspedisiList);
@@ -14781,7 +15011,11 @@ if ("serviceWorker" in navigator) {
     const seen = new Set();
     const out = [];
     PRODUCTS.forEach(p=>{
-      const k = (p.kodeSingkat || "").trim();
+      // BARU -- huruf besar dipaksakan di sini juga (pertahanan lapis
+      // kedua, sama alasannya dgn collectOrderItems) supaya header kolom
+      // SELALU cocok dgn kodeSingkat yang dikirim di data pesanan, tidak
+      // peduli bagaimana pun huruf besar/kecilnya tersimpan di Master Data.
+      const k = (p.kodeSingkat || "").trim().toUpperCase();
       if(k && !seen.has(k)){ seen.add(k); out.push(k); }
     });
     return out;
@@ -14961,7 +15195,7 @@ if ("serviceWorker" in navigator) {
     const kartu = (label, nilai)=> `<div style="background:var(--card); border:1px solid var(--primary-green); border-radius:9px; padding:8px 14px; font-size:14px;"><b>${escHtml(label)}</b>: ${nilai}</div>`;
     ekspedisiSummaryEl.innerHTML =
       `<div style="width:100%; font-size:13px; color:var(--ink-soft);">📦 Ringkasan ekspedisi "${escHtml(ekspedisiPilih)}"${adaOngkirKosong ? " — beberapa pesanan lama belum punya data Ongkir, dihitung 0" : ""}:</div>` +
-      kartu("Qty Customer", customerSet.size) +
+      kartu("Total Customer", customerSet.size) +
       kartu("Total KG", Math.round(totalKg*100)/100) +
       kartu("Total Ongkir", rupiah(totalOngkir)); // rupiah() = fungsi format Rp global yang sudah ada di app ini
   }

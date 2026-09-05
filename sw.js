@@ -4,8 +4,18 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v300";
+const CACHE_VERSION = "v302";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v302 -- Kunci-Edit di 6 bagian Master Data (Ekspedisi&Logistik,
+   Tampilan, Rumus, Keamanan, Finance, Master Nama Pelanggan), pola sama
+   spt "Daftar Produk" -- terkunci default, wajib "Mode Edit" dulu utk
+   ubah. Plus kode singkat produk (HA/HS dkk) sekarang selalu huruf
+   besar (index.html & Worker_Rincian_Pemesanan.js), label kartu "Qty
+   Customer" -> "Total Customer", DAN cadangan otomatis render nota
+   lewat server (v301, sempat lolos ketinggalan di build ini -- SUDAH
+   digabung ulang manual, tidak lagi hilang). SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Versi Baru
+   Tersedia", lihat versi 2.32.0 di Riwayat Update index.html). */
 /* v300 -- opsi baru "Render Nota Lewat Server" (Master Data > Tampilan,
    nonaktif secara default): gambar Rincian Pemesanan bisa dirender via
    Browserless.io (server) alih-alih html2canvas di HP CS -- draft
