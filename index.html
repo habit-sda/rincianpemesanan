@@ -2307,6 +2307,27 @@
   .md-nama-pagination button:hover:not(:disabled){background:var(--paper-dark);}
   .md-nama-pagination button:disabled{opacity:.4;cursor:not-allowed;}
   .md-nama-page-info{font-size:12px;color:var(--ink-soft);white-space:nowrap;}
+  /* BARU -- Master Nama v2 (pasangan Customer+CS, alias, saran ketidaksinkronan) */
+  .md-nama-row.v2{flex-direction:column;align-items:stretch;gap:8px;}
+  .md-nama-fields{display:flex;gap:8px;flex-wrap:wrap;}
+  .md-nama-fields .fld{flex:1;min-width:140px;}
+  .md-nama-fields .fld-label{font-size:10.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;}
+  .md-nama-fields .fld-val{font-size:13.5px;font-weight:700;color:var(--ink);word-break:break-word;}
+  .md-nama-fields .fld-val.cs{color:var(--primary-green);}
+  .md-nama-fields .fld-val.empty{color:var(--ink-soft);font-weight:400;font-style:italic;}
+  .md-nama-row-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .md-nama-alias-wrap{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+  .md-nama-alias-label{font-size:10.5px;color:var(--ink-soft);margin-right:2px;}
+  .md-alias-chip{display:inline-flex;align-items:center;gap:5px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px 6px 3px 10px;font-size:11.5px;color:var(--ink-soft);}
+  .md-alias-chip button{border:none;background:none;color:var(--danger-red);cursor:pointer;font-size:12px;padding:0 2px;line-height:1;}
+  .md-nama-suggest-card{border:1px solid #ffd48a;background:#fff8ec;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12.5px;color:var(--ink);}
+  .md-nama-suggest-card .row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .md-nama-suggest-card .txt{flex:1;min-width:200px;}
+  .md-nama-suggest-card .btns{display:flex;gap:6px;flex-shrink:0;}
+  .md-nama-suggest-card .btns button{border:1px solid var(--line);background:var(--card);border-radius:7px;padding:6px 10px;font-size:11.5px;cursor:pointer;}
+  .md-nama-suggest-card .btns button.sync{color:#1a73e8;}
+  .md-nama-suggest-card .btns button.hide{color:var(--danger-red);}
+  .md-nama-dedupe-note{font-size:11.5px;color:var(--primary-green);font-weight:700;margin-bottom:10px;}
   @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
     .md-panel{padding:0;display:block;background:#ffffff;}
     .md-panel-sheet{border-radius:0;max-width:none;box-shadow:none;padding:16px 16px 40px;}
@@ -4530,7 +4551,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="home-side">
         <div class="home-section-label">Aksi cepat</div>
         <div class="home-actionlist">
-          <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-actionrow tg">
+          <a href="https://t.me/+RtDvshvsHr1jijhm" target="_blank" rel="noopener" class="home-actionrow tg" id="home-actionrow-telegram">
             <span class="home-actionrow-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none"><path d="M17.7 7.3l-2.1 10.1c-.16.7-.58.87-1.17.54l-3.24-2.39-1.56 1.5c-.17.17-.32.32-.65.32l.23-3.3 5.98-5.4c.26-.23-.06-.36-.4-.13l-7.4 4.66-3.18-1c-.69-.21-.7-.69.14-1.02l12.44-4.8c.58-.21 1.08.14.9 1.02z" fill="#fff"/></svg>
             </span>
@@ -5809,8 +5830,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-lockwrap md-locked" id="md-namacustomer-lockwrap">
       <div class="md-card">
         <h3>Master Nama Pelanggan</h3>
-        <div class="md-note" style="margin-bottom:12px;">Daftar nama yang muncul sebagai rekomendasi otomatis di field "Nama Customer" (popup Kirim ke Grup Telegram). Mengganti/menghapus nama di sini <b>HANYA</b> mengubah daftar rekomendasi ini — Rincian Pemesanan, riwayat ongkir, dan riwayat resi yang sudah terkirim sebelumnya tidak ikut berubah. Daftar ini permanen (tidak pernah terhapus otomatis oleh sistem manapun) — hapus di sini kalau memang perlu dibersihkan manual (mis. salah ketik/duplikat).</div>
-        <input type="text" id="md-nama-search" class="md-lock-exempt" placeholder="Cari nama..." style="width:100%;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;margin-bottom:12px;">
+        <div class="md-note" style="margin-bottom:12px;">Daftar Customer + CS terdaftar, dipakai sebagai rekomendasi otomatis di field "Nama Customer" (popup Kirim ke Grup Telegram) <b>DAN</b> otomatis disinkronkan ke Rekap Pesanan &amp; Follow Up: ganti nama di sini akan menggabungkan riwayat lama (sebagai alias) ke nama baru, dan "🙈 Sembunyikan" akan menyembunyikan customer itu dari Rekap Pesanan/Follow Up (bukan hapus permanen — bisa dipulihkan kapan saja).</div>
+        <div id="md-nama-suggestions"></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="text" id="md-nama-search" class="md-lock-exempt" placeholder="Cari nama customer/CS..." style="flex:1;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;">
+          <button type="button" id="md-nama-toggle-hidden" class="md-lock-exempt" style="flex-shrink:0;height:40px;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:0 14px;font-size:12.5px;cursor:pointer;white-space:nowrap;">🙈 Tersembunyi (<span id="md-nama-hidden-count">0</span>)</button>
+        </div>
         <div id="md-nama-list"></div>
       </div>
       </div>
@@ -8807,6 +8832,12 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
      itu dibuang dari rekomendasi — soalnya "NEW" cuma berlaku 1x buat
      pesanan pertama. */
   let nameHistory = [];
+  // BARU -- true kalau nama yang sedang di field ini didapat dari KLIK
+  // kotak rekomendasi (bukan diketik manual) -- dipakai deteksi
+  // "customer baru" (kata kunci "NEW" DI AKHIR nama ATAU tidak diklik
+  // dari rekomendasi -> dianggap customer baru, otomatis terdaftar ke
+  // Master Nama sebagai milik CS yang input, lihat btnSend listener).
+  let pickedFromSuggestion = false;
   async function loadNameHistory(){
     if(!MASTER_DATA_WORKER_URL) return;
     try{
@@ -8890,6 +8921,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       el.addEventListener("mousedown", (e)=>{
         e.preventDefault(); // supaya input tidak keburu blur sebelum klik diproses
         nameInput.value = matches[i];
+        pickedFromSuggestion = true; // BARU -- dipilih dari rekomendasi -> BUKAN customer baru
         hideSuggestions();
         updateSendBtnState();
         checkDuplicateNameWarning(nameInput.value); // BARU -- nama dipilih dari daftar (persis nama lama), wajar langsung kena peringatan
@@ -9097,6 +9129,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   // supaya konsisten. Simpan posisi kursor supaya tidak "loncat" ke
   // akhir teks saat mengetik di tengah kata.
   nameInput.addEventListener("input", ()=>{
+    pickedFromSuggestion = false; // BARU -- diketik manual lagi (bukan diklik dari rekomendasi) -> reset penanda
     const pos = nameInput.selectionStart;
     nameInput.value = nameInput.value.toUpperCase();
     nameInput.setSelectionRange(pos, pos);
@@ -9133,6 +9166,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   function openModal(){
     statusEl.textContent = "";
     statusEl.style.color = "";
+    pickedFromSuggestion = false; // BARU -- popup baru dibuka, reset penanda "dipilih dari rekomendasi"
     refreshSenderPreview();
     updateSendBtnState();
     hideSuggestions();
@@ -9175,7 +9209,12 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   btnSend.addEventListener("click", async ()=>{
     // BARU -- sama seperti autosaveDraft(): buang "NEW" sebelum benar-benar
     // dikirim & tersimpan, supaya tidak nempel permanen di nama customer.
-    const customerName = stripNewTag(nameInput.value.trim());
+    const rawNameBeforeStrip = nameInput.value.trim();
+    const customerName = stripNewTag(rawNameBeforeStrip);
+    // BARU -- deteksi "customer baru" (otomatis terdaftar ke Master Nama
+    // sbg milik CS yang input): kata kunci "NEW" di akhir nama, ATAU CS
+    // TIDAK klik dari kotak rekomendasi saat mau kirim.
+    const isNewCustomer = /\s*NEW\s*$/i.test(rawNameBeforeStrip) || !pickedFromSuggestion;
     const senderId = getTelegramSenderId();
     if(!customerName){
       statusEl.textContent = "Nama customer wajib diisi.";
@@ -9224,6 +9263,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         items,
         isRevisi: !!(revisiCheck && revisiCheck.checked),
         revisiTargetMessageId: pendingRevisiTargetMessageId,
+        isNewCustomer, // BARU -- lihat catatan deteksi di atas
       });
 
       // BARU -- teks status beda tergantung jalurnya, supaya CS tahu apa
@@ -12955,30 +12995,43 @@ if ("serviceWorker" in navigator) {
     window.__mdCheckStatus = checkStatus;
   })();
 
-  /* ---------- Master Nama Pelanggan ----------
+  /* ---------- Master Nama Pelanggan (v2) ----------
      Dimuat otomatis begitu tab "Master Nama" dibuka (lihat pemanggilan di
      handler klik .md-tab di bawah). Edit/hapus langsung ke server (bukan
      ke SETTINGS lokal) supaya semua device lihat daftar yang sama.
-     BARU -- daftar yang dikembalikan GET /customer-names SEKARANG sudah
-     otomatis dibersihkan dari tag " NEW" (+ duplikat lamanya) di sisi
-     worker (lihat getCustomerNameHistory di Worker_RincianPemesanan.js),
-     jadi tab ini TIDAK PERLU strip manual lagi di sini -- nama yang
-     tampil di sini sudah pasti bersih. Ini SENGAJA beda dari Rekap
-     Pesanan, yang memang harus tetap tampilkan "NEW" apa adanya. */
+     BARU (rombak total) -- sekarang 1 baris = 1 customer dgn PASANGAN
+     Nama Customer + Nama CS (bisa diedit sekaligus), daftar "Nama Lama"
+     (alias hasil ganti nama, bisa dihapus satu-satu tanpa menyentuh data
+     pesanan), tombol "🙈 Sembunyikan"/"♻️ Pulihkan" (soft-hide, BUKAN
+     hapus permanen -- Rekap Pesanan & Follow Up otomatis ikut
+     menyembunyikan/memunculkan lagi), dan kartu saran ketidaksinkronan
+     (nama Master Nama vs nama yang benar-benar dipakai di data pesanan,
+     kalau ada >=5 karakter identik tapi tidak 100% sama). */
   (function(){
     const listEl = document.getElementById("md-nama-list");
     const searchEl = document.getElementById("md-nama-search");
+    const suggestWrapEl = document.getElementById("md-nama-suggestions");
+    const toggleHiddenBtn = document.getElementById("md-nama-toggle-hidden");
+    const hiddenCountEl = document.getElementById("md-nama-hidden-count");
     if(!listEl || !searchEl) return;
-    let allNames = [];
-    let editingName = null;
+    let allCustomers = [];   // aktif (tidak disembunyikan)
+    let hiddenCustomers = [];
+    let showHidden = false;
+    let editingName = null;  // nama AKTIF baris yang sedang diedit
     let currentPage = 1;
     const PAGE_SIZE = 20;
 
     function escapeHtmlNama(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
     function getFiltered(){
+      const source = showHidden ? hiddenCustomers : allCustomers;
       const q = searchEl.value.trim().toLowerCase();
-      return q ? allNames.filter(n=> n.toLowerCase().includes(q)) : allNames;
+      if(!q) return source;
+      return source.filter(c=>
+        (c.name || "").toLowerCase().includes(q) ||
+        (c.cs || "").toLowerCase().includes(q) ||
+        (Array.isArray(c.aliases) && c.aliases.some(a=> (a||"").toLowerCase().includes(q)))
+      );
     }
 
     function paginationHtml(totalPages){
@@ -12991,10 +13044,25 @@ if ("serviceWorker" in navigator) {
         </div>`;
     }
 
+    function aliasChipsHtml(c){
+      const aliases = Array.isArray(c.aliases) ? c.aliases : [];
+      if(!aliases.length) return "";
+      return `
+        <div class="md-nama-alias-wrap">
+          <span class="md-nama-alias-label">↳ Nama lama:</span>
+          ${aliases.map(a=> `<span class="md-alias-chip">${escapeHtmlNama(a)}<button type="button" class="md-alias-del" data-alias="${escapeHtmlNama(a)}" title="Hapus alias ini (tidak menyentuh data pesanan)">✕</button></span>`).join("")}
+        </div>`;
+    }
+
     function render(){
       const filtered = getFiltered();
+      toggleHiddenBtn.textContent = showHidden ? "👁️ Tampilkan Aktif" : "🙈 Tersembunyi (" + hiddenCustomers.length + ")";
       if(!filtered.length){
-        listEl.innerHTML = `<div class="md-hanging-empty">${allNames.length ? "Tidak ada nama yang cocok dicari." : "Belum ada nama tersimpan."}</div>`;
+        listEl.innerHTML = `<div class="md-hanging-empty">${
+          (showHidden ? hiddenCustomers.length : allCustomers.length)
+            ? "Tidak ada yang cocok dicari."
+            : (showHidden ? "Tidak ada customer yang disembunyikan." : "Belum ada nama tersimpan.")
+        }</div>`;
         return;
       }
       const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -13003,26 +13071,113 @@ if ("serviceWorker" in navigator) {
       const start = (currentPage - 1) * PAGE_SIZE;
       const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
-      const rowsHtml = pageItems.map(n=>{
-        if(n === editingName){
+      const rowsHtml = pageItems.map(c=>{
+        const n = c.name;
+        if(!showHidden && n === editingName){
           return `
-            <div class="md-nama-row" data-name="${escapeHtmlNama(n)}">
-              <div class="md-nama-edit-row">
-                <input type="text" class="md-nama-edit-input" value="${escapeHtmlNama(n)}">
-                <button type="button" class="edit md-nama-save">Simpan</button>
+            <div class="md-nama-row v2" data-name="${escapeHtmlNama(n)}">
+              <div class="md-nama-fields">
+                <div class="fld">
+                  <div class="fld-label">Nama Customer</div>
+                  <input type="text" class="md-nama-edit-input md-nama-edit-customer" value="${escapeHtmlNama(n)}" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
+                </div>
+                <div class="fld">
+                  <div class="fld-label">Nama CS</div>
+                  <input type="text" class="md-nama-edit-input md-nama-edit-cs" value="${escapeHtmlNama(c.cs || "")}" placeholder="(kosong)" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
+                </div>
+              </div>
+              ${aliasChipsHtml(c)}
+              <div class="md-nama-row-actions">
+                <button type="button" class="edit md-nama-save">💾 Simpan</button>
                 <button type="button" class="del md-nama-cancel">Batal</button>
               </div>
             </div>`;
         }
+        if(showHidden){
+          return `
+            <div class="md-nama-row v2" data-name="${escapeHtmlNama(n)}">
+              <div class="md-nama-fields">
+                <div class="fld"><div class="fld-label">Nama Customer</div><div class="fld-val">${escapeHtmlNama(n)}</div></div>
+                <div class="fld"><div class="fld-label">Nama CS</div><div class="fld-val cs ${c.cs ? "" : "empty"}">${c.cs ? escapeHtmlNama(c.cs) : "(kosong)"}</div></div>
+              </div>
+              <div class="md-nama-row-actions">
+                <button type="button" class="edit md-nama-unhide-btn">♻️ Pulihkan</button>
+              </div>
+            </div>`;
+        }
         return `
-          <div class="md-nama-row" data-name="${escapeHtmlNama(n)}">
-            <span class="nm">${escapeHtmlNama(n)}</span>
-            <button type="button" class="edit md-nama-edit-btn">✏️ Edit</button>
-            <button type="button" class="del md-nama-del-btn">🗑️ Hapus</button>
+          <div class="md-nama-row v2" data-name="${escapeHtmlNama(n)}">
+            <div class="md-nama-fields">
+              <div class="fld"><div class="fld-label">Nama Customer</div><div class="fld-val">${escapeHtmlNama(n)}</div></div>
+              <div class="fld"><div class="fld-label">Nama CS</div><div class="fld-val cs ${c.cs ? "" : "empty"}">${c.cs ? escapeHtmlNama(c.cs) : "(kosong)"}</div></div>
+            </div>
+            ${aliasChipsHtml(c)}
+            <div class="md-nama-row-actions">
+              <button type="button" class="edit md-nama-edit-btn">✏️ Edit</button>
+              <button type="button" class="del md-nama-del-btn">🙈 Sembunyikan</button>
+            </div>
           </div>`;
       }).join("");
 
       listEl.innerHTML = rowsHtml + paginationHtml(totalPages);
+    }
+
+    /* ---------- Kartu saran ketidaksinkronan ---------- */
+    async function loadSuggestions(){
+      if(!suggestWrapEl || !MASTER_DATA_WORKER_URL) return;
+      try{
+        const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/mismatch-suggestions", { headers: workerHeaders() });
+        const data = await res.json().catch(()=> ({}));
+        const suggestions = Array.isArray(data.suggestions) ? data.suggestions : [];
+        if(!suggestions.length){ suggestWrapEl.innerHTML = ""; return; }
+        suggestWrapEl.innerHTML = (data.dedupedAny
+          ? `<div class="md-nama-dedupe-note">✓ Ditemukan &amp; digabung otomatis nama yang 100% identik dobel di Master Nama.</div>`
+          : ""
+        ) + suggestions.map((s, i)=> `
+          <div class="md-nama-suggest-card" data-idx="${i}">
+            <div class="row">
+              <div class="txt">🔎 Nama transaksi <b>"${escapeHtmlNama(s.orderName)}"</b> mirip dengan Master Nama <b>"${escapeHtmlNama(s.masterName)}"</b> tapi tidak 100% sama — apakah customer yang sama?</div>
+              <div class="btns">
+                <button type="button" class="sync md-nama-sugg-sync">🔄 Sinkronkan</button>
+                <button type="button" class="hide md-nama-sugg-hide">🙈 Sembunyikan</button>
+              </div>
+            </div>
+          </div>`
+        ).join("");
+        suggestWrapEl.querySelectorAll(".md-nama-suggest-card").forEach(card=>{
+          const idx = Number(card.dataset.idx);
+          const s = suggestions[idx];
+          if(!s) return;
+          const syncBtn = card.querySelector(".md-nama-sugg-sync");
+          const hideBtn = card.querySelector(".md-nama-sugg-hide");
+          if(syncBtn) syncBtn.addEventListener("click", async ()=>{
+            if(!confirm(`Gabungkan "${s.orderName}" sebagai nama lama dari "${s.masterName}"?\n\nSetelah ini, pesanan lama atas nama "${s.orderName}" akan tampil tergabung di bawah "${s.masterName}" di Rekap Pesanan/Follow Up.`)) return;
+            try{
+              const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/add-alias", {
+                method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ name: s.masterName, alias: s.orderName }),
+              });
+              const data2 = await res.json();
+              if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyinkronkan.");
+              await loadNames();
+              await loadSuggestions();
+            }catch(err){ alert("Gagal menyinkronkan: " + String(err.message || err)); }
+          });
+          if(hideBtn) hideBtn.addEventListener("click", async ()=>{
+            if(!confirm(`Sembunyikan "${s.orderName}" dari Rekap Pesanan/Follow Up?\n\nBisa dipulihkan kapan saja lewat "🙈 Tersembunyi".`)) return;
+            try{
+              const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
+                method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ name: s.orderName }),
+              });
+              const data2 = await res.json();
+              if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyembunyikan.");
+              await loadNames();
+              await loadSuggestions();
+            }catch(err){ alert("Gagal menyembunyikan: " + String(err.message || err)); }
+          });
+        });
+      }catch(e){ console.log("Gagal ambil saran ketidaksinkronan:", e); }
     }
 
     async function loadNames(){
@@ -13030,7 +13185,8 @@ if ("serviceWorker" in navigator) {
       try{
         const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
         const data = await res.json();
-        allNames = Array.isArray(data.names) ? data.names : [];
+        allCustomers = Array.isArray(data.customers) ? data.customers : [];
+        hiddenCustomers = Array.isArray(data.hiddenCustomers) ? data.hiddenCustomers : [];
         currentPage = 1;
         render();
       }catch(e){
@@ -13039,6 +13195,13 @@ if ("serviceWorker" in navigator) {
     }
 
     searchEl.addEventListener("input", ()=>{ currentPage = 1; render(); });
+    if(toggleHiddenBtn) toggleHiddenBtn.addEventListener("click", ()=>{
+      showHidden = !showHidden;
+      editingName = null;
+      currentPage = 1;
+      searchEl.value = "";
+      render();
+    });
 
     listEl.addEventListener("click", async (e)=>{
       if(e.target.classList.contains("md-nama-page-prev")){
@@ -13051,10 +13214,41 @@ if ("serviceWorker" in navigator) {
       if(!row) return;
       const name = row.dataset.name;
 
+      if(e.target.classList.contains("md-alias-del")){
+        const alias = e.target.dataset.alias;
+        if(!confirm(`Hapus "${alias}" dari daftar nama lama "${name}"?\n\nTIDAK menyentuh data pesanan apa pun -- alias lama ini cuma berhenti otomatis tergabung ke "${name}".`)) return;
+        try{
+          const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete-alias", {
+            method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify({ name, alias }),
+          });
+          const data = await res.json();
+          if(!res.ok || data.error) throw new Error(data.error || "Gagal menghapus alias.");
+          allCustomers = data.customers || allCustomers;
+          render();
+        }catch(err){ alert("Gagal menghapus alias: " + String(err.message || err)); }
+        return;
+      }
+
+      if(e.target.classList.contains("md-nama-unhide-btn")){
+        try{
+          const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/unhide", {
+            method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify({ name }),
+          });
+          const data = await res.json();
+          if(!res.ok || data.error) throw new Error(data.error || "Gagal memulihkan.");
+          await loadNames();
+          showHidden = false;
+          render();
+        }catch(err){ alert("Gagal memulihkan: " + String(err.message || err)); }
+        return;
+      }
+
       if(e.target.classList.contains("md-nama-edit-btn")){
         editingName = name;
         render();
-        const input = listEl.querySelector(".md-nama-edit-input");
+        const input = listEl.querySelector(".md-nama-edit-customer");
         if(input){ input.focus(); input.select(); }
         return;
       }
@@ -13064,54 +13258,58 @@ if ("serviceWorker" in navigator) {
         return;
       }
       if(e.target.classList.contains("md-nama-save")){
-        const input = row.querySelector(".md-nama-edit-input");
-        const newName = input ? input.value.trim() : "";
-        if(!newName){ alert("Nama baru tidak boleh kosong."); return; }
-        if(newName === name){ editingName = null; render(); return; }
+        const custInput = row.querySelector(".md-nama-edit-customer");
+        const csInput = row.querySelector(".md-nama-edit-cs");
+        const newName = custInput ? custInput.value.trim().toUpperCase() : "";
+        const newCs = csInput ? csInput.value.trim() : "";
+        if(!newName){ alert("Nama customer tidak boleh kosong."); return; }
         try{
-          const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/rename", {
+          // Ubah nama customer (jadi alias otomatis) HANYA kalau memang berubah.
+          if(newName !== name){
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/rename", {
+              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ oldName: name, newName }),
+            });
+            const data = await res.json();
+            if(!res.ok || data.error) throw new Error(data.error || "Gagal menyimpan nama.");
+            allCustomers = data.customers || allCustomers;
+          }
+          // Simpan CS terdaftar (dicek by nama AKTIF SEKARANG, yaitu newName).
+          const res2 = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/set-cs", {
             method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-            body: JSON.stringify({ oldName: name, newName }),
+            body: JSON.stringify({ name: newName, cs: newCs }),
           });
-          const data = await res.json();
-          if(!res.ok || data.error) throw new Error(data.error || "Gagal menyimpan.");
-          allNames = data.names;
+          const data2 = await res2.json();
+          if(!res2.ok || data2.error) throw new Error(data2.error || "Gagal menyimpan CS.");
+          allCustomers = data2.customers || allCustomers;
           editingName = null;
           render();
+          loadSuggestions();
         }catch(err){
-          alert("Gagal mengubah nama: " + String(err.message || err));
+          alert("Gagal menyimpan: " + String(err.message || err));
         }
         return;
       }
       if(e.target.classList.contains("md-nama-del-btn")){
-        // PENTING -- sejak fitur ini ditambahkan, hapus di sini JUGA
-        // menghapus PERMANEN riwayat pesanan Lunas customer ini yang
-        // dipakai menu Follow Up (pola repeat-order/grafik riwayat) --
-        // BUKAN cuma dari daftar rekomendasi nama. Rincian Pemesanan
-        // (Rekap Pesanan) yang sudah terkirim tetap TIDAK berubah, tapi
-        // data Follow Up customer ini akan mulai dari NOL lagi kalau dia
-        // order lagi nanti. Makanya konfirmasinya ditulis tegas.
-        if(!confirm(`Hapus "${name}"?\n\nIni akan:\n- Menghapus "${name}" dari daftar rekomendasi nama.\n- Menghapus PERMANEN riwayat pesanan customer ini di menu Follow Up (pola repeat-order, grafik riwayat) -- TIDAK BISA dikembalikan.\n\nRincian Pemesanan/Rekap Pesanan yang sudah terkirim TIDAK ikut berubah/hilang.`)) return;
+        // BARU -- ini SEKARANG soft-hide (TIDAK menghapus data apa pun secara
+        // permanen). Customer langsung hilang dari Rekap Pesanan & Follow Up,
+        // tapi bisa dipulihkan kapan saja lewat "🙈 Tersembunyi" di atas.
+        if(!confirm(`Sembunyikan "${name}" dari Rekap Pesanan &amp; Follow Up?\n\nData pesanan customer ini TIDAK dihapus -- bisa dipulihkan kapan saja lewat tombol "🙈 Tersembunyi" di atas daftar.`)) return;
         try{
           const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
             method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
             body: JSON.stringify({ name }),
           });
           const data = await res.json();
-          if(!res.ok || data.error) throw new Error(data.error || "Gagal menghapus.");
-          allNames = data.names;
-          render();
-          const jumlah = Number(data.deletedRows) || 0;
-          if(jumlah > 0){
-            alert(`"${name}" dihapus. ${jumlah} baris riwayat Follow Up customer ini ikut dihapus permanen.`);
-          }
+          if(!res.ok || data.error) throw new Error(data.error || "Gagal menyembunyikan.");
+          await loadNames();
         }catch(err){
-          alert("Gagal menghapus nama: " + String(err.message || err));
+          alert("Gagal menyembunyikan nama: " + String(err.message || err));
         }
       }
     });
 
-    window.__mdLoadNamaList = loadNames;
+    window.__mdLoadNamaList = ()=>{ loadNames(); loadSuggestions(); };
   })();
 
   /* ---------- Daftar Finance (dipakai worker untuk validasi reaction/konfirmasi) ---------- */
@@ -16350,19 +16548,29 @@ if ("serviceWorker" in navigator) {
 <script>
   /* ============================================================
      PINTASAN APP SHORTCUTS (long-press ikon di homescreen HP)
-     Cuma 2: Penjualan (Grosir) & Custom -- dibaca dari query string
-     ?shortcut=... yang dikirim manifest.json (field "shortcuts").
-     SENGAJA ditaruh di paling akhir file (sebelum </body>) supaya
-     tombol [data-open-tab] (yang memicu openTab()) dijamin sudah
-     terpasang duluan. Tidak menyentuh logic navigasi yang sudah ada
-     sama sekali -- cuma memicu klik tombol yang SUDAH ADA di Beranda,
-     persis pola yang dipakai blok tombol Back Telegram di atasnya.
+     3 pintasan: Penjualan (Grosir), Custom, & Grup Telegram -- dibaca
+     dari query string ?shortcut=... yang dikirim manifest.json (field
+     "shortcuts"). SENGAJA ditaruh di paling akhir file (sebelum
+     </body>) supaya tombol [data-open-tab] (yang memicu openTab()) dan
+     tombol #home-actionrow-telegram dijamin sudah terpasang duluan.
+     Tidak menyentuh logic navigasi yang sudah ada sama sekali -- cuma
+     memicu klik tombol yang SUDAH ADA di Beranda, persis pola yang
+     dipakai blok tombol Back Telegram di atasnya. Shortcut "telegram"
+     TIDAK bisa langsung diarahkan ke t.me di manifest.json (spec
+     shortcuts mewajibkan url dalam scope app sendiri) -- makanya
+     lewat ?shortcut=telegram dulu, baru dari sini klik tombol yang
+     sudah ada, yang membuka t.me di tab/app baru (target="_blank").
      ============================================================ */
   (function(){
     try{
       const shortcut = new URLSearchParams(location.search).get("shortcut");
-      if(shortcut !== "penjualan" && shortcut !== "custom") return;
+      if(shortcut !== "penjualan" && shortcut !== "custom" && shortcut !== "telegram") return;
       setTimeout(function(){
+        if(shortcut === "telegram"){
+          const link = document.getElementById("home-actionrow-telegram");
+          if(link) link.click();
+          return;
+        }
         const btn = document.querySelector('[data-open-tab="'+shortcut+'"]');
         if(btn) btn.click();
       }, 50); // delay kecil -- pastikan semua event listener sempat terpasang

@@ -4,8 +4,19 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v305";
+const CACHE_VERSION = "v306";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v306 -- Pintasan baru "Grup Telegram" (long-press ikon di homescreen)
+   pakai icon Telegram identik (biru #1e96e8 + logo kertas terbang,
+   sama seperti tombol "Buka Payment Telegram" di Aksi cepat). Karena
+   spec App Shortcuts mewajibkan url dalam scope app sendiri (tidak
+   boleh langsung ke t.me), pintasan ini lewat
+   ?shortcut=telegram lalu index.html yang men-klik tombol Aksi Cepat
+   yang SUDAH ADA (id="home-actionrow-telegram", ditambahkan di sini)
+   -- yang lalu membuka t.me di tab/app terpisah seperti biasa. Tidak
+   ada logic baru, cuma memicu tombol lama. SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Versi Baru
+   Tersedia"). */
 /* v305 -- Optimasi performa: html2canvas (library ~200KB, sebelumnya
    di-load BLOCKING lewat <script src> di <head> -- diunduh & di-parse
    di SETIAP app dibuka walau cuma dipakai saat generate gambar
@@ -300,7 +311,8 @@ const CORE_ASSETS = [
   "./habit-logo.png",
   "./habit-hero.png",
   "./icon-grosir-192.png",
-  "./icon-custom-192.png"
+  "./icon-custom-192.png",
+  "./icon-telegram-192.png"
 ];
 /* ---------- INSTALL: simpan app-shell ke cache ---------- */
 self.addEventListener("install", (event) => {
