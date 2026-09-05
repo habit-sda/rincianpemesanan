@@ -112,6 +112,15 @@
       "icons": [
         { "src": "icon-custom-192.png", "sizes": "192x192", "type": "image/png" }
       ]
+    },
+    {
+      "name": "Grup Telegram",
+      "short_name": "Telegram",
+      "description": "Buka grup Payment Telegram",
+      "url": "./index.html?shortcut=telegram",
+      "icons": [
+        { "src": "icon-telegram-192.png", "sizes": "192x192", "type": "image/png" }
+      ]
     }
   ]
 }
