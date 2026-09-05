@@ -5829,7 +5829,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.30.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.30.1</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6025,7 +6025,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.30.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.30.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug: tombol back fisik/gesture HP langsung menutup aplikasi</b> saat lagi buka menu "Rekap Pesanan" atau "Follow Up" — sekarang mundur satu langkah dulu ke tampilan sebelumnya (Beranda atau tab yang lagi dibuka), sama seperti navigasi Beranda ↔ tab lain yang sudah lebih dulu berperilaku begitu. Tombol "← Kembali" di dalam kedua kartu itu ikut memakai jalur yang sama.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.30.0</div>
           <ul>
             <li><b>Tampilan tabel Rekap Pesanan (desktop) dirapikan</b> — kolom "Hari" dihapus (info tanggal/hari tetap ada lewat kolom "Tgl/Jam" &amp; filter "Semua Hari" di atas tabel), supaya tabel tidak terlalu lebar.</li>
             <li><b>Tombol baru "🙈 Sembunyikan Varian" / "👁️ Tampilkan Varian"</b> di toolbar Rekap Pesanan (khusus tampilan desktop) — sembunyikan sementara kolom-kolom varian produk supaya tabel lebih ringkas & jelas dibaca di layar komputer yang sempit. Preferensi disimpan per-perangkat, tidak mempengaruhi tampilan kartu di HP maupun Ekspor CSV (keduanya tetap selalu menampilkan semua varian).</li>
@@ -10447,11 +10453,32 @@ if ("serviceWorker" in navigator) {
      riwayat browser) — dipakai baik oleh navigasi tombol (yang push
      riwayat baru) maupun oleh popstate (yang tidak boleh push lagi,
      supaya tidak bikin loop maju-mundur). ---------- */
+  // BARU -- tombol back fisik/gesture HP (dan tombol back Telegram Mini
+  // App) sebelumnya LANGSUNG KELUAR APLIKASI kalau ditekan waktu lagi
+  // buka Rekap Pesanan/Follow Up, karena kedua halaman itu tidak pernah
+  // menambah entri riwayat browser (history.pushState) saat dibuka --
+  // beda dgn navigasi Beranda<->tab<->step wizard di bawah yang SUDAH
+  // pakai pola ini. Sekarang openRekapPesanan()/openFollowUp() (lihat
+  // window.__openRekapPesanan/__openFollowUp di script Rekap Pesanan &
+  // Follow Up masing2) ikut push riwayat, jadi tombol back HP mundur
+  // SATU LANGKAH dulu ke tampilan sebelumnya (Beranda atau tab yang lagi
+  // dibuka), baru kalau ditekan lagi benar2 keluar app -- bukan langsung
+  // keluar dari 1 kali tekan. leaveFullPageViews() di bawah memastikan
+  // auto-refresh & popup batas sesi punya Rekap Pesanan (window.
+  // __leaveRekapView) ikut dihentikan rapi tiap kali tampilan itu
+  // ditinggalkan, dari jalur mana pun (bukan cuma lewat tombol "←
+  // Kembali" di dalam kartunya sendiri).
+  function leaveFullPageViews(){
+    if(document.body.classList.contains("showing-rekap")){
+      document.body.classList.remove("showing-rekap");
+      if(window.__leaveRekapView) window.__leaveRekapView();
+    }
+    document.body.classList.remove("showing-followup");
+  }
   function applyHomeView(){
+    leaveFullPageViews(); // BARU -- tutup rapi Rekap Pesanan/Follow Up dulu kalau lagi aktif
     body.classList.add("showing-home");
     body.classList.remove("nota-confirmed");
-    body.classList.remove("showing-rekap"); // BARU -- keluar dari halaman Rekap Pesanan kalau balik ke Beranda dari mana pun
-    body.classList.remove("showing-followup"); // BARU -- keluar dari halaman Follow Up kalau balik ke Beranda dari mana pun
     window.scrollTo(0,0);
   }
   function applyWizStep(sheet, step){
@@ -10477,11 +10504,28 @@ if ("serviceWorker" in navigator) {
       return;
     }
     if(state.view === "wiz"){
+      leaveFullPageViews(); // BARU -- kalau sebelumnya di Rekap Pesanan/Follow Up, tutup dulu
       body.classList.remove("showing-home");
       const btn = document.querySelector(`.tab-btn[data-tab="${state.sheet}"]`);
       if(btn && !btn.classList.contains("active")) btn.click();
       applyWizStep(state.sheet, state.step);
       window.scrollTo(0,0);
+      return;
+    }
+    // BARU -- tampilan Rekap Pesanan/Follow Up sekarang ikut ditangkap
+    // popstate (lihat window.__applyRekapView/__applyFollowUpView di
+    // script masing2), TANPA push riwayat baru (mencegah loop maju-mundur).
+    if(state.view === "rekap"){
+      leaveFullPageViews();
+      body.classList.remove("showing-home");
+      if(window.__applyRekapView) window.__applyRekapView();
+      return;
+    }
+    if(state.view === "followup"){
+      leaveFullPageViews();
+      body.classList.remove("showing-home");
+      if(window.__applyFollowUpView) window.__applyFollowUpView();
+      return;
     }
   }
   window.addEventListener("popstate", (e)=> applyNavState(e.state));
@@ -10492,9 +10536,8 @@ if ("serviceWorker" in navigator) {
     try{ history.pushState({view:"home"}, ""); }catch(e){}
   }
   function openTab(tab){
+    leaveFullPageViews(); // BARU -- keluar dari Rekap Pesanan/Follow Up kalau langsung klik Penjualan/Custom dari sidebar
     body.classList.remove("showing-home");
-    body.classList.remove("showing-rekap"); // BARU -- keluar dari Rekap Pesanan kalau langsung klik Penjualan/Custom dari sidebar
-    body.classList.remove("showing-followup"); // BARU -- keluar dari Follow Up kalau langsung klik Penjualan/Custom dari sidebar
     const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
     if(btn) btn.click();
     wizGo(tab, "list");
@@ -14539,6 +14582,23 @@ if ("serviceWorker" in navigator) {
     if(statusTickTimer){ clearInterval(statusTickTimer); statusTickTimer = null; }
   }
 
+  // BARU -- dipisah jadi 2 fungsi: applyRekapView() cuma mengubah TAMPILAN
+  // (dipakai baik saat dibuka pertama kali maupun saat popstate/tombol
+  // back HP membawa balik ke tampilan ini -- TIDAK boleh push riwayat
+  // baru di situasi itu, lihat komentar leaveFullPageViews/applyNavState
+  // di script navigasi utama), sedangkan openRekapPesanan() (dipanggil
+  // tombol sidebar/Beranda) yang menambah 1 entri riwayat browser lewat
+  // history.pushState -- supaya tombol back fisik/gesture HP mundur ke
+  // tampilan SEBELUM Rekap Pesanan dibuka, bukan langsung keluar app.
+  function applyRekapView(){
+    document.body.classList.remove("showing-home");
+    document.body.classList.add("showing-rekap");
+    window.scrollTo(0,0);
+    rekapOpenedAt = Date.now(); // BARU -- catat kapan halaman ini dibuka, dasar hitungan batas 2 jam
+    hideSessionTimeoutPopup(); // BARU -- jaga2 kalau popup sempat kebuka sebelumnya
+    fetchAndRenderRekap();
+    startAutoRefresh(); // BARU
+  }
   function openRekapPesanan(){
     // BARU -- sambungkan ke toggle "Aktifkan menu Rekap Pesanan" (Master
     // Data > Tampilan, SETTINGS.rekapPesananEnabled). SEBELUMNYA toggle
@@ -14555,22 +14615,24 @@ if ("serviceWorker" in navigator) {
       }
       return;
     }
-    document.body.classList.remove("showing-home");
     document.body.classList.remove("showing-followup"); // BARU (fix bug) -- kalau sebelumnya lagi di Follow Up, class-nya wajib dilepas dulu, kalau tidak dua halaman full-page nyangkut aktif berbarengan dan Follow Up jadi tidak bisa dibuka lagi setelahnya.
-    document.body.classList.add("showing-rekap");
-    window.scrollTo(0,0);
-    rekapOpenedAt = Date.now(); // BARU -- catat kapan halaman ini dibuka, dasar hitungan batas 2 jam
-    hideSessionTimeoutPopup(); // BARU -- jaga2 kalau popup sempat kebuka sebelumnya
-    fetchAndRenderRekap();
-    startAutoRefresh(); // BARU
+    applyRekapView();
+    // BARU -- tambah 1 entri riwayat browser, ditangkap oleh popstate &
+    // applyNavState di script navigasi utama (lewat window.__applyRekapView
+    // di bawah) supaya tombol back HP mundur ke sini dgn benar.
+    try{ history.pushState({view:"rekap"}, ""); }catch(e){}
   }
   window.__openRekapPesanan = openRekapPesanan;
+  window.__applyRekapView = applyRekapView; // BARU -- dipanggil popstate, TANPA push riwayat baru
+  window.__leaveRekapView = function(){ stopAutoRefresh(); hideSessionTimeoutPopup(); }; // BARU -- dipanggil leaveFullPageViews() tiap kali halaman ini ditinggalkan dari jalur mana pun
   document.getElementById("rekap-back-btn").addEventListener("click", ()=>{
-    document.body.classList.remove("showing-rekap");
-    stopAutoRefresh(); // BARU
-    hideSessionTimeoutPopup(); // BARU
-    const el = document.querySelector("[data-back]");
-    if(el) el.click(); else document.body.classList.add("showing-home");
+    // BARU -- mundur lewat history.back() (pola SAMA dgn tombol back
+    // fisik/gesture HP & tombol back Telegram Mini App), supaya balik ke
+    // tampilan SEBELUM Rekap Pesanan dibuka (Beranda atau tab yang lagi
+    // aktif), bukan selalu paksa ke Beranda. popstate yang menangkap
+    // perpindahan ini otomatis memanggil window.__leaveRekapView lewat
+    // leaveFullPageViews() di script navigasi utama.
+    history.back();
   });
   // BARU -- begitu tab/HP dibuka lagi setelah disembunyikan, langsung cek
   // sekali (diam-diam), pola SAMA dgn kartu Follow Up -- TAPI cuma kalau
@@ -15188,17 +15250,15 @@ if ("serviceWorker" in navigator) {
     if(statusTickTimer){ clearInterval(statusTickTimer); statusTickTimer = null; } // BARU
   }
 
-  function openFollowUp(){
-    // BARU -- sambungkan ke toggle "Aktifkan menu Follow Up" (Master Data
-    // > Tampilan, SETTINGS.followUpEnabled), pola SAMA dgn openRekapPesanan.
-    if(!SETTINGS.followUpEnabled){
-      if(typeof showToast === "function"){
-        showToast("Menu Follow Up sedang nonaktif (Master Data > Tampilan).", true);
-      }
-      return;
-    }
+  // BARU -- dipisah jadi 2 fungsi, pola SAMA PERSIS dgn applyRekapView/
+  // openRekapPesanan di atas: applyFollowUpView() cuma ubah TAMPILAN
+  // (dipakai juga oleh popstate/tombol back HP lewat window.
+  // __applyFollowUpView, TANPA push riwayat baru), sedangkan
+  // openFollowUp() (dipanggil tombol sidebar/Beranda) yang menambah 1
+  // entri riwayat browser supaya tombol back fisik/gesture HP mundur ke
+  // tampilan SEBELUM Follow Up dibuka, bukan langsung keluar app.
+  function applyFollowUpView(){
     document.body.classList.remove("showing-home");
-    document.body.classList.remove("showing-rekap"); // BARU (fix bug) -- kalau sebelumnya lagi di Rekap Pesanan, class-nya wajib dilepas dulu, kalau tidak dua halaman full-page nyangkut aktif berbarengan dan salah satunya jadi tidak bisa dibuka lagi setelahnya.
     document.body.classList.add("showing-followup");
     window.scrollTo(0,0);
     // DIHAPUS (permintaan user) -- muat otomatis begitu kartu ini dibuka
@@ -15217,11 +15277,38 @@ if ("serviceWorker" in navigator) {
     // lagi) sudah DIMATIKAN sejak sebelumnya (lihat startAutoRefresh/
     // stopAutoRefresh, dead code, tidak dipanggil dari mana pun).
   }
+  function openFollowUp(){
+    // BARU -- sambungkan ke toggle "Aktifkan menu Follow Up" (Master Data
+    // > Tampilan, SETTINGS.followUpEnabled), pola SAMA dgn openRekapPesanan.
+    if(!SETTINGS.followUpEnabled){
+      if(typeof showToast === "function"){
+        showToast("Menu Follow Up sedang nonaktif (Master Data > Tampilan).", true);
+      }
+      return;
+    }
+    // BARU -- kalau sebelumnya lagi di Rekap Pesanan, hentikan dulu
+    // auto-refresh & popup batas sesi punya kartu itu (window.
+    // __leaveRekapView, pola SAMA dgn leaveFullPageViews() di script
+    // navigasi utama) sebelum class-nya dilepas -- supaya tidak ada
+    // timer yang nyangkut jalan diam-diam di belakang layar, & kalau
+    // tidak dilepas dua halaman full-page bisa nyangkut aktif
+    // berbarengan (salah satunya jadi tidak bisa dibuka lagi setelahnya).
+    if(document.body.classList.contains("showing-rekap") && window.__leaveRekapView) window.__leaveRekapView();
+    document.body.classList.remove("showing-rekap");
+    applyFollowUpView();
+    // BARU -- tambah 1 entri riwayat browser, ditangkap oleh popstate &
+    // applyNavState di script navigasi utama (lewat window.
+    // __applyFollowUpView di bawah) supaya tombol back HP mundur ke sini
+    // dgn benar.
+    try{ history.pushState({view:"followup"}, ""); }catch(e){}
+  }
   window.__openFollowUp = openFollowUp;
+  window.__applyFollowUpView = applyFollowUpView; // BARU -- dipanggil popstate, TANPA push riwayat baru
   document.getElementById("followup-back-btn").addEventListener("click", ()=>{
-    document.body.classList.remove("showing-followup");
-    const el = document.querySelector("[data-back]");
-    if(el) el.click(); else document.body.classList.add("showing-home");
+    // BARU -- mundur lewat history.back(), pola SAMA dgn Rekap Pesanan &
+    // tombol back fisik/gesture HP, supaya balik ke tampilan SEBELUM
+    // Follow Up dibuka, bukan selalu paksa ke Beranda.
+    history.back();
   });
   document.getElementById("followup-refresh-btn").addEventListener("click", fetchAndRenderFollowUp);
   searchEl.addEventListener("input", ()=> renderFollowUpTable());

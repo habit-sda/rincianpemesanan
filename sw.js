@@ -4,8 +4,16 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v297";
+const CACHE_VERSION = "v298";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v298 -- perbaikan bug: tombol back fisik/gesture HP langsung menutup
+   aplikasi saat lagi buka menu "Rekap Pesanan"/"Follow Up" (kedua
+   halaman itu sebelumnya tidak pernah menambah entri riwayat browser
+   saat dibuka). Sekarang keduanya ikut history.pushState/popstate,
+   pola SAMA dgn navigasi Beranda<->tab yang sudah ada, jadi tombol back
+   mundur satu langkah dulu ke tampilan sebelumnya. SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Versi Baru
+   Tersedia", lihat versi 2.30.1 di Riwayat Update index.html). */
 /* v297 -- tabel Rekap Pesanan (desktop) dirapikan: kolom "Hari" dihapus,
    & ditambah tombol toggle "Sembunyikan/Tampilkan Varian" utk sembunyikan
    sementara kolom-kolom varian produk (khusus tampilan desktop -- kartu
