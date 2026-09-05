@@ -4,8 +4,17 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v299";
+const CACHE_VERSION = "v300";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v300 -- opsi baru "Render Nota Lewat Server" (Master Data > Tampilan,
+   nonaktif secara default): gambar Rincian Pemesanan bisa dirender via
+   Browserless.io (server) alih-alih html2canvas di HP CS -- draft
+   autosave ikut jadi lebih ringan (kirim data mentah, bukan gambar
+   penuh). Dipasangkan dgn perubahan Worker_Rincian_Pemesanan.js
+   (endpoint /send-bukti & /save-draft terima `notaData`, plus kartu
+   kuota Browserless baru di Monitor Utama). SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Versi Baru
+   Tersedia", lihat versi 2.31.0 di Riwayat Update index.html). */
 /* v299 -- Master Data > kartu baru "🗂️ Topik Grup Resi": ID topik
    "Tagihan" & "Resi Aja" sekarang diatur di sini (bukan cuma env var
    Cloudflare) -- fleksibel diubah tiap kali ganti grup, tidak perlu

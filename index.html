@@ -5346,6 +5346,26 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <input type="time" id="md-followup-notif-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
         </div>
       </div>
+      <div class="md-card">
+        <h3>🖥️ Render Nota Lewat Server (Browserless)</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Kalau aktif, gambar "Rincian pemesanan" TIDAK LAGI digambar di HP CS (html2canvas) — HP cuma kirim data pesanan (teks kecil), Worker (server) yang render gambarnya lewat Browserless (Chrome asli). Efeknya: HP CS tidak perlu lagi menunggu proses menggambar nota, terutama terasa di HP yang agak lambat.
+        </div>
+        <div class="md-note" style="margin-bottom:12px; background:#fff8e1; color:#8a6100;">
+          ⚠️ Cuma berlaku kalau desain nota aktif "baru" (bukan yang lama, atur di Cek Pembaruan/pengaturan nota) — DAN Worker sudah dipasangi secret <code>BROWSERLESS_TOKEN</code>. Kalau salah satu belum terpenuhi, app otomatis balik ke cara lama (render di HP) tanpa perlu diapa-apakan, tidak ada yang rusak.
+        </div>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M8 20h8M12 16v4" stroke="var(--primary-green)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Render nota lewat server</div>
+            <div class="md-togglerow-sub">Nonaktif = cara lama (render di HP, seperti sekarang). Aktif = server yang render, HP cuma kirim data.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-rendernotaserver">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
       <div class="md-card" id="md-cslist-card">
         <h3>Daftar CS</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -5845,7 +5865,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.30.1</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.31.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6041,7 +6061,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.30.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.31.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Opsi baru: "Render Nota Lewat Server"</b> (Master Data → Tampilan) — kalau diaktifkan, gambar "Rincian pemesanan" tidak lagi digambar di HP CS (html2canvas), tapi lewat server (Browserless.io, Chrome asli). Efeknya: HP CS tidak perlu lagi menunggu proses menggambar nota, terutama terasa di HP yang agak lambat. Nonaktif secara default (cara lama tetap berjalan seperti biasa) — cuma berlaku kalau desain nota aktif "baru" dan Worker sudah dipasangi secret <code>BROWSERLESS_TOKEN</code>.</li>
+            <li><b>Draft autosave jadi lebih ringan</b> saat opsi di atas aktif — draft yang tersimpan sambil CS mengetik nama sekarang cuma berisi data pesanan (teks kecil), bukan gambar penuh — gambar baru dirender sekali, pas benar-benar dikirim.</li>
+            <li>Kartu baru "Kuota Browserless terpakai bulan ini" di Monitor Utama, memantau pemakaian layanan render server ini.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.30.1</div>
           <ul>
             <li><b>Perbaikan bug: tombol back fisik/gesture HP langsung menutup aplikasi</b> saat lagi buka menu "Rekap Pesanan" atau "Follow Up" — sekarang mundur satu langkah dulu ke tampilan sebelumnya (Beranda atau tab yang lagi dibuka), sama seperti navigasi Beranda ↔ tab lain yang sudah lebih dulu berperilaku begitu. Tombol "← Kembali" di dalam kedua kartu itu ikut memakai jalur yang sama.</li>
           </ul>
@@ -7127,7 +7155,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", csList:[], resiTagihanTopicId:"", resiAjaTopicId:""};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -7175,6 +7203,12 @@ function loadSettings(){
     if(typeof s.resiNoNameReminderEnabled === "boolean") SETTINGS.resiNoNameReminderEnabled = s.resiNoNameReminderEnabled;
     if(typeof s.autoRepostNoCaptionEnabled === "boolean") SETTINGS.autoRepostNoCaptionEnabled = s.autoRepostNoCaptionEnabled;
     if(typeof s.showTransferNominalCaptionEnabled === "boolean") SETTINGS.showTransferNominalCaptionEnabled = s.showTransferNominalCaptionEnabled;
+    // BARU -- toggle "Render nota lewat server (Browserless)". SENGAJA
+    // cuma berlaku kalau desain nota aktif "baru" (.pnota2-v3) -- lihat
+    // guard di collectNotaPayload(). Default false (aman, sama seperti
+    // sebelumnya: render html2canvas di HP CS) sampai kamu sendiri yang
+    // nyalakan setelah dites cocok.
+    if(typeof s.renderNotaViaBrowserless === "boolean") SETTINGS.renderNotaViaBrowserless = s.renderNotaViaBrowserless;
   }catch(e){ console.log("Pengaturan gagal dimuat:", e); }
 }
 function saveSettings(){
@@ -8243,7 +8277,13 @@ function measureV3NameWidth(text){
   return _v3MeasureCtx.measureText(text).width;
 }
 
-function buildPrintNotaV2(tab){
+// BARU -- data mentah nota (BUKAN HTML string) -- dipakai server
+// (Browserless) buat render, DAN dipakai buildPrintNotaV2() di bawah
+// buat bangun HTML seperti sebelumnya (client html2canvas). Field-nya
+// SENGAJA namanya PERSIS sama dgn yang dibaca buildNotaHtmlDariData()
+// di Worker_Rincian_Pemesanan.js -- kalau salah satu sisi diubah,
+// SISI SATUNYA WAJIB ikut disesuaikan manual (tidak otomatis sinkron).
+function collectNotaV2Data(tab){
   const pfx = tab==="penjualan" ? "pj" : "cs";
   const tbody = document.getElementById(tab==="penjualan" ? "rows-penjualan" : "rows-custom");
   const rows = [...tbody.querySelectorAll("tr")].filter(tr=>{
@@ -8251,33 +8291,22 @@ function buildPrintNotaV2(tab){
     return sel && sel.value !== "";
   });
 
-  /* ---- lebar kolom nama & lebar kartu FLEKSIBEL mengikuti nama produk
-     terpanjang di pesanan ini — supaya nama produk apa pun panjangnya
-     tetap 1 baris, tidak lagi kepotong turun ke bawah. Lebar dasar
-     (122px kolom / 716px kartu) tetap jadi batas MINIMUM supaya nota
-     pendek tampilannya tidak berubah dari sebelumnya. ---- */
   const NAME_COL_MIN = 132;
   const CARD_WIDTH_BASE = 762;
   const longestNamePx = rows.reduce((max, tr)=>{
     const w = measureV3NameWidth(tr.querySelector("select.prod").value || "");
     return Math.max(max, w);
   }, 0);
-  const nameColWidth = Math.max(NAME_COL_MIN, Math.ceil(longestNamePx) + 4); // +4px jaga-jaga anti kepotong
+  const nameColWidth = Math.max(NAME_COL_MIN, Math.ceil(longestNamePx) + 4);
   const cardWidth = CARD_WIDTH_BASE + Math.max(0, nameColWidth - NAME_COL_MIN);
 
-  const rowsHtml = rows.map((tr, idx)=>{
+  const items = rows.map((tr)=>{
     const name = tr.querySelector("select.prod").value;
     const prod = findProduct(name);
     const qty = tr.querySelector("input.qty").value || "0";
     const satuanLabel = prod ? prod.satuan : "";
     const hargaAsliTxt = tr.querySelector('[data-f="harga"]').textContent;
     const diskonEl = tr.querySelector('[data-f="diskon"]');
-    // Kolom Diskon di tab Custom itu <input> (user ketik manual) — .textContent
-    // elemen <input> SELALU kosong (isinya ada di .value, bukan .textContent),
-    // makanya sebelumnya kolom Diskon di gambar nota selalu blank untuk tab
-    // Custom walau datanya sudah benar dipakai di perhitungan Total. Sekarang
-    // dibaca & diformat dari .value, persis seperti format tab Penjualan
-    // (persen kalau <1, Rupiah kalau >=1) — bukan cuma disalin mentah.
     let diskonTxt = "–";
     if(diskonEl){
       if(diskonEl.tagName === "INPUT"){
@@ -8290,27 +8319,8 @@ function buildPrintNotaV2(tab){
     }
     const totalTxt = tr.querySelector('[data-f="total"]').textContent;
     const imgSrc = (prod && prod.gambar) ? resolveCachedProductImg(prod.gambar) : PRODUCT_IMG_PLACEHOLDER;
-    return `<div class="v3-row">
-      <div class="v3-badge-num">${idx+1}</div>
-      <img class="v3-thumb" src="${imgSrc}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'">
-      <div class="v3-col-name" style="flex-basis:${nameColWidth}px;">
-        <p class="v3-name" style="white-space:nowrap;">${name}</p>
-        <p class="v3-qty"><span class="v3-badge">${qty} ${satuanLabel}</span></p>
-      </div>
-      <div class="v3-col-harga v3-harga">${hargaAsliTxt}</div>
-      <div class="v3-col-diskon v3-diskon">${diskonTxt}</div>
-      <div class="v3-col-total v3-total">${totalTxt}</div>
-    </div>`;
-  }).join("");
-
-  const headRow = `<div class="v3-thead">
-    <div class="v3-col-num"></div>
-    <div class="v3-col-thumb"></div>
-    <div class="v3-col-name" style="flex-basis:${nameColWidth}px;"><span>Produk &amp; Qty</span></div>
-    <div class="v3-col-harga"><span>Harga</span></div>
-    <div class="v3-col-diskon"><span>Diskon</span></div>
-    <div class="v3-col-total"><span>Total</span></div>
-  </div>`;
+    return { nama: name, qty, satuan: satuanLabel, harga: hargaAsliTxt, diskon: diskonTxt, total: totalTxt, gambar: imgSrc };
+  });
 
   const hari = document.getElementById("hariNow").textContent;
   const tgl = document.getElementById("tglNow").textContent;
@@ -8318,10 +8328,10 @@ function buildPrintNotaV2(tab){
   const totalberat = document.getElementById(pfx+"-totalberat").textContent;
   const totalqty = document.getElementById(pfx+"-totalqty").textContent;
   const ongkir = document.getElementById(pfx+"-ongkir").textContent.replace(/\s*\(manual\)\s*$/i, "");
-  const grandtotal = document.getElementById(pfx+"-grandtotal").textContent;
-  const subtotalTxt = document.getElementById(pfx+"-subtotal").textContent;
+  const grandtotalTxt = document.getElementById(pfx+"-grandtotal").textContent;
+  const subtotal = document.getElementById(pfx+"-subtotal").textContent;
   const diskonOngkirEl = document.getElementById(pfx+"-diskonongkir");
-  const diskonOngkirTxt = diskonOngkirEl.tagName === "INPUT"
+  const diskonOngkir = diskonOngkirEl.tagName === "INPUT"
     ? rupiah(parseRp(diskonOngkirEl.value))
     : diskonOngkirEl.textContent;
 
@@ -8339,15 +8349,50 @@ function buildPrintNotaV2(tab){
   const statusBg = isKurang ? "#fdecea" : (isKembalian ? "#e8f0fe" : "#D9ECD4");
   const statusBorder = isKurang ? "#f3b4ae" : (isKembalian ? "#aac9f7" : "#bfe0c9");
 
+  return {
+    cardWidth, nameColWidth, items, hari, tgl, jamTxt,
+    totalqty, totalberat, ekspedisi, subtotal, ongkir, diskonOngkir,
+    grandtotalTxt, kelebihan, kelebihanFmt, statusLabel, selisihFmt,
+    signPrefix, statusColor, statusBg, statusBorder,
+    logoImg: ORDER_LOGO_IMG, // dikirim apa adanya supaya logo di gambar server 100% sama, bukan tebakan
+  };
+}
+
+function buildPrintNotaV2(tab){
+  const d = collectNotaV2Data(tab);
+
+  const rowsHtml = d.items.map((it, idx)=>{
+    return `<div class="v3-row">
+      <div class="v3-badge-num">${idx+1}</div>
+      <img class="v3-thumb" src="${it.gambar}" onerror="this.src='${PRODUCT_IMG_PLACEHOLDER}'">
+      <div class="v3-col-name" style="flex-basis:${d.nameColWidth}px;">
+        <p class="v3-name" style="white-space:nowrap;">${it.nama}</p>
+        <p class="v3-qty"><span class="v3-badge">${it.qty} ${it.satuan}</span></p>
+      </div>
+      <div class="v3-col-harga v3-harga">${it.harga}</div>
+      <div class="v3-col-diskon v3-diskon">${it.diskon}</div>
+      <div class="v3-col-total v3-total">${it.total}</div>
+    </div>`;
+  }).join("");
+
+  const headRow = `<div class="v3-thead">
+    <div class="v3-col-num"></div>
+    <div class="v3-col-thumb"></div>
+    <div class="v3-col-name" style="flex-basis:${d.nameColWidth}px;"><span>Produk &amp; Qty</span></div>
+    <div class="v3-col-harga"><span>Harga</span></div>
+    <div class="v3-col-diskon"><span>Diskon</span></div>
+    <div class="v3-col-total"><span>Total</span></div>
+  </div>`;
+
   return `
-    <div class="pnota2-v3" style="width:${cardWidth}px;">
+    <div class="pnota2-v3" style="width:${d.cardWidth}px;">
       <div class="v3-header">
-        <img class="v3-logo" src="${ORDER_LOGO_IMG}" alt="">
+        <img class="v3-logo" src="${d.logoImg}" alt="">
         <p class="v3-title">Rincian pemesanan</p>
         <div class="v3-meta">
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>${hari}, ${tgl}</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>${d.hari}, ${d.tgl}</span>
           <span class="v3-meta-divider"></span>
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>${jamTxt}</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>${d.jamTxt}</span>
         </div>
       </div>
       <div class="v3-product-card">
@@ -8356,23 +8401,23 @@ function buildPrintNotaV2(tab){
       </div>
       <div class="v3-ship-card">
         <div class="v3-stats">
-          <div><p class="l">Total qty</p><p class="v" style="color:#00845F;">${totalqty}</p></div>
-          <div><p class="l">Total berat</p><p class="v">${totalberat}</p></div>
-          <div><p class="l">Ekspedisi</p><p class="v">${ekspedisi}</p></div>
+          <div><p class="l">Total qty</p><p class="v" style="color:#00845F;">${d.totalqty}</p></div>
+          <div><p class="l">Total berat</p><p class="v">${d.totalberat}</p></div>
+          <div><p class="l">Ekspedisi</p><p class="v">${d.ekspedisi}</p></div>
         </div>
       </div>
       <div class="v3-costs">
-        <div class="v3-cost-row"><span>Subtotal produk</span><b>${subtotalTxt}</b></div>
-        <div class="v3-cost-row"><span>Ongkir</span><b>${ongkir}</b></div>
-        <div class="v3-cost-row"><span>Diskon ongkir</span><b>${diskonOngkirTxt}</b></div>
+        <div class="v3-cost-row"><span>Subtotal produk</span><b>${d.subtotal}</b></div>
+        <div class="v3-cost-row"><span>Ongkir</span><b>${d.ongkir}</b></div>
+        <div class="v3-cost-row"><span>Diskon ongkir</span><b>${d.diskonOngkir}</b></div>
       </div>
       <div class="v3-grand">
         <span class="l">Total pembayaran</span>
-        <span class="v">${grandtotal}</span>
+        <span class="v">${d.grandtotalTxt}</span>
       </div>
-      ${kelebihan!==0 ? `<div style="margin-top:16px;padding:16px 20px;border-radius:12px;background:${statusBg};border:1.5px solid ${statusBorder};display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;justify-content:space-between;font-size:18px;color:#3f3f3d;"><span>Kelebihan bayar sebelumnya</span><strong style="color:#171717;">${kelebihanFmt}</strong></div>
-        <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:700;color:${statusColor};"><span>${statusLabel}</span><span>${signPrefix}${selisihFmt}</span></div>
+      ${d.kelebihan!==0 ? `<div style="margin-top:16px;padding:16px 20px;border-radius:12px;background:${d.statusBg};border:1.5px solid ${d.statusBorder};display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:18px;color:#3f3f3d;"><span>Kelebihan bayar sebelumnya</span><strong style="color:#171717;">${d.kelebihanFmt}</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:700;color:${d.statusColor};"><span>${d.statusLabel}</span><span>${d.signPrefix}${d.selisihFmt}</span></div>
       </div>` : ``}
       <p class="v3-footer">Terima kasih atas kepercayaannya, semoga membawa keberkahan untuk kita semua</p>
     </div>
@@ -8867,15 +8912,25 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     const items = collectOrderItems(tab);
 
     const signature = computeNotaSignature(tab, grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate);
-    let imageDataUrl;
-    if(_notaImageCache.tab === tab && _notaImageCache.signature === signature){
+    // BARU -- kalau toggle "Render nota lewat server" AKTIF **dan** desain
+    // nota yang dipakai "baru" (server cuma tahu cara render .pnota2-v3,
+    // BUKAN desain lama), lewati renderCanvas() (html2canvas) SAMA SEKALI
+    // -- ini sumber utama HP CS terasa lambat pas ngetik nama (autosave
+    // tiap ~1,2 detik ikut menggambar ulang seluruh nota). Kirim data
+    // MENTAH-nya saja (notaData), Worker yang render belakangan.
+    const useServerRender = SETTINGS.renderNotaViaBrowserless && getNotaDesignPref() === "baru";
+    let imageDataUrl = null;
+    let notaData = null;
+    if(useServerRender){
+      notaData = collectNotaV2Data(tab);
+    }else if(_notaImageCache.tab === tab && _notaImageCache.signature === signature){
       imageDataUrl = _notaImageCache.imageDataUrl;
     }else{
       const canvas = await renderCanvas();
       imageDataUrl = canvas.toDataURL("image/png");
       _notaImageCache = { tab, signature, imageDataUrl };
     }
-    return { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, totalQtyLabel, totalBeratLabel, items, imageDataUrl };
+    return { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, totalQtyLabel, totalBeratLabel, items, imageDataUrl, notaData };
   }
 
   /* ---------- Autosave draft ke server ----------
@@ -8897,7 +8952,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     if(!senderId || !MASTER_DATA_WORKER_URL || isSavingDraft) return;
     isSavingDraft = true;
     try{
-      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, imageDataUrl, notaData } = await collectNotaPayload();
       await fetch(MASTER_DATA_WORKER_URL + "/save-draft", {
         method: "POST",
         headers: workerHeaders({ "Content-Type": "application/json" }),
@@ -8911,6 +8966,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
           ekspedisi: ekspedisiName,
           deliveryDate,
           image: imageDataUrl,
+          notaData,
         }),
       });
     }catch(e){ console.log("Autosave draft gagal:", e); }
@@ -9029,14 +9085,19 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     statusEl.textContent = "Menyiapkan gambar nota…";
 
     try{
-      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, totalQtyLabel, totalBeratLabel, items, imageDataUrl } = await collectNotaPayload();
+      const { tabLabel, grandTotalNum, ratePerKgNum, ongkirManualNum, ongkirTotalNum, ekspedisiName, deliveryDate, kelebihanNum, totalQtyLabel, totalBeratLabel, items, imageDataUrl, notaData } = await collectNotaPayload();
 
-      statusEl.textContent = "Mengirim ke grup Telegram…";
+      // BARU -- teks status beda tergantung jalurnya, supaya CS tahu apa
+      // yang sedang terjadi (render di server itu ada jeda jaringan
+      // tambahan yang tidak kelihatan progress-nya di HP, beda dgn
+      // render di HP yang minimal ada animasi/progress lokal).
+      statusEl.textContent = notaData ? "Mengirim data pesanan (nota dirender di server)…" : "Mengirim ke grup Telegram…";
       const res = await fetch(MASTER_DATA_WORKER_URL + "/send-bukti", {
         method: "POST",
         headers: workerHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           image: imageDataUrl,
+          notaData,
           customerName,
           senderId,
           tabLabel,
@@ -12158,6 +12219,21 @@ if ("serviceWorker" in navigator) {
       saveSettings();
       applySettingsToDom();
       await confirmMasterDataSave(SETTINGS.followUpEnabled ? "Menu Follow Up diaktifkan di sidebar." : "Menu Follow Up disembunyikan dari sidebar.");
+    });
+  }
+
+  // BARU -- toggle "Render nota lewat server (Browserless)". Pola SAMA
+  // dgn toggle lain di atas -- murni ubah SETTINGS + simpan, TIDAK ada
+  // efek DOM langsung yang perlu applySettingsToDom() (dibaca langsung
+  // dari SETTINGS.renderNotaViaBrowserless tiap kali collectNotaPayload()
+  // dipanggil, bukan class CSS yang di-toggle di awal).
+  const toggleRenderNotaServer = document.getElementById("md-toggle-rendernotaserver");
+  if(toggleRenderNotaServer){
+    toggleRenderNotaServer.checked = SETTINGS.renderNotaViaBrowserless;
+    toggleRenderNotaServer.addEventListener("change", async ()=>{
+      SETTINGS.renderNotaViaBrowserless = toggleRenderNotaServer.checked;
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.renderNotaViaBrowserless ? "Render nota lewat server diaktifkan." : "Render nota kembali dilakukan di HP (cara lama).");
     });
   }
 
