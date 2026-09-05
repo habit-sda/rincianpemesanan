@@ -4,8 +4,14 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v296";
+const CACHE_VERSION = "v297";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v297 -- tabel Rekap Pesanan (desktop) dirapikan: kolom "Hari" dihapus,
+   & ditambah tombol toggle "Sembunyikan/Tampilkan Varian" utk sembunyikan
+   sementara kolom-kolom varian produk (khusus tampilan desktop -- kartu
+   mobile & Ekspor CSV tidak berubah). SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Versi Baru Tersedia",
+   lihat versi 2.30.0 di Riwayat Update index.html). */
 /* v296 -- index.html digabung ulang dari 2 jalur perubahan yang sempat
    berkembang terpisah: (1) kartu "Kesehatan Durable Object (Dedupe)" di
    Master Data -- status DO ORDER_LOCKS, pesan error asli, fallback ke KV,
