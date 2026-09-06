@@ -1188,7 +1188,8 @@
        yang sudah ada di file ini -- override eksplisit pakai selector
        [hidden] supaya menang lagi dari inline style. */
     #followup-detail-overlay[hidden],
-    #followup-contact-overlay[hidden]{display:none !important;}
+    #followup-contact-overlay[hidden],
+    #md-nama-sync-overlay[hidden]{display:none !important;}
     #followup-table tbody tr{cursor:pointer;}
     #followup-table tbody tr:hover{background:var(--paper, #f7f8f6);}
     /* BARU (fix bug) -- kolom "Customer" dikunci (sticky) di sisi kiri
@@ -6004,7 +6005,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.35.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.38.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6200,7 +6201,25 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.35.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.38.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Audit menyeluruh sistem (cek kode, struktur halaman, dan alur data) — ketemu 1 bug: kadang-kadang nama CS yang baru saja otomatis terisi di Master Nama Pelanggan bisa kelihatan kosong lagi sesaat gara-gara urutan pemrosesan data yang tidak selalu sama. Sudah diperbaiki supaya hasilnya selalu konsisten. Bagian lain sistem sudah diperiksa dan tidak ditemukan masalah tambahan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.37.0</div>
+          <ul>
+            <li>Audit lanjutan (murni perbaikan teknis, tidak ada perubahan tampilan): penyimpanan daftar "nama yang diabaikan" (tombol "✕ Abaikan" di kartu saran Master Nama) dipindahkan konsisten ke penyimpanan yang sama dengan data Master Nama lainnya. Ditambah pengaman anti-dobel-klik di tombol "🔄 Sinkronkan" supaya tidak terpicu dua kali kalau diklik cepat berturut-turut.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.36.0</div>
+          <ul>
+            <li><b>Perbaikan bug: popup "Sinkronkan Nama Customer" nyangkut tampil terus di Beranda, tidak bisa ditutup</b> — bug regresi dari update sebelumnya (v2.34.0), penyebabnya kesalahan penulisan CSS pada popup itu sendiri sehingga muncul terus sejak app dibuka, bukan cuma saat tombol "🔄 Sinkronkan" diklik. Karena dampaknya membuat Beranda sama sekali tidak bisa dipakai, perbaikan ini diterapkan otomatis ke semua perangkat (tidak perlu klik "Perbarui Sekarang" dulu).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.35.0</div>
           <ul>
             <li><b>Perbaikan bug penting: tombol "Lupa PIN?" &amp; "Reset ke PIN bawaan" tidak berfungsi kalau dibuka lewat Telegram</b> — penyebabnya dialog konfirmasi bawaan browser (<code>confirm()</code>) yang ternyata diblokir total oleh WebView Telegram, sehingga tombolnya terlihat diam saja walau sudah diketuk. Ini jalur SATU-SATUNYA untuk pulih kalau lupa PIN Master Data, jadi diprioritaskan diperbaiki duluan.</li>
             <li><b>Audit &amp; perbaikan menyeluruh sisa dialog bawaan browser lainnya</b> — Hapus Produk/Ekspedisi, Batalkan perubahan Daftar Produk, serta Sembunyikan/Hapus di Master Nama Pelanggan (termasuk kartu saran ketidaksinkronan) sekarang semua pakai popup konfirmasi buatan sendiri yang sudah dipakai tombol RESET, bukan <code>confirm()</code>/<code>alert()</code> bawaan lagi — supaya konsisten berfungsi di semua platform, termasuk di dalam Telegram.</li>
@@ -13272,11 +13291,16 @@ if ("serviceWorker" in navigator) {
         const hideBtn = card.querySelector(".md-nama-sugg-hide");
         const ignoreBtn = card.querySelector(".md-nama-sugg-ignore");
         if(syncBtn) syncBtn.addEventListener("click", async ()=>{
-          // BARU -- ganti confirm() bawaan browser dgn popup custom yang
-          // menanyakan nama mana yang mau dipakai sbg nama aktif.
-          const finalName = await openSyncModal(s.masterName, s.orderName);
-          if(!finalName) return; // dibatalkan
+          // BARU -- guard anti-dobel-klik: tanpa ini, klik cepat 2x bisa
+          // membuka openSyncModal() dua kali sebelum yang pertama selesai
+          // (listener modal jadi dobel, berpotensi trigger sinkron 2x).
+          if(syncBtn.disabled) return;
+          syncBtn.disabled = true;
           try{
+            // BARU -- ganti confirm() bawaan browser dgn popup custom yang
+            // menanyakan nama mana yang mau dipakai sbg nama aktif.
+            const finalName = await openSyncModal(s.masterName, s.orderName);
+            if(!finalName) return; // dibatalkan -- finally di bawah tetap jalan, tombol aktif lagi
             const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/add-alias", {
               method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
               body: JSON.stringify({ name: s.masterName, alias: s.orderName, finalName }),
@@ -13284,8 +13308,15 @@ if ("serviceWorker" in navigator) {
             const data2 = await res.json();
             if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyinkronkan.");
             await loadNames();
-            await loadSuggestions();
-          }catch(err){ showMsg("Gagal menyinkronkan: " + String(err.message || err), true); }
+            await loadSuggestions(); // sukses -> card ini (termasuk syncBtn lama) dibuang & dirender ulang
+          }catch(err){
+            showMsg("Gagal menyinkronkan: " + String(err.message || err), true);
+          }finally{
+            // Aman dipanggil juga di jalur sukses: kalaupun node lama ini
+            // sudah dibuang loadSuggestions(), toggle disabled ke elemen
+            // yang sudah lepas dari DOM tidak berefek apa-apa (tidak error).
+            syncBtn.disabled = false;
+          }
         });
         if(hideBtn) hideBtn.addEventListener("click", ()=>{
           // BARU -- ganti confirm() bawaan browser (diblokir di WebView
@@ -13603,7 +13634,22 @@ if ("serviceWorker" in navigator) {
       }
     });
 
-    window.__mdLoadNamaList = ()=>{ loadNames(); autofillCsAndReload(); loadSuggestions(); refreshCsDatalist(); };
+    // BARU (perbaikan race condition) -- SEBELUMNYA loadNames() &
+    // autofillCsAndReload() dipanggil "lepas" (tidak saling menunggu),
+    // padahal KEDUANYA menulis ke allCustomers & memanggil render(). Kalau
+    // response GET /customer-names (loadNames) kebetulan datang BELAKANGAN
+    // drpd POST /customer-names/cs-autofill (mis. GET kena cache-miss),
+    // render() dari loadNames() menang terakhir dan MENIMPA hasil autofill
+    // dgn data lama (CS kosong lagi) -- padahal autofill-nya sendiri sudah
+    // sukses di server. Sekarang autofillCsAndReload() SENGAJA menunggu
+    // loadNames() selesai dulu, supaya render() TERAKHIR selalu yang sudah
+    // ter-autofill, bukan tergantung untung-untungan urutan network.
+    window.__mdLoadNamaList = async ()=>{
+      await loadNames();
+      await autofillCsAndReload();
+      loadSuggestions();
+      refreshCsDatalist();
+    };
   })();
 
   /* ---------- Daftar Finance (dipakai worker untuk validasi reaction/konfirmasi) ---------- */

@@ -4,8 +4,44 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v309";
+const CACHE_VERSION = "v312";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v312 -- Hasil audit menyeluruh sistem (cek sintaks JS, keseimbangan tag
+   HTML, ID/endpoint duplikat, referensi fungsi, dan alur async) -- ketemu
+   1 bug nyata: RACE CONDITION di tab Master Nama Pelanggan. loadNames()
+   dan autofillCsAndReload() (fitur baru v307) sebelumnya dipanggil
+   "lepas" tanpa saling menunggu, padahal keduanya menulis ke variabel
+   data customer & merender ulang daftar. Kalau kebetulan response
+   autofill datang LEBIH DULU drpd response daftar nama biasa (soal
+   timing jaringan, bisa beda2 tiap saat), hasil autofill CS bisa
+   KETIMPA BALIK data lama (CS kosong lagi) di layar -- padahal di
+   server datanya sudah benar. Sekarang urutannya dipastikan (loadNames
+   selesai dulu, baru autofill jalan) supaya hasil akhir SELALU benar,
+   tidak tergantung untung-untungan jaringan. Sisanya (endpoint, ID
+   HTML, struktur tag) diperiksa bersih, tidak ada bug lain ditemukan.
+   SENGAJA TIDAK dipaksa (bukan darurat) -- pakai alur normal (popup
+   "Perbarui Sekarang"). */
+/* v311 -- Hasil audit lanjutan (murni sisi Worker + pengerasan kecil sisi
+   app, TIDAK ada perubahan tampilan): (1) key KV baru "customerNameMismatchIgnored"
+   (tombol "✕ Abaikan") didaftarkan ke D1_PREFIXES -- sebelumnya kelewatan
+   sehingga masih numpang KV mentah, tidak konsisten dgn customerNameHistory/
+   customerMasterV2 yang sudah dimigrasikan. (2) Guard anti-dobel-klik di
+   tombol "🔄 Sinkronkan" (kartu saran Master Nama) -- klik cepat 2x sebelumnya
+   berpotensi membuka popup pemilihan nama dua kali sekaligus. SENGAJA TIDAK
+   dipaksa (bukan darurat) -- pakai alur normal (popup "Perbarui Sekarang"). */
+/* v310 -- PERBAIKAN BUG (regresi dari v308): popup "Sinkronkan Nama
+   Customer" yang baru ditambahkan v308 sempat NYANGKUT TAMPIL TERUS di
+   Beranda sejak app dibuka, tidak bisa ditutup (tombol "Batal" tidak
+   merespons). Penyebabnya: elemen popup itu ditulis dengan atribut
+   `hidden` BERBARENGAN inline style `display:flex` di tag yang sama --
+   inline style menang lawan aturan bawaan `[hidden]{display:none}`,
+   jadi atribut hidden-nya kalah & popup selalu tampil dari awal (bukan
+   cuma saat tombol "🔄 Sinkronkan" diklik). Karena muncul di luar alur
+   normal, tombol Batal-nya juga belum sempat "dipasangi" fungsi apa
+   pun. Sekarang ditambahkan override CSS eksplisit (pola yang sama
+   persis sudah dipakai popup Follow Up) supaya `hidden` menang lagi.
+   PENTING (walau bukan darurat keamanan) krn bug ini bikin Beranda
+   sama sekali tidak bisa dipakai. */
 /* v309 -- PENTING (tapi tidak dipaksa) -- audit menyeluruh & ganti SEMUA
    sisa dialog bawaan browser (confirm()/alert()) yang belum sempat
    dikonversi ke popup kustom, karena dialog bawaan itu DIBLOKIR TOTAL
@@ -342,8 +378,15 @@ const CACHE_NAME = "habit-" + CACHE_VERSION;
    index.html lain. SENGAJA TIDAK dipaksa (bukan darurat/keamanan) --
    pakai alur normal (popup "Perbarui Sekarang").
    v276 lama sudah dikeluarkan dari Set ini (update itu sudah tersebar
-   duluan). ---- */
-const FORCE_ACTIVATE_VERSIONS = new Set([]);
+   duluan).
+   v310 -- DIPAKSA (skipWaiting otomatis, TANPA popup "Perbarui
+   Sekarang") -- perbaikan bug popup "Sinkronkan Nama Customer" yang
+   nyangkut tampil terus-menerus di Beranda sejak app dibuka (lihat
+   catatan lengkap di komentar v310 di atas CACHE_VERSION). Dipaksa krn
+   Beranda jadi SAMA SEKALI tidak bisa dipakai selama bug ini aktif,
+   termasuk kemungkinan menutupi popup "Perbarui Sekarang" itu sendiri
+   -- menunggu user klik update normal tidak bisa diandalkan di sini. ---- */
+const FORCE_ACTIVATE_VERSIONS = new Set(["v310"]);
 // File same-origin yang wajib ada supaya app bisa dibuka offline.
 const CORE_ASSETS = [
   "./",
