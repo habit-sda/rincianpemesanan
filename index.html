@@ -2328,6 +2328,13 @@
   .md-nama-suggest-card .btns button.sync{color:#1a73e8;}
   .md-nama-suggest-card .btns button.hide{color:var(--danger-red);}
   .md-nama-dedupe-note{font-size:11.5px;color:var(--primary-green);font-weight:700;margin-bottom:10px;}
+  /* BARU -- kartu opsi radio custom di popup "Sinkronkan Nama Customer" */
+  .md-sync-option{display:flex;align-items:flex-start;gap:12px;border:2px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:border-color .15s ease, background .15s ease;}
+  .md-sync-option:hover{border-color:#bcd8ff;}
+  .md-sync-option.selected{border-color:var(--primary-green);background:#eaf7ee;}
+  .md-sync-option input[type="radio"]{width:17px;height:17px;margin-top:2px;flex-shrink:0;accent-color:var(--primary-green);}
+  .md-sync-option .opt-name{font-weight:700;font-size:14px;color:var(--ink);word-break:break-word;}
+  .md-sync-option .opt-hint{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
   @media (max-width:600px), (max-height:500px) and (orientation:landscape) and (pointer:coarse){
     .md-panel{padding:0;display:block;background:#ffffff;}
     .md-panel-sheet{border-radius:0;max-width:none;box-shadow:none;padding:16px 16px 40px;}
@@ -4776,6 +4783,26 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
   </div>
 
+  <!-- BARU -- Popup custom "Sinkronkan Nama Customer" (klik "🔄 Sinkronkan"
+       di kartu saran Master Nama). Menggantikan confirm() bawaan browser --
+       user diberi pilihan mau pakai nama yang mana sbg nama aktif. -->
+  <div id="md-nama-sync-overlay" hidden style="position:fixed; inset:0; background:rgba(15,23,20,.55); z-index:10000; display:flex; align-items:center; justify-content:center; padding:16px;">
+    <div id="md-nama-sync-modal" style="background:var(--paper,#fff); border-radius:16px; max-width:460px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.3);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+        <div style="width:38px; height:38px; border-radius:10px; background:#eaf7ee; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0;">🔄</div>
+        <div style="font-size:16.5px; font-weight:800; color:var(--ink);">Sinkronkan Nama Customer</div>
+      </div>
+      <div style="font-size:13px; color:var(--ink-soft); line-height:1.55; margin-bottom:18px;">
+        Kedua nama ini akan digabung jadi <b>1 customer</b> — riwayat pesanan lama tetap tergabung utuh. Pilih nama mana yang mau dipakai sebagai <b>nama aktif</b>; nama yang tidak dipilih otomatis tersimpan sebagai nama lama (alias).
+      </div>
+      <div id="md-nama-sync-options" style="display:flex; flex-direction:column; gap:10px; margin-bottom:22px;"></div>
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" id="md-nama-sync-cancel" class="tab-btn" style="padding:9px 16px;">Batal</button>
+        <button type="button" id="md-nama-sync-confirm" class="md-btn" style="padding:9px 18px;" disabled>🔄 Sinkronkan</button>
+      </div>
+    </div>
+  </div>
+
   <div class="tabs">
     <button class="tab-btn active" data-tab="penjualan">Penjualan (Grosir)</button>
     <button class="tab-btn" data-tab="custom">Custom</button>
@@ -5977,7 +6004,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.33.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.35.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6173,7 +6200,22 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.33.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.35.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug penting: tombol "Lupa PIN?" &amp; "Reset ke PIN bawaan" tidak berfungsi kalau dibuka lewat Telegram</b> — penyebabnya dialog konfirmasi bawaan browser (<code>confirm()</code>) yang ternyata diblokir total oleh WebView Telegram, sehingga tombolnya terlihat diam saja walau sudah diketuk. Ini jalur SATU-SATUNYA untuk pulih kalau lupa PIN Master Data, jadi diprioritaskan diperbaiki duluan.</li>
+            <li><b>Audit &amp; perbaikan menyeluruh sisa dialog bawaan browser lainnya</b> — Hapus Produk/Ekspedisi, Batalkan perubahan Daftar Produk, serta Sembunyikan/Hapus di Master Nama Pelanggan (termasuk kartu saran ketidaksinkronan) sekarang semua pakai popup konfirmasi buatan sendiri yang sudah dipakai tombol RESET, bukan <code>confirm()</code>/<code>alert()</code> bawaan lagi — supaya konsisten berfungsi di semua platform, termasuk di dalam Telegram.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.34.0</div>
+          <ul>
+            <li><b>Popup custom "Sinkronkan Nama Customer"</b> — tombol "🔄 Sinkronkan" di kartu saran Master Nama Pelanggan sekarang membuka popup pilihan (bukan konfirmasi bawaan browser lagi): Anda memilih sendiri nama mana yang mau dipakai sebagai nama aktif — nama Master Nama yang lama, atau nama dari transaksi. Nama yang tidak dipilih otomatis tersimpan sebagai nama lama (alias), riwayat pesanan tetap tergabung seperti biasa.</li>
+            <li><b>Tombol baru "✕ Abaikan"</b> di kartu saran yang sama — kalau dua nama itu memang BUKAN customer yang sama, klik Abaikan supaya pasangan nama itu tidak terus-menerus muncul lagi di rekomendasi ke depannya. Beda dari "🙈 Sembunyikan" — Abaikan tidak mengubah data customer apa pun, cuma menandai "jangan sarankan pasangan ini lagi".</li>
+            <li>Perbaikan konsistensi kecil: label pengirim di catatan aktivitas bot Telegram sekarang ikut memakai nama tampilan penuh (nama depan + belakang) kalau akun itu tidak punya username, bukan cuma nama depan saja.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.33.0</div>
           <ul>
             <li><b>Perbaikan bug kartu saran "tidak sinkron" di Master Nama Pelanggan</b> — sebelumnya nama kota dalam kurung ikut dibandingkan saat mendeteksi kemiripan nama, jadi banyak saran yang muncul ngawur cuma gara-gara dua customer kebetulan satu kota (mis. "Fatkhi (Malang)" disarankan mirip "Aminah Khaneman (Malang)"). Sekarang kota dipisah dulu sebelum dibandingkan, dan tiap saran dikasih skor kemiripan. Ditambah kartu ringkasan klik-filter (Total Saran/🟢 Kemiripan Tinggi/🟡 Perlu Ditinjau/🔴 Kemiripan Tipis) — gaya sama seperti kartu ringkasan di Follow Up — supaya gampang menimbang mana yang layak "Sinkronkan" atau "Sembunyikan".</li>
             <li><b>Perbaikan bug: ganti nama customer lewat "✏️ Edit" di Master Nama telat muncul di Follow Up/Rekap Pesanan</b> — penyebabnya endpoint ganti nama lupa membersihkan cache Follow Up &amp; Rekap Pesanan setelah simpan (beda dari tombol Sinkronkan/Sembunyikan yang sudah benar). Sekarang ganti nama langsung tersinkron seketika ke Follow Up &amp; Rekap Pesanan.</li>
@@ -13217,6 +13259,7 @@ if ("serviceWorker" in navigator) {
               <div class="btns">
                 <button type="button" class="sync md-nama-sugg-sync">🔄 Sinkronkan</button>
                 <button type="button" class="hide md-nama-sugg-hide">🙈 Sembunyikan</button>
+                <button type="button" class="md-nama-sugg-ignore" style="border:1px solid var(--line);background:var(--card);border-radius:7px;padding:6px 10px;font-size:11.5px;cursor:pointer;color:var(--ink-soft);">✕ Abaikan</button>
               </div>
             </div>
           </div>`;
@@ -13227,32 +13270,116 @@ if ("serviceWorker" in navigator) {
         if(!s) return;
         const syncBtn = card.querySelector(".md-nama-sugg-sync");
         const hideBtn = card.querySelector(".md-nama-sugg-hide");
+        const ignoreBtn = card.querySelector(".md-nama-sugg-ignore");
         if(syncBtn) syncBtn.addEventListener("click", async ()=>{
-          if(!confirm(`Gabungkan "${s.orderName}" sebagai nama lama dari "${s.masterName}"?\n\nSetelah ini, pesanan lama atas nama "${s.orderName}" akan tampil tergabung di bawah "${s.masterName}" di Rekap Pesanan/Follow Up.`)) return;
+          // BARU -- ganti confirm() bawaan browser dgn popup custom yang
+          // menanyakan nama mana yang mau dipakai sbg nama aktif.
+          const finalName = await openSyncModal(s.masterName, s.orderName);
+          if(!finalName) return; // dibatalkan
           try{
             const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/add-alias", {
               method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-              body: JSON.stringify({ name: s.masterName, alias: s.orderName }),
+              body: JSON.stringify({ name: s.masterName, alias: s.orderName, finalName }),
             });
             const data2 = await res.json();
             if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyinkronkan.");
             await loadNames();
             await loadSuggestions();
-          }catch(err){ alert("Gagal menyinkronkan: " + String(err.message || err)); }
+          }catch(err){ showMsg("Gagal menyinkronkan: " + String(err.message || err), true); }
         });
-        if(hideBtn) hideBtn.addEventListener("click", async ()=>{
-          if(!confirm(`Sembunyikan "${s.orderName}" dari Rekap Pesanan/Follow Up?\n\nBisa dipulihkan kapan saja lewat "🙈 Tersembunyi".`)) return;
+        if(hideBtn) hideBtn.addEventListener("click", ()=>{
+          // BARU -- ganti confirm() bawaan browser (diblokir di WebView
+          // Telegram) dgn popup kustom yang sudah dipakai fitur lain.
+          window.showResetConfirm(
+            `Sembunyikan "${s.orderName}" dari Rekap Pesanan/Follow Up?`,
+            async ()=>{
+              try{
+                const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
+                  method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+                  body: JSON.stringify({ name: s.orderName }),
+                });
+                const data2 = await res.json();
+                if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyembunyikan.");
+                await loadNames();
+                await loadSuggestions();
+              }catch(err){ showMsg("Gagal menyembunyikan: " + String(err.message || err), true); }
+            },
+            { icon: "🙈", iconBg: "#fdecea", iconColor: "var(--danger-red)",
+              okText: "Ya, Sembunyikan", okColor: "var(--danger-red)",
+              warningText: `Bisa dipulihkan kapan saja lewat "🙈 Tersembunyi".` }
+          );
+        });
+        // BARU -- "✕ Abaikan": pasangan nama ini MEMANG beda orang, jangan
+        // disarankan lagi ke depannya (disimpan permanen di server, TIDAK
+        // mengubah data customer apa pun -- beda dari "Sembunyikan").
+        if(ignoreBtn) ignoreBtn.addEventListener("click", async ()=>{
+          ignoreBtn.disabled = true;
+          ignoreBtn.textContent = "...";
           try{
-            const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/mismatch-suggestions/ignore", {
               method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-              body: JSON.stringify({ name: s.orderName }),
+              body: JSON.stringify({ masterName: s.masterName, orderName: s.orderName }),
             });
             const data2 = await res.json();
-            if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyembunyikan.");
-            await loadNames();
-            await loadSuggestions();
-          }catch(err){ alert("Gagal menyembunyikan: " + String(err.message || err)); }
+            if(!res.ok || data2.error) throw new Error(data2.error || "Gagal mengabaikan.");
+            await loadSuggestions(); // saran ini sudah tersimpan sbg "diabaikan" di server, tidak akan muncul lagi
+          }catch(err){
+            showMsg("Gagal mengabaikan: " + String(err.message || err), true);
+            ignoreBtn.disabled = false;
+            ignoreBtn.textContent = "✕ Abaikan";
+          }
         });
+      });
+    }
+
+    /* ---------- BARU -- popup custom "Sinkronkan Nama Customer" ----------
+       Menggantikan confirm() bawaan browser: user memilih nama mana yang
+       mau dipakai sbg nama AKTIF setelah 2 nama ini digabung. Return
+       Promise -> nama yang dipilih (string), atau null kalau dibatalkan. */
+    function openSyncModal(masterName, orderName){
+      return new Promise((resolve)=>{
+        const overlay = document.getElementById("md-nama-sync-overlay");
+        const optionsEl = document.getElementById("md-nama-sync-options");
+        const confirmBtn = document.getElementById("md-nama-sync-confirm");
+        const cancelBtn = document.getElementById("md-nama-sync-cancel");
+        if(!overlay || !optionsEl || !confirmBtn || !cancelBtn){ resolve(masterName); return; } // fallback aman kalau markup belum ke-load
+
+        let chosen = masterName; // default: nama Master Nama yang tetap aktif (perilaku lama)
+        optionsEl.innerHTML = `
+          <label class="md-sync-option selected" data-val="${escapeHtmlNama(masterName)}">
+            <input type="radio" name="md-nama-sync-choice" checked>
+            <div><div class="opt-name">${escapeHtmlNama(masterName)}</div><div class="opt-hint">Nama di Master Nama sekarang</div></div>
+          </label>
+          <label class="md-sync-option" data-val="${escapeHtmlNama(orderName)}">
+            <input type="radio" name="md-nama-sync-choice">
+            <div><div class="opt-name">${escapeHtmlNama(orderName)}</div><div class="opt-hint">Nama dari transaksi</div></div>
+          </label>`;
+        confirmBtn.disabled = false;
+
+        const optionEls = Array.from(optionsEl.querySelectorAll(".md-sync-option"));
+        function selectOption(el){
+          optionEls.forEach(o=> o.classList.remove("selected"));
+          el.classList.add("selected");
+          el.querySelector('input[type="radio"]').checked = true;
+          chosen = el.dataset.val;
+        }
+        optionEls.forEach(el=> el.addEventListener("click", ()=> selectOption(el)));
+
+        function cleanup(result){
+          overlay.hidden = true;
+          confirmBtn.removeEventListener("click", onConfirm);
+          cancelBtn.removeEventListener("click", onCancel);
+          overlay.removeEventListener("click", onOverlayClick);
+          resolve(result);
+        }
+        function onConfirm(){ cleanup(chosen); }
+        function onCancel(){ cleanup(null); }
+        function onOverlayClick(e){ if(e.target === overlay) cleanup(null); }
+
+        confirmBtn.addEventListener("click", onConfirm);
+        cancelBtn.addEventListener("click", onCancel);
+        overlay.addEventListener("click", onOverlayClick);
+        overlay.hidden = false;
       });
     }
 
@@ -13364,17 +13491,26 @@ if ("serviceWorker" in navigator) {
 
       if(e.target.classList.contains("md-alias-del")){
         const alias = e.target.dataset.alias;
-        if(!confirm(`Hapus "${alias}" dari daftar nama lama "${name}"?\n\nTIDAK menyentuh data pesanan apa pun -- alias lama ini cuma berhenti otomatis tergabung ke "${name}".`)) return;
-        try{
-          const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete-alias", {
-            method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-            body: JSON.stringify({ name, alias }),
-          });
-          const data = await res.json();
-          if(!res.ok || data.error) throw new Error(data.error || "Gagal menghapus alias.");
-          allCustomers = data.customers || allCustomers;
-          render();
-        }catch(err){ alert("Gagal menghapus alias: " + String(err.message || err)); }
+        // BARU -- ganti confirm() bawaan browser (diblokir di WebView Telegram)
+        // dgn popup kustom yang sudah dipakai fitur lain di app ini.
+        window.showResetConfirm(
+          `Hapus "${alias}" dari daftar nama lama "${name}"?`,
+          async ()=>{
+            try{
+              const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete-alias", {
+                method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ name, alias }),
+              });
+              const data = await res.json();
+              if(!res.ok || data.error) throw new Error(data.error || "Gagal menghapus alias.");
+              allCustomers = data.customers || allCustomers;
+              render();
+            }catch(err){ showMsg("Gagal menghapus alias: " + String(err.message || err), true); }
+          },
+          { icon: "🗑️", iconBg: "#fdecea", iconColor: "var(--danger-red)",
+            okText: "Ya, Hapus", okColor: "var(--danger-red)",
+            warningText: `TIDAK menyentuh data pesanan apa pun -- alias lama ini cuma berhenti otomatis tergabung ke "${name}".` }
+        );
         return;
       }
 
@@ -13389,7 +13525,7 @@ if ("serviceWorker" in navigator) {
           await loadNames();
           showHidden = false;
           render();
-        }catch(err){ alert("Gagal memulihkan: " + String(err.message || err)); }
+        }catch(err){ showMsg("Gagal memulihkan: " + String(err.message || err), true); }
         return;
       }
 
@@ -13411,7 +13547,7 @@ if ("serviceWorker" in navigator) {
         const csInput = row.querySelector(".md-nama-edit-cs");
         const newName = custInput ? custInput.value.trim().toUpperCase() : "";
         const newCs = csInput ? csInput.value.trim() : "";
-        if(!newName){ alert("Nama customer tidak boleh kosong."); return; }
+        if(!newName){ showMsg("Nama customer tidak boleh kosong.", true); return; }
         try{
           // Ubah nama customer (jadi alias otomatis) HANYA kalau memang berubah.
           if(newName !== name){
@@ -13435,7 +13571,7 @@ if ("serviceWorker" in navigator) {
           render();
           loadSuggestions();
         }catch(err){
-          alert("Gagal menyimpan: " + String(err.message || err));
+          showMsg("Gagal menyimpan: " + String(err.message || err), true);
         }
         return;
       }
@@ -13443,18 +13579,27 @@ if ("serviceWorker" in navigator) {
         // BARU -- ini SEKARANG soft-hide (TIDAK menghapus data apa pun secara
         // permanen). Customer langsung hilang dari Rekap Pesanan & Follow Up,
         // tapi bisa dipulihkan kapan saja lewat "🙈 Tersembunyi" di atas.
-        if(!confirm(`Sembunyikan "${name}" dari Rekap Pesanan &amp; Follow Up?\n\nData pesanan customer ini TIDAK dihapus -- bisa dipulihkan kapan saja lewat tombol "🙈 Tersembunyi" di atas daftar.`)) return;
-        try{
-          const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
-            method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-            body: JSON.stringify({ name }),
-          });
-          const data = await res.json();
-          if(!res.ok || data.error) throw new Error(data.error || "Gagal menyembunyikan.");
-          await loadNames();
-        }catch(err){
-          alert("Gagal menyembunyikan nama: " + String(err.message || err));
-        }
+        // Ganti confirm() bawaan browser (diblokir di WebView Telegram) dgn
+        // popup kustom yang sudah dipakai fitur lain.
+        window.showResetConfirm(
+          `Sembunyikan "${name}" dari Rekap Pesanan & Follow Up?`,
+          async ()=>{
+            try{
+              const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
+                method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ name }),
+              });
+              const data = await res.json();
+              if(!res.ok || data.error) throw new Error(data.error || "Gagal menyembunyikan.");
+              await loadNames();
+            }catch(err){
+              showMsg("Gagal menyembunyikan nama: " + String(err.message || err), true);
+            }
+          },
+          { icon: "🙈", iconBg: "#fdecea", iconColor: "var(--danger-red)",
+            okText: "Ya, Sembunyikan", okColor: "var(--danger-red)",
+            warningText: `Data pesanan customer ini TIDAK dihapus -- bisa dipulihkan kapan saja lewat tombol "🙈 Tersembunyi" di atas daftar.` }
+        );
       }
     });
 
@@ -13805,13 +13950,21 @@ if ("serviceWorker" in navigator) {
     }
   });
   document.getElementById("md-pin-cancel").addEventListener("click", ()=>{ pinOverlay.hidden = true; mdPendingTab = null; });
-  document.getElementById("md-pin-forgot").addEventListener("click", async ()=>{
-    if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
-      setPin(DEFAULT_PIN);
-      pinErr.style.color = "var(--primary-green)";
-      pinErr.textContent = "PIN sudah direset ke PIN bawaan.";
-      await confirmMasterDataSave("PIN sudah direset ke PIN bawaan.");
-    }
+  document.getElementById("md-pin-forgot").addEventListener("click", ()=>{
+    // BARU -- ganti confirm() bawaan browser dgn popup kustom. Ini PENTING
+    // krn confirm()/alert() DIBLOKIR di dalam WebView Telegram -- kalau
+    // dibiarkan, tombol "Lupa PIN?" (jalur SATU-SATUNYA buat pulih saat
+    // terkunci) akan terlihat tidak berfungsi sama sekali di Telegram.
+    window.showResetConfirm(
+      "PIN akan dikembalikan ke PIN bawaan. Lanjutkan?",
+      async ()=>{
+        setPin(DEFAULT_PIN);
+        pinErr.style.color = "var(--primary-green)";
+        pinErr.textContent = "PIN sudah direset ke PIN bawaan.";
+        await confirmMasterDataSave("PIN sudah direset ke PIN bawaan.");
+      },
+      { icon: "🔑", okText: "Ya, Reset PIN" }
+    );
   });
   document.getElementById("md-pin-submit").addEventListener("click", submitPin);
   function submitPin(){
@@ -14039,16 +14192,30 @@ if ("serviceWorker" in navigator) {
     renderProdukList();
   });
   document.getElementById("md-produk-edit-cancel").addEventListener("click", ()=>{
+    function doCancelEdit(){
+      if(mdProdukSnapshot){
+        PRODUCTS.length = 0;
+        mdProdukSnapshot.forEach(p=> PRODUCTS.push(p));
+        refreshAfterDataChange();
+      }
+      mdProdukSnapshot = null;
+      setMdProdukEditMode(false);
+      renderProdukList();
+    }
     if(mdProdukSnapshot){
       const changed = JSON.stringify(PRODUCTS) !== JSON.stringify(mdProdukSnapshot);
-      if(changed && !confirm("Batalkan semua perubahan yang belum di-\"Simpan & Kunci\" pada Daftar produk?")) return;
-      PRODUCTS.length = 0;
-      mdProdukSnapshot.forEach(p=> PRODUCTS.push(p));
-      refreshAfterDataChange();
+      if(changed){
+        // BARU -- ganti confirm() bawaan browser (diblokir di WebView
+        // Telegram) dgn popup kustom yang sudah dipakai fitur lain.
+        window.showResetConfirm(
+          "Batalkan semua perubahan yang belum di-\"Simpan & Kunci\" pada Daftar produk?",
+          doCancelEdit,
+          { okText: "Ya, Batalkan" }
+        );
+        return;
+      }
     }
-    mdProdukSnapshot = null;
-    setMdProdukEditMode(false);
-    renderProdukList();
+    doCancelEdit();
   });
   function renderProdukList(){
     const list = document.getElementById("md-produk-list");
@@ -14417,7 +14584,7 @@ if ("serviceWorker" in navigator) {
     }
   });
   document.getElementById("md-hapus-cancel").addEventListener("click", resetHapusForm);
-  document.getElementById("md-hapus-confirm").addEventListener("click", async ()=>{
+  document.getElementById("md-hapus-confirm").addEventListener("click", ()=>{
     if(!__hapusFound) return;
     // cari ulang berdasar kode (bukan pakai idx lama) — jaga-jaga kalau
     // daftar produk/ekspedisi sempat berubah selagi preview ini terbuka.
@@ -14427,16 +14594,26 @@ if ("serviceWorker" in navigator) {
       document.getElementById("md-hapus-err").textContent = "Data ini sudah tidak ada (mungkin sudah terhapus sebelumnya).";
       return;
     }
-    if(!confirm(`Hapus ${fresh.tipe.toLowerCase()} "${fresh.nama}" (kode ${fresh.kode})? Data yang sudah terpakai di pesanan berjalan tidak akan otomatis terhapus dari situ.`)) return;
-    if(fresh.tipe === "Produk"){
-      PRODUCTS.splice(fresh.idx, 1);
-      renderProdukList();
-    } else {
-      EKSPEDISI.splice(fresh.idx, 1);
-      renderEkspedisiList();
-    }
-    await refreshAfterDataChange(`${fresh.tipe} "${fresh.nama}" dihapus.`);
-    resetHapusForm();
+    // BARU -- ganti confirm() bawaan browser (diblokir di WebView Telegram,
+    // bikin tombol Hapus terlihat tidak berfungsi) dgn popup kustom yang
+    // sudah dipakai fitur lain di app ini.
+    window.showResetConfirm(
+      `Hapus ${fresh.tipe.toLowerCase()} "${fresh.nama}" (kode ${fresh.kode})?`,
+      async ()=>{
+        if(fresh.tipe === "Produk"){
+          PRODUCTS.splice(fresh.idx, 1);
+          renderProdukList();
+        } else {
+          EKSPEDISI.splice(fresh.idx, 1);
+          renderEkspedisiList();
+        }
+        await refreshAfterDataChange(`${fresh.tipe} "${fresh.nama}" dihapus.`);
+        resetHapusForm();
+      },
+      { icon: "🗑️", iconBg: "#fdecea", iconColor: "var(--danger-red)",
+        okText: "Ya, Hapus", okColor: "var(--danger-red)",
+        warningText: "Data yang sudah terpakai di pesanan berjalan tidak akan otomatis terhapus dari situ." }
+    );
   });
 
   /* ---------- Ubah / Reset PIN ---------- */
@@ -14457,14 +14634,20 @@ if ("serviceWorker" in navigator) {
     document.getElementById("md-pin-new2").value = "";
     await confirmMasterDataSave("PIN berhasil diganti.");
   });
-  document.getElementById("md-pin-reset-btn").addEventListener("click", async ()=>{
-    if(confirm("PIN akan dikembalikan ke PIN bawaan. Lanjutkan?")){
-      setPin(DEFAULT_PIN);
-      const errEl = document.getElementById("md-pin-change-err");
-      errEl.style.color = "var(--primary-green)";
-      errEl.textContent = "PIN sudah direset ke PIN bawaan.";
-      await confirmMasterDataSave("PIN sudah direset ke PIN bawaan.");
-    }
+  document.getElementById("md-pin-reset-btn").addEventListener("click", ()=>{
+    // BARU -- ganti confirm() bawaan browser dgn popup kustom (sama alasan
+    // spt "Lupa PIN?" di atas -- diblokir di WebView Telegram).
+    window.showResetConfirm(
+      "PIN akan dikembalikan ke PIN bawaan. Lanjutkan?",
+      async ()=>{
+        setPin(DEFAULT_PIN);
+        const errEl = document.getElementById("md-pin-change-err");
+        errEl.style.color = "var(--primary-green)";
+        errEl.textContent = "PIN sudah direset ke PIN bawaan.";
+        await confirmMasterDataSave("PIN sudah direset ke PIN bawaan.");
+      },
+      { icon: "🔑", okText: "Ya, Reset PIN" }
+    );
   });
 })();
 </script>
@@ -15815,7 +15998,7 @@ if ("serviceWorker" in navigator) {
   // aktif). Dibuka Excel/Google Sheets biasa.
   document.getElementById("rekap-export-csv-btn").addEventListener("click", ()=>{
     const { rows, kodeList } = terapkanFilter();
-    if(!rows.length){ alert("Tidak ada data untuk diekspor."); return; }
+    if(!rows.length){ showMsg("Tidak ada data untuk diekspor.", true); return; }
     const header = ["No","Hari","Tanggal/Jam","CS","Customer", ...kodeList, "Total Qty","Status","KG","Ekspedisi","Ongkir","Resi","Sudah di Invoice"];
     const csvEscape = (v)=> `"${String(v).replace(/"/g,'""')}"`;
     const lines = [header.map(csvEscape).join(",")];

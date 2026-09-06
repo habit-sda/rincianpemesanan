@@ -4,8 +4,38 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v307";
+const CACHE_VERSION = "v309";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v309 -- PENTING (tapi tidak dipaksa) -- audit menyeluruh & ganti SEMUA
+   sisa dialog bawaan browser (confirm()/alert()) yang belum sempat
+   dikonversi ke popup kustom, karena dialog bawaan itu DIBLOKIR TOTAL
+   di dalam WebView Telegram (bikin tombolnya kelihatan "tidak
+   berfungsi", padahal kodenya jalan normal). Titik paling kritis yang
+   ikut kena: tombol "Lupa PIN? Reset ke PIN bawaan" (SATU-SATUNYA jalur
+   pemulihan kalau lupa PIN Master Data) dan "Reset ke PIN bawaan" di
+   tab Keamanan -- sebelumnya kalau dibuka dari Telegram, tombol ini
+   bisa terlihat sama sekali tidak merespons. Titik lain yang ikut
+   diganti: Hapus Produk/Ekspedisi, Batalkan perubahan Daftar Produk,
+   Sembunyikan/Hapus alias di Master Nama Pelanggan (termasuk 2 tombol
+   di kartu saran ketidaksinkronan yang baru ditambahkan v307/v308),
+   plus 9 pesan error/validasi (alert()) diganti jadi notifikasi
+   non-blocking yang sudah dipakai di tempat lain. Semua popup
+   konfirmasi ini SEKARANG pakai komponen yang sama (window.
+   showResetConfirm) yang sudah lama dipakai tombol RESET & toggle
+   status Invoice, supaya konsisten 1 komponen di seluruh app. */
+/* v308 -- (1) Popup custom "Sinkronkan Nama Customer" (bukan confirm()
+   bawaan browser) di kartu saran Master Nama Pelanggan: user sekarang
+   memilih sendiri nama mana (Master Nama lama / nama transaksi baru)
+   yang mau dipakai sbg nama aktif saat "🔄 Sinkronkan". (2) Tombol baru
+   "✕ Abaikan" di kartu saran yang sama -- pasangan nama yang MEMANG
+   beda orang tidak akan terus-menerus muncul lagi di rekomendasi
+   (tersimpan permanen di server, tidak mengubah data customer apa
+   pun). (3) Perbaikan konsistensi kecil: label "byUser" di log
+   keanggotaan bot Telegram sekarang ikut memakai nama tampilan penuh
+   (first name + last name) kalau username tidak ada, bukan cuma first
+   name -- konsisten dgn label pengirim CS di tempat lain. SENGAJA
+   TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup
+   "Versi Baru Tersedia"). */
 /* v307 -- (1) Perbaikan bug kartu saran "tidak sinkron" di Master Nama
    > Master Nama Pelanggan: SEBELUMNYA nama kota dalam kurung ikut
    dibandingkan saat mendeteksi kemiripan nama, jadi banyak saran ngawur
