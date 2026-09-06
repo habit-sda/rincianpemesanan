@@ -5831,7 +5831,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-card">
         <h3>Master Nama Pelanggan</h3>
         <div class="md-note" style="margin-bottom:12px;">Daftar Customer + CS terdaftar, dipakai sebagai rekomendasi otomatis di field "Nama Customer" (popup Kirim ke Grup Telegram) <b>DAN</b> otomatis disinkronkan ke Rekap Pesanan &amp; Follow Up: ganti nama di sini akan menggabungkan riwayat lama (sebagai alias) ke nama baru, dan "🙈 Sembunyikan" akan menyembunyikan customer itu dari Rekap Pesanan/Follow Up (bukan hapus permanen — bisa dipulihkan kapan saja).</div>
+        <div class="followup-stats-grid" id="md-nama-suggest-stats" style="display:none;"></div>
+        <div class="followup-quickfilter-chip" id="md-nama-suggest-quickfilter-chip">
+          <span id="md-nama-suggest-quickfilter-chip-text"></span>
+          <button type="button" id="md-nama-suggest-quickfilter-clear">✕ Hapus filter</button>
+        </div>
         <div id="md-nama-suggestions"></div>
+        <div id="md-nama-cs-suggestions"></div>
+        <datalist id="md-nama-cs-datalist"></datalist>
         <div style="display:flex;gap:8px;margin-bottom:12px;">
           <input type="text" id="md-nama-search" class="md-lock-exempt" placeholder="Cari nama customer/CS..." style="flex:1;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;">
           <button type="button" id="md-nama-toggle-hidden" class="md-lock-exempt" style="flex-shrink:0;height:40px;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:0 14px;font-size:12.5px;cursor:pointer;white-space:nowrap;">🙈 Tersembunyi (<span id="md-nama-hidden-count">0</span>)</button>
@@ -5970,7 +5977,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.32.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.33.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6166,7 +6173,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.32.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.33.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug kartu saran "tidak sinkron" di Master Nama Pelanggan</b> — sebelumnya nama kota dalam kurung ikut dibandingkan saat mendeteksi kemiripan nama, jadi banyak saran yang muncul ngawur cuma gara-gara dua customer kebetulan satu kota (mis. "Fatkhi (Malang)" disarankan mirip "Aminah Khaneman (Malang)"). Sekarang kota dipisah dulu sebelum dibandingkan, dan tiap saran dikasih skor kemiripan. Ditambah kartu ringkasan klik-filter (Total Saran/🟢 Kemiripan Tinggi/🟡 Perlu Ditinjau/🔴 Kemiripan Tipis) — gaya sama seperti kartu ringkasan di Follow Up — supaya gampang menimbang mana yang layak "Sinkronkan" atau "Sembunyikan".</li>
+            <li><b>Perbaikan bug: ganti nama customer lewat "✏️ Edit" di Master Nama telat muncul di Follow Up/Rekap Pesanan</b> — penyebabnya endpoint ganti nama lupa membersihkan cache Follow Up &amp; Rekap Pesanan setelah simpan (beda dari tombol Sinkronkan/Sembunyikan yang sudah benar). Sekarang ganti nama langsung tersinkron seketika ke Follow Up &amp; Rekap Pesanan.</li>
+            <li><b>Nama CS di Master Nama sekarang otomatis terisi</b> dari riwayat transaksi customer itu (data yang sama dipakai kolom CS di Follow Up), khusus untuk yang field CS-nya masih kosong — dijalankan otomatis tiap kali tab Master Nama Pelanggan dibuka. Yang sudah terisi (baik otomatis maupun diedit manual) tidak akan pernah ditimpa balik lagi — kalau hasilnya kurang pas, tinggal "✏️ Edit" sekali dan itu final.</li>
+            <li>Field "Nama CS" di form Edit Master Nama sekarang punya rekomendasi otomatis (ketik sedikit, muncul saran) dari Daftar CS terdaftar — mengurangi typo/variasi penulisan nama CS yang sama.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.32.0</div>
           <ul>
             <li><b>Kunci-Edit di Master Data</b> — 6 bagian (Ekspedisi &amp; Logistik, Tampilan, Rumus, Keamanan, Finance, Master Nama Pelanggan) sekarang terkunci (read-only) secara default, sama seperti "Daftar Produk" yang sudah lebih dulu begitu — supaya tidak ada perubahan tidak sengaja (mis. kepencet pas scroll di HP). Tekan "✏️ Mode Edit" dulu buat mengubah, lalu "💾 Simpan &amp; Kunci" setelah selesai. Bagian "Hapus Data" tidak ikut dikunci (sudah punya perlindungan sendiri — wajib ketik kode persis + konfirmasi).</li>
             <li><b>Kode singkat produk (mis. HA, HS) sekarang selalu huruf besar</b> — otomatis berubah huruf besar sambil mengetik di Master Data → Produk, dan dipastikan konsisten di data yang dikirim ke bot &amp; kolom Rekap Pesanan (walau produk lama sempat tersimpan huruf kecil/campuran).</li>
@@ -13083,7 +13099,7 @@ if ("serviceWorker" in navigator) {
                 </div>
                 <div class="fld">
                   <div class="fld-label">Nama CS</div>
-                  <input type="text" class="md-nama-edit-input md-nama-edit-cs" value="${escapeHtmlNama(c.cs || "")}" placeholder="(kosong)" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
+                  <input type="text" class="md-nama-edit-input md-nama-edit-cs" list="md-nama-cs-datalist" value="${escapeHtmlNama(c.cs || "")}" placeholder="(kosong)" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
                 </div>
               </div>
               ${aliasChipsHtml(c)}
@@ -13122,62 +13138,194 @@ if ("serviceWorker" in navigator) {
       listEl.innerHTML = rowsHtml + paginationHtml(totalPages);
     }
 
-    /* ---------- Kartu saran ketidaksinkronan ---------- */
-    async function loadSuggestions(){
-      if(!suggestWrapEl || !MASTER_DATA_WORKER_URL) return;
-      try{
-        const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/mismatch-suggestions", { headers: workerHeaders() });
-        const data = await res.json().catch(()=> ({}));
-        const suggestions = Array.isArray(data.suggestions) ? data.suggestions : [];
-        if(!suggestions.length){ suggestWrapEl.innerHTML = ""; return; }
-        suggestWrapEl.innerHTML = (data.dedupedAny
-          ? `<div class="md-nama-dedupe-note">✓ Ditemukan &amp; digabung otomatis nama yang 100% identik dobel di Master Nama.</div>`
-          : ""
-        ) + suggestions.map((s, i)=> `
-          <div class="md-nama-suggest-card" data-idx="${i}">
+    /* ---------- Kartu saran ketidaksinkronan ----------
+       BARU -- filter cepat ala kartu ringkasan Follow Up (klik kartu utk
+       mempersempit daftar saran berdasarkan skor kemiripan yang dihitung
+       Worker: "tinggi" = kemungkinan besar customer sama (cocok utk
+       "Sinkronkan"), "sedang" = perlu ditinjau manual, "rendah" = mirip
+       tipis/kemungkinan beda orang (cocok utk "Sembunyikan"). Pola &
+       CSS-nya SAMA PERSIS dgn .followup-stat-box/.followup-quickfilter-chip
+       di halaman Follow Up supaya konsisten. */
+    const suggestStatsEl = document.getElementById("md-nama-suggest-stats");
+    const suggestQfChipEl = document.getElementById("md-nama-suggest-quickfilter-chip");
+    const suggestQfChipTextEl = document.getElementById("md-nama-suggest-quickfilter-chip-text");
+    let allSuggestions = [];      // data mentah dari server (belum difilter)
+    let suggestDedupedAny = false;
+    let suggestQuickFilter = null; // null = semua | "tinggi" | "sedang" | "rendah"
+    const SUGGEST_QF_LABEL = {
+      tinggi: "🟢 Kemiripan Tinggi (kemungkinan besar sama)",
+      sedang: "🟡 Perlu Ditinjau (kemiripan sedang)",
+      rendah: "🔴 Kemiripan Tipis (kemungkinan beda orang)"
+    };
+
+    function updateSuggestQfChip(){
+      if(suggestQuickFilter && SUGGEST_QF_LABEL[suggestQuickFilter]){
+        suggestQfChipTextEl.textContent = "Filter aktif: " + SUGGEST_QF_LABEL[suggestQuickFilter];
+        suggestQfChipEl.classList.add("show");
+      }else{
+        suggestQfChipEl.classList.remove("show");
+      }
+    }
+
+    function renderSuggestStats(){
+      if(!suggestStatsEl) return;
+      if(!allSuggestions.length){ suggestStatsEl.style.display = "none"; return; }
+      suggestStatsEl.style.display = "";
+      const total = allSuggestions.length;
+      const tinggi = allSuggestions.filter(s=> s.confidence === "tinggi").length;
+      const sedang = allSuggestions.filter(s=> s.confidence === "sedang").length;
+      const rendah = allSuggestions.filter(s=> s.confidence === "rendah" || !s.confidence).length;
+      const box = (key, num, lbl, color)=>{
+        const isActive = (key === "total") ? (suggestQuickFilter === null) : (suggestQuickFilter === key);
+        return `<div class="followup-stat-box clickable${isActive ? " active" : ""}" data-filter="${key}">` +
+          `<div class="num"${color ? ` style="color:${color};"` : ""}>${num}</div>` +
+          `<div class="lbl">${lbl}</div></div>`;
+      };
+      suggestStatsEl.innerHTML =
+        box("total", total, "Total Saran") +
+        box("tinggi", tinggi, "🟢 Kemiripan Tinggi", "var(--primary-green)") +
+        box("sedang", sedang, "🟡 Perlu Ditinjau", "#7b6000") +
+        box("rendah", rendah, "🔴 Kemiripan Tipis", "var(--danger-red)");
+      updateSuggestQfChip();
+    }
+
+    function renderSuggestCards(){
+      if(!suggestWrapEl) return;
+      const filtered = suggestQuickFilter
+        ? allSuggestions.filter(s=> (s.confidence || "rendah") === suggestQuickFilter)
+        : allSuggestions;
+      if(!allSuggestions.length){ suggestWrapEl.innerHTML = ""; return; }
+      if(!filtered.length){
+        suggestWrapEl.innerHTML = `<div class="md-hanging-empty">Tidak ada saran pada kategori ini.</div>`;
+        return;
+      }
+      const CONF_BADGE = {
+        tinggi: `<span style="color:var(--primary-green);font-weight:700;">🟢 Kemiripan tinggi</span>`,
+        sedang: `<span style="color:#7b6000;font-weight:700;">🟡 Perlu ditinjau</span>`,
+        rendah: `<span style="color:var(--danger-red);font-weight:700;">🔴 Kemiripan tipis</span>`
+      };
+      suggestWrapEl.innerHTML = (suggestDedupedAny
+        ? `<div class="md-nama-dedupe-note">✓ Ditemukan &amp; digabung otomatis nama yang 100% identik dobel di Master Nama.</div>`
+        : ""
+      ) + filtered.map((s)=>{
+        const idx = allSuggestions.indexOf(s);
+        const badge = CONF_BADGE[s.confidence] || "";
+        return `
+          <div class="md-nama-suggest-card" data-idx="${idx}">
             <div class="row">
-              <div class="txt">🔎 Nama transaksi <b>"${escapeHtmlNama(s.orderName)}"</b> mirip dengan Master Nama <b>"${escapeHtmlNama(s.masterName)}"</b> tapi tidak 100% sama — apakah customer yang sama?</div>
+              <div class="txt">🔎 Nama transaksi <b>"${escapeHtmlNama(s.orderName)}"</b> mirip dengan Master Nama <b>"${escapeHtmlNama(s.masterName)}"</b> tapi tidak 100% sama — apakah customer yang sama? ${badge ? `<br>${badge}${typeof s.score === "number" ? ` (${s.score}%)` : ""}` : ""}</div>
               <div class="btns">
                 <button type="button" class="sync md-nama-sugg-sync">🔄 Sinkronkan</button>
                 <button type="button" class="hide md-nama-sugg-hide">🙈 Sembunyikan</button>
               </div>
             </div>
-          </div>`
-        ).join("");
-        suggestWrapEl.querySelectorAll(".md-nama-suggest-card").forEach(card=>{
-          const idx = Number(card.dataset.idx);
-          const s = suggestions[idx];
-          if(!s) return;
-          const syncBtn = card.querySelector(".md-nama-sugg-sync");
-          const hideBtn = card.querySelector(".md-nama-sugg-hide");
-          if(syncBtn) syncBtn.addEventListener("click", async ()=>{
-            if(!confirm(`Gabungkan "${s.orderName}" sebagai nama lama dari "${s.masterName}"?\n\nSetelah ini, pesanan lama atas nama "${s.orderName}" akan tampil tergabung di bawah "${s.masterName}" di Rekap Pesanan/Follow Up.`)) return;
-            try{
-              const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/add-alias", {
-                method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-                body: JSON.stringify({ name: s.masterName, alias: s.orderName }),
-              });
-              const data2 = await res.json();
-              if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyinkronkan.");
-              await loadNames();
-              await loadSuggestions();
-            }catch(err){ alert("Gagal menyinkronkan: " + String(err.message || err)); }
-          });
-          if(hideBtn) hideBtn.addEventListener("click", async ()=>{
-            if(!confirm(`Sembunyikan "${s.orderName}" dari Rekap Pesanan/Follow Up?\n\nBisa dipulihkan kapan saja lewat "🙈 Tersembunyi".`)) return;
-            try{
-              const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
-                method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-                body: JSON.stringify({ name: s.orderName }),
-              });
-              const data2 = await res.json();
-              if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyembunyikan.");
-              await loadNames();
-              await loadSuggestions();
-            }catch(err){ alert("Gagal menyembunyikan: " + String(err.message || err)); }
-          });
+          </div>`;
+      }).join("");
+      suggestWrapEl.querySelectorAll(".md-nama-suggest-card").forEach(card=>{
+        const idx = Number(card.dataset.idx);
+        const s = allSuggestions[idx];
+        if(!s) return;
+        const syncBtn = card.querySelector(".md-nama-sugg-sync");
+        const hideBtn = card.querySelector(".md-nama-sugg-hide");
+        if(syncBtn) syncBtn.addEventListener("click", async ()=>{
+          if(!confirm(`Gabungkan "${s.orderName}" sebagai nama lama dari "${s.masterName}"?\n\nSetelah ini, pesanan lama atas nama "${s.orderName}" akan tampil tergabung di bawah "${s.masterName}" di Rekap Pesanan/Follow Up.`)) return;
+          try{
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/add-alias", {
+              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ name: s.masterName, alias: s.orderName }),
+            });
+            const data2 = await res.json();
+            if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyinkronkan.");
+            await loadNames();
+            await loadSuggestions();
+          }catch(err){ alert("Gagal menyinkronkan: " + String(err.message || err)); }
         });
+        if(hideBtn) hideBtn.addEventListener("click", async ()=>{
+          if(!confirm(`Sembunyikan "${s.orderName}" dari Rekap Pesanan/Follow Up?\n\nBisa dipulihkan kapan saja lewat "🙈 Tersembunyi".`)) return;
+          try{
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/delete", {
+              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ name: s.orderName }),
+            });
+            const data2 = await res.json();
+            if(!res.ok || data2.error) throw new Error(data2.error || "Gagal menyembunyikan.");
+            await loadNames();
+            await loadSuggestions();
+          }catch(err){ alert("Gagal menyembunyikan: " + String(err.message || err)); }
+        });
+      });
+    }
+
+    if(suggestStatsEl) suggestStatsEl.addEventListener("click", (e)=>{
+      const box = e.target.closest(".followup-stat-box.clickable");
+      if(!box) return;
+      const key = box.dataset.filter;
+      suggestQuickFilter = (suggestQuickFilter === key || key === "total") ? null : key;
+      renderSuggestStats();
+      renderSuggestCards();
+    });
+    const suggestQfClearBtn = document.getElementById("md-nama-suggest-quickfilter-clear");
+    if(suggestQfClearBtn) suggestQfClearBtn.addEventListener("click", ()=>{
+      suggestQuickFilter = null;
+      renderSuggestStats();
+      renderSuggestCards();
+    });
+
+    async function loadSuggestions(){
+      if(!suggestWrapEl || !MASTER_DATA_WORKER_URL) return;
+      try{
+        const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/mismatch-suggestions", { headers: workerHeaders() });
+        const data = await res.json().catch(()=> ({}));
+        allSuggestions = Array.isArray(data.suggestions) ? data.suggestions : [];
+        suggestDedupedAny = !!data.dedupedAny;
+        // Kalau kategori yang lagi difilter jadi kosong (mis. sudah semua
+        // disinkron/disembunyikan), reset filter otomatis biar tidak
+        // "nyangkut" di kartu kosong.
+        if(suggestQuickFilter && !allSuggestions.some(s=> (s.confidence || "rendah") === suggestQuickFilter)){
+          suggestQuickFilter = null;
+        }
+        renderSuggestStats();
+        renderSuggestCards();
       }catch(e){ console.log("Gagal ambil saran ketidaksinkronan:", e); }
+    }
+
+    /* ---------- BARU -- AUTO-ISI nama CS (bukan sekadar saran) ----------
+       Permintaan user: "jangan sarankan, tapi langsung isi, kalau tidak
+       sesuai bisa saya edit" -- jadi tiap kali tab Master Nama dibuka,
+       Worker langsung mengisi `cs` yang MASIH KOSONG pakai CS yang paling
+       sering menangani transaksi customer itu (customer_order_log).
+       Endpoint /customer-names/cs-autofill di Worker SENGAJA hanya
+       menyentuh yang kosong -- begitu Anda edit manual (atau sudah
+       keisi otomatis), TIDAK akan pernah ditimpa balik lagi. */
+    const csAutofillNoteEl = document.getElementById("md-nama-cs-suggestions");
+    async function autofillCsAndReload(){
+      if(!MASTER_DATA_WORKER_URL) return;
+      try{
+        const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/cs-autofill", {
+          method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+        });
+        const data = await res.json().catch(()=> ({}));
+        if(data && Array.isArray(data.customers)) allCustomers = data.customers;
+        if(csAutofillNoteEl){
+          csAutofillNoteEl.innerHTML = (data && data.filled > 0)
+            ? `<div class="md-nama-dedupe-note">✓ ${data.filled} nama CS otomatis disinkronkan dari riwayat transaksi. Kalau ada yang kurang pas, tinggal "✏️ Edit" — sekali diedit tidak akan ditimpa balik lagi.</div>`
+            : "";
+        }
+        render(); // tampilkan hasil autofill terbaru di daftar tanpa perlu refresh manual
+      }catch(e){ console.log("Gagal autofill CS:", e); }
+    }
+
+    // BARU -- isi <datalist> rekomendasi nama CS di form edit dari Daftar CS
+    // terdaftar (Master Data > Tampilan > SETTINGS.csList, sumber SAMA dgn
+    // dropdown Daftar CS yang sudah dipakai di tempat lain) supaya saat
+    // mengetik di field "Nama CS", browser otomatis menyarankan nama yang
+    // sudah terdaftar (mengurangi typo/variasi penulisan nama CS yang sama).
+    function refreshCsDatalist(){
+      const dl = document.getElementById("md-nama-cs-datalist");
+      if(!dl) return;
+      const names = (Array.isArray(SETTINGS.csList) ? SETTINGS.csList : [])
+        .map(c=> c && c.name).filter(Boolean);
+      dl.innerHTML = names.map(n=> `<option value="${escapeHtmlNama(n)}"></option>`).join("");
     }
 
     async function loadNames(){
@@ -13248,6 +13396,7 @@ if ("serviceWorker" in navigator) {
       if(e.target.classList.contains("md-nama-edit-btn")){
         editingName = name;
         render();
+        refreshCsDatalist(); // pastikan rekomendasi nama CS terbaru (Daftar CS bisa berubah di tab lain)
         const input = listEl.querySelector(".md-nama-edit-customer");
         if(input){ input.focus(); input.select(); }
         return;
@@ -13309,7 +13458,7 @@ if ("serviceWorker" in navigator) {
       }
     });
 
-    window.__mdLoadNamaList = ()=>{ loadNames(); loadSuggestions(); };
+    window.__mdLoadNamaList = ()=>{ loadNames(); autofillCsAndReload(); loadSuggestions(); refreshCsDatalist(); };
   })();
 
   /* ---------- Daftar Finance (dipakai worker untuk validasi reaction/konfirmasi) ---------- */

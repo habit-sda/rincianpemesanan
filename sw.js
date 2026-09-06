@@ -4,8 +4,25 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v306";
+const CACHE_VERSION = "v307";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v307 -- (1) Perbaikan bug kartu saran "tidak sinkron" di Master Nama
+   > Master Nama Pelanggan: SEBELUMNYA nama kota dalam kurung ikut
+   dibandingkan saat mendeteksi kemiripan nama, jadi banyak saran ngawur
+   cuma gara-gara kebetulan satu kota (mis. "FATKHI (MALANG)" vs "AMINAH
+   KHANEMAN (MALANG)"). Sekarang kota dipisah dulu, cuma bagian nama yang
+   dibandingkan, plus kartu ringkasan klik-filter (Total/Kemiripan
+   Tinggi/Perlu Ditinjau/Kemiripan Tipis) gaya sama seperti kartu Follow
+   Up. (2) Ganti nama customer lewat "✏️ Edit" di Master Nama sekarang
+   LANGSUNG tersinkron ke Follow Up & Rekap Pesanan (sebelumnya ada bug
+   lupa purge cache, jadi bisa telat muncul). (3) Nama CS yang masih
+   kosong di Master Nama sekarang OTOMATIS terisi dari riwayat transaksi
+   customer itu (customer_order_log) tiap tab Master Nama dibuka -- yang
+   sudah terisi (otomatis maupun diedit manual) tidak akan pernah ditimpa
+   balik lagi, aman diedit manual kapan saja lewat "✏️ Edit". (4) Field
+   "Nama CS" di form Edit sekarang punya rekomendasi otomatis (datalist)
+   dari Daftar CS terdaftar. SENGAJA TIDAK dipaksa (bukan darurat/
+   keamanan) -- pakai alur normal (popup "Versi Baru Tersedia"). */
 /* v306 -- Pintasan baru "Grup Telegram" (long-press ikon di homescreen)
    pakai icon Telegram identik (biru #1e96e8 + logo kertas terbang,
    sama seperti tombol "Buka Payment Telegram" di Aksi cepat). Karena
