@@ -4,8 +4,50 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v314";
+const CACHE_VERSION = "v317";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v317 -- Audit & perbaikan bug: 4 popup (#followup-detail-overlay "Detail
+   Customer", #followup-contact-overlay "Perlu Dihubungi", #followup-chart-overlay
+   "Grafik Riwayat", #md-nama-sync-overlay "Sinkronkan Nama Customer") SENGAJA
+   dibuat lepas dari class .md-overlay/.calc-overlay (posisi & z-index kustom
+   lewat inline style), tapi akibatnya TIDAK IKUT TERDETEKSI oleh 2 mekanisme
+   generik yang selama ini cuma memantau ".md-overlay, .calc-overlay":
+   1) Kunci scroll body (setupOverlayScrollLock) -- scroll halaman belakang
+      tidak terkunci selagi salah satu dari 4 popup ini terbuka di HP.
+   2) Tombol/gesture Back Telegram Mini App (findOpenOverlay) -- YANG PALING
+      SERIUS: menekan back Telegram saat salah satu popup ini terbuka TIDAK
+      menutup popup itu dulu (beda dari tujuan fitur ini), melainkan langsung
+      history.back() -- dan kalau itu langkah sejarah pertama, Mini App-nya
+      bisa langsung KETUTUP TOTAL. Diperbaiki dgn menambahkan ID ke-4 popup
+      ini eksplisit ke 3 titik selector terkait, plus aria-label="Tutup"/
+      "Batal" pada tombol tutup masing-masing supaya tombol back Telegram
+      memanggil fungsi tutup ASLINYA (bukan cuma hidden=true paksa).
+   SENGAJA TIDAK dipaksa (baru kena kalau user pas menekan back Telegram
+   selagi salah satu dari 4 popup spesifik ini terbuka, bukan tiap saat app
+   dibuka) -- pakai alur normal (popup "Perbarui Sekarang"). */
+/* v316 -- Audit & perbaikan bug: semua popup konfirmasi (window.showResetConfirm,
+   dipakai utk konfirmasi hapus produk/ekspedisi/CS, hapus alias nama, sembunyikan
+   customer, reset PIN, batal edit produk, dsb) SEBELUMNYA ketutupan/tampil di
+   BELAKANG panel Master Data karena z-index-nya (1000, warisan dari .calc-overlay)
+   lebih rendah dari z-index panel Master Data (.md-panel = 1250) dan sub-popupnya
+   (.md-overlay = 1300) -- akibatnya tombol "Batal"/"Ya" di popup konfirmasi jadi
+   tidak kelihatan/tidak bisa diklik saat dipanggil dari dalam menu Master Data.
+   Diperbaiki dgn menaikkan z-index #reset-confirm-overlay ke 10050 (paling
+   tinggi di seluruh app) supaya SELALU tampil paling depan di menu mana pun.
+   SENGAJA TIDAK dipaksa (bukan bikin app sama sekali tidak bisa dipakai, cuma
+   1 popup konfirmasi tertentu di dalam Master Data) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
+/* v315 -- 3 perubahan di halaman Follow Up & Master Nama Pelanggan:
+   1) Hilangkan kolom "Order Lunas" & "Belum Lunas" dari tabel menu
+      Follow Up (kolom lain tidak berubah).
+   2) Hilangkan tombol "📥 Jalankan Impor Sekarang" (impor riwayat
+      pesanan lama) di Master Nama Pelanggan beserta kode JS-nya --
+      fitur ini cuma dipakai 1x dan sudah tidak diperlukan lagi.
+   3) Field "Nama Customer" saat edit baris di Master Nama sekarang
+      punya dropdown saran nama customer kustom (desain sendiri,
+      BUKAN <datalist> bawaan browser) supaya tampilannya konsisten
+      di semua perangkat -- memudahkan saat mau menyamakan/
+      menggabungkan nama customer yang mirip. */
 /* v314 -- Fitur baru (sekali pakai): tombol "📥 Jalankan Impor Sekarang"
    di Master Nama Pelanggan untuk memasukkan riwayat pesanan lama (file
    Excel ERP, 65 customer, 1.841 invoice, periode 2021-2026) ke Rincian

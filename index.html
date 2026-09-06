@@ -325,6 +325,19 @@
   #reset-confirm-overlay{
     align-items:center;background:rgba(15,23,32,.55);
     -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+    /* BARU -- hasil audit "popup konfirmasi ketiban popup Master Data":
+       elemen ini mewarisi z-index:1000 dari .calc-overlay, padahal
+       window.showResetConfirm() dipakai juga UNTUK konfirmasi di dalam
+       menu Master Data (hapus produk/ekspedisi/CS, hapus alias, sembunyikan
+       customer, reset PIN, batal edit produk) yang overlay/panel-nya sendiri
+       ada di z-index 1250 (.md-panel) dan 1300 (.md-overlay) -- akibatnya
+       popup konfirmasi ini tampil DI BELAKANG panel Master Data (ketutupan)
+       dan tombol "Batal"/"Ya" jadi tidak bisa diklik. Dipaksa ke z-index
+       tertinggi di seluruh app (lebih tinggi dari 10000 milik
+       #md-nama-sync-overlay/#followup-chart-overlay) supaya popup
+       konfirmasi ini SELALU tampil paling depan, di menu mana pun ia
+       dipanggil. */
+    z-index:10050;
   }
   .reset-confirm-popup{
     position:relative;width:320px;border-radius:16px;
@@ -2321,6 +2334,20 @@
   .md-nama-alias-label{font-size:10.5px;color:var(--ink-soft);margin-right:2px;}
   .md-alias-chip{display:inline-flex;align-items:center;gap:5px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px 6px 3px 10px;font-size:11.5px;color:var(--ink-soft);}
   .md-alias-chip button{border:none;background:none;color:var(--danger-red);cursor:pointer;font-size:12px;padding:0 2px;line-height:1;}
+  /* BARU -- dropdown saran nama customer (kustom, BUKAN <datalist> bawaan
+     browser) dipakai di field "Nama Customer" saat edit baris Master Nama.
+     Muncul begitu field diklik/diketik, menampilkan nama-nama customer lain
+     yang sudah terdaftar supaya gampang pilih nama yang sudah tepat sama
+     (mis. saat mau menggabungkan/menyamakan dua nama customer). */
+  .md-nama-cust-wrap{position:relative;}
+  .md-nama-cust-suggest{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);max-height:230px;overflow-y:auto;padding:6px;}
+  .md-nama-cust-suggest-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--ink);cursor:pointer;}
+  .md-nama-cust-suggest-item:hover,.md-nama-cust-suggest-item.active{background:var(--paper-dark);}
+  .md-nama-cust-suggest-item .ic{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink-soft);}
+  .md-nama-cust-suggest-item .txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .md-nama-cust-suggest-item .txt b{color:var(--primary-green);}
+  .md-nama-cust-suggest-item .cs-tag{flex-shrink:0;font-size:10.5px;color:var(--ink-soft);background:var(--paper);border-radius:999px;padding:2px 8px;}
+  .md-nama-cust-suggest-empty{padding:10px 12px;font-size:12.5px;color:var(--ink-soft);text-align:center;}
   .md-nama-suggest-card{border:1px solid #ffd48a;background:#fff8ec;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12.5px;color:var(--ink);}
   .md-nama-suggest-card .row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
   .md-nama-suggest-card .txt{flex:1;min-width:200px;}
@@ -4740,7 +4767,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
         <div style="display:flex; gap:8px; align-items:center; flex:0 0 auto;">
           <button type="button" id="followup-chart-btn" class="md-btn" style="white-space:nowrap;">📈 Grafik Riwayat</button>
-          <button type="button" id="followup-detail-close" class="tab-btn">✕</button>
+          <button type="button" id="followup-detail-close" class="tab-btn" aria-label="Tutup">✕</button>
         </div>
       </div>
       <div id="followup-detail-body" style="font-size:14px; line-height:1.7;"></div>
@@ -4758,7 +4785,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div id="followup-chart-title" style="font-size:16px; font-weight:800;">📈 Riwayat Pembelian</div>
           <div id="followup-chart-sub" style="font-size:11px; color:var(--ink-soft); margin-top:2px;"></div>
         </div>
-        <button type="button" id="followup-chart-close" class="tab-btn" style="flex:0 0 auto;">✕</button>
+        <button type="button" id="followup-chart-close" class="tab-btn" aria-label="Tutup" style="flex:0 0 auto;">✕</button>
       </div>
       <div class="fu-chart-tabs">
         <div class="fu-chart-tab active" data-m="qty">Qty per Order</div>
@@ -4778,7 +4805,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div style="font-size:16px; font-weight:800;">🟠 Segera Perlu Dihubungi</div>
           <div id="followup-contact-sub" style="font-size:12px; color:var(--ink-soft); margin-top:2px;"></div>
         </div>
-        <button type="button" id="followup-contact-close" class="tab-btn" style="flex:0 0 auto;">✕</button>
+        <button type="button" id="followup-contact-close" class="tab-btn" aria-label="Tutup" style="flex:0 0 auto;">✕</button>
       </div>
       <div id="followup-contact-list" style="display:flex; flex-direction:column; gap:8px;"></div>
     </div>
@@ -4798,7 +4825,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div id="md-nama-sync-options" style="display:flex; flex-direction:column; gap:10px; margin-bottom:22px;"></div>
       <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button type="button" id="md-nama-sync-cancel" class="tab-btn" style="padding:9px 16px;">Batal</button>
+        <button type="button" id="md-nama-sync-cancel" class="tab-btn" aria-label="Batal" style="padding:9px 16px;">Batal</button>
         <button type="button" id="md-nama-sync-confirm" class="md-btn" style="padding:9px 18px;" disabled>🔄 Sinkronkan</button>
       </div>
     </div>
@@ -5859,19 +5886,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-card">
         <h3>Master Nama Pelanggan</h3>
         <div class="md-note" style="margin-bottom:12px;">Daftar Customer + CS terdaftar, dipakai sebagai rekomendasi otomatis di field "Nama Customer" (popup Kirim ke Grup Telegram) <b>DAN</b> otomatis disinkronkan ke Rekap Pesanan &amp; Follow Up: ganti nama di sini akan menggabungkan riwayat lama (sebagai alias) ke nama baru, dan "🙈 Sembunyikan" akan menyembunyikan customer itu dari Rekap Pesanan/Follow Up (bukan hapus permanen — bisa dipulihkan kapan saja).</div>
-        <!-- BARU (Sept 2026) -- tombol IMPOR SATU-KALI riwayat pesanan lama
-             (65 customer, 1.841 invoice, 2021-2026) dari file Excel ke
-             Rincian Pemesanan/Follow Up + Master Nama, CS diisi "Mila
-             Paramita". Aman diklik berkali-kali (idempotent di sisi
-             Worker) -- tapi cukup sekali saja, boleh dihapus dari sini
-             kapan-kapan setelah tidak dipakai lagi. -->
-        <div id="md-nama-import-legacy-wrap" style="border:1px solid #ffd48a;background:#fff8ec;border-radius:10px;padding:12px 14px;margin-bottom:14px;">
-          <div style="font-size:12.5px;color:var(--ink);margin-bottom:8px;">📥 <b>Impor riwayat pesanan lama</b> (65 customer, 1.841 invoice, 2021–2026) ke Rincian Pemesanan &amp; Follow Up, sekaligus daftarkan ke Master Nama dengan CS <b>"Mila Paramita"</b>. Baris yang tanggal &amp; namanya sudah tercatat di sistem otomatis dilewati.</div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <button type="button" id="md-nama-import-legacy-btn" class="md-btn">📥 Jalankan Impor Sekarang</button>
-            <span id="md-nama-import-legacy-status" style="font-size:12px;color:var(--ink-soft);"></span>
-          </div>
-        </div>
         <div class="followup-stats-grid" id="md-nama-suggest-stats" style="display:none;"></div>
         <div class="followup-quickfilter-chip" id="md-nama-suggest-quickfilter-chip">
           <span id="md-nama-suggest-quickfilter-chip-text"></span>
@@ -13179,9 +13193,10 @@ if ("serviceWorker" in navigator) {
           return `
             <div class="md-nama-row v2" data-name="${escapeHtmlNama(n)}">
               <div class="md-nama-fields">
-                <div class="fld">
+                <div class="fld md-nama-cust-wrap">
                   <div class="fld-label">Nama Customer</div>
-                  <input type="text" class="md-nama-edit-input md-nama-edit-customer" value="${escapeHtmlNama(n)}" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
+                  <input type="text" class="md-nama-edit-input md-nama-edit-customer" value="${escapeHtmlNama(n)}" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
+                  <div class="md-nama-cust-suggest" hidden></div>
                 </div>
                 <div class="fld">
                   <div class="fld-label">Nama CS</div>
@@ -13554,6 +13569,75 @@ if ("serviceWorker" in navigator) {
       render();
     });
 
+    /* ---------- BARU -- Dropdown saran nama customer (kustom) ----------
+       Muncul di bawah field "Nama Customer" saat baris sedang diedit.
+       Sengaja dibuat sendiri (BUKAN <datalist> bawaan browser) supaya
+       tampilannya konsisten dgn desain app (kartu, warna, hover) di semua
+       perangkat -- <datalist> tampilannya beda-beda tergantung browser dan
+       tidak bisa didandani. Sumber saran: allCustomers (nama yang sudah
+       terdaftar aktif), berguna terutama saat mau menyamakan/menggabungkan
+       nama customer yang mirip. */
+    function highlightMatch(name, q){
+      if(!q) return escapeHtmlNama(name);
+      const idx = name.toUpperCase().indexOf(q.toUpperCase());
+      if(idx === -1) return escapeHtmlNama(name);
+      return escapeHtmlNama(name.slice(0, idx)) + "<b>" + escapeHtmlNama(name.slice(idx, idx + q.length)) + "</b>" + escapeHtmlNama(name.slice(idx + q.length));
+    }
+    function renderCustSuggest(box, query, excludeName){
+      const q = query.trim();
+      const source = allCustomers.filter(c=> c.name && c.name !== excludeName);
+      let matches;
+      if(!q){
+        matches = source.slice(0, 8);
+      }else{
+        const qU = q.toUpperCase();
+        matches = source.filter(c=> c.name.toUpperCase().includes(qU)).slice(0, 8);
+      }
+      if(!matches.length){
+        box.innerHTML = `<div class="md-nama-cust-suggest-empty">Tidak ada nama customer lain yang cocok.</div>`;
+        box.hidden = false;
+        return;
+      }
+      box.innerHTML = matches.map(c=>
+        `<div class="md-nama-cust-suggest-item" data-name="${escapeHtmlNama(c.name)}">
+          <span class="ic">👤</span>
+          <span class="txt">${highlightMatch(c.name, q)}</span>
+          ${c.cs ? `<span class="cs-tag">${escapeHtmlNama(c.cs)}</span>` : ""}
+        </div>`
+      ).join("");
+      box.hidden = false;
+    }
+    function hideCustSuggest(box){
+      if(!box) return;
+      box.hidden = true;
+      box.innerHTML = "";
+    }
+    listEl.addEventListener("focusin", (e)=>{
+      if(!e.target.classList || !e.target.classList.contains("md-nama-edit-customer")) return;
+      const box = e.target.closest(".md-nama-cust-wrap").querySelector(".md-nama-cust-suggest");
+      renderCustSuggest(box, e.target.value, editingName);
+    });
+    listEl.addEventListener("input", (e)=>{
+      if(!e.target.classList || !e.target.classList.contains("md-nama-edit-customer")) return;
+      const box = e.target.closest(".md-nama-cust-wrap").querySelector(".md-nama-cust-suggest");
+      renderCustSuggest(box, e.target.value, editingName);
+    });
+    listEl.addEventListener("focusout", (e)=>{
+      if(!e.target.classList || !e.target.classList.contains("md-nama-edit-customer")) return;
+      const box = e.target.closest(".md-nama-cust-wrap").querySelector(".md-nama-cust-suggest");
+      // delay dikit supaya event mousedown di item saran (di bawah) sempat kepencet dulu
+      setTimeout(()=> hideCustSuggest(box), 150);
+    });
+    listEl.addEventListener("mousedown", (e)=>{
+      const item = e.target.closest(".md-nama-cust-suggest-item");
+      if(!item) return;
+      e.preventDefault(); // supaya input tidak keburu blur sebelum nilainya diisi
+      const wrap = item.closest(".md-nama-cust-wrap");
+      const input = wrap ? wrap.querySelector(".md-nama-edit-customer") : null;
+      if(input){ input.value = item.dataset.name; input.focus(); }
+      hideCustSuggest(item.closest(".md-nama-cust-suggest"));
+    });
+
     listEl.addEventListener("click", async (e)=>{
       if(e.target.classList.contains("md-nama-page-prev")){
         currentPage--; render(); return;
@@ -13689,34 +13773,6 @@ if ("serviceWorker" in navigator) {
     // sukses di server. Sekarang autofillCsAndReload() SENGAJA menunggu
     // loadNames() selesai dulu, supaya render() TERAKHIR selalu yang sudah
     // ter-autofill, bukan tergantung untung-untungan urutan network.
-    // BARU (Sept 2026) -- tombol impor satu-kali riwayat pesanan lama.
-    // Pakai popup kustom (window.showResetConfirm), BUKAN confirm() bawaan
-    // browser (diblokir di WebView Telegram, lihat perbaikan v309).
-    const importLegacyBtn = document.getElementById("md-nama-import-legacy-btn");
-    const importLegacyStatusEl = document.getElementById("md-nama-import-legacy-status");
-    if(importLegacyBtn) importLegacyBtn.addEventListener("click", ()=>{
-      window.showResetConfirm(
-        "Impor 1.841 invoice riwayat lama (65 customer) ke Rincian Pemesanan & Follow Up sekarang?",
-        async ()=>{
-          importLegacyBtn.disabled = true;
-          importLegacyStatusEl.textContent = "⏳ Memproses (bisa beberapa detik, jangan tutup halaman ini)...";
-          try{
-            const res = await fetch(MASTER_DATA_WORKER_URL + "/admin/import-legacy-orders-2026-09", { headers: workerHeaders() });
-            const data = await res.json();
-            if(!res.ok || data.error) throw new Error(data.error || data.message || "Gagal impor.");
-            importLegacyStatusEl.textContent = `✅ Selesai — ${data.berhasilDiimpor} invoice diimpor, ${data.dilewatiKarenaSudahAda} dilewati (sudah ada), ${data.customerBaruDitambahkan} customer baru + ${data.customerCsIkutTerisi} CS ikut terisi di Master Nama.`;
-            importLegacyBtn.textContent = "✅ Sudah Diimpor";
-            await loadNames();
-            await loadSuggestions();
-          }catch(err){
-            importLegacyStatusEl.textContent = "";
-            showMsg("Gagal impor riwayat lama: " + String(err.message || err), true);
-            importLegacyBtn.disabled = false;
-          }
-        },
-        { icon: "📥", okText: "Ya, Impor Sekarang" }
-      );
-    });
 
     window.__mdLoadNamaList = async ()=>{
       await loadNames();
@@ -15438,7 +15494,15 @@ if ("serviceWorker" in navigator) {
      begitu popup terakhir ditutup, supaya posisi baca tidak reset ke atas.
      ============================================================ */
   (function setupOverlayScrollLock(){
-    const overlaySelectors = ".md-overlay, .calc-overlay";
+    // BARU (hasil audit) -- #followup-detail-overlay, #followup-contact-overlay,
+    // #followup-chart-overlay & #md-nama-sync-overlay SENGAJA tidak pakai class
+    // .md-overlay/.calc-overlay (posisi & z-index-nya kustom lewat inline style,
+    // lihat komentar "PERBAIKAN BUG" di atas #followup-chart-overlay), jadi
+    // TIDAK IKUT TERDETEKSI di sini -- scroll body di belakangnya tidak
+    // terkunci selagi salah satu dari 4 popup ini terbuka. Ditambahkan
+    // eksplisit supaya kunci scroll berlaku SEMUA popup, bukan cuma yang
+    // pakai class generik.
+    const overlaySelectors = ".md-overlay, .calc-overlay, #followup-detail-overlay, #followup-contact-overlay, #followup-chart-overlay, #md-nama-sync-overlay";
     let savedScrollY = 0;
     let locked = false;
     function anyOverlayOpen(){
@@ -16569,21 +16633,19 @@ if ("serviceWorker" in navigator) {
     const td = (t, extra, cls)=> `<td class="${cls||""}" style="border:1px solid var(--line); padding:7px 8px;${extra||""}">${t}</td>`;
 
     let html = "<thead><tr>" +
-      th("Customer", "220px", "nm") + th("CS", "100px") + th("Order Lunas", "70px") + th("Belum Lunas", "80px") +
+      th("Customer", "220px", "nm") + th("CS", "100px") +
       th("Order Pertama", "100px") + th("Order Terakhir", "100px") + th("Rata Jarak", "90px") +
       th("Prediksi Berikutnya", "110px") + th("Sisa", "90px") + th("Status", "140px") + th("Qty Rata²", "70px") +
       "</tr></thead><tbody>";
 
     if(!rows.length){
-      html += `<tr><td colspan="11" style="border:1px solid var(--line); padding:16px; text-align:center; color:var(--ink-soft);">Belum ada customer dengan riwayat pesanan Lunas yang cocok dengan filter.</td></tr>`;
+      html += `<tr><td colspan="9" style="border:1px solid var(--line); padding:16px; text-align:center; color:var(--ink-soft);">Belum ada customer dengan riwayat pesanan Lunas yang cocok dengan filter.</td></tr>`;
     }
 
     rows.forEach(r=>{
       html += `<tr data-customer="${escHtml(r.customer)}">` +
         td(escHtml(r.customer), "font-weight:600; white-space:normal; word-break:break-word;", "nm") +
         td(escHtml(r.cs || "-")) +
-        td(r.jumlahOrder, "text-align:center;") +
-        td(r.jumlahBelumLunas || 0, "text-align:center; color:var(--ink-soft);") +
         td(fmtTgl(r.first)) + td(fmtTgl(r.last)) +
         td(r.medGap!==null ? fmtHari(r.medGap) : "-") +
         td(r.pred ? fmtTgl(r.pred) : "-") +
@@ -16942,7 +17004,13 @@ if ("serviceWorker" in navigator) {
       if(!tg || !tg.BackButton) return; // di luar Telegram -> tidak relevan, lewati
 
       function findOpenOverlay(){
-        return document.querySelector(".md-overlay:not([hidden]), .calc-overlay:not([hidden])");
+        // BARU (hasil audit) -- 4 popup ini dibuat lepas dari class
+        // .md-overlay/.calc-overlay (lihat catatan yang sama di setupOverlayScrollLock
+        // di atas), jadi tombol/gesture back Telegram sebelumnya SAMA SEKALI
+        // tidak menganggapnya "popup lagi terbuka" -- akibatnya menekan back
+        // saat salah satu popup ini terbuka bisa langsung keluar dari Mini
+        // App (bukan menutup popup-nya dulu). Ditambahkan eksplisit di sini.
+        return document.querySelector(".md-overlay:not([hidden]), .calc-overlay:not([hidden]), #followup-detail-overlay:not([hidden]), #followup-contact-overlay:not([hidden]), #followup-chart-overlay:not([hidden]), #md-nama-sync-overlay:not([hidden])");
       }
 
       function closeOverlay(ov){
@@ -16987,7 +17055,7 @@ if ("serviceWorker" in navigator) {
       // tanpa lewat klik langsung (dipicu fungsi lain) -- MutationObserver
       // pada atribut "hidden" memastikan status tombol tetap akurat.
       const overlayObserver = new MutationObserver(()=> syncBackButtonVisibility());
-      document.querySelectorAll(".md-overlay, .calc-overlay").forEach((el)=>{
+      document.querySelectorAll(".md-overlay, .calc-overlay, #followup-detail-overlay, #followup-contact-overlay, #followup-chart-overlay, #md-nama-sync-overlay").forEach((el)=>{
         overlayObserver.observe(el, { attributes:true, attributeFilter:["hidden"] });
       });
       syncBackButtonVisibility();
