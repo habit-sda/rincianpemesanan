@@ -4,8 +4,18 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v317";
+const CACHE_VERSION = "v318";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v318 -- Perbaikan bug popup "Kirim ke Grup Telegram": warning "⚠️
+   Customer ini kemungkinan sudah terdaftar" SEBELUMNYA tetap muncul walau
+   nama customer BARU SAJA dipilih langsung dari kotak rekomendasi nama
+   (bukan diketik manual) -- padahal itu bukan potensi duplikat sama
+   sekali (memang sengaja pilih customer yang sudah terdaftar), jadi
+   warning-nya cuma membingungkan CS. Sekarang checkDuplicateNameWarning()
+   otomatis skip/sembunyikan warning ini kalau nama sedang berasal dari
+   klik kotak rekomendasi (pickedFromSuggestion true) -- warning tetap
+   muncul normal seperti biasa kalau nama diketik manual dan ternyata
+   mirip/sama dengan yang sudah terdaftar. */
 /* v317 -- Audit & perbaikan bug: 4 popup (#followup-detail-overlay "Detail
    Customer", #followup-contact-overlay "Perlu Dihubungi", #followup-chart-overlay
    "Grafik Riwayat", #md-nama-sync-overlay "Sinkronkan Nama Customer") SENGAJA

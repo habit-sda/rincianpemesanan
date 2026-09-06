@@ -9009,6 +9009,20 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   }
   function checkDuplicateNameWarning(query){
     if(!dupWarningEl) return;
+    // PERBAIKAN (permintaan "harusnya tidak seperti itu") -- SEBELUMNYA
+    // warning ini tetap muncul walau nama BARU SAJA dipilih dari kotak
+    // rekomendasi (lihat komentar lama di listener klik saran: "wajar
+    // langsung kena peringatan"). Itu keliru: tujuan warning ini menangkap
+    // kasus CS KETIK MANUAL nama yang ternyata mirip/sama dengan yang
+    // sudah terdaftar (supaya tidak tercipta 2 nama beda utk 1 customer
+    // yang sama). Kalau CS memilih LANGSUNG dari kotak rekomendasi, itu
+    // BUKAN potensi duplikat sama sekali -- itu memang customer yang
+    // sudah terdaftar & sengaja dipilih, jadi warning "kemungkinan sudah
+    // terdaftar" jadi tidak relevan/membingungkan di sana. pickedFromSuggestion
+    // otomatis balik false lagi begitu CS mengetik manual (lihat listener
+    // "input" di atas), jadi warning tetap muncul normal utk kasus ketik
+    // manual seperti biasa.
+    if(pickedFromSuggestion){ hideDuplicateWarning(); return; }
     const matched = findRegisteredNameMatch(query);
     if(!matched){ hideDuplicateWarning(); return; }
     dupWarningEl.innerHTML = `⚠️ Customer ini kemungkinan <b>sudah terdaftar</b> sebagai "${escHtml(matched)}" -- cek dulu sebelum lanjut (cuma peringatan, tidak menghalangi kirim).`;
@@ -9040,7 +9054,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         pickedFromSuggestion = true; // BARU -- dipilih dari rekomendasi -> BUKAN customer baru
         hideSuggestions();
         updateSendBtnState();
-        checkDuplicateNameWarning(nameInput.value); // BARU -- nama dipilih dari daftar (persis nama lama), wajar langsung kena peringatan
+        checkDuplicateNameWarning(nameInput.value); // PERBAIKAN -- checkDuplicateNameWarning sekarang otomatis skip/sembunyikan warning kalau pickedFromSuggestion true (lihat catatan di definisinya), jadi baris ini aman dipanggil apa adanya -- dulu di sini warning-nya malah SENGAJA dimunculkan lagi, sekarang sudah tidak lagi.
         checkEkspedisiSuggestion(); // BARU -- nama dipilih dari daftar, langsung cek saran ekspedisinya
       });
     });
