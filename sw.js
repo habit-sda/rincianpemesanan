@@ -4,8 +4,29 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v312";
+const CACHE_VERSION = "v314";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v314 -- Fitur baru (sekali pakai): tombol "📥 Jalankan Impor Sekarang"
+   di Master Nama Pelanggan untuk memasukkan riwayat pesanan lama (file
+   Excel ERP, 65 customer, 1.841 invoice, periode 2021-2026) ke Rincian
+   Pemesanan/Follow Up + Master Nama, CS diisi "Mila Paramita" (sesuai
+   instruksi user, file sumber tidak punya kolom CS). Semua invoice lama
+   dianggap Lunas (instruksi user). Baris yang customer+tanggalnya SUDAH
+   ADA di sistem (mis. sudah tercatat otomatis lewat bot Telegram)
+   OTOMATIS DILEWATI, tidak dobel. Aman diklik berkali-kali (idempotent).
+   Endpoint & tombol ini boleh dihapus kapan-kapan setelah dipastikan
+   sukses & tidak dipakai lagi. SENGAJA TIDAK dipaksa (bukan darurat) --
+   pakai alur normal (popup "Perbarui Sekarang"). */
+/* v313 -- Perbaikan: rekomendasi (datalist) di field "Nama CS" pada form
+   Edit Master Nama Pelanggan sebelumnya HANYA mengambil dari "Daftar CS"
+   yang didaftarkan manual di Master Data -- padahal banyak nama CS yang
+   SUDAH terpakai di data customer (mis. hasil auto-resolve username
+   Telegram spt "@ulva_lailatul" dari fitur auto-isi CS v307) tidak
+   pernah didaftarkan manual, jadi tidak pernah muncul sbg rekomendasi
+   walau sudah jelas dipakai di tempat lain. Sekarang rekomendasi
+   digabung dari 2 sumber: Daftar CS resmi + semua nama CS yang sudah
+   ada di data Master Nama saat ini. SENGAJA TIDAK dipaksa (bukan
+   darurat) -- pakai alur normal (popup "Perbarui Sekarang"). */
 /* v312 -- Hasil audit menyeluruh sistem (cek sintaks JS, keseimbangan tag
    HTML, ID/endpoint duplikat, referensi fungsi, dan alur async) -- ketemu
    1 bug nyata: RACE CONDITION di tab Master Nama Pelanggan. loadNames()

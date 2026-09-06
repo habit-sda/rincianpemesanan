@@ -5859,6 +5859,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-card">
         <h3>Master Nama Pelanggan</h3>
         <div class="md-note" style="margin-bottom:12px;">Daftar Customer + CS terdaftar, dipakai sebagai rekomendasi otomatis di field "Nama Customer" (popup Kirim ke Grup Telegram) <b>DAN</b> otomatis disinkronkan ke Rekap Pesanan &amp; Follow Up: ganti nama di sini akan menggabungkan riwayat lama (sebagai alias) ke nama baru, dan "🙈 Sembunyikan" akan menyembunyikan customer itu dari Rekap Pesanan/Follow Up (bukan hapus permanen — bisa dipulihkan kapan saja).</div>
+        <!-- BARU (Sept 2026) -- tombol IMPOR SATU-KALI riwayat pesanan lama
+             (65 customer, 1.841 invoice, 2021-2026) dari file Excel ke
+             Rincian Pemesanan/Follow Up + Master Nama, CS diisi "Mila
+             Paramita". Aman diklik berkali-kali (idempotent di sisi
+             Worker) -- tapi cukup sekali saja, boleh dihapus dari sini
+             kapan-kapan setelah tidak dipakai lagi. -->
+        <div id="md-nama-import-legacy-wrap" style="border:1px solid #ffd48a;background:#fff8ec;border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+          <div style="font-size:12.5px;color:var(--ink);margin-bottom:8px;">📥 <b>Impor riwayat pesanan lama</b> (65 customer, 1.841 invoice, 2021–2026) ke Rincian Pemesanan &amp; Follow Up, sekaligus daftarkan ke Master Nama dengan CS <b>"Mila Paramita"</b>. Baris yang tanggal &amp; namanya sudah tercatat di sistem otomatis dilewati.</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button type="button" id="md-nama-import-legacy-btn" class="md-btn">📥 Jalankan Impor Sekarang</button>
+            <span id="md-nama-import-legacy-status" style="font-size:12px;color:var(--ink-soft);"></span>
+          </div>
+        </div>
         <div class="followup-stats-grid" id="md-nama-suggest-stats" style="display:none;"></div>
         <div class="followup-quickfilter-chip" id="md-nama-suggest-quickfilter-chip">
           <span id="md-nama-suggest-quickfilter-chip-text"></span>
@@ -6005,7 +6018,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.38.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.40.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6201,7 +6214,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.38.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.40.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Fitur baru (sekali pakai): Impor riwayat pesanan lama</b> — tombol baru di Master Nama Pelanggan untuk memasukkan riwayat pesanan lama dari Excel (65 customer, 1.841 invoice, 2021–2026) ke Rincian Pemesanan &amp; Follow Up, sekaligus mendaftarkan ke Master Nama dengan CS "Mila Paramita". Pesanan yang tanggal &amp; namanya sudah tercatat di sistem otomatis dilewati, tidak akan dobel.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.39.0</div>
+          <ul>
+            <li><b>Perbaikan: rekomendasi nama CS tidak muncul untuk CS yang sudah terpakai</b> — field "Nama CS" di form Edit Master Nama sebelumnya cuma menyarankan nama yang didaftarkan manual di Daftar CS, padahal banyak nama CS (termasuk hasil auto-isi otomatis) sudah dipakai di customer lain tapi tidak pernah didaftarkan manual. Sekarang rekomendasi mengambil dari kedua sumber, jadi nama yang sudah pernah dipakai ikut muncul juga.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.38.0</div>
           <ul>
             <li>Audit menyeluruh sistem (cek kode, struktur halaman, dan alur data) — ketemu 1 bug: kadang-kadang nama CS yang baru saja otomatis terisi di Master Nama Pelanggan bisa kelihatan kosong lagi sesaat gara-gara urutan pemrosesan data yang tidak selalu sama. Sudah diperbaiki supaya hasilnya selalu konsisten. Bagian lain sistem sudah diperiksa dan tidak ditemukan masalah tambahan.</li>
           </ul>
@@ -13478,11 +13503,31 @@ if ("serviceWorker" in navigator) {
     // dropdown Daftar CS yang sudah dipakai di tempat lain) supaya saat
     // mengetik di field "Nama CS", browser otomatis menyarankan nama yang
     // sudah terdaftar (mengurangi typo/variasi penulisan nama CS yang sama).
+    // BARU (perbaikan) -- SEBELUMNYA cuma ambil dari SETTINGS.csList
+    // ("Daftar CS" yang didaftarkan manual di Master Data). Masalahnya,
+    // banyak nama CS yang SUDAH terpakai di data customer (mis. hasil
+    // auto-resolve username Telegram spt "@ulva_lailatul" dari fitur
+    // auto-isi CS) TIDAK PERNAH didaftarkan manual ke Daftar CS -- jadi
+    // tidak pernah muncul sbg rekomendasi walau sudah jelas-jelas dipakai
+    // di tempat lain. Sekarang digabung DUA sumber: (1) Daftar CS resmi,
+    // (2) semua nilai `cs` yang SUDAH ada di allCustomers (Master Nama)
+    // -- supaya nama yang sudah terbukti terpakai ikut direkomendasikan,
+    // bukan cuma yang kebetulan didaftarkan manual duluan.
     function refreshCsDatalist(){
       const dl = document.getElementById("md-nama-cs-datalist");
       if(!dl) return;
-      const names = (Array.isArray(SETTINGS.csList) ? SETTINGS.csList : [])
+      const fromDaftarCs = (Array.isArray(SETTINGS.csList) ? SETTINGS.csList : [])
         .map(c=> c && c.name).filter(Boolean);
+      const fromDataTerpakai = (Array.isArray(allCustomers) ? allCustomers : [])
+        .map(c=> c && c.cs).filter(Boolean);
+      const seen = new Set();
+      const names = [];
+      for(const n of fromDaftarCs.concat(fromDataTerpakai)){
+        const key = n.trim().toLowerCase();
+        if(!key || seen.has(key)) continue;
+        seen.add(key);
+        names.push(n);
+      }
       dl.innerHTML = names.map(n=> `<option value="${escapeHtmlNama(n)}"></option>`).join("");
     }
 
@@ -13644,6 +13689,35 @@ if ("serviceWorker" in navigator) {
     // sukses di server. Sekarang autofillCsAndReload() SENGAJA menunggu
     // loadNames() selesai dulu, supaya render() TERAKHIR selalu yang sudah
     // ter-autofill, bukan tergantung untung-untungan urutan network.
+    // BARU (Sept 2026) -- tombol impor satu-kali riwayat pesanan lama.
+    // Pakai popup kustom (window.showResetConfirm), BUKAN confirm() bawaan
+    // browser (diblokir di WebView Telegram, lihat perbaikan v309).
+    const importLegacyBtn = document.getElementById("md-nama-import-legacy-btn");
+    const importLegacyStatusEl = document.getElementById("md-nama-import-legacy-status");
+    if(importLegacyBtn) importLegacyBtn.addEventListener("click", ()=>{
+      window.showResetConfirm(
+        "Impor 1.841 invoice riwayat lama (65 customer) ke Rincian Pemesanan & Follow Up sekarang?",
+        async ()=>{
+          importLegacyBtn.disabled = true;
+          importLegacyStatusEl.textContent = "⏳ Memproses (bisa beberapa detik, jangan tutup halaman ini)...";
+          try{
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/admin/import-legacy-orders-2026-09", { headers: workerHeaders() });
+            const data = await res.json();
+            if(!res.ok || data.error) throw new Error(data.error || data.message || "Gagal impor.");
+            importLegacyStatusEl.textContent = `✅ Selesai — ${data.berhasilDiimpor} invoice diimpor, ${data.dilewatiKarenaSudahAda} dilewati (sudah ada), ${data.customerBaruDitambahkan} customer baru + ${data.customerCsIkutTerisi} CS ikut terisi di Master Nama.`;
+            importLegacyBtn.textContent = "✅ Sudah Diimpor";
+            await loadNames();
+            await loadSuggestions();
+          }catch(err){
+            importLegacyStatusEl.textContent = "";
+            showMsg("Gagal impor riwayat lama: " + String(err.message || err), true);
+            importLegacyBtn.disabled = false;
+          }
+        },
+        { icon: "📥", okText: "Ya, Impor Sekarang" }
+      );
+    });
+
     window.__mdLoadNamaList = async ()=>{
       await loadNames();
       await autofillCsAndReload();
