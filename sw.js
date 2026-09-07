@@ -4,8 +4,30 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v339";
+const CACHE_VERSION = "v340";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v340 -- Optimasi lanjutan "render nota di bawah 1 detik" (Kirim ke Grup
+   Telegram): (1) ensureHtml2Canvas() sekarang JUGA dipicu lewat
+   requestIdleCallback begitu app dibuka -- bukan cuma ditunggu sampai CS
+   pertama kali klik Kirim/Unduh/Bagikan -- supaya download ~200KB
+   html2canvas numpang di waktu browser nganggur, bukan bersaing dgn
+   interaksi pertama CS. (2) renderCanvas() sekarang ikut menunggu
+   document.fonts.ready (paralel dgn precache foto produk) sebelum
+   menggambar nota -- jaga-jaga font Roboto belum sempat siap kalau CS
+   langsung kirim dalam hitungan detik setelah app dibuka, yang bisa bikin
+   lebar kolom nama produk (dihitung di atas asumsi Roboto) meleset dari
+   font fallback yang sempat kepakai. (3) Dropdown saran nama di popup
+   "Kirim ke Grup Telegram" sekarang menampilkan lagi baris "↳ dulu: ..."
+   (nama alias) -- SEBELUMNYA (lihat catatan v-lama di HISTORY index.html)
+   fitur ini pernah dicabut karena ambigu (sumbernya nameHistory, daftar
+   nama flat, jadi alias yang tampil bisa salah sambung ke nama yang
+   cuma kebetulan mengandung substring yang sama). Sekarang sumbernya
+   diganti ke customerRecords (objek lengkap {name, cs, aliases[]}, SAMA
+   PERSIS dgn yang sudah lama aman dipakai dropdown Master Nama/Rekap
+   Pesanan/Follow Up) -- alias yang tampil di sini dijamin menempel ke
+   record yang memang cocok, bukan hasil lookup terpisah yang gampang
+   salah sambung seperti dulu. SENGAJA TIDAK dipaksa (bukan darurat/
+   keamanan) -- pakai alur normal (popup "Versi Baru Tersedia"). */
 /* v339 -- Menu Rekap Pesanan: filter rentang tanggal (dari-sampai)
    ditambahkan di sebelah dropdown "Semua Hari" -- 2 input tanggal +
    tombol ✕ pembersih, min/max kalender otomatis mengikuti data yang

@@ -8922,9 +8922,30 @@ function ensureHtml2Canvas(){
   });
   return _html2canvasLoading;
 }
+// BARU (permintaan "render nota di bawah 1 detik") -- SEBELUMNYA
+// ensureHtml2Canvas() baru dipanggil PERSIS saat CS pertama kali klik
+// Kirim/Unduh/Bagikan (lihat renderCanvas di bawah) -- artinya percobaan
+// render PERTAMA di tiap sesi/tab baru (mis. abis buka app dari homescreen)
+// masih harus nunggu download+parse ~200KB dari cdnjs SEBELUM bisa mulai
+// menggambar nota, walau <link rel="preconnect"> di <head> sudah menyiapkan
+// DNS+TLS lebih awal. Sekarang dipicu SEKALI lagi di sini, saat app selesai
+// dimuat DAN browser sedang idle (requestIdleCallback -- kalau tidak
+// didukung, fallback setTimeout pendek) -- supaya download library ini
+// numpang di waktu browser nganggur, TIDAK bersaing dengan render layar
+// pertama/interaksi awal CS. ensureHtml2Canvas() sendiri sudah aman
+// dipanggil berkali-kali (memo _html2canvasLoading), jadi panggilan dari
+// renderCanvas() nanti otomatis dapat promise yang SAMA / sudah selesai --
+// tidak ada unduhan dobel. Best-effort murni (gagal diam-diam, mis. offline
+// saat app dibuka) -- renderCanvas() TETAP mencoba ulang sendiri seperti
+// biasa kalau ini belum sempat selesai.
+(function schedulePreloadHtml2Canvas(){
+  const start = () => ensureHtml2Canvas().catch(()=>{});
+  if("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 4000 });
+  else setTimeout(start, 1500);
+})();
 function renderCanvas(){
   const run = async () => {
-    const html2canvasReady = ensureHtml2Canvas(); // mulai unduh paralel, belum diblokir
+    const html2canvasReady = ensureHtml2Canvas(); // biasanya SUDAH selesai/lagi jalan dari preload idle di atas -- baris ini cuma jaga-jaga kalau preload itu belum sempat/gagal
     const tab = document.querySelector(".tab-btn.active").dataset.tab;
     const holder = document.getElementById("print-holder");
     const useV2 = getNotaDesignPref() === "baru";
@@ -8932,7 +8953,20 @@ function renderCanvas(){
     // dibangun — ini yang menghilangkan jeda "nunggu foto ke-download"
     // yang sebelumnya bikin Salin/Unduh/Bagikan/Kirim & autosave draft
     // terasa lama (lihat catatan lengkap di ensureProductImagesCached).
-    if(useV2) await ensureProductImagesCached(getTabProductImageUrls(tab));
+    // BARU -- dijalankan BERSAMAAN (Promise.all) dengan menunggu font
+    // Roboto benar-benar siap (document.fonts.ready), bukan cuma
+    // diasumsikan sudah selesai load dari <link> di <head>. Kalau CS
+    // langsung klik Kirim dalam hitungan detik setelah app dibuka (jaringan
+    // lambat), font Roboto/Roboto Mono mungkin belum sempat kepasang --
+    // tanpa ini, html2canvas bisa menggambar pakai font fallback sesaat
+    // sebelum font asli kepasang, padahal lebar kolom nama produk
+    // (nameColWidth) sudah dihitung di atas asumsi Roboto -- berisiko
+    // teks nabrak kolom Harga di sebelahnya (lihat catatan measureV3NameWidth).
+    // document.fonts.ready HAMPIR SELALU sudah resolved duluan di titik ini
+    // (font di-load sejak <head>, jauh sebelum CS sempat isi form & klik
+    // Kirim), jadi baris ini praktis tidak menambah waktu tunggu nyata.
+    const imgCachePromise = useV2 ? ensureProductImagesCached(getTabProductImageUrls(tab)) : Promise.resolve();
+    await Promise.all([imgCachePromise, document.fonts.ready.catch(()=>{})]);
     holder.innerHTML = useV2 ? buildPrintNotaV2(tab) : buildPrintNota(tab);
     // Foto sekarang sudah base64 (data URI) tertanam langsung di HTML kalau
     // sempat ke-cache di atas — tidak perlu nunggu load gambar lagi, jadi
@@ -9341,30 +9375,39 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     if(q.length < 1){ hideSuggestions(); return; }
     const seen = new Set();
     const matches = [];
-    for(const raw of nameHistory){
-      const clean = stripNewTag(raw);
-      if(!clean.toUpperCase().includes(q)) continue;
+    // PERBAIKAN (permintaan "munculkan lagi alias di dropdown ini, tapi
+    // benar") -- SEBELUMNYA sumbernya `nameHistory` (daftar nama flat,
+    // sekadar teks) -- itulah AKAR masalah kenapa baris "↳ dulu: ..."
+    // pernah dicabut lagi: karena sumbernya cuma teks, alias yang
+    // ditampilkan harus dicari lewat lookup TERPISAH yang gampang salah
+    // sambung ke record yang salah kalau ada 2+ nama mengandung substring
+    // yang sama. Sekarang sumbernya `customerRecords` (objek LENGKAP
+    // {name, cs, aliases[]} -- SAMA PERSIS dgn yang dipakai dropdown Master
+    // Nama/Rekap Pesanan/Follow Up, yang sudah lama aman menampilkan
+    // "↳ dulu:") -- setiap alias yang tampil di sini DIJAMIN menempel ke
+    // record customer yang memang cocok, karena datang dari FIELD alias
+    // milik record itu sendiri, bukan hasil lookup nebak-nebak lagi.
+    for(const rec of customerRecords){
+      const clean = stripNewTag(rec && rec.name || "");
+      if(!clean || !clean.toUpperCase().includes(q)) continue;
       const key = clean.toUpperCase();
       if(seen.has(key)) continue;
       seen.add(key);
-      matches.push(clean);
+      matches.push({ name: clean, aliases: Array.isArray(rec.aliases) ? rec.aliases : [] });
       if(matches.length >= 6) break;
     }
     if(!matches.length){ hideSuggestions(); return; }
-    // BARU (dikembalikan) -- sempat ditambah baris "↳ dulu: ..." di sini,
-    // tapi dicabut lagi karena AMBIGU dalam konteks dropdown ini: alias
-    // yang ditampilkan bisa jadi bukan alias dari NAMA yang match, cuma
-    // kebetulan ikut ke-substring saat pencocokan -- beda dari kotak
-    // peringatan alias (checkAliasWarning di atas) yang HANYA muncul kalau
-    // yang diketik PERSIS SAMA dgn 1 alias tertentu, jadi tidak ambigu.
-    suggestBox.innerHTML = matches.map(name=>
-      `<div class="kt-suggest-item" style="padding:10px 12px;cursor:pointer;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--line);">${name}</div>`
-    ).join("");
+    suggestBox.innerHTML = matches.map(m=>{
+      const aliasSub = m.aliases.length
+        ? `<div style="font-size:10.5px;color:var(--ink-soft);margin-top:2px;">↳ dulu: ${escHtml(m.aliases.join(", "))}</div>`
+        : "";
+      return `<div class="kt-suggest-item" style="padding:10px 12px;cursor:pointer;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--line);">${m.name}${aliasSub}</div>`;
+    }).join("");
     suggestBox.hidden = false;
     Array.from(suggestBox.children).forEach((el, i)=>{
       el.addEventListener("mousedown", (e)=>{
         e.preventDefault(); // supaya input tidak keburu blur sebelum klik diproses
-        nameInput.value = matches[i];
+        nameInput.value = matches[i].name;
         pickedFromSuggestion = true; // BARU -- dipilih dari rekomendasi -> BUKAN customer baru
         hideSuggestions();
         updateSendBtnState();
