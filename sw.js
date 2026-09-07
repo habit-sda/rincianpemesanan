@@ -4,8 +4,14 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v320";
+const CACHE_VERSION = "v321";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v321 -- Rekap Pesanan: urutan default sekarang berdasarkan AKTIVITAS
+   TERAKHIR (lastActivityAt -- field yang sudah lama ada & otomatis
+   ke-update tiap ada perubahan pesanan: bukti transfer masuk, status
+   berubah, dst), bukan cuma kapan pesanan DIBUAT lagi. Jadi pesanan yang
+   baru saja ada perubahan naik ke paling atas. 0 kuota KV/D1 tambahan --
+   murni baca ulang field yang sudah ada di data yang sama. */
 /* v320 -- Bump ulang (permintaan "update dropship tidak muncul") --
    TIDAK ADA perubahan kode index.html sejak v319 (fitur Dropship sudah
    ada & sudah dicek lagi, tetap utuh) -- ini murni memaksa service
