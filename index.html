@@ -6043,7 +6043,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.48.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.49.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6257,7 +6257,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.48.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.49.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Menu Follow Up: nama alias (nama lama) sekarang ikut ditampilkan</b> — di tabel desktop, kartu mobile, dan popup Detail Customer, muncul baris kecil "↳ dulu: ..." di bawah nama customer kalau customer itu tercatat pernah pakai nama lain di Master Nama. Data diambil dari endpoint yang sudah ada, tidak menambah kuota.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.48.0</div>
           <ul>
             <li><b>Master Nama Pelanggan: tombol baru "+ Tambah"</b> di sebelah chip-chip nama lama — sekarang bisa menambahkan alias/nama lama secara manual kapan saja, tidak perlu menunggu kartu saran ketidaksinkronan muncul otomatis dulu.</li>
           </ul>
@@ -16636,6 +16642,31 @@ if ("serviceWorker" in navigator) {
   const quickFilterChipTextEl = document.getElementById("followup-quickfilter-chip-text");
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
+  // BARU -- lookup nama alias (nama lama) per customer, diambil dari
+  // endpoint YANG SUDAH ADA (/customer-names, sama dipakai Master Nama &
+  // popup Kirim ke Grup Telegram) -- 0 endpoint baru. Key = nama aktif
+  // customer (UPPERCASE), value = array alias-nya. Dipakai supaya CS yang
+  // buka Follow Up langsung tahu kalau 1 customer ini sebelumnya pernah
+  // pakai nama lain (mis. sesudah "Sinkronkan" di Master Nama).
+  let fuAliasLookup = {};
+  async function fuLoadAliasLookup(){
+    if(!MASTER_DATA_WORKER_URL) return;
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
+      const body = await res.json().catch(()=> ({}));
+      const map = {};
+      (Array.isArray(body.customers) ? body.customers : []).forEach(c=>{
+        if(c && c.name && Array.isArray(c.aliases) && c.aliases.length) map[c.name.trim().toUpperCase()] = c.aliases;
+      });
+      fuAliasLookup = map;
+      if(allRows.length) renderFollowUpTable(); // BARU -- data alias baru selesai dimuat, render ulang supaya baris "↳ dulu: ..." langsung tampil tanpa perlu refresh manual
+    }catch(e){ console.log("Gagal ambil daftar alias untuk Follow Up:", e); } // gagal -> diam saja, cuma baris alias tidak tampil, fitur lain tidak terganggu
+  }
+  function fuAliasSubline(customerName){
+    const aliases = fuAliasLookup[(customerName || "").trim().toUpperCase()];
+    if(!aliases || !aliases.length) return "";
+    return `<div style="font-size:10.5px; color:var(--ink-soft); font-weight:400; margin-top:1px;">↳ dulu: ${aliases.map(a=> escHtml(a)).join(", ")}</div>`;
+  }
   // BARU -- filter cepat dari klik kartu ringkasan (Total Customer/Jatuh
   // Tempo/Hari Ini/Minggu Ini/Belum Cukup Data). null = tidak ada filter
   // cepat aktif (tampilkan semua, sama seperti klik "Total Customer").
@@ -16897,6 +16928,7 @@ if ("serviceWorker" in navigator) {
       const body = await res.json();
       if(!res.ok) throw new Error(body.error || "Gagal memuat data.");
       const rowsBaru = body.rows || [];
+      fuLoadAliasLookup(); // BARU -- dijalankan lepas (tidak di-await), gagal/lambat tidak menghambat tabel utama tampil
       const signatureBaru = JSON.stringify(rowsBaru);
       // BARU -- ditandai di SINI (sebelum cek berubah/tidak) supaya "X
       // menit yang lalu" mengukur kapan data ini diterima dari server,
@@ -17010,6 +17042,7 @@ if ("serviceWorker" in navigator) {
         <div class="fc-avatar" style="background:${FU_AVATAR_BG[r.cls] || "var(--primary-green)"};">${escHtml(initial)}</div>
         <div class="fc-info">
           <div class="fc-nama">${escHtml(r.customer)}</div>
+          ${fuAliasSubline(r.customer)}
           <div class="fc-sub">${escHtml(r.cs || "-")} &middot; ${sisaTeks}</div>
         </div>
         <span class="fu-badge ${r.cls}" style="flex-shrink:0;">${escHtml(r.status)}</span>
@@ -17042,7 +17075,7 @@ if ("serviceWorker" in navigator) {
 
     rows.forEach(r=>{
       html += `<tr data-customer="${escHtml(r.customer)}">` +
-        td(escHtml(r.customer), "font-weight:600; white-space:normal; word-break:break-word;", "nm") +
+        td(escHtml(r.customer) + fuAliasSubline(r.customer), "font-weight:600; white-space:normal; word-break:break-word;", "nm") +
         td(escHtml(r.cs || "-")) +
         td(fmtTgl(r.first)) + td(fmtTgl(r.last)) +
         td(r.medGap!==null ? fmtHari(r.medGap) : "-") +
@@ -17076,7 +17109,7 @@ if ("serviceWorker" in navigator) {
     const { p8, nBln, estBln, bulanLabel } = fuHitungPrediksi(r, TODAY);
 
     document.getElementById("followup-detail-nama").textContent = r.customer;
-    document.getElementById("followup-detail-cs").textContent = `CS paling sering: ${r.cs || "-"}`;
+    document.getElementById("followup-detail-cs").innerHTML = `CS paling sering: ${escHtml(r.cs || "-")}${fuAliasSubline(r.customer)}`;
 
     // BARU -- "Riwayat Order Lunas" (daftar tanggal + qty per order) SENGAJA
     // disembunyikan dari popup Detail Customer atas permintaan user. Data

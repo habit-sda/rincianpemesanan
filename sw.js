@@ -4,8 +4,15 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v328";
+const CACHE_VERSION = "v329";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v329 -- Menu Follow Up: nama alias (nama lama) sekarang ditampilkan
+   di tabel desktop, kartu mobile, dan popup Detail Customer -- baris
+   kecil "↳ dulu: ..." di bawah nama kalau customer itu tercatat punya
+   alias di Master Nama. Dipakai endpoint yang SUDAH ADA (/customer-
+   names), dimuat lepas (tidak menghambat tabel utama), tidak ada
+   perubahan Worker. SENGAJA TIDAK dipaksa (bukan darurat/keamanan) --
+   pakai alur normal (popup "Perbarui Sekarang"). */
 /* v328 -- Master Nama Pelanggan: tombol baru "+ Tambah" di sebelah chip
    nama lama -- sekarang bisa tambah alias secara manual kapan saja,
    tidak perlu nunggu kartu saran ketidaksinkronan. Pakai endpoint yang
