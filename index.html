@@ -108,6 +108,53 @@
   })();
 </script>
 
+<script>
+  /* ============================================================
+     PENCATAT TAMPILAN TERAKHIR (biar F5/reload tidak selalu balik
+     paksa ke Beranda/Dashboard).
+     Navigasi Beranda<->Wizard<->Rekap Pesanan<->Follow Up di app ini
+     sudah pakai history.pushState/replaceState dengan objek
+     {view:...}, tapi itu cuma hidup di riwayat browser sesi
+     berjalan -- begitu di-reload, script jalan dari awal dan SELALU
+     di-set balik ke {view:"home"} (lihat modul wizard). Blok ini
+     menumpang di pola pushState/replaceState yang SUDAH ADA (tanpa
+     ubah satu-satu titik pemanggilnya di seluruh file): setiap kali
+     dipanggil dengan state ber-properti "view", disalin juga ke
+     localStorage. window.__initialLastView menyimpan nilai SEBELUM
+     sempat ditimpa replaceState({view:"home"}) awal tadi -- dipakai
+     blok pemulihan di paling akhir <body> (setelah semua modul
+     Wizard/Rekap Pesanan/Follow Up selesai didefinisikan).
+     ============================================================ */
+  (function(){
+    const KEY = "notaHalawa_lastView";
+    let initial = null;
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(raw) initial = JSON.parse(raw);
+    }catch(e){ /* localStorage tidak tersedia/rusak -- abaikan, fallback tetap ke Beranda */ }
+    window.__initialLastView = initial;
+
+    function save(state){
+      try{
+        if(state && typeof state === "object" && state.view){
+          localStorage.setItem(KEY, JSON.stringify(state));
+        }
+      }catch(e){ /* mode privat/kuota penuh -- abaikan, fitur ini sengaja tidak kritis */ }
+    }
+    const origPush = history.pushState.bind(history);
+    const origReplace = history.replaceState.bind(history);
+    history.pushState = function(state, title, url){
+      save(state);
+      return origPush(state, title, url);
+    };
+    history.replaceState = function(state, title, url){
+      save(state);
+      return origReplace(state, title, url);
+    };
+    window.addEventListener("popstate", function(e){ save(e.state); });
+  })();
+</script>
+
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00845f">
@@ -11244,6 +11291,7 @@ if ("serviceWorker" in navigator) {
     }
   }
   window.addEventListener("popstate", (e)=> applyNavState(e.state));
+  window.__applyNavState = applyNavState; // BARU -- dipanggil blok pemulihan tampilan terakhir di akhir <body>
   try{ history.replaceState({view:"home"}, ""); }catch(e){ /* mode privat/embed kadang blokir History API — app tetap jalan, cuma tombol Kembali fallback ke perilaku browser biasa */ }
 
   function goHome(){
@@ -17727,6 +17775,56 @@ if ("serviceWorker" in navigator) {
       syncBackButtonVisibility();
     }catch(e){
       console.log("Telegram BackButton init dilewati:", e);
+    }
+  })();
+</script>
+
+<script>
+  /* ============================================================
+     PEMULIHAN TAMPILAN TERAKHIR SETELAH F5/RELOAD
+     Sebelumnya, F5 SELALU balik ke Beranda karena status "lagi di
+     halaman apa" cuma hidup di memori JS, hilang tiap kali browser
+     reload script dari awal. Sekarang status itu ikut disalin ke
+     localStorage tiap kali berubah (lihat blok pencatat di <head>,
+     dekat bootstrap tema) -- di sinilah nilai itu dibaca lagi (lewat
+     window.__initialLastView, DIBACA SEBELUM sempat ditimpa
+     replaceState({view:"home"}) awal milik modul wizard) lalu dipakai
+     memulihkan tampilan yang sama.
+     SENGAJA ditaruh di paling akhir <body> (setelah modul Wizard,
+     Rekap Pesanan, & Follow Up semuanya selesai memasang
+     window.__applyNavState/__applyRekapView/__applyFollowUpView
+     miliknya) -- kalau dipanggil lebih awal, fungsi2 punya Rekap
+     Pesanan/Follow Up belum tentu sudah terpasang karena kode
+     mereka baru dieksekusi belakangan di file ini.
+     ============================================================ */
+  (function(){
+    try{
+      // Pintasan shortcut (?shortcut=...) lebih diprioritaskan -- itu
+      // aksi eksplisit user baru saja klik ikon di homescreen, jangan
+      // ditimpa tampilan lama sebelum ini (blok shortcut ada di bawah).
+      if(new URLSearchParams(location.search).get("shortcut")) return;
+
+      const state = window.__initialLastView;
+      if(!state || state.view === "home") return; // default memang sudah Beranda, tidak perlu apa2
+
+      // Samakan riwayat browser dgn tampilan yang mau dipulihkan, supaya
+      // tombol/gesture back sesudahnya tetap konsisten mundur ke
+      // Beranda -- bukan nyangkut di entry "home" bawaan awal tadi.
+      try{ history.replaceState(state, ""); }catch(e){}
+
+      setTimeout(function(){
+        if(state.view === "wiz" && state.sheet && window.__applyNavState){
+          window.__applyNavState(state);
+        }else if(state.view === "rekap" && window.__applyRekapView){
+          document.body.classList.remove("showing-home");
+          window.__applyRekapView();
+        }else if(state.view === "followup" && window.__applyFollowUpView){
+          document.body.classList.remove("showing-home");
+          window.__applyFollowUpView();
+        }
+      }, 60); // delay kecil -- pastikan semua tombol tab & modul terkait sudah siap dipakai (pola sama dgn blok pintasan shortcut di bawah)
+    }catch(e){
+      console.log("Pemulihan tampilan terakhir dilewati:", e);
     }
   })();
 </script>
