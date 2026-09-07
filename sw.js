@@ -4,8 +4,20 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v321";
+const CACHE_VERSION = "v322";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v322 -- 2 perubahan di index.html:
+   1) Popup "Kirim ke Grup Telegram" -- preview "Dikirim sebagai" sekarang
+      resolve ke username/nama tampilan Telegram asli (lewat endpoint
+      /resolve-sender yang sudah ada di worker), bukan angka ID mentah
+      lagi. Tombol "Ubah" di sebelahnya dihapus (pengaturan ID Telegram
+      tetap bisa lewat menu "ID Telegram Saya" di footer).
+   2) Field "Nama CS" di form Edit Master Nama Pelanggan -- rekomendasi
+      diganti dari <datalist> bawaan browser jadi dropdown kustom sendiri
+      (pola & styling SAMA PERSIS dgn dropdown "Nama Customer" yang sudah
+      ada), supaya tampilannya konsisten di semua perangkat/browser.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
 /* v321 -- Rekap Pesanan: urutan default sekarang berdasarkan AKTIVITAS
    TERAKHIR (lastActivityAt -- field yang sudah lama ada & otomatis
    ke-update tiap ada perubahan pesanan: bukti transfer masuk, status

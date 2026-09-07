@@ -2348,6 +2348,14 @@
   .md-nama-cust-suggest-item .txt b{color:var(--primary-green);}
   .md-nama-cust-suggest-item .cs-tag{flex-shrink:0;font-size:10.5px;color:var(--ink-soft);background:var(--paper);border-radius:999px;padding:2px 8px;}
   .md-nama-cust-suggest-empty{padding:10px 12px;font-size:12.5px;color:var(--ink-soft);text-align:center;}
+  .md-nama-cs-wrap{position:relative;}
+  .md-nama-cs-suggest{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);max-height:230px;overflow-y:auto;padding:6px;}
+  .md-nama-cs-suggest-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--ink);cursor:pointer;}
+  .md-nama-cs-suggest-item:hover,.md-nama-cs-suggest-item.active{background:var(--paper-dark);}
+  .md-nama-cs-suggest-item .ic{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink-soft);}
+  .md-nama-cs-suggest-item .txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .md-nama-cs-suggest-item .txt b{color:var(--primary-green);}
+  .md-nama-cs-suggest-empty{padding:10px 12px;font-size:12.5px;color:var(--ink-soft);text-align:center;}
   .md-nama-suggest-card{border:1px solid #ffd48a;background:#fff8ec;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12.5px;color:var(--ink);}
   .md-nama-suggest-card .row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
   .md-nama-suggest-card .txt{flex:1;min-width:200px;}
@@ -5893,7 +5901,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
         <div id="md-nama-suggestions"></div>
         <div id="md-nama-cs-suggestions"></div>
-        <datalist id="md-nama-cs-datalist"></datalist>
         <div style="display:flex;gap:8px;margin-bottom:12px;">
           <input type="text" id="md-nama-search" class="md-lock-exempt" placeholder="Cari nama customer/CS..." style="flex:1;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;">
           <button type="button" id="md-nama-toggle-hidden" class="md-lock-exempt" style="flex-shrink:0;height:40px;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:0 14px;font-size:12.5px;cursor:pointer;white-space:nowrap;">🙈 Tersembunyi (<span id="md-nama-hidden-count">0</span>)</button>
@@ -6032,7 +6039,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.42.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.43.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6122,7 +6129,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <label for="kt-dropship-recipient" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Penerima</label>
           <input type="text" id="kt-dropship-recipient" class="kt-input" placeholder="Isi nama penerima akhir" autocomplete="off" style="text-transform:uppercase;">
         </div>
-        <p class="kt-hint" style="margin-top:10px;">Dikirim sebagai: <b id="kt-sender-preview">—</b> · <button type="button" id="kt-edit-sender" style="background:none;border:none;padding:0;color:var(--primary-green);font-weight:700;text-decoration:underline;cursor:pointer;font-size:11px;">Ubah</button></p>
+        <p class="kt-hint" style="margin-top:10px;">Dikirim sebagai: <b id="kt-sender-preview">—</b></p>
         <p class="kt-hint" id="kt-status"></p>
       </div>
       <div class="confirm-actionrow">
@@ -6240,7 +6247,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.42.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.43.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Popup "Kirim ke Grup Telegram": preview "Dikirim sebagai" sekarang tampilkan username/nama Telegram asli</b>, bukan angka ID mentah lagi — tombol "Ubah" di sebelahnya juga dihapus (pengaturan ID Telegram tetap bisa diakses lewat menu "ID Telegram Saya" di footer).</li>
+            <li><b>Field "Nama CS" di form Edit Master Nama sekarang pakai dropdown rekomendasi kustom</b> (desain sendiri, bukan datalist bawaan browser) — tampilannya konsisten di semua perangkat, sama seperti dropdown "Nama Customer" yang sudah ada.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.42.0</div>
           <ul>
             <li><b>Rekap Pesanan: urutan sekarang ikut aktivitas terakhir</b> — pesanan yang baru saja ada perubahan (bukti transfer masuk, status berubah, dsb) sekarang naik ke paling atas tabel, bukan cuma berdasar kapan pesanan pertama kali dibuat.</li>
           </ul>
@@ -8956,7 +8970,6 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   const ekspedisiSuggestEl = document.getElementById("kt-ekspedisi-suggest");
   const statusEl = document.getElementById("kt-status");
   const senderPreview = document.getElementById("kt-sender-preview");
-  const btnEditSender = document.getElementById("kt-edit-sender");
   const btnOpen = document.getElementById("btn-kirim-telegram");
   const btnClose = document.getElementById("kt-close");
   const btnCancel = document.getElementById("kt-cancel");
@@ -9146,9 +9159,28 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     };
   }
 
-  function refreshSenderPreview(){
+  // BARU -- preview "Dikirim sebagai" sekarang menampilkan username/nama
+  // tampilan Telegram asli (bukan angka ID mentah lagi). Kalau yang
+  // tersimpan bukan angka (sudah nama/username manual), dipakai apa
+  // adanya. Kalau angka ID, coba resolve ke username asli lewat server
+  // (endpoint /resolve-sender, sama yang dipakai sambutan "Selamat
+  // datang" di beranda) -- gagal/offline -> fallback tampilkan angkanya.
+  let senderPreviewToken = 0;
+  async function refreshSenderPreview(){
     const val = getTelegramSenderId();
-    senderPreview.textContent = val ? val : "(belum diatur)";
+    if(!val){ senderPreview.textContent = "(belum diatur)"; return; }
+    if(!/^\d+$/.test(val)){ senderPreview.textContent = val.replace(/^@/, ""); return; }
+    senderPreview.textContent = val; // tampilkan angkanya dulu sambil nunggu resolve
+    if(!MASTER_DATA_WORKER_URL) return;
+    const myToken = ++senderPreviewToken;
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/resolve-sender?senderId=" + encodeURIComponent(val), { headers: workerHeaders() });
+      const body = await res.json().catch(()=> ({}));
+      if(myToken !== senderPreviewToken) return; // modal sudah dibuka ulang/berubah, hasil ini basi
+      if(body && typeof body.label === "string" && body.label.trim()){
+        senderPreview.textContent = body.label.trim().replace(/^@/, "");
+      }
+    }catch(e){ /* gagal resolve -> tetap tampilkan angka ID, tidak apa-apa */ }
   }
 
   /* ---- Cache gambar nota TERAKHIR yang di-render, dikunci per "signature"
@@ -9376,7 +9408,6 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   btnClose.addEventListener("click", closeModal);
   btnCancel.addEventListener("click", closeModal);
   overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
-  btnEditSender.addEventListener("click", ()=> document.getElementById("home-link-tgid").click());
   window.__openKirimTelegramModal = openModal;
 
   btnSend.addEventListener("click", async ()=>{
@@ -9396,7 +9427,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       return;
     }
     if(!senderId){
-      statusEl.textContent = "ID Telegram kamu belum diatur — ketuk \"Ubah\" untuk isi dulu.";
+      statusEl.textContent = "ID Telegram kamu belum diatur — isi dulu lewat menu \"ID Telegram Saya\" di bagian bawah halaman.";
       statusEl.style.color = "var(--danger-red)";
       return;
     }
@@ -13261,9 +13292,10 @@ if ("serviceWorker" in navigator) {
                   <input type="text" class="md-nama-edit-input md-nama-edit-customer" value="${escapeHtmlNama(n)}" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
                   <div class="md-nama-cust-suggest" hidden></div>
                 </div>
-                <div class="fld">
+                <div class="fld md-nama-cs-wrap">
                   <div class="fld-label">Nama CS</div>
-                  <input type="text" class="md-nama-edit-input md-nama-edit-cs" list="md-nama-cs-datalist" value="${escapeHtmlNama(c.cs || "")}" placeholder="(kosong)" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
+                  <input type="text" class="md-nama-edit-input md-nama-edit-cs" value="${escapeHtmlNama(c.cs || "")}" placeholder="(kosong)" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
+                  <div class="md-nama-cs-suggest" hidden></div>
                 </div>
               </div>
               ${aliasChipsHtml(c)}
@@ -13591,9 +13623,13 @@ if ("serviceWorker" in navigator) {
     // (2) semua nilai `cs` yang SUDAH ada di allCustomers (Master Nama)
     // -- supaya nama yang sudah terbukti terpakai ikut direkomendasikan,
     // bukan cuma yang kebetulan didaftarkan manual duluan.
+    // BARU -- diganti dari <datalist> bawaan browser (tampilannya beda-beda
+    // tiap browser/perangkat dan tidak bisa didandani) jadi dropdown kustom
+    // sendiri, konsisten dengan dropdown "Nama Customer" di atas (kartu,
+    // warna, hover mengikuti desain app). csNameList cuma nyimpen daftar
+    // nama CS-nya; tampilan dropdown-nya ditangani renderCsSuggest() di bawah.
+    let csNameList = [];
     function refreshCsDatalist(){
-      const dl = document.getElementById("md-nama-cs-datalist");
-      if(!dl) return;
       const fromDaftarCs = (Array.isArray(SETTINGS.csList) ? SETTINGS.csList : [])
         .map(c=> c && c.name).filter(Boolean);
       const fromDataTerpakai = (Array.isArray(allCustomers) ? allCustomers : [])
@@ -13606,7 +13642,7 @@ if ("serviceWorker" in navigator) {
         seen.add(key);
         names.push(n);
       }
-      dl.innerHTML = names.map(n=> `<option value="${escapeHtmlNama(n)}"></option>`).join("");
+      csNameList = names;
     }
 
     async function loadNames(){
@@ -13699,6 +13735,67 @@ if ("serviceWorker" in navigator) {
       const input = wrap ? wrap.querySelector(".md-nama-edit-customer") : null;
       if(input){ input.value = item.dataset.name; input.focus(); }
       hideCustSuggest(item.closest(".md-nama-cust-suggest"));
+    });
+
+    /* ---------- BARU -- Dropdown rekomendasi nama CS (kustom) ----------
+       Sama polanya dengan dropdown "Nama Customer" di atas: dibuat sendiri
+       (BUKAN <datalist> bawaan browser) supaya tampilannya konsisten dgn
+       desain app di semua perangkat. Sumber saran: csNameList, gabungan
+       Daftar CS resmi + nama CS yang sudah pernah dipakai (lihat
+       refreshCsDatalist()). Muncul begitu field difokus (termasuk saat
+       masih kosong, menampilkan sampai 8 nama teratas), lalu menyaring
+       sambil diketik. */
+    function renderCsSuggest(box, query){
+      const q = query.trim();
+      let matches;
+      if(!q){
+        matches = csNameList.slice(0, 8);
+      }else{
+        const qU = q.toUpperCase();
+        matches = csNameList.filter(n=> n.toUpperCase().includes(qU)).slice(0, 8);
+      }
+      if(!matches.length){
+        box.innerHTML = `<div class="md-nama-cs-suggest-empty">Tidak ada nama CS yang cocok.</div>`;
+        box.hidden = false;
+        return;
+      }
+      box.innerHTML = matches.map(n=>
+        `<div class="md-nama-cs-suggest-item" data-name="${escapeHtmlNama(n)}">
+          <span class="ic">🧑‍💼</span>
+          <span class="txt">${highlightMatch(n, q)}</span>
+        </div>`
+      ).join("");
+      box.hidden = false;
+    }
+    function hideCsSuggest(box){
+      if(!box) return;
+      box.hidden = true;
+      box.innerHTML = "";
+    }
+    listEl.addEventListener("focusin", (e)=>{
+      if(!e.target.classList || !e.target.classList.contains("md-nama-edit-cs")) return;
+      const box = e.target.closest(".md-nama-cs-wrap").querySelector(".md-nama-cs-suggest");
+      renderCsSuggest(box, e.target.value);
+    });
+    listEl.addEventListener("input", (e)=>{
+      if(!e.target.classList || !e.target.classList.contains("md-nama-edit-cs")) return;
+      const box = e.target.closest(".md-nama-cs-wrap").querySelector(".md-nama-cs-suggest");
+      renderCsSuggest(box, e.target.value);
+    });
+    listEl.addEventListener("focusout", (e)=>{
+      if(!e.target.classList || !e.target.classList.contains("md-nama-edit-cs")) return;
+      const box = e.target.closest(".md-nama-cs-wrap").querySelector(".md-nama-cs-suggest");
+      // delay dikit supaya event mousedown di item saran (di bawah) sempat kepencet dulu
+      setTimeout(()=> hideCsSuggest(box), 150);
+    });
+    listEl.addEventListener("mousedown", (e)=>{
+      const item = e.target.closest(".md-nama-cs-suggest-item");
+      if(!item) return;
+      e.preventDefault(); // supaya input tidak keburu blur sebelum nilainya diisi
+      const wrap = item.closest(".md-nama-cs-wrap");
+      const input = wrap ? wrap.querySelector(".md-nama-edit-cs") : null;
+      if(input){ input.value = item.dataset.name; input.focus(); }
+      hideCsSuggest(item.closest(".md-nama-cs-suggest"));
     });
 
     listEl.addEventListener("click", async (e)=>{
