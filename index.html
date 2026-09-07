@@ -2336,6 +2336,7 @@
   .md-alias-chip button{border:none;background:none;color:var(--danger-red);cursor:pointer;font-size:12px;padding:0 2px;line-height:1;}
   .md-alias-text{cursor:text;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--ink-soft);text-underline-offset:2px;}
   .md-alias-edit-input{height:24px;font-size:11.5px;border:1px solid var(--primary-green);border-radius:6px;padding:0 6px;width:130px;text-transform:uppercase;}
+  .md-alias-edit-hint{font-size:10px;color:var(--ink-soft);margin-left:6px;white-space:nowrap;}
   .md-alias-add-btn{display:inline-flex;align-items:center;background:none;border:1px dashed var(--line);border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--primary-green);cursor:pointer;}
   .md-alias-add-btn:hover{border-color:var(--primary-green);background:var(--paper);}
   /* BARU -- dropdown saran nama customer (kustom, BUKAN <datalist> bawaan
@@ -6043,7 +6044,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.49.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.50.4</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6257,7 +6258,38 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.49.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.50.4 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Baris "↳ dulu: ..." di dropdown saran nama popup "Kirim ke Grup Telegram" <b>dihapus lagi</b> — dinilai berpotensi ambigu (bisa terkesan alias milik nama yang cocok, padahal sekadar hasil pencocokan substring). Kotak peringatan alias (muncul kalau nama yang diketik PERSIS SAMA dengan alias tertentu) tidak berubah, tetap ada. Dropdown saran di Master Nama sendiri juga tidak berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.50.3</div>
+          <ul>
+            <li>Teks "A.N." pada info Dropship dikembalikan jadi <b>"a.n."</b> (huruf kecil seperti semula) — di badge kartu mobile Rekap Pesanan, tooltip tabel desktop, dan caption yang dikirim ke grup Telegram.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.50.2</div>
+          <ul>
+            <li>Teks "a.n." pada info Dropship diseragamkan jadi <b>"A.N."</b> (huruf besar) — di badge kartu mobile Rekap Pesanan, tooltip tabel desktop, dan caption yang dikirim ke grup Telegram.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.50.1</div>
+          <ul>
+            <li>Rekap Pesanan (versi kartu mobile): badge <b>"📦 Dropship"</b> sekarang ikut menampilkan nama penerimanya langsung ("📦 Dropship · a.n. {nama}") — sebelumnya nama penerima cuma nongol lewat tooltip yang praktis tidak kebaca di layar sentuh.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.50.0</div>
+          <ul>
+            <li><b>Master Nama: keterangan "Tekan Enter untuk simpan"</b> ditambahkan begitu mode edit/tambah nama alias aktif.</li>
+            <li><b>Nama alias sekarang ikut muncul di 4 tempat baru</b>: Rekap Pesanan (tabel &amp; kartu mobile), popup "📞 Perlu Dihubungi", judul popup "📈 Riwayat Pembelian", serta dropdown saran nama di popup Kirim ke Grup Telegram dan di Master Nama sendiri. Semua pakai baris kecil "↳ dulu: ..." di bawah nama, konsisten dengan yang sudah ada di Follow Up.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.49.0</div>
           <ul>
             <li><b>Menu Follow Up: nama alias (nama lama) sekarang ikut ditampilkan</b> — di tabel desktop, kartu mobile, dan popup Detail Customer, muncul baris kecil "↳ dulu: ..." di bawah nama customer kalau customer itu tercatat pernah pakai nama lain di Master Nama. Data diambil dari endpoint yang sudah ada, tidak menambah kuota.</li>
           </ul>
@@ -9224,6 +9256,12 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       if(matches.length >= 6) break;
     }
     if(!matches.length){ hideSuggestions(); return; }
+    // BARU (dikembalikan) -- sempat ditambah baris "↳ dulu: ..." di sini,
+    // tapi dicabut lagi karena AMBIGU dalam konteks dropdown ini: alias
+    // yang ditampilkan bisa jadi bukan alias dari NAMA yang match, cuma
+    // kebetulan ikut ke-substring saat pencocokan -- beda dari kotak
+    // peringatan alias (checkAliasWarning di atas) yang HANYA muncul kalau
+    // yang diketik PERSIS SAMA dgn 1 alias tertentu, jadi tidak ambigu.
     suggestBox.innerHTML = matches.map(name=>
       `<div class="kt-suggest-item" style="padding:10px 12px;cursor:pointer;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--line);">${name}</div>`
     ).join("");
@@ -13836,13 +13874,21 @@ if ("serviceWorker" in navigator) {
         box.hidden = false;
         return;
       }
-      box.innerHTML = matches.map(c=>
-        `<div class="md-nama-cust-suggest-item" data-name="${escapeHtmlNama(c.name)}">
+      box.innerHTML = matches.map(c=>{
+        const aliasSub = (Array.isArray(c.aliases) && c.aliases.length)
+          ? `<div style="font-size:10px;color:var(--ink-soft);">↳ dulu: ${escapeHtmlNama(c.aliases.join(", "))}</div>`
+          : "";
+        return `<div class="md-nama-cust-suggest-item" data-name="${escapeHtmlNama(c.name)}">
           <span class="ic">👤</span>
-          <span class="txt">${highlightMatch(c.name, q)}</span>
-          ${c.cs ? `<span class="cs-tag">${escapeHtmlNama(c.cs)}</span>` : ""}
-        </div>`
-      ).join("");
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="txt" style="flex:1;">${highlightMatch(c.name, q)}</span>
+              ${c.cs ? `<span class="cs-tag">${escapeHtmlNama(c.cs)}</span>` : ""}
+            </div>
+            ${aliasSub}
+          </div>
+        </div>`;
+      }).join("");
       box.hidden = false;
     }
     function hideCustSuggest(box){
@@ -13965,7 +14011,11 @@ if ("serviceWorker" in navigator) {
         input.className = "md-alias-edit-input";
         input.placeholder = "Nama lama baru";
         input.autocomplete = "off";
+        const hint = document.createElement("span");
+        hint.className = "md-alias-edit-hint";
+        hint.textContent = "Tekan Enter untuk simpan";
         btn.replaceWith(input);
+        input.insertAdjacentElement("afterend", hint);
         input.focus();
         let settled = false;
         const saveNewAlias = async ()=>{
@@ -14003,6 +14053,10 @@ if ("serviceWorker" in navigator) {
         input.autocomplete = "off";
         chip.innerHTML = "";
         chip.appendChild(input);
+        const hint = document.createElement("span");
+        hint.className = "md-alias-edit-hint";
+        hint.textContent = "Tekan Enter untuk simpan";
+        chip.appendChild(hint);
         input.focus();
         input.select();
         let settled = false;
@@ -15939,6 +15993,30 @@ if ("serviceWorker" in navigator) {
   const belumInvoiceEl = document.getElementById("rekap-filter-belumInvoice");
   const csSummaryEl = document.getElementById("rekap-cs-summary");
   const hariSummaryEl = document.getElementById("rekap-hari-summary"); // BARU -- ringkasan total qty per hari
+  // BARU -- lookup alias (nama lama), pola SAMA PERSIS dgn fuAliasLookup
+  // di menu Follow Up (endpoint YANG SUDAH ADA /customer-names, 0 endpoint
+  // baru). Scope IIFE ini terpisah dari Follow Up, jadi dibuat salinannya
+  // sendiri di sini -- bukan duplikasi bug, cuma dua modul beda file
+  // scope yang kebetulan butuh info yang sama.
+  let rkAliasLookup = {};
+  async function rkLoadAliasLookup(){
+    if(!MASTER_DATA_WORKER_URL) return;
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
+      const body = await res.json().catch(()=> ({}));
+      const map = {};
+      (Array.isArray(body.customers) ? body.customers : []).forEach(c=>{
+        if(c && c.name && Array.isArray(c.aliases) && c.aliases.length) map[c.name.trim().toUpperCase()] = c.aliases;
+      });
+      rkAliasLookup = map;
+      if(allRows.length){ renderRekapTable(); } // BARU -- render ulang begitu alias selesai dimuat, tanpa perlu refresh manual
+    }catch(e){ console.log("Gagal ambil daftar alias untuk Rekap Pesanan:", e); }
+  }
+  function rkAliasSubline(customerName){
+    const aliases = rkAliasLookup[(customerName || "").trim().toUpperCase()];
+    if(!aliases || !aliases.length) return "";
+    return `<div style="font-size:10px; color:var(--ink-soft); font-weight:400;">↳ dulu: ${aliases.map(a=> escHtml(a)).join(", ")}</div>`;
+  }
   const ekspedisiSummaryEl = document.getElementById("rekap-ekspedisi-summary"); // BARU -- kartu ringkasan per ekspedisi
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
@@ -16216,6 +16294,7 @@ if ("serviceWorker" in navigator) {
       const savedScrollY = window.scrollY;
       allRows = rowsBaru;
       lastRowsSignature = signatureBaru;
+      rkLoadAliasLookup(); // BARU -- dijalankan lepas (tidak di-await), gagal/lambat tidak menghambat tabel utama tampil
       isiUlangDropdownFilter();
       renderRekapTable();
       if(tableWrapEl) tableWrapEl.scrollLeft = savedScrollLeft;
@@ -16369,9 +16448,13 @@ if ("serviceWorker" in navigator) {
     cardsEl.innerHTML = rows.map(r=>{
       const isVoid = /void|hoax/i.test(r.status);
       const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline;">${escHtml(r.customer)}</a>`;
-      // BARU -- badge Dropship, pola sama dgn tabel desktop (renderRekapTable).
+      // BARU -- badge Dropship sekarang ikut menampilkan nama penerima
+      // langsung di kartu (sebelumnya cuma badge "📦 Dropship" polos, nama
+      // penerimanya cuma nongol lewat title="..." tabel desktop -- yang
+      // praktis tidak kebaca di HP karena hover/tooltip tidak berfungsi
+      // di layar sentuh).
       const dropshipBadgeMobile = r.dropshipRecipient
-        ? `<div style="margin-top:2px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px;">📦 Dropship</span></div>`
+        ? `<div style="margin-top:2px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px;">📦 Dropship · a.n. ${escHtml(r.dropshipRecipient)}</span></div>`
         : "";
       const varianRingkas = kodeList
         .map(k=> (r.items && r.items[k]) ? `${escHtml(k)} ${r.items[k]}` : null)
@@ -16380,6 +16463,7 @@ if ("serviceWorker" in navigator) {
         <div class="rc-card-top">
           <div>
             <div class="rc-card-nama">${namaLink}</div>
+            ${rkAliasSubline(r.customer)}
             ${dropshipBadgeMobile}
             <div class="rc-card-sub">${escHtml(r.cs || "-")} &middot; ${escHtml(r.hari)}, ${escHtml(r.tanggalJam)}</div>
           </div>
@@ -16459,7 +16543,7 @@ if ("serviceWorker" in navigator) {
       const dropshipBadge = r.dropshipRecipient
         ? `<div style="margin-top:3px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px; white-space:nowrap;">📦 Dropship</span></div>`
         : "";
-      const namaCell = namaLink + dropshipBadge;
+      const namaCell = namaLink + rkAliasSubline(r.customer) + dropshipBadge;
       const namaTitle = r.dropshipRecipient ? `${r.customer} · Dropship a.n. ${r.dropshipRecipient}` : r.customer;
       // BARU -- title="..." supaya kalau masih terpotong di layar sempit,
       // teks lengkapnya tetap bisa dibaca lewat hover (desktop) / tahan
@@ -17232,7 +17316,8 @@ if ("serviceWorker" in navigator) {
     if(!r) return;
     const hist = (r.riwayat || []).map(h=> ({ d: new Date(h.tanggal), q: h.qty })).sort((a,b)=> a.d - b.d);
     document.getElementById("followup-chart-title").textContent = `📈 Riwayat Pembelian — ${r.customer}`;
-    document.getElementById("followup-chart-sub").textContent = `${hist.length} order tercatat${hist.length ? " • " + fmtTgl(hist[0].d.toISOString()) + " s/d " + fmtTgl(hist[hist.length-1].d.toISOString()) : ""}`;
+    const chartAliases = fuAliasLookup[(r.customer || "").trim().toUpperCase()];
+    document.getElementById("followup-chart-sub").innerHTML = `${hist.length} order tercatat${hist.length ? " • " + fmtTgl(hist[0].d.toISOString()) + " s/d " + fmtTgl(hist[hist.length-1].d.toISOString()) : ""}${chartAliases && chartAliases.length ? `<br>↳ dulu: ${chartAliases.map(a=> escHtml(a)).join(", ")}` : ""}`;
 
     let labels, values, unitLbl, color, isLine;
     if(fuChartMode === "qty"){
@@ -17389,6 +17474,7 @@ if ("serviceWorker" in navigator) {
         `<div data-customer="${escHtml(r.customer)}" style="display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid var(--line); border-radius:9px; padding:10px 12px; cursor:pointer;">
           <div>
             <div style="font-weight:700;">${escHtml(r.customer)}</div>
+            ${fuAliasSubline(r.customer)}
             <div style="font-size:12px; color:var(--ink-soft);">${escHtml(r.cs || "-")} • Terakhir order ${fmtTgl(r.last)}</div>
           </div>
           <div style="color:#c36a00; font-weight:700; white-space:nowrap;">🟠 ${fmtHari(r.sisa)} lagi</div>

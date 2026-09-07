@@ -4,8 +4,41 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v329";
+const CACHE_VERSION = "v334";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v334 -- Baris "↳ dulu: ..." di dropdown saran nama popup "Kirim ke
+   Grup Telegram" dihapus lagi -- dinilai ambigu di konteks pencocokan
+   substring. Kotak peringatan alias (exact-match) TIDAK berubah, tetap
+   ada. Dropdown saran nama di Master Nama sendiri juga tidak berubah.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
+/* v333 -- Teks "A.N." pada info Dropship dikembalikan jadi "a.n." (huruf
+   kecil seperti semula) di badge kartu mobile Rekap Pesanan & tooltip
+   tabel desktop. Worker_Rincian_Pemesanan.js juga ikut dikembalikan
+   (caption "a.n." yang dikirim ke grup Telegram) -- perlu deploy ulang
+   Worker terpisah. SENGAJA TIDAK dipaksa (bukan darurat/keamanan) --
+   pakai alur normal (popup "Perbarui Sekarang"). */
+/* v332 -- Teks "a.n." pada info Dropship diseragamkan jadi "A.N." di
+   badge kartu mobile Rekap Pesanan & tooltip tabel desktop. Worker_
+   Rincian_Pemesanan.js juga ikut diubah (caption "A.N." yang dikirim ke
+   grup Telegram) -- perlu deploy ulang Worker terpisah. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
+/* v331 -- Rekap Pesanan (kartu mobile): badge "📦 Dropship" sekarang
+   menampilkan nama penerima langsung di badge-nya ("📦 Dropship · a.n.
+   {nama}"), bukan cuma badge polos. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang"). */
+/* v330 -- 2 perubahan:
+   1) Master Nama: keterangan "Tekan Enter untuk simpan" muncul begitu
+      mode edit/tambah alias aktif (baik lewat ketuk teks alias maupun
+      tombol "+ Tambah").
+   2) Nama alias (nama lama) sekarang ikut ditampilkan di 4 tempat baru:
+      Rekap Pesanan (tabel & kartu mobile), popup "Perlu Dihubungi",
+      subtitle popup "Riwayat Pembelian", dan dropdown saran nama di
+      popup Kirim ke Grup Telegram + Master Nama sendiri. Semua pakai
+      endpoint /customer-names yang SUDAH ADA, 0 endpoint baru.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
 /* v329 -- Menu Follow Up: nama alias (nama lama) sekarang ditampilkan
    di tabel desktop, kartu mobile, dan popup Detail Customer -- baris
    kecil "↳ dulu: ..." di bawah nama kalau customer itu tercatat punya
