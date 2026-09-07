@@ -4,8 +4,22 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v340";
+const CACHE_VERSION = "v341";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v341 -- Perbaikan bug: menu "Rekap Pesanan" bisa freeze/macet total
+   (harus force close dari recent apps) begitu HP dibuka lagi setelah
+   sempat diminimize/pindah app lain. Penyebab: listener visibilitychange
+   (fetch immediate begitu halaman terlihat lagi) TIDAK me-reset timer
+   setInterval 30 detik (startAutoRefresh) -- padahal browser mobile
+   menahan (throttle) setInterval selagi halaman disembunyikan, jadi
+   timer yang tertahan itu bisa ikut "kejar setoran" persis di momen yang
+   sama dengan fetch immediate, keduanya (fetch+hitung ulang ringkasan
+   dari SELURUH baris+render ulang tabel) numpuk di saat paling sibuk
+   (app baru resume) -> main thread terkunci beberapa detik. Sekarang
+   startAutoRefresh() dipanggil ulang setelah fetch immediate selesai,
+   countdown 30 detik mulai bersih dari momen resume, timer lama tidak
+   akan sempat menembak dobel. SENGAJA TIDAK dipaksa (bukan darurat/
+   keamanan) -- pakai alur normal (popup "Versi Baru Tersedia"). */
 /* v340 -- Optimasi lanjutan "render nota di bawah 1 detik" (Kirim ke Grup
    Telegram): (1) ensureHtml2Canvas() sekarang JUGA dipicu lewat
    requestIdleCallback begitu app dibuka -- bukan cuma ditunggu sampai CS

@@ -16345,6 +16345,21 @@ if ("serviceWorker" in navigator) {
   // sekali (diam-diam), pola SAMA dgn kartu Follow Up -- TAPI cuma kalau
   // belum lewat batas 2 jam (kalau sudah lewat, biarkan popup yang
   // muncul dari startAutoRefresh() yang menangani, bukan langsung fetch).
+  // PERBAIKAN BUG (laporan "app freeze/macet total, harus force close")
+  // -- SEBELUMNYA listener ini fetch sekali TANPA me-reset timer
+  // setInterval 30 detik (startAutoRefresh) -- padahal browser mobile
+  // (terutama WebView Android) MENAHAN (throttle) setInterval selagi
+  // halaman disembunyikan/app diminimize. Begitu app dibuka lagi, timer
+  // yang tertahan itu bisa langsung "kejar setoran" & ikut menembak
+  // fetchAndRenderRekap() PERSIS di waktu yang sama dengan fetch
+  // immediate di bawah ini -- keduanya (fetch+hitung ulang ringkasan dari
+  // SELURUH baris+render ulang tabel) numpuk di momen paling sibuk (app
+  // baru resume, browser sedang repaint) -> main thread terkunci beberapa
+  // detik, kelihatan seperti freeze total. Sekarang startAutoRefresh()
+  // dipanggil ULANG di sini (stopAutoRefresh() di dalamnya otomatis
+  // membersihkan timer lama dulu) SETELAH fetch immediate selesai --
+  // countdown 30 detik jadi mulai bersih dari momen resume ini, timer
+  // lama yang sempat tertahan tidak akan pernah sempat menembak dobel.
   document.addEventListener("visibilitychange", ()=>{
     if(!document.hidden && document.body.classList.contains("showing-rekap")){
       if(rekapOpenedAt && (Date.now() - rekapOpenedAt) >= SESSION_LIMIT_MS){
@@ -16352,7 +16367,7 @@ if ("serviceWorker" in navigator) {
         showSessionTimeoutPopup();
         return;
       }
-      fetchAndRenderRekap({ silent:true });
+      fetchAndRenderRekap({ silent:true }).finally(startAutoRefresh);
     }
   });
   document.getElementById("rekap-refresh-btn").addEventListener("click", fetchAndRenderRekap);
