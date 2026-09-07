@@ -2336,6 +2336,8 @@
   .md-alias-chip button{border:none;background:none;color:var(--danger-red);cursor:pointer;font-size:12px;padding:0 2px;line-height:1;}
   .md-alias-text{cursor:text;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--ink-soft);text-underline-offset:2px;}
   .md-alias-edit-input{height:24px;font-size:11.5px;border:1px solid var(--primary-green);border-radius:6px;padding:0 6px;width:130px;text-transform:uppercase;}
+  .md-alias-add-btn{display:inline-flex;align-items:center;background:none;border:1px dashed var(--line);border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--primary-green);cursor:pointer;}
+  .md-alias-add-btn:hover{border-color:var(--primary-green);background:var(--paper);}
   /* BARU -- dropdown saran nama customer (kustom, BUKAN <datalist> bawaan
      browser) dipakai di field "Nama Customer" saat edit baris Master Nama.
      Muncul begitu field diklik/diketik, menampilkan nama-nama customer lain
@@ -6041,7 +6043,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.47.1</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.48.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6255,7 +6257,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.47.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.48.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Master Nama Pelanggan: tombol baru "+ Tambah"</b> di sebelah chip-chip nama lama — sekarang bisa menambahkan alias/nama lama secara manual kapan saja, tidak perlu menunggu kartu saran ketidaksinkronan muncul otomatis dulu.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.47.1</div>
           <ul>
             <li>Menu Follow Up — popup Detail Customer, Bagian C: label "kali order" pada kartu "Jumlah order prediksi" diperjelas jadi <b>"kali order lagi"</b>, supaya jelas ini prediksi order KE DEPAN (sisa bulan berjalan), bukan total order yang sudah terjadi.</li>
           </ul>
@@ -13381,11 +13389,11 @@ if ("serviceWorker" in navigator) {
 
     function aliasChipsHtml(c){
       const aliases = Array.isArray(c.aliases) ? c.aliases : [];
-      if(!aliases.length) return "";
       return `
         <div class="md-nama-alias-wrap">
           <span class="md-nama-alias-label">↳ Nama lama:</span>
           ${aliases.map(a=> `<span class="md-alias-chip"><span class="md-alias-text" data-alias="${escapeHtmlNama(a)}" title="Ketuk untuk edit nama lama ini">${escapeHtmlNama(a)}</span><button type="button" class="md-alias-del" data-alias="${escapeHtmlNama(a)}" title="Hapus alias ini (tidak menyentuh data pesanan)">✕</button></span>`).join("")}
+          <button type="button" class="md-alias-add-btn" title="Tambah nama lama secara manual (tanpa harus nunggu saran otomatis)">+ Tambah</button>
         </div>`;
     }
 
@@ -13937,6 +13945,47 @@ if ("serviceWorker" in navigator) {
       // BARU -- edit alias di tempat (Opsi 2: ketuk teksnya langsung).
       // Chip berubah jadi input kecil; Enter/blur = simpan (panggil
       // /customer-names/edit-alias), Escape = batal tanpa menyimpan.
+      // BARU -- tambah alias (nama lama) secara MANUAL, tidak perlu nunggu
+      // kartu saran otomatis muncul dulu. Klik "+ Tambah" -> jadi input
+      // kecil, Enter/blur = simpan (panggil /customer-names/add-alias
+      // yang sudah ada, endpoint yg sama dipakai tombol "🔄 Sinkronkan"),
+      // Escape = batal. Kalau teks yang diketik ternyata sudah jadi nama
+      // AKTIF customer lain, endpoint ini otomatis menggabungkan 2 record
+      // itu jadi 1 (perilaku bawaan add-alias, sama seperti Sinkronkan).
+      if(e.target.classList.contains("md-alias-add-btn")){
+        const btn = e.target;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "md-alias-edit-input";
+        input.placeholder = "Nama lama baru";
+        input.autocomplete = "off";
+        btn.replaceWith(input);
+        input.focus();
+        let settled = false;
+        const saveNewAlias = async ()=>{
+          if(settled) return;
+          settled = true;
+          const newAlias = input.value.trim().toUpperCase();
+          if(!newAlias){ render(); return; }
+          try{
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/add-alias", {
+              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ name, alias: newAlias }),
+            });
+            const data = await res.json();
+            if(!res.ok || data.error) throw new Error(data.error || "Gagal menambah nama lama.");
+            allCustomers = data.customers || allCustomers;
+            render();
+          }catch(err){ showMsg("Gagal menambah nama lama: " + String(err.message || err), true); render(); }
+        };
+        input.addEventListener("keydown", (ev)=>{
+          if(ev.key === "Enter"){ ev.preventDefault(); saveNewAlias(); }
+          if(ev.key === "Escape"){ settled = true; render(); }
+        });
+        input.addEventListener("blur", ()=> saveNewAlias());
+        return;
+      }
+
       if(e.target.classList.contains("md-alias-text")){
         const chip = e.target.closest(".md-alias-chip");
         const oldAlias = e.target.dataset.alias;

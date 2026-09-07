@@ -4,8 +4,14 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v327";
+const CACHE_VERSION = "v328";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v328 -- Master Nama Pelanggan: tombol baru "+ Tambah" di sebelah chip
+   nama lama -- sekarang bisa tambah alias secara manual kapan saja,
+   tidak perlu nunggu kartu saran ketidaksinkronan. Pakai endpoint yang
+   SUDAH ADA (POST /customer-names/add-alias, sama dgn tombol "🔄
+   Sinkronkan"), tidak ada perubahan Worker. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang"). */
 /* v327 -- Menu Follow Up, popup Detail Customer Bagian C: label "kali
    order" pada kartu "Jumlah order prediksi" diganti jadi "kali order
    lagi" supaya jelas ini proyeksi order KE DEPAN, bukan total order yang
