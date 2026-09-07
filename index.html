@@ -2334,6 +2334,8 @@
   .md-nama-alias-label{font-size:10.5px;color:var(--ink-soft);margin-right:2px;}
   .md-alias-chip{display:inline-flex;align-items:center;gap:5px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px 6px 3px 10px;font-size:11.5px;color:var(--ink-soft);}
   .md-alias-chip button{border:none;background:none;color:var(--danger-red);cursor:pointer;font-size:12px;padding:0 2px;line-height:1;}
+  .md-alias-text{cursor:text;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--ink-soft);text-underline-offset:2px;}
+  .md-alias-edit-input{height:24px;font-size:11.5px;border:1px solid var(--primary-green);border-radius:6px;padding:0 6px;width:130px;text-transform:uppercase;}
   /* BARU -- dropdown saran nama customer (kustom, BUKAN <datalist> bawaan
      browser) dipakai di field "Nama Customer" saat edit baris Master Nama.
      Muncul begitu field diklik/diketik, menampilkan nama-nama customer lain
@@ -6039,7 +6041,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.43.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.46.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6106,6 +6108,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
              sedang diketik punya kemiripan tinggi (9 karakter berurutan yang
              sama) dengan salah satu nama di riwayat Master Nama Pelanggan. -->
         <p id="kt-name-duplicate-warning" class="kt-hint" hidden style="margin-top:8px;background:#fff6e0;border:1px solid #e0a800;border-radius:8px;padding:8px 10px;color:var(--ink);"></p>
+        <!-- BARU -- peringatan nama lama/alias: muncul kalau nama yang
+             diketik PERSIS SAMA dengan salah satu alias (nama lama) di
+             Master Nama, artinya customer ini sudah pernah ganti nama dan
+             sekarang aktif dengan nama lain. Beda dari warning kemiripan
+             di atas (yang cuma "mirip", ini "identik dgn nama lama"). -->
+        <p id="kt-name-alias-warning" class="kt-hint" hidden style="margin-top:8px;background:#fff6e0;border:1px solid #e0a800;border-radius:8px;padding:8px 10px;color:var(--ink);"></p>
         <!-- BARU -- saran ekspedisi berdasarkan riwayat customer ini (GET
              /customer-rate). CUMA muncul kalau ekspedisi tercatat di
              riwayat BEDA dari yang sedang dipilih di form -- kalau sudah
@@ -6126,8 +6134,8 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <span>📦 Dropship</span>
         </label>
         <div id="kt-dropship-field" hidden style="margin-top:8px;">
-          <label for="kt-dropship-recipient" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Penerima</label>
-          <input type="text" id="kt-dropship-recipient" class="kt-input" placeholder="Isi nama penerima akhir" autocomplete="off" style="text-transform:uppercase;">
+          <label for="kt-dropship-recipient" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Penerima Dropship</label>
+          <input type="text" id="kt-dropship-recipient" class="kt-input" placeholder="Isi nama penerima dropship" autocomplete="off" style="text-transform:uppercase;">
         </div>
         <p class="kt-hint" style="margin-top:10px;">Dikirim sebagai: <b id="kt-sender-preview">—</b></p>
         <p class="kt-hint" id="kt-status"></p>
@@ -6247,7 +6255,27 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.43.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.46.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Master Nama Pelanggan: nama alias (nama lama) sekarang bisa diedit</b> — sebelumnya cuma bisa dihapus. Ketuk langsung teks nama lama di chip-nya (ditandai garis putus-putus), ubah teksnya, lalu Enter atau ketuk di luar untuk simpan. Tombol ✕ untuk hapus tetap ada seperti biasa.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.45.0</div>
+          <ul>
+            <li><b>Fitur baru: peringatan nama lama (alias)</b> di popup "Kirim ke Grup Telegram" — kalau nama yang diketik CS persis sama dengan nama lama customer (yang sudah pernah diganti lewat "Sinkronkan Nama Customer" di Master Nama), muncul kotak kuning yang bilang nama aktifnya sekarang apa, lengkap tombol "Pakai nama baru" untuk langsung mengisi ulang field.</li>
+            <li><b>Kotak "Customer ini kemungkinan sudah terdaftar"</b> sekarang juga punya tombol "Pakai nama ini" — sebelumnya cuma informasi, sekarang bisa langsung diklik untuk mengisi field dengan nama yang disarankan.</li>
+            <li><b>Perbaikan bug: kotak peringatan tertutup dropdown saran nama</b> — sebelumnya kedua kotak peringatan di atas bisa ketiban dropdown saran nama (tidak kelihatan). Sekarang keduanya gantian: selagi dropdown saran masih terbuka, peringatan disembunyikan dulu; begitu dropdown tertutup (pilih nama / klik di luar), peringatan baru muncul penuh.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.44.0</div>
+          <ul>
+            <li>Label field di popup Dropship diperjelas: <b>"Nama Penerima"</b> diganti jadi <b>"Nama Penerima Dropship"</b> supaya tidak rancu dengan nama customer/kolom lain.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.43.0</div>
           <ul>
             <li><b>Popup "Kirim ke Grup Telegram": preview "Dikirim sebagai" sekarang tampilkan username/nama Telegram asli</b>, bukan angka ID mentah lagi — tombol "Ubah" di sebelahnya juga dihapus (pengaturan ID Telegram tetap bisa diakses lewat menu "ID Telegram Saya" di footer).</li>
             <li><b>Field "Nama CS" di form Edit Master Nama sekarang pakai dropdown rekomendasi kustom</b> (desain sendiri, bukan datalist bawaan browser) — tampilannya konsisten di semua perangkat, sama seperti dropdown "Nama Customer" yang sudah ada.</li>
@@ -8995,6 +9023,11 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
      itu dibuang dari rekomendasi — soalnya "NEW" cuma berlaku 1x buat
      pesanan pertama. */
   let nameHistory = [];
+  // BARU -- record lengkap Master Nama (name, cs, aliases[]) dari field
+  // `customers` yang SUDAH dikirim /customer-names (dipakai jugadi Master
+  // Nama Pelanggan) -- dipakai khusus utk deteksi alias di atas, TIDAK
+  // menambah panggilan API baru sama sekali.
+  let customerRecords = [];
   // BARU -- true kalau nama yang sedang di field ini didapat dari KLIK
   // kotak rekomendasi (bukan diketik manual) -- dipakai deteksi
   // "customer baru" (kata kunci "NEW" DI AKHIR nama ATAU tidak diklik
@@ -9007,6 +9040,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
       const body = await res.json().catch(()=> ({}));
       if(Array.isArray(body.names)) nameHistory = body.names;
+      if(Array.isArray(body.customers)) customerRecords = body.customers;
     }catch(e){ console.log("Gagal ambil riwayat nama customer:", e); }
   }
   function stripNewTag(name){
@@ -9028,6 +9062,35 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
      ketemu dgn cek "includes" biasa. HANYA peringatan, TIDAK memblokir
      apa pun (tidak menonaktifkan tombol kirim, dsb). ---------- */
   const dupWarningEl = document.getElementById("kt-name-duplicate-warning");
+  const aliasWarningEl = document.getElementById("kt-name-alias-warning");
+  // BARU -- tombol "Pakai nama ini"/"Pakai nama baru" di dalam kedua kotak
+  // peringatan ini dirender ulang tiap kali innerHTML-nya diganti, jadi
+  // listener klik-nya dipasang SEKALI lewat delegasi ke elemen induknya
+  // (bukan re-attach tiap render) supaya tidak numpuk/lupa lepas listener.
+  if(dupWarningEl){
+    dupWarningEl.addEventListener("click", (e)=>{
+      const btn = e.target.closest(".kt-warn-use-btn");
+      if(!btn) return;
+      nameInput.value = btn.dataset.useName || "";
+      pickedFromSuggestion = true; // nama dipakai dari saran resmi -> bukan customer baru
+      updateSendBtnState();
+      hideDuplicateWarning();
+      hideAliasWarning();
+      checkEkspedisiSuggestion();
+    });
+  }
+  if(aliasWarningEl){
+    aliasWarningEl.addEventListener("click", (e)=>{
+      const btn = e.target.closest(".kt-warn-use-btn");
+      if(!btn) return;
+      nameInput.value = btn.dataset.useName || "";
+      pickedFromSuggestion = true;
+      updateSendBtnState();
+      hideDuplicateWarning();
+      hideAliasWarning();
+      checkEkspedisiSuggestion();
+    });
+  }
   const DUP_MATCH_LEN = 9;
   function hasIdenticalRun(a, b, len){
     if(a.length < len || b.length < len) return false;
@@ -9072,8 +9135,53 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     if(pickedFromSuggestion){ hideDuplicateWarning(); return; }
     const matched = findRegisteredNameMatch(query);
     if(!matched){ hideDuplicateWarning(); return; }
-    dupWarningEl.innerHTML = `⚠️ Customer ini kemungkinan <b>sudah terdaftar</b> sebagai "${escHtml(matched)}" -- cek dulu sebelum lanjut (cuma peringatan, tidak menghalangi kirim).`;
+    dupWarningEl.innerHTML = `⚠️ Customer ini kemungkinan <b>sudah terdaftar</b> sebagai "${escHtml(matched)}" -- cek dulu sebelum lanjut (cuma peringatan, tidak menghalangi kirim).<br><button type="button" class="kt-warn-use-btn" data-use-name="${escHtml(matched)}" style="margin-top:6px;background:none;border:none;padding:0;color:#8a6d1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:11.5px;">Pakai nama ini</button>`;
     dupWarningEl.hidden = false;
+  }
+
+  /* ---------- BARU -- peringatan nama lama/alias ----------
+     customerRecords (diisi di loadNameHistory dari body.customers, field
+     `aliases` sudah tersedia dari Worker -- lihat Master Nama v2) berisi
+     record { name, cs, aliases[] }. Kalau nama yang diketik PERSIS SAMA
+     (bukan cuma mirip) dengan salah satu `aliases` sebuah record, artinya
+     customer ini sudah pernah ganti nama dan sekarang aktif dgn nama lain
+     (record.name). Beda dari checkDuplicateNameWarning (yang mendeteksi
+     KEMIRIPAN, bukan kecocokan persis ke alias tercatat). ---------- */
+  function hideAliasWarning(){
+    if(!aliasWarningEl) return;
+    aliasWarningEl.hidden = true;
+    aliasWarningEl.innerHTML = "";
+  }
+  function findAliasMatch(query){
+    const q = query.trim().toUpperCase().replace(/\s+/g, " ");
+    if(!q) return null;
+    for(const rec of customerRecords){
+      if(!rec || !Array.isArray(rec.aliases)) continue;
+      const hit = rec.aliases.some(a=> String(a || "").trim().toUpperCase().replace(/\s+/g, " ") === q);
+      if(hit) return rec;
+    }
+    return null;
+  }
+  function checkAliasWarning(query){
+    if(!aliasWarningEl) return;
+    if(pickedFromSuggestion){ hideAliasWarning(); return; }
+    const rec = findAliasMatch(query);
+    if(!rec || !rec.name){ hideAliasWarning(); return; }
+    aliasWarningEl.innerHTML = `⚠️ "${escHtml(query.trim())}" adalah <b>nama lama</b> -- customer ini sekarang terdaftar sebagai "${escHtml(rec.name)}".<br><button type="button" class="kt-warn-use-btn" data-use-name="${escHtml(rec.name)}" style="margin-top:6px;background:none;border:none;padding:0;color:#8a6d1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:11.5px;">Pakai nama baru</button>`;
+    aliasWarningEl.hidden = false;
+  }
+
+  /* ---------- BARU -- cegah 2 kotak peringatan ketutupan dropdown saran
+     ---------- Selagi dropdown saran nama (suggestBox) sedang tampil,
+     kedua kotak peringatan ini SENGAJA disembunyikan dulu (dropdown lebih
+     diprioritaskan karena CS sedang aktif memilih dari daftar). Begitu
+     dropdown tertutup (nama dipilih / blur / query tidak match apa pun),
+     baru kotak peringatan dihitung & ditampilkan normal. Ini mencegah
+     dropdown saran menutupi kotak peringatan seperti yang dilaporkan. */
+  function refreshNameWarnings(query){
+    if(!suggestBox.hidden){ hideDuplicateWarning(); hideAliasWarning(); return; }
+    checkDuplicateNameWarning(query);
+    checkAliasWarning(query);
   }
   function renderSuggestions(query){
     const q = query.trim().toUpperCase();
@@ -9102,6 +9210,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         hideSuggestions();
         updateSendBtnState();
         checkDuplicateNameWarning(nameInput.value); // PERBAIKAN -- checkDuplicateNameWarning sekarang otomatis skip/sembunyikan warning kalau pickedFromSuggestion true (lihat catatan di definisinya), jadi baris ini aman dipanggil apa adanya -- dulu di sini warning-nya malah SENGAJA dimunculkan lagi, sekarang sudah tidak lagi.
+        checkAliasWarning(nameInput.value); // BARU -- ikut cek alias juga begitu nama dipilih dari saran
         checkEkspedisiSuggestion(); // BARU -- nama dipilih dari daftar, langsung cek saran ekspedisinya
       });
     });
@@ -9330,20 +9439,23 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     nameInput.value = nameInput.value.toUpperCase();
     nameInput.setSelectionRange(pos, pos);
     renderSuggestions(nameInput.value);
-    checkDuplicateNameWarning(nameInput.value);
+    refreshNameWarnings(nameInput.value); // BARU -- gantian dgn dropdown saran (Solusi 2), lihat definisinya
     scheduleAutosave();
     // BARU -- cek saran ekspedisi, di-debounce 500ms (jangan tiap huruf)
     clearTimeout(ekspedisiSuggestTimer);
     ekspedisiSuggestTimer = setTimeout(checkEkspedisiSuggestion, 500);
   });
   nameInput.addEventListener("blur", ()=>{
-    setTimeout(hideSuggestions, 120);
+    setTimeout(()=>{
+      hideSuggestions();
+      refreshNameWarnings(nameInput.value); // BARU -- dropdown sudah tertutup, tampilkan peringatan kalau relevan
+    }, 120);
     clearTimeout(draftTimer);
     autosaveDraft();
     clearTimeout(ekspedisiSuggestTimer);
     checkEkspedisiSuggestion(); // BARU -- cek sekali lagi begitu selesai ngetik (blur)
   });
-  nameInput.addEventListener("focus", ()=>{ renderSuggestions(nameInput.value); checkDuplicateNameWarning(nameInput.value); });
+  nameInput.addEventListener("focus", ()=>{ renderSuggestions(nameInput.value); refreshNameWarnings(nameInput.value); });
 
   let isSending = false;
   function updateSendBtnState(){
@@ -9372,6 +9484,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     updateSendBtnState();
     hideSuggestions();
     hideDuplicateWarning(); // BARU -- reset dulu, popup baru dibuka blm tentu relevan lagi
+    hideAliasWarning();
     hideEkspedisiSuggest(); // BARU -- reset dulu, cek ulang di bawah setelah nama ada isinya
     if(revisiCheck) revisiCheck.checked = false;
     resetRevisiPicker();
@@ -9541,7 +9654,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       showMsg("Bukti untuk \"" + customerName + "\" terkirim ke grup Telegram.");
       clearTimeout(draftTimer);
       resetRevisiPicker();
-      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); hideDuplicateWarning(); }, 900);
+      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); hideDuplicateWarning(); hideAliasWarning(); }, 900);
     }catch(e){
       statusEl.textContent = "Gagal mengirim: " + (e.message || e);
       statusEl.style.color = "var(--danger-red)";
@@ -13260,7 +13373,7 @@ if ("serviceWorker" in navigator) {
       return `
         <div class="md-nama-alias-wrap">
           <span class="md-nama-alias-label">↳ Nama lama:</span>
-          ${aliases.map(a=> `<span class="md-alias-chip">${escapeHtmlNama(a)}<button type="button" class="md-alias-del" data-alias="${escapeHtmlNama(a)}" title="Hapus alias ini (tidak menyentuh data pesanan)">✕</button></span>`).join("")}
+          ${aliases.map(a=> `<span class="md-alias-chip"><span class="md-alias-text" data-alias="${escapeHtmlNama(a)}" title="Ketuk untuk edit nama lama ini">${escapeHtmlNama(a)}</span><button type="button" class="md-alias-del" data-alias="${escapeHtmlNama(a)}" title="Hapus alias ini (tidak menyentuh data pesanan)">✕</button></span>`).join("")}
         </div>`;
     }
 
@@ -13808,6 +13921,47 @@ if ("serviceWorker" in navigator) {
       const row = e.target.closest(".md-nama-row");
       if(!row) return;
       const name = row.dataset.name;
+
+      // BARU -- edit alias di tempat (Opsi 2: ketuk teksnya langsung).
+      // Chip berubah jadi input kecil; Enter/blur = simpan (panggil
+      // /customer-names/edit-alias), Escape = batal tanpa menyimpan.
+      if(e.target.classList.contains("md-alias-text")){
+        const chip = e.target.closest(".md-alias-chip");
+        const oldAlias = e.target.dataset.alias;
+        if(!chip || !oldAlias) return;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "md-alias-edit-input";
+        input.value = oldAlias;
+        input.autocomplete = "off";
+        chip.innerHTML = "";
+        chip.appendChild(input);
+        input.focus();
+        input.select();
+        let settled = false;
+        const saveAlias = async ()=>{
+          if(settled) return;
+          settled = true;
+          const newAlias = input.value.trim().toUpperCase();
+          if(!newAlias || newAlias === oldAlias.toUpperCase().trim()){ render(); return; }
+          try{
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/edit-alias", {
+              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ name, oldAlias, newAlias }),
+            });
+            const data = await res.json();
+            if(!res.ok || data.error) throw new Error(data.error || "Gagal mengubah nama lama.");
+            allCustomers = data.customers || allCustomers;
+            render();
+          }catch(err){ showMsg("Gagal mengubah nama lama: " + String(err.message || err), true); render(); }
+        };
+        input.addEventListener("keydown", (ev)=>{
+          if(ev.key === "Enter"){ ev.preventDefault(); saveAlias(); }
+          if(ev.key === "Escape"){ settled = true; render(); }
+        });
+        input.addEventListener("blur", ()=> saveAlias());
+        return;
+      }
 
       if(e.target.classList.contains("md-alias-del")){
         const alias = e.target.dataset.alias;

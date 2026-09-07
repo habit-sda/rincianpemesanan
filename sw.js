@@ -4,8 +4,34 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v322";
+const CACHE_VERSION = "v325";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v325 -- Master Nama Pelanggan: nama alias (nama lama) sekarang bisa
+   diedit di tempat, bukan cuma dihapus. Ketuk teks alias di chip (garis
+   putus-putus di bawahnya) -> jadi input kecil, Enter/blur = simpan lewat
+   endpoint BARU POST /customer-names/edit-alias (Worker_Rincian_
+   Pemesanan.js), Escape = batal. Endpoint baru ini rename 1 alias di
+   tempat (bukan hapus+tambah) supaya atomik. SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
+/* v324 -- Popup "Kirim ke Grup Telegram" (index.html):
+   1) Fitur baru: peringatan nama lama/alias -- kalau nama yang diketik
+      persis sama dgn alias tercatat (customer sudah ganti nama lewat
+      "Sinkronkan Nama Customer"), muncul kotak kuning + tombol "Pakai
+      nama baru". Data alias diambil dari field `customers` yang SUDAH
+      dikirim GET /customer-names (endpoint lama, tidak ada endpoint
+      baru/perubahan Worker).
+   2) Kotak "Customer ini kemungkinan sudah terdaftar" sekarang punya
+      tombol "Pakai nama ini".
+   3) Perbaikan bug: kedua kotak peringatan di atas sekarang gantian
+      tampil dgn dropdown saran nama (dropdown diprioritaskan selagi
+      terbuka), supaya tidak saling menutupi lagi.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
+/* v323 -- Label field "Nama Penerima" di popup Dropship (Kirim ke Grup
+   Telegram) diganti jadi "Nama Penerima Dropship" -- perubahan teks
+   murni, tidak ada perubahan logika. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang"). */
 /* v322 -- 2 perubahan di index.html:
    1) Popup "Kirim ke Grup Telegram" -- preview "Dikirim sebagai" sekarang
       resolve ke username/nama tampilan Telegram asli (lewat endpoint
