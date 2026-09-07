@@ -4,8 +4,18 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v337";
+const CACHE_VERSION = "v338";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v338 -- Perbaikan bug: popup "Versi Baru Tersedia" bisa muncul
+   berulang-ulang untuk versi yang sama. handleNewWorkerInstalled()
+   SEBELUMNYA menulis localStorage (LS_KEY) begitu update terdeteksi,
+   padahal user belum tentu klik terapkan / reload-nya belum tentu mulus
+   -- localStorage jadi tidak sinkron dgn versi yang BENAR-BENAR aktif,
+   memicu popup berulang. Sekarang localStorage HANYA ditulis oleh
+   checkStartupVersionChange() (baca versi asli dari DOM), sedangkan
+   dedup popup dalam 1 sesi tab pakai variabel di memori. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
 /* v337 -- 2 perubahan:
    1) Teks pengaturan menu "Rekap Pesanan" di Master Data diperbaiki:
       tidak lagi mengklaim "cuma tampil di versi desktop" (sekarang juga

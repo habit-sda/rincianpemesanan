@@ -6049,7 +6049,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.51.2</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.51.3</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6263,7 +6263,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.51.2 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.51.3 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug: popup "Versi Baru Tersedia" bisa muncul berulang-ulang untuk versi yang sama</b> — penyebabnya, sistem mencatat versi sebagai "sudah dilihat" begitu update TERDETEKSI, bukan setelah beneran diterapkan. Kalau reload sempat tidak mulus (banyak tab terbuka, koneksi putus, dll), catatan itu jadi tidak sinkron dengan versi yang benar-benar aktif, sehingga popup yang sama bisa muncul lagi dan lagi. Sekarang catatan itu hanya ditulis berdasarkan versi ASLI yang benar-benar sedang berjalan di halaman, bukan tebakan di awal.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.51.2</div>
           <ul>
             <li>Teks pengaturan menu "Rekap Pesanan" di Master Data diperbaiki — sudah tidak akurat lagi soal "cuma tampil di versi desktop" (sekarang juga ada di HP lewat "Aksi cepat"), dan penjelasan retensi data diperjelas: order Lunas + resi ada disimpan 25 hari, order yang belum selesai disimpan sampai 90 hari.</li>
             <li><b>Rekap Pesanan sekarang dipaginasi</b> (25 baris per halaman, tabel desktop maupun kartu mobile) — tombol "‹ Sebelumnya" / "Selanjutnya ›" muncul otomatis kalau hasil filter lebih dari 25 baris, supaya daftar tidak memanjang tanpa batas ke bawah. Baris TOTAL, ringkasan per-CS/hari/ekspedisi, dan Ekspor CSV/PDF tetap menghitung/menyertakan SEMUA baris hasil filter, bukan cuma halaman yang sedang aktif.</li>
@@ -10929,23 +10935,34 @@ if ("serviceWorker" in navigator) {
     }
   }
 
+  // BARU (perbaikan bug "popup update muncul terus-menerus") -- SEBELUMNYA
+  // fungsi ini menulis localStorage.setItem(LS_KEY, versionKey) begitu versi
+  // baru TERDETEKSI, padahal user belum tentu benar-benar klik "Perbarui
+  // Sekarang" (atau reload-nya sempat tidak mulus -- banyak tab terbuka,
+  // koneksi putus, dst). Akibatnya localStorage bisa mencatat "sudah dilihat
+  // vX" padahal halaman yang BENAR-BENAR jalan masih versi lama -> siklus
+  // deteksi berikutnya jadi bingung & popup yang sama bisa muncul berulang.
+  // Sekarang: localStorage HANYA ditulis oleh checkStartupVersionChange()
+  // (yang membaca versi ASLI dari DOM halaman yang sedang berjalan, bukan
+  // asumsi) -- fungsi ini cukup pakai penanda di memori (bukan localStorage)
+  // supaya popup yang SAMA tidak dobel muncul dalam 1 sesi tab yang sama.
+  let lastPopupShownVersion = null;
   async function handleNewWorkerInstalled(newWorker){
     const info = await getUpdateInfo();
     const versionKey = info && info.version ? info.version : null;
     const currentVersion = getCurrentAppVersion();
 
-    // Sudah pernah dikasih tahu/diterapkan untuk versi yang SAMA -> jangan ulangi.
-    if(versionKey && localStorage.getItem(LS_KEY) === versionKey) return;
+    // Sudah ditampilkan utk versi yang SAMA di tab/sesi ini -> jangan ulangi.
+    if(versionKey && lastPopupShownVersion === versionKey) return;
 
     if(versionKey && currentVersion && isPatchOnlyChange(currentVersion, versionKey)){
       // Update PATCH kecil -> terapkan diam-diam, TANPA popup & TANPA reload paksa.
       suppressNextReload = true;
-      localStorage.setItem(LS_KEY, versionKey);
       newWorker.postMessage({ type: "SKIP_WAITING" });
       return;
     }
 
-    if(versionKey) localStorage.setItem(LS_KEY, versionKey);
+    if(versionKey) lastPopupShownVersion = versionKey;
     openPopupPending(newWorker, versionKey, info && info.items);
   }
 
