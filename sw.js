@@ -4,8 +4,22 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v342";
+const CACHE_VERSION = "v343";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v343 -- Perbaikan bug lanjutan (laporan "masih freeze begitu app
+   dibuka lagi, selalu balik ke Rekap Pesanan"): ternyata ada fitur
+   "pulihkan tampilan terakhir setelah reload" (localStorage
+   notaHalawa_lastView) yang bikin app OTOMATIS lompat ke Rekap Pesanan/
+   Follow Up begitu dibuka lagi -- lalu LANGSUNG fetch+render tabel penuh
+   dari nol, PERSIS bersamaan dgn index.html (~1MB, satu file besar)
+   yang masih diparse/dieksekusi browser saat boot. 2 beban berat itu
+   numpuk di detik paling kritis -> kemungkinan kuat inilah penyebab
+   freeze yang dilaporkan. Sekarang reload/buka-ulang app SELALU balik
+   ke Beranda dulu utk 2 halaman itu (bukan lagi otomatis lompat) --
+   pemulihan tampilan "wiz" (form Grosir/Custom yang lagi diisi) TIDAK
+   berubah, tetap dipulihkan seperti biasa krn itu murni data lokal,
+   tidak ada fetch jaringan sama sekali. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Versi Baru Tersedia"). */
 /* v342 -- Fitur baru "Pesan u/ Inventory" (dulu "Keterangan Tambahan") di
    popup "Kirim ke Grup Telegram": checkbox baru di samping "Dropship"
    (1 baris, rapi), field-nya textarea (lebih tinggi, isinya catatan

@@ -17959,6 +17959,20 @@ if ("serviceWorker" in navigator) {
 
       const state = window.__initialLastView;
       if(!state || state.view === "home") return; // default memang sudah Beranda, tidak perlu apa2
+      // PERBAIKAN (laporan "app freeze/macet total begitu dibuka lagi,
+      // selalu di Rekap Pesanan") -- SEBELUMNYA "rekap"/"followup" ikut
+      // dipulihkan otomatis persis seperti "wiz" -- padahal keduanya
+      // BEDA SIFAT: begitu dipulihkan, applyRekapView()/applyFollowUpView()
+      // LANGSUNG memicu fetch ke Worker + render tabel penuh dari nol,
+      // PERSIS di detik-detik paling kritis saat index.html (~1MB, satu
+      // file) masih diparse/dieksekusi Chrome/WebView. 2 beban berat itu
+      // numpuk bersamaan -> kemungkinan kuat jadi penyebab freeze yang
+      // dilaporkan. "wiz" (form Grosir/Custom yang lagi diisi) TIDAK
+      // ikut kena -- itu murni tampilan ulang data lokal yang sudah ada
+      // di memori, TIDAK ada fetch jaringan sama sekali, jadi tetap aman
+      // dipulihkan seperti biasa (supaya draft pesanan yang lagi diisi
+      // tidak hilang kalau app tidak sengaja tertutup).
+      if(state.view === "rekap" || state.view === "followup") return; // biarkan default ke Beranda
 
       // Samakan riwayat browser dgn tampilan yang mau dipulihkan, supaya
       // tombol/gesture back sesudahnya tetap konsisten mundur ke
@@ -17968,12 +17982,6 @@ if ("serviceWorker" in navigator) {
       setTimeout(function(){
         if(state.view === "wiz" && state.sheet && window.__applyNavState){
           window.__applyNavState(state);
-        }else if(state.view === "rekap" && window.__applyRekapView){
-          document.body.classList.remove("showing-home");
-          window.__applyRekapView();
-        }else if(state.view === "followup" && window.__applyFollowUpView){
-          document.body.classList.remove("showing-home");
-          window.__applyFollowUpView();
         }
       }, 60); // delay kecil -- pastikan semua tombol tab & modul terkait sudah siap dipakai (pola sama dgn blok pintasan shortcut di bawah)
     }catch(e){
