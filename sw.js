@@ -4,8 +4,18 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v334";
+const CACHE_VERSION = "v336";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v336 -- Menu Rekap Pesanan: kolom pencarian nama sekarang juga
+   mencocokkan nama alias (nama lama), sama pola dgn Follow Up. Pakai
+   rkAliasLookup yang SUDAH ADA, tidak ada perubahan Worker. SENGAJA
+   TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup
+   "Perbarui Sekarang"). */
+/* v335 -- Menu Follow Up: kolom pencarian nama sekarang juga mencocokkan
+   nama alias (nama lama), bukan cuma nama aktif customer. Pakai
+   fuAliasLookup yang SUDAH ADA, tidak ada perubahan Worker. SENGAJA
+   TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup
+   "Perbarui Sekarang"). */
 /* v334 -- Baris "↳ dulu: ..." di dropdown saran nama popup "Kirim ke
    Grup Telegram" dihapus lagi -- dinilai ambigu di konteks pencocokan
    substring. Kotak peringatan alias (exact-match) TIDAK berubah, tetap

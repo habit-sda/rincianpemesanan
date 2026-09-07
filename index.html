@@ -6044,7 +6044,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.50.4</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.51.1</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6258,7 +6258,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.50.4 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.51.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Menu Rekap Pesanan: kolom pencarian nama sekarang <b>juga mencocokkan nama alias (nama lama)</b> customer, sama seperti yang sudah diterapkan di Follow Up.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.51.0</div>
+          <ul>
+            <li>Menu Follow Up: kolom pencarian nama sekarang <b>juga mencocokkan nama alias (nama lama)</b> customer, bukan cuma nama aktifnya — CS yang masih ingat nama lama customer tetap ketemu hasilnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.50.4</div>
           <ul>
             <li>Baris "↳ dulu: ..." di dropdown saran nama popup "Kirim ke Grup Telegram" <b>dihapus lagi</b> — dinilai berpotensi ambigu (bisa terkesan alias milik nama yang cocok, padahal sekadar hasil pencocokan substring). Kotak peringatan alias (muncul kalau nama yang diketik PERSIS SAMA dengan alias tertentu) tidak berubah, tetap ada. Dropdown saran di Master Nama sendiri juga tidak berubah.</li>
           </ul>
@@ -16315,6 +16327,15 @@ if ("serviceWorker" in navigator) {
   // Semua filter + sort dijalankan di sisi BROWSER, dari data yang SUDAH
   // diambil (allRows) -- ganti kata kunci/filter/urutan TIDAK memanggil
   // server lagi sama sekali, 0 tambahan kuota baca KV.
+  function rkMatchKeyword(customerName, keyword){
+    if((customerName || "").toLowerCase().includes(keyword)) return true;
+    // BARU -- pencarian juga cocok kalau keyword ketemu di salah satu nama
+    // ALIAS (nama lama) customer itu, bukan cuma nama aktifnya -- sama
+    // pola dgn fuMatchKeyword di menu Follow Up.
+    const aliases = rkAliasLookup[(customerName || "").trim().toUpperCase()];
+    if(aliases && aliases.some(a=> a.toLowerCase().includes(keyword))) return true;
+    return false;
+  }
   function terapkanFilter(){
     const kodeList = daftarKodeSingkatAktif();
     const keyword = searchEl.value.trim().toLowerCase();
@@ -16324,7 +16345,7 @@ if ("serviceWorker" in navigator) {
     const ekspedisiPilih = ekspedisiFilterEl.value; // BARU -- filter per ekspedisi
     const belumInvoiceSaja = belumInvoiceEl.checked;
     let rows = allRows.filter(r=>
-      (!keyword || (r.customer||"").toLowerCase().includes(keyword)) &&
+      (!keyword || rkMatchKeyword(r.customer, keyword)) &&
       (!csPilih || r.cs === csPilih) &&
       (!statusPilih || r.status === statusPilih) &&
       (!hariPilih || dateKeyDariRow(r) === hariPilih) &&
@@ -17058,12 +17079,21 @@ if ("serviceWorker" in navigator) {
   // angka di kartu ringkasan (supaya angka di kartu-kartu lain tetap
   // tampil stabil walau salah satu kartu sedang aktif diklik), sedangkan
   // terapkanFilter() (dasar + filter cepat) dipakai utk isi tabel.
+  function fuMatchKeyword(customerName, keyword){
+    if((customerName || "").toLowerCase().includes(keyword)) return true;
+    // BARU -- pencarian juga cocok kalau keyword ketemu di salah satu nama
+    // ALIAS (nama lama) customer itu, bukan cuma nama aktifnya -- supaya
+    // CS yang masih ingat nama lama customer tetap ketemu hasilnya.
+    const aliases = fuAliasLookup[(customerName || "").trim().toUpperCase()];
+    if(aliases && aliases.some(a=> a.toLowerCase().includes(keyword))) return true;
+    return false;
+  }
   function terapkanFilterDasar(){
     const keyword = searchEl.value.trim().toLowerCase();
     const csPilih = csFilterEl.value;
     const statusPilih = statusFilterEl.value;
     return allRows.filter(r=>
-      (!keyword || (r.customer||"").toLowerCase().includes(keyword)) &&
+      (!keyword || fuMatchKeyword(r.customer, keyword)) &&
       (!csPilih || r.cs === csPilih) &&
       (!statusPilih || r.status === statusPilih)
     );
