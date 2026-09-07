@@ -6195,14 +6195,43 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <!-- BARU -- Dropship: nota tetap tampil normal, cuma caption di grup
              dapat blok "📦 Dropship / a.n. {Nama Penerima}" tambahan (lihat
              collectNotaPayload & backend sendRincianToGroup). customerName
-             TIDAK pernah diubah oleh field ini -- murni info kirim tambahan. -->
-        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
-          <input type="checkbox" id="kt-dropship-check" style="margin-top:2px;">
-          <span>📦 Dropship</span>
-        </label>
+             TIDAK pernah diubah oleh field ini -- murni info kirim tambahan.
+             BARU -- disatukan dalam 1 baris flex bareng checkbox Keterangan
+             Tambahan (gap 16px, flex-wrap supaya tetap rapi kalau layar
+             sangat sempit) -- 2 checkbox pendek berdampingan lebih hemat
+             tempat & enak dipindai mata drpd ditumpuk vertikal. -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px;">
+          <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
+            <input type="checkbox" id="kt-dropship-check" style="margin-top:2px;">
+            <span>📦 Dropship</span>
+          </label>
+          <!-- BARU -- checkbox "Pesan u/ Inventory" (dulu labelnya
+               "Keterangan"): field-nya SENGAJA disembunyikan di belakang
+               checkbox ini (bukan langsung tampil) karena isinya catatan
+               bebas (bisa panjang) -- kalau textarea-nya selalu tampil,
+               popup jadi lebih tinggi dari yang perlu utk pesanan yang
+               memang tidak butuh catatan apa-apa (mayoritas kasus). -->
+          <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
+            <input type="checkbox" id="kt-keterangan-check" style="margin-top:2px;">
+            <span>📝 Pesan u/ Inventory</span>
+          </label>
+        </div>
         <div id="kt-dropship-field" hidden style="margin-top:8px;">
           <label for="kt-dropship-recipient" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Penerima Dropship</label>
           <input type="text" id="kt-dropship-recipient" class="kt-input" placeholder="Isi nama penerima dropship" autocomplete="off" style="text-transform:uppercase;">
+        </div>
+        <!-- BARU -- "Pesan u/ Inventory" (dulu "Keterangan Tambahan"):
+             diisi CS saat bikin Rincian Pemesanan, TIDAK ikut caption/nota
+             (biar tidak bocor ke customer) -- cuma dibaca ulang worker &
+             ditaruh sbg baris terakhir "Pesan dari CS: ..." di DM "siap
+             diproses" ke Logistik (lihat
+             sendRincianToGroup/handleStickerButtonPress). Pakai <textarea>
+             (bukan <input> 1 baris spt Dropship) karena isinya catatan
+             bebas yang bisa lebih dari beberapa kata (mis. instruksi
+             packing/pengiriman khusus). -->
+        <div id="kt-keterangan-field" hidden style="margin-top:8px;">
+          <label for="kt-keterangan-input" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Pesan buat Inventory</label>
+          <textarea id="kt-keterangan-input" class="kt-input" rows="3" placeholder="Tulis pesan buat Inventory di sini, otomatis kekirim ke notifikasi mereka" style="resize:vertical;"></textarea>
         </div>
         <p class="kt-hint" style="margin-top:10px;">Dikirim sebagai: <b id="kt-sender-preview">—</b></p>
         <p class="kt-hint" id="kt-status"></p>
@@ -9201,6 +9230,55 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       if(!dropshipCheck.checked && dropshipRecipientInput) dropshipRecipientInput.value = "";
     });
   }
+  // BARU -- Keterangan Tambahan (khusus Logistik) -- pola SAMA PERSIS dgn
+  // Dropship di atas: checkbox cuma menampilkan/menyembunyikan field,
+  // dikosongkan lagi begitu di-uncheck (supaya tidak kebawa nyangkut kalau
+  // CS berubah pikiran sebelum kirim).
+  const keteranganCheck = document.getElementById("kt-keterangan-check");
+  const keteranganField = document.getElementById("kt-keterangan-field");
+  const keteranganInput = document.getElementById("kt-keterangan-input");
+  if(keteranganCheck && keteranganField){
+    keteranganCheck.addEventListener("change", ()=>{
+      keteranganField.hidden = !keteranganCheck.checked;
+      if(!keteranganCheck.checked && keteranganInput) keteranganInput.value = "";
+    });
+  }
+  // BARU (Cara A -- "auto-isi Dropship & Pesan u/ Inventory saat Revisi
+  // dicentang") -- begitu checkbox Revisi Pemesanan dicentang (atau nama
+  // customer diedit selagi Revisi sudah tercentang), tanya Worker lewat
+  // /revisi-autofill apakah customer ini punya rincian lama yang MASIH DI
+  // BAWAH 48 JAM -- kalau ada & isinya terisi, langsung isi ulang
+  // checkbox+field Dropship/Pesan u/ Inventory (CS tidak perlu ngetik
+  // ulang). Kalau tidak ada/sudah lewat 48 jam, field DIBIARKAN seperti
+  // sedia kala (tidak dikosongkan paksa -- jaga-jaga CS sudah keburu
+  // ngetik sendiri sebelum hasil autofill ini datang). Debounced 400ms
+  // biar tidak nembak API tiap huruf saat mengetik nama.
+  let revisiAutofillTimer = null;
+  async function checkRevisiAutofill(){
+    if(!revisiCheck || !revisiCheck.checked) return;
+    const nama = nameInput.value.trim();
+    if(!nama || !MASTER_DATA_WORKER_URL) return;
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/revisi-autofill?customerName=" + encodeURIComponent(nama), { headers: workerHeaders() });
+      const body = await res.json().catch(()=> ({}));
+      if(body.dropshipRecipient && dropshipCheck && dropshipRecipientInput){
+        dropshipCheck.checked = true;
+        dropshipField.hidden = false;
+        dropshipRecipientInput.value = body.dropshipRecipient;
+        updateSendBtnState();
+      }
+      if(body.keteranganTambahan && keteranganCheck && keteranganInput){
+        keteranganCheck.checked = true;
+        keteranganField.hidden = false;
+        keteranganInput.value = body.keteranganTambahan;
+      }
+    }catch(e){ console.log("Gagal cek auto-isi Revisi:", e); } // best-effort, gagal diam-diam -- CS masih bisa isi manual spt biasa
+  }
+  if(revisiCheck){
+    revisiCheck.addEventListener("change", ()=>{
+      if(revisiCheck.checked) checkRevisiAutofill();
+    });
+  }
   let pendingRevisiTargetMessageId = null; // diisi kalau user sudah pilih dari daftar kandidat (ronde ke-2)
 
   /* ---------- Rekomendasi Nama Customer (riwayat dari server) ----------
@@ -9646,6 +9724,11 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // BARU -- cek saran ekspedisi, di-debounce 500ms (jangan tiap huruf)
     clearTimeout(ekspedisiSuggestTimer);
     ekspedisiSuggestTimer = setTimeout(checkEkspedisiSuggestion, 500);
+    // BARU (Cara A) -- kalau Revisi sudah tercentang & nama diedit lagi
+    // (mis. tadinya salah ketik), cek ulang auto-isi Dropship/Pesan u/
+    // Inventory-nya juga, debounce 400ms sama seperti saran ekspedisi.
+    clearTimeout(revisiAutofillTimer);
+    revisiAutofillTimer = setTimeout(checkRevisiAutofill, 400);
   });
   nameInput.addEventListener("blur", ()=>{
     setTimeout(()=>{
@@ -9694,6 +9777,10 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     if(dropshipCheck) dropshipCheck.checked = false;
     if(dropshipField) dropshipField.hidden = true;
     if(dropshipRecipientInput) dropshipRecipientInput.value = "";
+    // BARU -- Keterangan Tambahan: reset tiap kali modal dibuka, sama pola dgn Dropship.
+    if(keteranganCheck) keteranganCheck.checked = false;
+    if(keteranganField) keteranganField.hidden = true;
+    if(keteranganInput) keteranganInput.value = "";
     overlay.hidden = false;
     setTimeout(()=> nameInput.focus(), 50);
     loadNameHistory();
@@ -9789,6 +9876,14 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         // "" (server melewati baris caption Dropship kalau kosong).
         dropshipRecipient: (dropshipCheck && dropshipCheck.checked && dropshipRecipientInput)
           ? dropshipRecipientInput.value.trim().toUpperCase() : "",
+        // BARU -- Keterangan Tambahan (khusus Logistik): pola SAMA PERSIS
+        // dgn dropshipRecipient di atas -- cuma dikirim kalau checkbox
+        // dicentang DAN field-nya terisi, kalau tidak "" (server melewati
+        // baris "Keterangan Tambahan" di DM Logistik kalau kosong). TIDAK
+        // di-uppercase (beda dgn dropshipRecipient) karena isinya kalimat
+        // bebas, bukan nama.
+        keteranganTambahan: (keteranganCheck && keteranganCheck.checked && keteranganInput)
+          ? keteranganInput.value.trim() : "",
       });
 
       // BARU -- teks status beda tergantung jalurnya, supaya CS tahu apa

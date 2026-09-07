@@ -4,8 +4,25 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v341";
+const CACHE_VERSION = "v342";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v342 -- Fitur baru "Pesan u/ Inventory" (dulu "Keterangan Tambahan") di
+   popup "Kirim ke Grup Telegram": checkbox baru di samping "Dropship"
+   (1 baris, rapi), field-nya textarea (lebih tinggi, isinya catatan
+   bebas buat Logistik) yang cuma muncul kalau dicentang. Isinya TIDAK
+   pernah masuk caption/nota (tidak bocor ke customer) -- cuma dibaca
+   ulang & ditaruh sbg baris terakhir "Pesan dari CS: ..." di DM "siap
+   diproses" ke Logistik (dikirim begitu Finance klik Konfirmasi DAN
+   status sudah Lunas 100%). DM Logistik itu juga sekarang menampilkan
+   baris alias customer ("↳ dulu: ...") kalau ada, persis di bawah nama.
+   BARU JUGA -- "auto-isi saat Revisi Pemesanan dicentang": begitu
+   checkbox Revisi dicentang & nama customer terisi, sistem cek endpoint
+   baru /revisi-autofill -- kalau customer itu punya rincian lama (di
+   bawah 48 jam) yang punya data Dropship dan/atau Pesan u/ Inventory,
+   field-nya otomatis ke-isi ulang (CS tidak perlu ngetik ulang info yang
+   sama). Lewat 48 jam, dianggap basi & tidak ikut ke-autofill lagi.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Versi Baru Tersedia"). */
 /* v341 -- Perbaikan bug: menu "Rekap Pesanan" bisa freeze/macet total
    (harus force close dari recent apps) begitu HP dibuka lagi setelah
    sempat diminimize/pindah app lain. Penyebab: listener visibilitychange
