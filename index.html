@@ -4695,6 +4695,18 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <select id="rekap-filter-hari" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
         <option value="">Semua Hari</option>
       </select>
+      <!-- BARU -- filter RENTANG tanggal (hari-bulan), terpisah dari dropdown
+           "Semua Hari" di atas (yang cuma bisa pilih 1 hari spesifik).
+           Terapkanfilter() menggabungkan keduanya dgn AND -- kalau dua-duanya
+           diisi sekaligus, hasilnya jadi irisan (biasanya cukup pakai salah
+           satu saja). min/max di-set otomatis dari rentang tanggal yang
+           BENAR-BENAR ada di data (lihat isiUlangDropdownFilter()). -->
+      <div style="display:flex; align-items:center; gap:6px;">
+        <input type="date" id="rekap-filter-hari-dari" title="Dari tanggal" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 8px; font-size:14px;">
+        <span style="color:var(--ink-soft); font-size:13px;">s/d</span>
+        <input type="date" id="rekap-filter-hari-sampai" title="Sampai tanggal" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 8px; font-size:14px;">
+        <button type="button" id="rekap-filter-hari-range-clear" class="md-btn" title="Bersihkan filter rentang tanggal" style="height:44px; padding:0 10px; font-size:13px;">✕</button>
+      </div>
       <!-- BARU -- filter per nama ekspedisi, pola SAMA dgn dropdown CS/
            Status/Hari di sampingnya: opsinya diisi ulang otomatis dari data
            yang benar-benar ada (isiUlangDropdownFilter()), filternya jalan
@@ -6049,7 +6061,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.51.3</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.52.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6263,7 +6275,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.51.3 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.52.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Menu Rekap Pesanan: filter rentang tanggal (dari-sampai)</b> ditambahkan di sebelah dropdown "Semua Hari" — pilih tanggal awal & akhir untuk melihat pesanan di rentang beberapa hari sekaligus (sebelumnya cuma bisa pilih 1 hari spesifik lewat dropdown). Kalender otomatis dibatasi sesuai rentang tanggal yang benar-benar ada di data, dan ada tombol ✕ untuk membersihkan filter ini dengan cepat.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.51.3</div>
           <ul>
             <li><b>Perbaikan bug: popup "Versi Baru Tersedia" bisa muncul berulang-ulang untuk versi yang sama</b> — penyebabnya, sistem mencatat versi sebagai "sudah dilihat" begitu update TERDETEKSI, bukan setelah beneran diterapkan. Kalau reload sempat tidak mulus (banyak tab terbuka, koneksi putus, dll), catatan itu jadi tidak sinkron dengan versi yang benar-benar aktif, sehingga popup yang sama bisa muncul lagi dan lagi. Sekarang catatan itu hanya ditulis berdasarkan versi ASLI yang benar-benar sedang berjalan di halaman, bukan tebakan di awal.</li>
           </ul>
@@ -16030,6 +16048,9 @@ if ("serviceWorker" in navigator) {
   const csFilterEl = document.getElementById("rekap-filter-cs");
   const statusFilterEl = document.getElementById("rekap-filter-status");
   const hariFilterEl = document.getElementById("rekap-filter-hari"); // BARU -- filter per hari
+  const hariDariEl = document.getElementById("rekap-filter-hari-dari"); // BARU -- filter rentang tanggal (dari)
+  const hariSampaiEl = document.getElementById("rekap-filter-hari-sampai"); // BARU -- filter rentang tanggal (sampai)
+  const hariRangeClearBtn = document.getElementById("rekap-filter-hari-range-clear");
   const ekspedisiFilterEl = document.getElementById("rekap-filter-ekspedisi"); // BARU -- filter per ekspedisi
   const belumInvoiceEl = document.getElementById("rekap-filter-belumInvoice");
   const csSummaryEl = document.getElementById("rekap-cs-summary");
@@ -16248,6 +16269,12 @@ if ("serviceWorker" in navigator) {
   csFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); });
   statusFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); });
   hariFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); }); // BARU
+  hariDariEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); }); // BARU -- filter rentang tanggal
+  hariSampaiEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); }); // BARU -- filter rentang tanggal
+  hariRangeClearBtn.addEventListener("click", ()=>{
+    hariDariEl.value = ""; hariSampaiEl.value = "";
+    rkPage = 1; renderRekapTable();
+  });
   ekspedisiFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); }); // BARU
   belumInvoiceEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); });
   sortBtn.addEventListener("click", ()=>{
@@ -16313,6 +16340,13 @@ if ("serviceWorker" in navigator) {
     if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
     if(hariSet.includes(prevHari)) hariFilterEl.value = prevHari;
     if(ekspedisiSet.includes(prevEkspedisi)) ekspedisiFilterEl.value = prevEkspedisi;
+    // BARU -- batasi kalender rentang tanggal (min/max) sesuai tanggal yang
+    // BENAR-BENAR ada di data (hariSet sudah terurut TERBARU dulu, jadi
+    // elemen pertama = tanggal termuda, terakhir = tertua).
+    if(hariSet.length){
+      const oldest = hariSet[hariSet.length - 1], newest = hariSet[0];
+      [hariDariEl, hariSampaiEl].forEach(el=>{ el.min = oldest; el.max = newest; });
+    }
   }
 
   async function fetchAndRenderRekap(opts){
@@ -16380,16 +16414,21 @@ if ("serviceWorker" in navigator) {
     const csPilih = csFilterEl.value;
     const statusPilih = statusFilterEl.value;
     const hariPilih = hariFilterEl.value; // BARU -- filter per hari (value = dateKey YYYY-MM-DD)
+    const hariDari = hariDariEl.value; // BARU -- filter rentang tanggal (dari), format YYYY-MM-DD sama dgn dateKeyDariRow
+    const hariSampai = hariSampaiEl.value; // BARU -- filter rentang tanggal (sampai)
     const ekspedisiPilih = ekspedisiFilterEl.value; // BARU -- filter per ekspedisi
     const belumInvoiceSaja = belumInvoiceEl.checked;
-    let rows = allRows.filter(r=>
-      (!keyword || rkMatchKeyword(r.customer, keyword)) &&
-      (!csPilih || r.cs === csPilih) &&
-      (!statusPilih || r.status === statusPilih) &&
-      (!hariPilih || dateKeyDariRow(r) === hariPilih) &&
-      (!ekspedisiPilih || r.ekspedisi === ekspedisiPilih) &&
-      (!belumInvoiceSaja || !r.manualInvoiced)
-    );
+    let rows = allRows.filter(r=>{
+      const dk = dateKeyDariRow(r); // BARU -- dihitung sekali per baris, dipakai filter Hari & rentang tanggal sekaligus
+      return (!keyword || rkMatchKeyword(r.customer, keyword)) &&
+        (!csPilih || r.cs === csPilih) &&
+        (!statusPilih || r.status === statusPilih) &&
+        (!hariPilih || dk === hariPilih) &&
+        (!hariDari || dk >= hariDari) && // BARU -- perbandingan string YYYY-MM-DD aman diurutkan langsung
+        (!hariSampai || dk <= hariSampai) && // BARU
+        (!ekspedisiPilih || r.ekspedisi === ekspedisiPilih) &&
+        (!belumInvoiceSaja || !r.manualInvoiced);
+    });
     // DIUBAH (permintaan "kalau ada aktivitas taruh paling atas") -- pakai
     // lastActivityAtMs (dari data yang SUDAH dikirim server, 0 field baru
     // yang perlu di-fetch terpisah) -- pesanan yang baru saja ada

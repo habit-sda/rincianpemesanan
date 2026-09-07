@@ -4,8 +4,15 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v338";
+const CACHE_VERSION = "v339";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v339 -- Menu Rekap Pesanan: filter rentang tanggal (dari-sampai)
+   ditambahkan di sebelah dropdown "Semua Hari" -- 2 input tanggal +
+   tombol ✕ pembersih, min/max kalender otomatis mengikuti data yang
+   benar-benar ada. Filter jalan di browser (dateKeyDariRow, perbandingan
+   string YYYY-MM-DD), 0 tambahan kuota baca KV. SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
 /* v338 -- Perbaikan bug: popup "Versi Baru Tersedia" bisa muncul
    berulang-ulang untuk versi yang sama. handleNewWorkerInstalled()
    SEBELUMNYA menulis localStorage (LS_KEY) begitu update terdeteksi,
