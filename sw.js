@@ -4,8 +4,18 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v318";
+const CACHE_VERSION = "v319";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v319 -- Fitur baru: Dropship. Popup "Kirim ke Grup Telegram" sekarang
+   punya checkbox "📦 Dropship" -- dicentang, muncul field "Nama Penerima"
+   (nama penerima akhir barang, BEDA dari Nama Customer yang tetap jadi
+   kunci sistem/reseller). Nama Customer TIDAK PERNAH diubah oleh fitur
+   ini. Kalau dropship diisi, caption nota yang dikirim ke grup dapat 1
+   blok tambahan "📦 Dropship / a.n. {Nama Penerima}" (di TENGAH caption,
+   baris PALING BAWAH tetap "Pengirim {nama}" seperti sebelumnya -- jadi
+   Monitor Utama tidak perlu diubah). Tabel Rekap Pesanan (desktop & kartu
+   mobile) menampilkan badge kecil "📦 Dropship" di BAWAH nama customer
+   kalau pesanan itu dropship. */
 /* v318 -- Perbaikan bug popup "Kirim ke Grup Telegram": warning "⚠️
    Customer ini kemungkinan sudah terdaftar" SEBELUMNYA tetap muncul walau
    nama customer BARU SAJA dipilih langsung dari kotak rekomendasi nama

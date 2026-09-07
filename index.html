@@ -6110,6 +6110,18 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <span>Revisi Pemesanan — hapus rincian pemesanan <b>lama</b> atas nama customer ini (nama harus persis sama), diganti rincian baru yang ini.</span>
         </label>
         <div id="kt-revisi-picker" hidden style="margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);"></div>
+        <!-- BARU -- Dropship: nota tetap tampil normal, cuma caption di grup
+             dapat blok "📦 Dropship / a.n. {Nama Penerima}" tambahan (lihat
+             collectNotaPayload & backend sendRincianToGroup). customerName
+             TIDAK pernah diubah oleh field ini -- murni info kirim tambahan. -->
+        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
+          <input type="checkbox" id="kt-dropship-check" style="margin-top:2px;">
+          <span>📦 Dropship</span>
+        </label>
+        <div id="kt-dropship-field" hidden style="margin-top:8px;">
+          <label for="kt-dropship-recipient" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Penerima</label>
+          <input type="text" id="kt-dropship-recipient" class="kt-input" placeholder="Isi nama penerima akhir" autocomplete="off" style="text-transform:uppercase;">
+        </div>
         <p class="kt-hint" style="margin-top:10px;">Dikirim sebagai: <b id="kt-sender-preview">—</b> · <button type="button" id="kt-edit-sender" style="background:none;border:none;padding:0;color:var(--primary-green);font-weight:700;text-decoration:underline;cursor:pointer;font-size:11px;">Ubah</button></p>
         <p class="kt-hint" id="kt-status"></p>
       </div>
@@ -8939,6 +8951,16 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   const btnSend = document.getElementById("kt-send");
   const revisiCheck = document.getElementById("kt-revisi-check");
   const revisiPicker = document.getElementById("kt-revisi-picker");
+  // BARU -- Dropship
+  const dropshipCheck = document.getElementById("kt-dropship-check");
+  const dropshipField = document.getElementById("kt-dropship-field");
+  const dropshipRecipientInput = document.getElementById("kt-dropship-recipient");
+  if(dropshipCheck && dropshipField){
+    dropshipCheck.addEventListener("change", ()=>{
+      dropshipField.hidden = !dropshipCheck.checked;
+      if(!dropshipCheck.checked && dropshipRecipientInput) dropshipRecipientInput.value = "";
+    });
+  }
   let pendingRevisiTargetMessageId = null; // diisi kalau user sudah pilih dari daftar kandidat (ronde ke-2)
 
   /* ---------- Rekomendasi Nama Customer (riwayat dari server) ----------
@@ -9282,10 +9304,15 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   let isSending = false;
   function updateSendBtnState(){
     if(isSending) return; // lagi proses kirim, jangan diubah dari sini
-    btnSend.disabled = !nameInput.value.trim();
+    // BARU -- kalau Dropship dicentang, Nama Penerima ikut wajib diisi
+    // sebelum bisa kirim (mencegah checkbox kecentang tapi field kosong).
+    const dropshipOk = !(dropshipCheck && dropshipCheck.checked) || !!(dropshipRecipientInput && dropshipRecipientInput.value.trim());
+    btnSend.disabled = !nameInput.value.trim() || !dropshipOk;
   }
   nameInput.addEventListener("input", ()=>{ updateSendBtnState(); resetRevisiPicker(); });
   if(revisiCheck) revisiCheck.addEventListener("change", ()=> resetRevisiPicker());
+  if(dropshipCheck) dropshipCheck.addEventListener("change", updateSendBtnState);
+  if(dropshipRecipientInput) dropshipRecipientInput.addEventListener("input", updateSendBtnState);
 
   function resetRevisiPicker(){
     pendingRevisiTargetMessageId = null;
@@ -9304,6 +9331,10 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     hideEkspedisiSuggest(); // BARU -- reset dulu, cek ulang di bawah setelah nama ada isinya
     if(revisiCheck) revisiCheck.checked = false;
     resetRevisiPicker();
+    // BARU -- Dropship: reset tiap kali modal dibuka, sama pola dgn revisi.
+    if(dropshipCheck) dropshipCheck.checked = false;
+    if(dropshipField) dropshipField.hidden = true;
+    if(dropshipRecipientInput) dropshipRecipientInput.value = "";
     overlay.hidden = false;
     setTimeout(()=> nameInput.focus(), 50);
     loadNameHistory();
@@ -9394,6 +9425,12 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         isRevisi: !!(revisiCheck && revisiCheck.checked),
         revisiTargetMessageId: pendingRevisiTargetMessageId,
         isNewCustomer, // BARU -- lihat catatan deteksi di atas
+        // BARU -- Dropship: customerName TETAP dikirim apa adanya di atas
+        // (tidak pernah diubah field ini). dropshipRecipient cuma dikirim
+        // kalau checkbox dicentang DAN field-nya terisi -- kalau tidak,
+        // "" (server melewati baris caption Dropship kalau kosong).
+        dropshipRecipient: (dropshipCheck && dropshipCheck.checked && dropshipRecipientInput)
+          ? dropshipRecipientInput.value.trim().toUpperCase() : "",
       });
 
       // BARU -- teks status beda tergantung jalurnya, supaya CS tahu apa
@@ -15992,6 +16029,10 @@ if ("serviceWorker" in navigator) {
     cardsEl.innerHTML = rows.map(r=>{
       const isVoid = /void|hoax/i.test(r.status);
       const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline;">${escHtml(r.customer)}</a>`;
+      // BARU -- badge Dropship, pola sama dgn tabel desktop (renderRekapTable).
+      const dropshipBadgeMobile = r.dropshipRecipient
+        ? `<div style="margin-top:2px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px;">📦 Dropship</span></div>`
+        : "";
       const varianRingkas = kodeList
         .map(k=> (r.items && r.items[k]) ? `${escHtml(k)} ${r.items[k]}` : null)
         .filter(Boolean).join(", ") || "-";
@@ -15999,6 +16040,7 @@ if ("serviceWorker" in navigator) {
         <div class="rc-card-top">
           <div>
             <div class="rc-card-nama">${namaLink}</div>
+            ${dropshipBadgeMobile}
             <div class="rc-card-sub">${escHtml(r.cs || "-")} &middot; ${escHtml(r.hari)}, ${escHtml(r.tanggalJam)}</div>
           </div>
           <span class="fu-badge ${isVoid ? "r" : "g"}">${escHtml(ringkasStatus(r.status))}</span>
@@ -16071,13 +16113,21 @@ if ("serviceWorker" in navigator) {
       // "/status <nama>" SUDAH TERISI (Telegram tidak izinkan auto-kirim
       // dari link demi keamanan -- orangnya tetap perlu tap kirim sendiri).
       const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline; word-break:break-word;">${escHtml(r.customer)}</a>`;
+      // BARU -- badge "📦 Dropship" di BAWAH nama (bukan di samping, biar
+      // tidak melebarkan kolom Customer) -- teks jelas terbaca (bukan cuma
+      // ikon polos), muncul HANYA kalau r.dropshipRecipient terisi.
+      const dropshipBadge = r.dropshipRecipient
+        ? `<div style="margin-top:3px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px; white-space:nowrap;">📦 Dropship</span></div>`
+        : "";
+      const namaCell = namaLink + dropshipBadge;
+      const namaTitle = r.dropshipRecipient ? `${r.customer} · Dropship a.n. ${r.dropshipRecipient}` : r.customer;
       // BARU -- title="..." supaya kalau masih terpotong di layar sempit,
       // teks lengkapnya tetap bisa dibaca lewat hover (desktop) / tahan
       // tap (mobile), tanpa perlu melebarkan kolom.
       html += `<tr style="${rowBg}">` +
         td(i+1) + td(escHtml(r.tanggalJam), "white-space:nowrap;") +
         td(escHtml(r.cs), "white-space:normal; word-break:break-word; max-width:110px;") +
-        td(namaLink, "white-space:normal; max-width:240px;", escHtml(r.customer)) +
+        td(namaCell, "white-space:normal; max-width:240px;", escHtml(namaTitle)) +
         kodeListTampil.map(k=> td(r.items && r.items[k] ? r.items[k] : "-", "text-align:center;")).join("") +
         td(r.totalQty || 0, "text-align:center; font-weight:600;") +
         td(escHtml(ringkasStatus(r.status)), "white-space:normal; word-break:break-word; max-width:130px;") + td(escHtml(r.kg), "text-align:center; white-space:nowrap;") +
