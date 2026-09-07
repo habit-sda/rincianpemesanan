@@ -4,8 +4,20 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v325";
+const CACHE_VERSION = "v327";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v327 -- Menu Follow Up, popup Detail Customer Bagian C: label "kali
+   order" pada kartu "Jumlah order prediksi" diganti jadi "kali order
+   lagi" supaya jelas ini proyeksi order KE DEPAN, bukan total order yang
+   sudah terjadi. Perubahan teks murni, tidak ada perubahan logika.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
+/* v326 -- Menu Follow Up: bagian "Riwayat Order Lunas" di popup Detail
+   Customer (daftar tanggal + qty tiap order) disembunyikan atas
+   permintaan user. Bagian A/B/C dan Grafik Riwayat tidak terpengaruh --
+   masih pakai data r.riwayat yang sama seperti sebelumnya. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
 /* v325 -- Master Nama Pelanggan: nama alias (nama lama) sekarang bisa
    diedit di tempat, bukan cuma dihapus. Ketuk teks alias di chip (garis
    putus-putus di bawahnya) -> jadi input kecil, Enter/blur = simpan lewat

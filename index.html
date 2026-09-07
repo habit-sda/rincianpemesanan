@@ -6041,7 +6041,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.46.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.47.1</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6255,7 +6255,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.46.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.47.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li>Menu Follow Up — popup Detail Customer, Bagian C: label "kali order" pada kartu "Jumlah order prediksi" diperjelas jadi <b>"kali order lagi"</b>, supaya jelas ini prediksi order KE DEPAN (sisa bulan berjalan), bukan total order yang sudah terjadi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.47.0</div>
+          <ul>
+            <li>Menu Follow Up — popup "Detail Customer": bagian <b>"Riwayat Order Lunas"</b> (daftar tanggal + qty tiap order) disembunyikan. Bagian A/B/C (parameter, prediksi order berikutnya, prediksi stok) dan Grafik Riwayat tidak berubah, tetap memakai data yang sama seperti biasa.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.46.0</div>
           <ul>
             <li><b>Master Nama Pelanggan: nama alias (nama lama) sekarang bisa diedit</b> — sebelumnya cuma bisa dihapus. Ketuk langsung teks nama lama di chip-nya (ditandai garis putus-putus), ubah teksnya, lalu Enter atau ketuk di luar untuk simpan. Tombol ✕ untuk hapus tetap ada seperti biasa.</li>
           </ul>
@@ -17017,9 +17029,11 @@ if ("serviceWorker" in navigator) {
     document.getElementById("followup-detail-nama").textContent = r.customer;
     document.getElementById("followup-detail-cs").textContent = `CS paling sering: ${r.cs || "-"}`;
 
-    const riwayatHtml = (r.riwayat || []).slice().reverse().map(h=>
-      `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--line);"><span>${fmtTgl(h.tanggal)}</span><span>Qty ${h.qty}</span></div>`
-    ).join("") || `<div style="color:var(--ink-soft);">Belum ada riwayat.</div>`;
+    // BARU -- "Riwayat Order Lunas" (daftar tanggal + qty per order) SENGAJA
+    // disembunyikan dari popup Detail Customer atas permintaan user. Data
+    // r.riwayat sendiri TIDAK dihapus -- tetap dipakai normal oleh Bagian
+    // A/B/C di atas dan oleh Grafik Riwayat (fuRenderChart), cuma daftar
+    // baris tanggal+qty mentahnya yang tidak lagi ditampilkan di sini.
 
     // BAGIAN A -- Parameter & Asumsi
     const rowsA = [
@@ -17059,7 +17073,7 @@ if ("serviceWorker" in navigator) {
     // BAGIAN C -- Prediksi kebutuhan stok bulan ini
     const bagianCHtml = `
       <div class="fu-stok-grid">
-        <div class="fu-stok-item"><div class="s-label">Jumlah order prediksi ${bulanLabel}</div><div class="s-val">${nBln}</div><div class="s-unit">kali order</div></div>
+        <div class="fu-stok-item"><div class="s-label">Jumlah order prediksi ${bulanLabel}</div><div class="s-val">${nBln}</div><div class="s-unit">kali order lagi</div></div>
         <div class="fu-stok-item" style="background:#fffde7;"><div class="s-label">Estimasi total qty bulan ini</div><div class="s-val" style="font-size:24px;">${fmtNumID(estBln)}</div><div class="s-unit">pcs / unit</div></div>
         <div class="fu-stok-item"><div class="s-label">Rata-rata qty per order</div><div class="s-val">${r.avgQty}</div><div class="s-unit">pcs per order</div></div>
       </div>`;
@@ -17088,9 +17102,6 @@ if ("serviceWorker" in navigator) {
         <div class="fu-bag-hdr">▌ BAGIAN C — PREDIKSI KEBUTUHAN STOK BULAN INI</div>
         ${bagianCHtml}
       </div>
-
-      <div style="font-weight:700; font-size:13px; margin:14px 0 6px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.5px;">Riwayat Order Lunas</div>
-      ${riwayatHtml}
     `;
     detailOverlay.hidden = false;
   }
