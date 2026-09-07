@@ -4,8 +4,23 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v336";
+const CACHE_VERSION = "v337";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v337 -- 2 perubahan:
+   1) Teks pengaturan menu "Rekap Pesanan" di Master Data diperbaiki:
+      tidak lagi mengklaim "cuma tampil di versi desktop" (sekarang juga
+      ada di HP lewat "Aksi cepat"), dan penjelasan retensi data
+      diperjelas: order Lunas+resi ada disimpan 25 hari, order yang belum
+      selesai disimpan sampai 90 hari (sesuai ORDER_RETENTION_DAYS /
+      ORDER_RETENTION_DAYS_INCOMPLETE di Worker).
+   2) Rekap Pesanan dipaginasi (25 baris/halaman, tabel desktop & kartu
+      mobile) -- tombol Sebelumnya/Selanjutnya muncul otomatis kalau
+      hasil filter >25 baris. Baris TOTAL, ringkasan, dan Ekspor CSV/PDF
+      tetap menghitung/menyertakan SEMUA baris hasil filter (PDF sengaja
+      merender ulang penuh sesaat sebelum cetak, lalu kembali ke tampilan
+      berhalaman setelahnya).
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
 /* v336 -- Menu Rekap Pesanan: kolom pencarian nama sekarang juga
    mencocokkan nama alias (nama lama), sama pola dgn Follow Up. Pakai
    rkAliasLookup yang SUDAH ADA, tidak ada perubahan Worker. SENGAJA
