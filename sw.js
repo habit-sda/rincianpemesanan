@@ -4,8 +4,17 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v319";
+const CACHE_VERSION = "v320";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v320 -- Bump ulang (permintaan "update dropship tidak muncul") --
+   TIDAK ADA perubahan kode index.html sejak v319 (fitur Dropship sudah
+   ada & sudah dicek lagi, tetap utuh) -- ini murni memaksa service
+   worker deteksi "ada versi baru" lagi, buat kasus v319 kemarin belum
+   sempat ke-cache/ke-deploy dgn benar di sisi hosting. Kalau setelah
+   deploy v320 ini checkbox "📦 Dropship" MASIH tidak muncul, penyebabnya
+   BUKAN cache lagi -- lihat catatan troubleshooting di changelog respons.
+   SENGAJA TIDAK dipaksa (skipWaiting) -- pakai alur normal popup
+   "Perbarui Sekarang", sama seperti v319. */
 /* v319 -- Fitur baru: Dropship. Popup "Kirim ke Grup Telegram" sekarang
    punya checkbox "📦 Dropship" -- dicentang, muncul field "Nama Penerima"
    (nama penerima akhir barang, BEDA dari Nama Customer yang tetap jadi
