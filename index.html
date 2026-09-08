@@ -5527,7 +5527,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-card" id="md-followup-notif-card">
         <h3>📞 Notifikasi Follow Up ke CS</h3>
         <div class="md-note" style="margin-bottom:12px;">
-          Tiap pagi, tiap CS dapat DM daftar customer MILIKNYA SENDIRI yang jadwal Follow Up-nya (prediksi order berikutnya, dari menu "Follow Up" di atas) jatuh PERSIS hari ini — biar CS tahu siapa yang perlu segera dihubungi tanpa perlu buka menu Follow Up manual tiap hari. Kalau hari ini tidak ada customer yang jadwalnya jatuh hari ini, tidak ada DM terkirim. Customer yang order-nya pernah dicatat sebelum CS-nya tersimpan sebagai ID Telegram (order lama) tidak akan pernah ikut DM ini walau tetap tampil di tabel Follow Up.
+          Tiap pagi, <b>semua orang di Daftar CS</b> (di bawah) dapat DM yang <b>sama persis</b> — daftar SEMUA customer yang jadwal Follow Up-nya (prediksi order berikutnya, dari menu "Follow Up" di atas) jatuh PERSIS hari ini, tidak peduli itu customer siapa punya (gaya sama seperti Info Resi Kemarin di Daftar Logistik). Kalau hari ini tidak ada customer yang jadwalnya jatuh hari ini, tidak ada DM terkirim.
         </div>
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:12px;">
           <input type="checkbox" id="md-followup-notif-toggle" style="width:18px; height:18px;">
@@ -5561,7 +5561,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-card" id="md-cslist-card">
         <h3>Daftar CS</h3>
         <div class="md-note" style="margin-bottom:12px;">
-          Dipakai KHUSUS oleh Notifikasi Follow Up di atas — begitu aktif &amp; sudah lewat jam kirim, pesan "Jadwal Follow Up hari ini" (daftar SEMUA customer yang jadwalnya jatuh hari ini, bukan per orang) dikirim ke SEMUA orang di daftar ini sekaligus, gaya sama seperti Daftar Logistik. Isi Telegram ID numerik (bisa didapat lewat bot seperti @userinfobot). Orang yang kebetulan juga terdaftar di Daftar Logistik (tab Ekspedisi) TIDAK akan ikut dikirimi DM ini, walau ditambahkan di sini.
+          Dipakai KHUSUS oleh Notifikasi Follow Up di atas — begitu aktif &amp; sudah lewat jam kirim, pesan "Jadwal Follow Up hari ini" (daftar SEMUA customer yang jadwalnya jatuh hari ini, bukan per orang) dikirim ke SEMUA orang di daftar ini sekaligus, gaya sama seperti Daftar Logistik. Isi Telegram ID numerik (bisa didapat lewat bot seperti @userinfobot). Orang yang kebetulan juga terdaftar di Daftar Logistik (tab Ekspedisi) <b>tetap ikut dikirimi</b> DM ini kalau namanya ada di daftar ini juga.
         </div>
         <div id="md-cslist-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -6108,7 +6108,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.53.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.55.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6351,7 +6351,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.53.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.55.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Notifikasi Follow Up ke CS: orang yang nyambi Logistik tetap dapat DM</b> — sebelumnya siapa pun di Daftar CS yang ID Telegram-nya juga terdaftar di Daftar Logistik otomatis dikecualikan. Sekarang khusus fitur ini, semua orang di Daftar CS dapat DM-nya, terlepas dia juga terdaftar di Daftar Logistik atau tidak.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.54.0</div>
+          <ul>
+            <li><b>Perbaikan besar: Notifikasi Follow Up ke CS</b> — sebelumnya fitur ini TIDAK PERNAH benar-benar mengirim DM (filter per-CS berdasarkan ID Telegram yang tersimpan di pesanan gagal cocok untuk hampir semua order lama). Sekarang kembali ke mode broadcast: semua orang di Daftar CS dapat 1 pesan yang sama, berisi daftar SEMUA customer yang jadwalnya jatuh hari ini — tidak peduli itu customer siapa.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.53.0</div>
           <ul>
             <li><b>Rekap Pesanan: badge "diupdate" per field</b> — titik hijau kecil + teks "diupdate" muncul persis di kolom yang baru berubah (Status, Resi, Invoice, KG, Ekspedisi, atau Varian/Qty), di tabel desktop maupun kartu mobile. Hilang otomatis 3 jam setelah perubahan.</li>
           </ul>

@@ -4,8 +4,15 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v344";
+const CACHE_VERSION = "v346";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v346 -- Notifikasi Follow Up ke CS: pengecualian overlap Daftar
+   Logistik dihapus khusus di fitur ini -- lihat perbaikan di
+   Worker_Rincian_Pemesanan.js (checkFollowUpDmNotif). */
+/* v345 -- Perbaikan teks kartu "Notifikasi Follow Up ke CS" supaya sesuai
+   perilaku backend yang baru diperbaiki (mode broadcast, bukan per-CS
+   lagi) -- lihat perbaikan besar di Worker_Rincian_Pemesanan.js
+   (checkFollowUpDmNotif). */
 /* v344 -- Rekap Pesanan: badge kecil "● diupdate" sekarang nempel PERSIS
    di kolom field yang baru berubah (Status/Resi/Invoice/KG/Ekspedisi/
    Varian&Qty), bukan cuma penanda umum. Disimpan di Upstash (BUKAN KV/D1
