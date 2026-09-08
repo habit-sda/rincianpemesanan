@@ -4,12 +4,217 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v322";
+const CACHE_VERSION = "v344";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
-/* v322 -- Rekap Pesanan: badge kecil "● diupdate" sekarang nempel PERSIS
+/* v344 -- Rekap Pesanan: badge kecil "● diupdate" sekarang nempel PERSIS
    di kolom field yang baru berubah (Status/Resi/Invoice/KG/Ekspedisi/
    Varian&Qty), bukan cuma penanda umum. Disimpan di Upstash (BUKAN KV/D1
    -- murni data tampilan, hilang otomatis setelah 3 jam). */
+/* v343 -- Perbaikan bug lanjutan (laporan "masih freeze begitu app
+   dibuka lagi, selalu balik ke Rekap Pesanan"): ternyata ada fitur
+   "pulihkan tampilan terakhir setelah reload" (localStorage
+   notaHalawa_lastView) yang bikin app OTOMATIS lompat ke Rekap Pesanan/
+   Follow Up begitu dibuka lagi -- lalu LANGSUNG fetch+render tabel penuh
+   dari nol, PERSIS bersamaan dgn index.html (~1MB, satu file besar)
+   yang masih diparse/dieksekusi browser saat boot. 2 beban berat itu
+   numpuk di detik paling kritis -> kemungkinan kuat inilah penyebab
+   freeze yang dilaporkan. Sekarang reload/buka-ulang app SELALU balik
+   ke Beranda dulu utk 2 halaman itu (bukan lagi otomatis lompat) --
+   pemulihan tampilan "wiz" (form Grosir/Custom yang lagi diisi) TIDAK
+   berubah, tetap dipulihkan seperti biasa krn itu murni data lokal,
+   tidak ada fetch jaringan sama sekali. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Versi Baru Tersedia"). */
+/* v342 -- Fitur baru "Pesan u/ Inventory" (dulu "Keterangan Tambahan") di
+   popup "Kirim ke Grup Telegram": checkbox baru di samping "Dropship"
+   (1 baris, rapi), field-nya textarea (lebih tinggi, isinya catatan
+   bebas buat Logistik) yang cuma muncul kalau dicentang. Isinya TIDAK
+   pernah masuk caption/nota (tidak bocor ke customer) -- cuma dibaca
+   ulang & ditaruh sbg baris terakhir "Pesan dari CS: ..." di DM "siap
+   diproses" ke Logistik (dikirim begitu Finance klik Konfirmasi DAN
+   status sudah Lunas 100%). DM Logistik itu juga sekarang menampilkan
+   baris alias customer ("↳ dulu: ...") kalau ada, persis di bawah nama.
+   BARU JUGA -- "auto-isi saat Revisi Pemesanan dicentang": begitu
+   checkbox Revisi dicentang & nama customer terisi, sistem cek endpoint
+   baru /revisi-autofill -- kalau customer itu punya rincian lama (di
+   bawah 48 jam) yang punya data Dropship dan/atau Pesan u/ Inventory,
+   field-nya otomatis ke-isi ulang (CS tidak perlu ngetik ulang info yang
+   sama). Lewat 48 jam, dianggap basi & tidak ikut ke-autofill lagi.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Versi Baru Tersedia"). */
+/* v341 -- Perbaikan bug: menu "Rekap Pesanan" bisa freeze/macet total
+   (harus force close dari recent apps) begitu HP dibuka lagi setelah
+   sempat diminimize/pindah app lain. Penyebab: listener visibilitychange
+   (fetch immediate begitu halaman terlihat lagi) TIDAK me-reset timer
+   setInterval 30 detik (startAutoRefresh) -- padahal browser mobile
+   menahan (throttle) setInterval selagi halaman disembunyikan, jadi
+   timer yang tertahan itu bisa ikut "kejar setoran" persis di momen yang
+   sama dengan fetch immediate, keduanya (fetch+hitung ulang ringkasan
+   dari SELURUH baris+render ulang tabel) numpuk di saat paling sibuk
+   (app baru resume) -> main thread terkunci beberapa detik. Sekarang
+   startAutoRefresh() dipanggil ulang setelah fetch immediate selesai,
+   countdown 30 detik mulai bersih dari momen resume, timer lama tidak
+   akan sempat menembak dobel. SENGAJA TIDAK dipaksa (bukan darurat/
+   keamanan) -- pakai alur normal (popup "Versi Baru Tersedia"). */
+/* v340 -- Optimasi lanjutan "render nota di bawah 1 detik" (Kirim ke Grup
+   Telegram): (1) ensureHtml2Canvas() sekarang JUGA dipicu lewat
+   requestIdleCallback begitu app dibuka -- bukan cuma ditunggu sampai CS
+   pertama kali klik Kirim/Unduh/Bagikan -- supaya download ~200KB
+   html2canvas numpang di waktu browser nganggur, bukan bersaing dgn
+   interaksi pertama CS. (2) renderCanvas() sekarang ikut menunggu
+   document.fonts.ready (paralel dgn precache foto produk) sebelum
+   menggambar nota -- jaga-jaga font Roboto belum sempat siap kalau CS
+   langsung kirim dalam hitungan detik setelah app dibuka, yang bisa bikin
+   lebar kolom nama produk (dihitung di atas asumsi Roboto) meleset dari
+   font fallback yang sempat kepakai. (3) Dropdown saran nama di popup
+   "Kirim ke Grup Telegram" sekarang menampilkan lagi baris "↳ dulu: ..."
+   (nama alias) -- SEBELUMNYA (lihat catatan v-lama di HISTORY index.html)
+   fitur ini pernah dicabut karena ambigu (sumbernya nameHistory, daftar
+   nama flat, jadi alias yang tampil bisa salah sambung ke nama yang
+   cuma kebetulan mengandung substring yang sama). Sekarang sumbernya
+   diganti ke customerRecords (objek lengkap {name, cs, aliases[]}, SAMA
+   PERSIS dgn yang sudah lama aman dipakai dropdown Master Nama/Rekap
+   Pesanan/Follow Up) -- alias yang tampil di sini dijamin menempel ke
+   record yang memang cocok, bukan hasil lookup terpisah yang gampang
+   salah sambung seperti dulu. SENGAJA TIDAK dipaksa (bukan darurat/
+   keamanan) -- pakai alur normal (popup "Versi Baru Tersedia"). */
+/* v339 -- Menu Rekap Pesanan: filter rentang tanggal (dari-sampai)
+   ditambahkan di sebelah dropdown "Semua Hari" -- 2 input tanggal +
+   tombol ✕ pembersih, min/max kalender otomatis mengikuti data yang
+   benar-benar ada. Filter jalan di browser (dateKeyDariRow, perbandingan
+   string YYYY-MM-DD), 0 tambahan kuota baca KV. SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
+/* v338 -- Perbaikan bug: popup "Versi Baru Tersedia" bisa muncul
+   berulang-ulang untuk versi yang sama. handleNewWorkerInstalled()
+   SEBELUMNYA menulis localStorage (LS_KEY) begitu update terdeteksi,
+   padahal user belum tentu klik terapkan / reload-nya belum tentu mulus
+   -- localStorage jadi tidak sinkron dgn versi yang BENAR-BENAR aktif,
+   memicu popup berulang. Sekarang localStorage HANYA ditulis oleh
+   checkStartupVersionChange() (baca versi asli dari DOM), sedangkan
+   dedup popup dalam 1 sesi tab pakai variabel di memori. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
+/* v337 -- 2 perubahan:
+   1) Teks pengaturan menu "Rekap Pesanan" di Master Data diperbaiki:
+      tidak lagi mengklaim "cuma tampil di versi desktop" (sekarang juga
+      ada di HP lewat "Aksi cepat"), dan penjelasan retensi data
+      diperjelas: order Lunas+resi ada disimpan 25 hari, order yang belum
+      selesai disimpan sampai 90 hari (sesuai ORDER_RETENTION_DAYS /
+      ORDER_RETENTION_DAYS_INCOMPLETE di Worker).
+   2) Rekap Pesanan dipaginasi (25 baris/halaman, tabel desktop & kartu
+      mobile) -- tombol Sebelumnya/Selanjutnya muncul otomatis kalau
+      hasil filter >25 baris. Baris TOTAL, ringkasan, dan Ekspor CSV/PDF
+      tetap menghitung/menyertakan SEMUA baris hasil filter (PDF sengaja
+      merender ulang penuh sesaat sebelum cetak, lalu kembali ke tampilan
+      berhalaman setelahnya).
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
+/* v336 -- Menu Rekap Pesanan: kolom pencarian nama sekarang juga
+   mencocokkan nama alias (nama lama), sama pola dgn Follow Up. Pakai
+   rkAliasLookup yang SUDAH ADA, tidak ada perubahan Worker. SENGAJA
+   TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup
+   "Perbarui Sekarang"). */
+/* v335 -- Menu Follow Up: kolom pencarian nama sekarang juga mencocokkan
+   nama alias (nama lama), bukan cuma nama aktif customer. Pakai
+   fuAliasLookup yang SUDAH ADA, tidak ada perubahan Worker. SENGAJA
+   TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup
+   "Perbarui Sekarang"). */
+/* v334 -- Baris "↳ dulu: ..." di dropdown saran nama popup "Kirim ke
+   Grup Telegram" dihapus lagi -- dinilai ambigu di konteks pencocokan
+   substring. Kotak peringatan alias (exact-match) TIDAK berubah, tetap
+   ada. Dropdown saran nama di Master Nama sendiri juga tidak berubah.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
+/* v333 -- Teks "A.N." pada info Dropship dikembalikan jadi "a.n." (huruf
+   kecil seperti semula) di badge kartu mobile Rekap Pesanan & tooltip
+   tabel desktop. Worker_Rincian_Pemesanan.js juga ikut dikembalikan
+   (caption "a.n." yang dikirim ke grup Telegram) -- perlu deploy ulang
+   Worker terpisah. SENGAJA TIDAK dipaksa (bukan darurat/keamanan) --
+   pakai alur normal (popup "Perbarui Sekarang"). */
+/* v332 -- Teks "a.n." pada info Dropship diseragamkan jadi "A.N." di
+   badge kartu mobile Rekap Pesanan & tooltip tabel desktop. Worker_
+   Rincian_Pemesanan.js juga ikut diubah (caption "A.N." yang dikirim ke
+   grup Telegram) -- perlu deploy ulang Worker terpisah. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
+/* v331 -- Rekap Pesanan (kartu mobile): badge "📦 Dropship" sekarang
+   menampilkan nama penerima langsung di badge-nya ("📦 Dropship · a.n.
+   {nama}"), bukan cuma badge polos. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang"). */
+/* v330 -- 2 perubahan:
+   1) Master Nama: keterangan "Tekan Enter untuk simpan" muncul begitu
+      mode edit/tambah alias aktif (baik lewat ketuk teks alias maupun
+      tombol "+ Tambah").
+   2) Nama alias (nama lama) sekarang ikut ditampilkan di 4 tempat baru:
+      Rekap Pesanan (tabel & kartu mobile), popup "Perlu Dihubungi",
+      subtitle popup "Riwayat Pembelian", dan dropdown saran nama di
+      popup Kirim ke Grup Telegram + Master Nama sendiri. Semua pakai
+      endpoint /customer-names yang SUDAH ADA, 0 endpoint baru.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
+/* v329 -- Menu Follow Up: nama alias (nama lama) sekarang ditampilkan
+   di tabel desktop, kartu mobile, dan popup Detail Customer -- baris
+   kecil "↳ dulu: ..." di bawah nama kalau customer itu tercatat punya
+   alias di Master Nama. Dipakai endpoint yang SUDAH ADA (/customer-
+   names), dimuat lepas (tidak menghambat tabel utama), tidak ada
+   perubahan Worker. SENGAJA TIDAK dipaksa (bukan darurat/keamanan) --
+   pakai alur normal (popup "Perbarui Sekarang"). */
+/* v328 -- Master Nama Pelanggan: tombol baru "+ Tambah" di sebelah chip
+   nama lama -- sekarang bisa tambah alias secara manual kapan saja,
+   tidak perlu nunggu kartu saran ketidaksinkronan. Pakai endpoint yang
+   SUDAH ADA (POST /customer-names/add-alias, sama dgn tombol "🔄
+   Sinkronkan"), tidak ada perubahan Worker. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang"). */
+/* v327 -- Menu Follow Up, popup Detail Customer Bagian C: label "kali
+   order" pada kartu "Jumlah order prediksi" diganti jadi "kali order
+   lagi" supaya jelas ini proyeksi order KE DEPAN, bukan total order yang
+   sudah terjadi. Perubahan teks murni, tidak ada perubahan logika.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
+/* v326 -- Menu Follow Up: bagian "Riwayat Order Lunas" di popup Detail
+   Customer (daftar tanggal + qty tiap order) disembunyikan atas
+   permintaan user. Bagian A/B/C dan Grafik Riwayat tidak terpengaruh --
+   masih pakai data r.riwayat yang sama seperti sebelumnya. SENGAJA TIDAK
+   dipaksa (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
+/* v325 -- Master Nama Pelanggan: nama alias (nama lama) sekarang bisa
+   diedit di tempat, bukan cuma dihapus. Ketuk teks alias di chip (garis
+   putus-putus di bawahnya) -> jadi input kecil, Enter/blur = simpan lewat
+   endpoint BARU POST /customer-names/edit-alias (Worker_Rincian_
+   Pemesanan.js), Escape = batal. Endpoint baru ini rename 1 alias di
+   tempat (bukan hapus+tambah) supaya atomik. SENGAJA TIDAK dipaksa
+   (bukan darurat/keamanan) -- pakai alur normal (popup "Perbarui
+   Sekarang"). */
+/* v324 -- Popup "Kirim ke Grup Telegram" (index.html):
+   1) Fitur baru: peringatan nama lama/alias -- kalau nama yang diketik
+      persis sama dgn alias tercatat (customer sudah ganti nama lewat
+      "Sinkronkan Nama Customer"), muncul kotak kuning + tombol "Pakai
+      nama baru". Data alias diambil dari field `customers` yang SUDAH
+      dikirim GET /customer-names (endpoint lama, tidak ada endpoint
+      baru/perubahan Worker).
+   2) Kotak "Customer ini kemungkinan sudah terdaftar" sekarang punya
+      tombol "Pakai nama ini".
+   3) Perbaikan bug: kedua kotak peringatan di atas sekarang gantian
+      tampil dgn dropdown saran nama (dropdown diprioritaskan selagi
+      terbuka), supaya tidak saling menutupi lagi.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
+/* v323 -- Label field "Nama Penerima" di popup Dropship (Kirim ke Grup
+   Telegram) diganti jadi "Nama Penerima Dropship" -- perubahan teks
+   murni, tidak ada perubahan logika. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang"). */
+/* v322 -- 2 perubahan di index.html:
+   1) Popup "Kirim ke Grup Telegram" -- preview "Dikirim sebagai" sekarang
+      resolve ke username/nama tampilan Telegram asli (lewat endpoint
+      /resolve-sender yang sudah ada di worker), bukan angka ID mentah
+      lagi. Tombol "Ubah" di sebelahnya dihapus (pengaturan ID Telegram
+      tetap bisa lewat menu "ID Telegram Saya" di footer).
+   2) Field "Nama CS" di form Edit Master Nama Pelanggan -- rekomendasi
+      diganti dari <datalist> bawaan browser jadi dropdown kustom sendiri
+      (pola & styling SAMA PERSIS dgn dropdown "Nama Customer" yang sudah
+      ada), supaya tampilannya konsisten di semua perangkat/browser.
+   SENGAJA TIDAK dipaksa (bukan darurat/keamanan) -- pakai alur normal
+   (popup "Perbarui Sekarang"). */
 /* v321 -- Rekap Pesanan: urutan default sekarang berdasarkan AKTIVITAS
    TERAKHIR (lastActivityAt -- field yang sudah lama ada & otomatis
    ke-update tiap ada perubahan pesanan: bukti transfer masuk, status
