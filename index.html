@@ -6108,7 +6108,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.55.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.57.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6351,7 +6351,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.55.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.57.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Dropdown saran nama (Kirim ke Grup Telegram) sekarang ikut mencari nama LAMA (alias)</b> — sebelumnya kalau CS ketik nama lama customer, dropdown diam total walau nama itu sudah terdaftar sebagai alias. Sekarang tetap muncul, dengan penanda jelas berwarna "⚠️ [nama yang diketik] adalah nama LAMA — nama aktifnya sekarang ini" supaya CS tidak salah kira itu customer baru.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.56.0</div>
+          <ul>
+            <li><b>Perbaikan: peringatan "Customer ini kemungkinan sudah terdaftar"</b> — sebelumnya bisa salah alarm kalau 2 customer beda nama tapi kebetulan sekota (mis. "Nurul (Surabaya)" dianggap mirip "Vivie (Surabaya)" cuma karena sama-sama "(Surabaya)"). Sekarang bagian kota dalam kurung tidak ikut dibandingkan — yang dicek murni bagian nama-nya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.55.0</div>
           <ul>
             <li><b>Notifikasi Follow Up ke CS: orang yang nyambi Logistik tetap dapat DM</b> — sebelumnya siapa pun di Daftar CS yang ID Telegram-nya juga terdaftar di Daftar Logistik otomatis dikecualikan. Sekarang khusus fitur ini, semua orang di Daftar CS dapat DM-nya, terlepas dia juga terdaftar di Daftar Logistik atau tidak.</li>
           </ul>
@@ -9382,15 +9394,30 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     }
     return false;
   }
+  // PERBAIKAN (laporan "kenapa VIVIE (SURABAYA) muncul buat NURUL
+  // (SURABAYA)?") -- hasIdenticalRun SEBELUMNYA dijalankan ke nama UTUH
+  // termasuk kota dalam kurung. Karena banyak customer 1 kota yang sama
+  // (mis. "(SURABAYA)"), bagian KOTA itu sendiri sudah >= 9 karakter --
+  // jadi 2 customer dengan NAMA yang SAMA SEKALI BEDA (Nurul vs Vivie)
+  // ke-flag "mirip" cuma krn kebetulan sekota, bagian nama aslinya tidak
+  // pernah benar2 dibandingkan. Sekarang bagian kota (" (...)" di akhir,
+  // ditutup ATAU BELUM -- CS mungkin belum selesai ngetik) dibuang DULU
+  // sebelum dicari kecocokan 9-karakternya -- yang dibandingkan sekarang
+  // murni bagian NAMA-nya saja.
+  function stripCityForDupCheck(s){
+    return s.replace(/\s*\([^)]*\)?\s*$/, "").trim();
+  }
   function findRegisteredNameMatch(query){
     // Spasi berlebih dirapikan dulu (mis. "BU   WIWIK" vs "BU WIWIK")
     // supaya perbedaan spasi tidak bikin jendela 9-karakternya geser dan
     // gagal ketemu padahal isinya sama.
-    const q = query.trim().toUpperCase().replace(/\s+/g, " ");
+    const qFull = query.trim().toUpperCase().replace(/\s+/g, " ");
+    const q = stripCityForDupCheck(qFull);
     if(q.length < DUP_MATCH_LEN) return null;
     for(const raw of nameHistory){
-      const clean = stripNewTag(raw).toUpperCase().replace(/\s+/g, " ");
-      if(!clean) continue;
+      const cleanFull = stripNewTag(raw).toUpperCase().replace(/\s+/g, " ");
+      if(!cleanFull) continue;
+      const clean = stripCityForDupCheck(cleanFull);
       if(hasIdenticalRun(q, clean, DUP_MATCH_LEN)) return stripNewTag(raw);
     }
     return null;
@@ -9471,33 +9498,45 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     if(q.length < 1){ hideSuggestions(); return; }
     const seen = new Set();
     const matches = [];
-    // PERBAIKAN (permintaan "munculkan lagi alias di dropdown ini, tapi
-    // benar") -- SEBELUMNYA sumbernya `nameHistory` (daftar nama flat,
-    // sekadar teks) -- itulah AKAR masalah kenapa baris "↳ dulu: ..."
-    // pernah dicabut lagi: karena sumbernya cuma teks, alias yang
-    // ditampilkan harus dicari lewat lookup TERPISAH yang gampang salah
-    // sambung ke record yang salah kalau ada 2+ nama mengandung substring
-    // yang sama. Sekarang sumbernya `customerRecords` (objek LENGKAP
-    // {name, cs, aliases[]} -- SAMA PERSIS dgn yang dipakai dropdown Master
-    // Nama/Rekap Pesanan/Follow Up, yang sudah lama aman menampilkan
-    // "↳ dulu:") -- setiap alias yang tampil di sini DIJAMIN menempel ke
-    // record customer yang memang cocok, karena datang dari FIELD alias
-    // milik record itu sendiri, bukan hasil lookup nebak-nebak lagi.
+    // PERBAIKAN (permintaan "munculkan nama alias di field ini, tapi CS
+    // harus tahu itu nama alias") -- SEBELUMNYA pencarian cuma mencocokkan
+    // `rec.name` (nama AKTIF) -- kalau CS ketik nama LAMA/alias (mis.
+    // "NURUL", yang sekarang jadi alias "BISMA BRAWIJAYA (MALANG)"),
+    // dropdown ini diam total, padahal recordnya ADA, cuma nyantol di
+    // alias-nya. Sekarang `rec.aliases` ikut dicari juga -- kalau yang
+    // cocok BUKAN nama aktif tapi salah satu alias-nya, disimpan di
+    // `matchedAlias` supaya bisa ditandai jelas & beda tampilannya (lihat
+    // rendering di bawah) -- CS harus SADAR ini nama lama, bukan sekadar
+    // tersembunyi jadi kelihatan nama aktifnya doang.
     for(const rec of customerRecords){
       const clean = stripNewTag(rec && rec.name || "");
-      if(!clean || !clean.toUpperCase().includes(q)) continue;
+      if(!clean) continue;
       const key = clean.toUpperCase();
       if(seen.has(key)) continue;
+      const aliases = Array.isArray(rec.aliases) ? rec.aliases : [];
+      const nameMatches = key.includes(q);
+      const matchedAlias = !nameMatches
+        ? aliases.find(a=> stripNewTag(a).toUpperCase().includes(q))
+        : null;
+      if(!nameMatches && !matchedAlias) continue;
       seen.add(key);
-      matches.push({ name: clean, aliases: Array.isArray(rec.aliases) ? rec.aliases : [] });
+      matches.push({ name: clean, aliases, matchedAlias: matchedAlias ? stripNewTag(matchedAlias) : null });
       if(matches.length >= 6) break;
     }
     if(!matches.length){ hideSuggestions(); return; }
     suggestBox.innerHTML = matches.map(m=>{
-      const aliasSub = m.aliases.length
+      // BARU -- kalau yang cocok itu ALIAS (bukan nama aktif), tampilkan
+      // penanda MENCOLOK (warna beda, bukan abu-abu polos spt "↳ dulu:")
+      // supaya CS langsung sadar: "yang saya ketik itu nama LAMA, nama
+      // aktifnya sekarang beda" -- bukan cuma info kecil yang gampang
+      // kelewat.
+      const aliasFlag = m.matchedAlias
+        ? `<div style="font-size:10.5px;color:#8a6d1a;background:#fff8e1;border-radius:5px;padding:2px 6px;margin-top:3px;display:inline-block;">⚠️ "${escHtml(m.matchedAlias)}" adalah nama LAMA -- nama aktifnya sekarang ini</div>`
+        : "";
+      const aliasSub = (!m.matchedAlias && m.aliases.length)
         ? `<div style="font-size:10.5px;color:var(--ink-soft);margin-top:2px;">↳ dulu: ${escHtml(m.aliases.join(", "))}</div>`
         : "";
-      return `<div class="kt-suggest-item" style="padding:10px 12px;cursor:pointer;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--line);">${m.name}${aliasSub}</div>`;
+      return `<div class="kt-suggest-item" style="padding:10px 12px;cursor:pointer;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--line);">${m.name}${aliasFlag}${aliasSub}</div>`;
     }).join("");
     suggestBox.hidden = false;
     Array.from(suggestBox.children).forEach((el, i)=>{

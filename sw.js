@@ -4,8 +4,14 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v346";
+const CACHE_VERSION = "v348";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v348 -- Dropdown saran nama (Kirim ke Grup Telegram) sekarang ikut
+   mencari nama LAMA/alias, dengan penanda jelas biar CS tahu itu bukan
+   nama aktif. */
+/* v347 -- Perbaikan false-positive di peringatan "Customer ini kemungkinan
+   sudah terdaftar" (Kirim ke Grup Telegram) -- bagian kota dalam kurung
+   tidak lagi ikut dibandingkan, cuma bagian nama. */
 /* v346 -- Notifikasi Follow Up ke CS: pengecualian overlap Daftar
    Logistik dihapus khusus di fitur ini -- lihat perbaikan di
    Worker_Rincian_Pemesanan.js (checkFollowUpDmNotif). */
