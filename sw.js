@@ -4,8 +4,12 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v352";
+const CACHE_VERSION = "v353";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v353 -- Fitur baru: kolom "Probabilitas Masih Aktif" di Follow Up,
+   model statistik BG/NBD (Fader-Hardie-Lee 2005), TERPISAH dari prediksi
+   median gap yang sudah ada (tidak diubah). Lihat computeFollowUpData di
+   Worker_Rincian_Pemesanan.js. */
 /* v352 -- Badge "adalah nama LAMA" di dropdown Kirim ke Grup Telegram:
    latar jadi hijau pudar, nama yang diketik ditebalkan. */
 /* v351 -- Fitur baru: dialog "Kirim Sebelum Lunas / Setelah Lunas" saat
