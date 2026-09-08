@@ -4,8 +4,13 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v350";
+const CACHE_VERSION = "v351";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v351 -- Fitur baru: dialog "Kirim Sebelum Lunas / Setelah Lunas" saat
+   checkbox "Pesan u/ Inventory" dicentang. Notifikasi resmi "siap
+   diproses" ke Logistik TIDAK berubah sama sekali (tetap nunggu ACC
+   Finance) -- ini cuma tambahan opsional. Lihat sendRincianToGroup di
+   Worker_Rincian_Pemesanan.js. */
 /* v350 -- Follow Up: indikator keyakinan prediksi (tinggi/sedang/rendah)
    berdasar konsistensi histori gap tiap customer -- rumus median TIDAK
    diubah (sudah dikonfirmasi dekat-optimal lewat backtest), murni

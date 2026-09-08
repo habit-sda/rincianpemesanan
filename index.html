@@ -6108,7 +6108,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.59.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.60.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6351,7 +6351,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.59.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.60.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Fitur baru: kirim pesan Inventory sebelum Lunas</b> — kalau checkbox "Pesan u/ Inventory" dicentang saat kirim nota, muncul pilihan "Kirim Sebelum Lunas" (Logistik langsung dapat notifikasi persiapan stok — dengan penanda jelas "BELUM Lunas, JANGAN kirim barang dulu") atau "Kirim Setelah Lunas" (perilaku biasa, menunggu ACC Finance). Notifikasi resmi "siap diproses" tetap selalu terkirim terpisah begitu pesanan benar-benar Lunas, apa pun pilihannya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.59.0</div>
           <ul>
             <li><b>Follow Up: indikator keyakinan prediksi</b> — berdasarkan analisis backtest ke data riwayat penjualan (129 customer, 5 metode dibandingkan), median tetap jadi metode terbaik (tidak diubah). Tapi karena histori order sebagian customer memang tidak konsisten (bukan salah sistem), sekarang ditambahkan label "Keyakinan: tinggi/sedang/rendah" — dan tanggal prediksi diberi awalan "≈" kalau keyakinannya bukan tinggi, supaya tidak dikira tanggal pasti.</li>
           </ul>
@@ -9881,6 +9887,34 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
   window.__openKirimTelegramModal = openModal;
 
+  // BARU (permintaan "dialog kirim pesan inventory sebelum/ketika Lunas")
+  // -- overlay kecil bikinan sendiri (bukan confirm() bawaan browser,
+  // supaya gaya tombolnya konsisten dgn app), muncul HANYA kalau checkbox
+  // "Pesan u/ Inventory" dicentang & isinya terisi. Balikin Promise<boolean>
+  // -- true = "sebelum Lunas" (kirim notif persiapan SEKARANG JUGA), false
+  // = "ketika Lunas" (perilaku LAMA/biasa, tunggu Finance approve). Ikon
+  // ✕ / klik di luar kotak = default ke false (paling aman, sama seperti
+  // sebelum fitur ini ada -- tidak pernah diam-diam pilih opsi baru).
+  function askInventoryTiming(){
+    return new Promise((resolve)=>{
+      const overlay = document.createElement("div");
+      overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;";
+      overlay.innerHTML = `
+        <div style="background:var(--card);border-radius:14px;padding:18px;max-width:360px;width:100%;">
+          <h3 style="margin:0 0 8px;font-size:15px;">Pesan Inventory dikirim kapan?</h3>
+          <p style="margin:0 0 14px;font-size:12.5px;color:var(--ink-soft);line-height:1.5;">Kalau Logistik perlu siap-siap stok dari sekarang, pilih Sebelum Lunas. Notifikasi resmi tetap akan dikirim lagi nanti begitu pesanan ini benar-benar Lunas.</p>
+          <button type="button" data-choice="sebelum" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#fff8e1;color:#8a6d1a;font-weight:700;font-size:13px;margin-bottom:8px;cursor:pointer;">Kirim Sebelum Lunas</button>
+          <button type="button" data-choice="ketika" style="width:100%;padding:10px;border-radius:10px;border:none;background:var(--primary-green);color:#fff;font-weight:700;font-size:13px;cursor:pointer;">Kirim Setelah Lunas</button>
+        </div>`;
+      overlay.addEventListener("click", (e)=>{
+        const choice = e.target && e.target.getAttribute && e.target.getAttribute("data-choice");
+        if(choice){ overlay.remove(); resolve(choice === "sebelum"); }
+        else if(e.target === overlay){ overlay.remove(); resolve(false); } // klik luar kotak = default aman
+      });
+      document.body.appendChild(overlay);
+    });
+  }
+
   btnSend.addEventListener("click", async ()=>{
     // BARU -- sama seperti autosaveDraft(): buang "NEW" sebelum benar-benar
     // dikirim & tersimpan, supaya tidak nempel permanen di nama customer.
@@ -9906,6 +9940,15 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       statusEl.textContent = "URL worker belum diatur di kode (MASTER_DATA_WORKER_URL).";
       statusEl.style.color = "var(--danger-red)";
       return;
+    }
+
+    // BARU -- dialog "kirim sebelum/ketika Lunas", CUMA muncul kalau
+    // checkbox "Pesan u/ Inventory" dicentang & isinya terisi (kalau
+    // tidak, sendInventoryNotifNow tetap false -- 0 perubahan perilaku
+    // dari sebelum fitur ini ada).
+    let sendInventoryNotifNow = false;
+    if(keteranganCheck && keteranganCheck.checked && keteranganInput && keteranganInput.value.trim()){
+      sendInventoryNotifNow = await askInventoryTiming();
     }
 
     revisiPicker.hidden = true; // sembunyikan picker (TANPA hapus pendingRevisiTargetMessageId kalau user baru pilih)
@@ -9953,6 +9996,11 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         // bebas, bukan nama.
         keteranganTambahan: (keteranganCheck && keteranganCheck.checked && keteranganInput)
           ? keteranganInput.value.trim() : "",
+        // BARU -- hasil pilihan dialog di atas (sudah ditanya SEBELUM
+        // fetch ini dimulai). false kalau dialog tidak pernah muncul
+        // (checkbox tidak dicentang) -- server memperlakukan itu identik
+        // dgn perilaku lama (tunggu Finance approve).
+        sendInventoryNotifNow,
       });
 
       // BARU -- teks status beda tergantung jalurnya, supaya CS tahu apa
