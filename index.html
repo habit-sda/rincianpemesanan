@@ -6108,7 +6108,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.57.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.59.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6351,7 +6351,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.57.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.59.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Follow Up: indikator keyakinan prediksi</b> — berdasarkan analisis backtest ke data riwayat penjualan (129 customer, 5 metode dibandingkan), median tetap jadi metode terbaik (tidak diubah). Tapi karena histori order sebagian customer memang tidak konsisten (bukan salah sistem), sekarang ditambahkan label "Keyakinan: tinggi/sedang/rendah" — dan tanggal prediksi diberi awalan "≈" kalau keyakinannya bukan tinggi, supaya tidak dikira tanggal pasti.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.58.0</div>
+          <ul>
+            <li><b>Perbaikan label kolom Follow Up</b> — kolom "Rata Jarak" di tabel Follow Up sebenarnya menampilkan MEDIAN jarak antar order (bukan rata-rata/mean), sesuai yang dipakai untuk prediksi. Namanya diganti jadi "Median Jarak" supaya tidak terlihat beda angka dengan "Rata-rata Gap" di popup Riwayat Pembelian (yang memang mean sungguhan) — tidak ada angka atau logika prediksi yang berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.57.0</div>
           <ul>
             <li><b>Dropdown saran nama (Kirim ke Grup Telegram) sekarang ikut mencari nama LAMA (alias)</b> — sebelumnya kalau CS ketik nama lama customer, dropdown diam total walau nama itu sudah terdaftar sebagai alias. Sekarang tetap muncul, dengan penanda jelas berwarna "⚠️ [nama yang diketik] adalah nama LAMA — nama aktifnya sekarang ini" supaya CS tidak salah kira itu customer baru.</li>
           </ul>
@@ -17579,7 +17591,7 @@ if ("serviceWorker" in navigator) {
 
     let html = "<thead><tr>" +
       th("Customer", "220px", "nm") + th("CS", "100px") +
-      th("Order Pertama", "100px") + th("Order Terakhir", "100px") + th("Rata Jarak", "90px") +
+      th("Order Pertama", "100px") + th("Order Terakhir", "100px") + th("Median Jarak", "90px") +
       th("Prediksi Berikutnya", "110px") + th("Sisa", "90px") + th("Status", "140px") + th("Qty Rata²", "70px") +
       "</tr></thead><tbody>";
 
@@ -17588,12 +17600,21 @@ if ("serviceWorker" in navigator) {
     }
 
     rows.forEach(r=>{
+      // BARU -- indikator keyakinan prediksi, dari variasi histori gap
+      // customer itu sendiri (lihat computeFollowUpData). "≈" nempel di
+      // depan tanggal kalau keyakinannya bukan "tinggi" -- biar CS tidak
+      // menganggap tanggal itu pasti, padahal histori order customer ini
+      // sendiri memang naik-turun tidak beraturan.
+      const predPrefix = (r.pred && r.confidence && r.confidence !== "tinggi") ? "≈ " : "";
+      const confBadge = r.confidence
+        ? `<div style="font-size:10px;margin-top:2px;color:${r.confidence==="tinggi"?"var(--text-success)":r.confidence==="sedang"?"var(--text-warning)":"var(--text-danger)"};">Keyakinan: ${r.confidence}</div>`
+        : "";
       html += `<tr data-customer="${escHtml(r.customer)}">` +
         td(escHtml(r.customer) + fuAliasSubline(r.customer), "font-weight:600; white-space:normal; word-break:break-word;", "nm") +
         td(escHtml(r.cs || "-")) +
         td(fmtTgl(r.first)) + td(fmtTgl(r.last)) +
         td(r.medGap!==null ? fmtHari(r.medGap) : "-") +
-        td(r.pred ? fmtTgl(r.pred) : "-") +
+        td((r.pred ? predPrefix + fmtTgl(r.pred) : "-") + confBadge) +
         td(r.sisa!==null ? fmtHari(r.sisa) : "-") +
         td(`<span class="fu-badge ${r.cls}">${escHtml(r.status)}</span>`) +
         td(r.avgQty, "text-align:center;") +
@@ -17641,6 +17662,10 @@ if ("serviceWorker" in navigator) {
       ["Rata-Rata Gap (hari)", r.avgGap!==null ? fmtHari(r.avgGap) : "-", false],
       ["Median Gap (hari) ⭐", r.medGap!==null ? fmtHari(r.medGap) : "-", true],
       ["Rata-Rata Qty/Order", `${r.avgQty}`, false],
+      // BARU -- keyakinan prediksi, dari variasi (CV) histori gap customer
+      // ini sendiri. Nilai CV mentahnya diikutkan di kurung buat yang mau
+      // lihat angka pastinya, bukan cuma label.
+      ["Keyakinan Prediksi", r.confidence ? `${r.confidence}${r.gapCV!==null ? ` (CV ${r.gapCV})` : ""}` : "Belum cukup data", false],
     ];
     const tblAHtml = rowsA.map(([l,v,hl])=>
       `<tr class="${hl?"hl":""}"><td>${l}</td><td>${v}</td></tr>`

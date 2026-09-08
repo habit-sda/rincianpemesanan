@@ -4,8 +4,16 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v348";
+const CACHE_VERSION = "v350";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v350 -- Follow Up: indikator keyakinan prediksi (tinggi/sedang/rendah)
+   berdasar konsistensi histori gap tiap customer -- rumus median TIDAK
+   diubah (sudah dikonfirmasi dekat-optimal lewat backtest), murni
+   tambahan transparansi. Lihat computeFollowUpData di
+   Worker_Rincian_Pemesanan.js. */
+/* v349 -- Follow Up: label kolom "Rata Jarak" diganti jadi "Median Jarak"
+   (isinya memang median, bukan mean -- tidak ada logika/angka yang
+   berubah, murni perbaikan label). */
 /* v348 -- Dropdown saran nama (Kirim ke Grup Telegram) sekarang ikut
    mencari nama LAMA/alias, dengan penanda jelas biar CS tahu itu bukan
    nama aktif. */
