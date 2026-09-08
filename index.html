@@ -6108,7 +6108,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.60.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.61.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6351,7 +6351,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.60.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.61.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan tampilan badge nama lama</b> — badge "adalah nama LAMA" di dropdown Kirim ke Grup Telegram sekarang latar hijau pudar (bukan kuning), dan nama yang diketik ditebalkan supaya lebih mudah dibaca sekilas.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.60.0</div>
           <ul>
             <li><b>Fitur baru: kirim pesan Inventory sebelum Lunas</b> — kalau checkbox "Pesan u/ Inventory" dicentang saat kirim nota, muncul pilihan "Kirim Sebelum Lunas" (Logistik langsung dapat notifikasi persiapan stok — dengan penanda jelas "BELUM Lunas, JANGAN kirim barang dulu") atau "Kirim Setelah Lunas" (perilaku biasa, menunggu ACC Finance). Notifikasi resmi "siap diproses" tetap selalu terkirim terpisah begitu pesanan benar-benar Lunas, apa pun pilihannya.</li>
           </ul>
@@ -9549,7 +9555,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       // aktifnya sekarang beda" -- bukan cuma info kecil yang gampang
       // kelewat.
       const aliasFlag = m.matchedAlias
-        ? `<div style="font-size:10.5px;color:#8a6d1a;background:#fff8e1;border-radius:5px;padding:2px 6px;margin-top:3px;display:inline-block;">⚠️ "${escHtml(m.matchedAlias)}" adalah nama LAMA -- nama aktifnya sekarang ini</div>`
+        ? `<div style="font-size:10.5px;color:#1c7a4d;background:#e6f7ed;border-radius:5px;padding:2px 6px;margin-top:3px;display:inline-block;">⚠️ <b>"${escHtml(m.matchedAlias)}"</b> adalah nama LAMA -- nama aktifnya sekarang ini</div>`
         : "";
       const aliasSub = (!m.matchedAlias && m.aliases.length)
         ? `<div style="font-size:10.5px;color:var(--ink-soft);margin-top:2px;">↳ dulu: ${escHtml(m.aliases.join(", "))}</div>`

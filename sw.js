@@ -4,8 +4,10 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v351";
+const CACHE_VERSION = "v352";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v352 -- Badge "adalah nama LAMA" di dropdown Kirim ke Grup Telegram:
+   latar jadi hijau pudar, nama yang diketik ditebalkan. */
 /* v351 -- Fitur baru: dialog "Kirim Sebelum Lunas / Setelah Lunas" saat
    checkbox "Pesan u/ Inventory" dicentang. Notifikasi resmi "siap
    diproses" ke Logistik TIDAK berubah sama sekali (tetap nunggu ACC
