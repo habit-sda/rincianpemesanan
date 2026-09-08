@@ -108,53 +108,6 @@
   })();
 </script>
 
-<script>
-  /* ============================================================
-     PENCATAT TAMPILAN TERAKHIR (biar F5/reload tidak selalu balik
-     paksa ke Beranda/Dashboard).
-     Navigasi Beranda<->Wizard<->Rekap Pesanan<->Follow Up di app ini
-     sudah pakai history.pushState/replaceState dengan objek
-     {view:...}, tapi itu cuma hidup di riwayat browser sesi
-     berjalan -- begitu di-reload, script jalan dari awal dan SELALU
-     di-set balik ke {view:"home"} (lihat modul wizard). Blok ini
-     menumpang di pola pushState/replaceState yang SUDAH ADA (tanpa
-     ubah satu-satu titik pemanggilnya di seluruh file): setiap kali
-     dipanggil dengan state ber-properti "view", disalin juga ke
-     localStorage. window.__initialLastView menyimpan nilai SEBELUM
-     sempat ditimpa replaceState({view:"home"}) awal tadi -- dipakai
-     blok pemulihan di paling akhir <body> (setelah semua modul
-     Wizard/Rekap Pesanan/Follow Up selesai didefinisikan).
-     ============================================================ */
-  (function(){
-    const KEY = "notaHalawa_lastView";
-    let initial = null;
-    try{
-      const raw = localStorage.getItem(KEY);
-      if(raw) initial = JSON.parse(raw);
-    }catch(e){ /* localStorage tidak tersedia/rusak -- abaikan, fallback tetap ke Beranda */ }
-    window.__initialLastView = initial;
-
-    function save(state){
-      try{
-        if(state && typeof state === "object" && state.view){
-          localStorage.setItem(KEY, JSON.stringify(state));
-        }
-      }catch(e){ /* mode privat/kuota penuh -- abaikan, fitur ini sengaja tidak kritis */ }
-    }
-    const origPush = history.pushState.bind(history);
-    const origReplace = history.replaceState.bind(history);
-    history.pushState = function(state, title, url){
-      save(state);
-      return origPush(state, title, url);
-    };
-    history.replaceState = function(state, title, url){
-      save(state);
-      return origReplace(state, title, url);
-    };
-    window.addEventListener("popstate", function(e){ save(e.state); });
-  })();
-</script>
-
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00845f">
@@ -2381,11 +2334,6 @@
   .md-nama-alias-label{font-size:10.5px;color:var(--ink-soft);margin-right:2px;}
   .md-alias-chip{display:inline-flex;align-items:center;gap:5px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px 6px 3px 10px;font-size:11.5px;color:var(--ink-soft);}
   .md-alias-chip button{border:none;background:none;color:var(--danger-red);cursor:pointer;font-size:12px;padding:0 2px;line-height:1;}
-  .md-alias-text{cursor:text;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--ink-soft);text-underline-offset:2px;}
-  .md-alias-edit-input{height:24px;font-size:11.5px;border:1px solid var(--primary-green);border-radius:6px;padding:0 6px;width:130px;text-transform:uppercase;}
-  .md-alias-edit-hint{font-size:10px;color:var(--ink-soft);margin-left:6px;white-space:nowrap;}
-  .md-alias-add-btn{display:inline-flex;align-items:center;background:none;border:1px dashed var(--line);border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--primary-green);cursor:pointer;}
-  .md-alias-add-btn:hover{border-color:var(--primary-green);background:var(--paper);}
   /* BARU -- dropdown saran nama customer (kustom, BUKAN <datalist> bawaan
      browser) dipakai di field "Nama Customer" saat edit baris Master Nama.
      Muncul begitu field diklik/diketik, menampilkan nama-nama customer lain
@@ -2400,14 +2348,6 @@
   .md-nama-cust-suggest-item .txt b{color:var(--primary-green);}
   .md-nama-cust-suggest-item .cs-tag{flex-shrink:0;font-size:10.5px;color:var(--ink-soft);background:var(--paper);border-radius:999px;padding:2px 8px;}
   .md-nama-cust-suggest-empty{padding:10px 12px;font-size:12.5px;color:var(--ink-soft);text-align:center;}
-  .md-nama-cs-wrap{position:relative;}
-  .md-nama-cs-suggest{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);max-height:230px;overflow-y:auto;padding:6px;}
-  .md-nama-cs-suggest-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--ink);cursor:pointer;}
-  .md-nama-cs-suggest-item:hover,.md-nama-cs-suggest-item.active{background:var(--paper-dark);}
-  .md-nama-cs-suggest-item .ic{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink-soft);}
-  .md-nama-cs-suggest-item .txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .md-nama-cs-suggest-item .txt b{color:var(--primary-green);}
-  .md-nama-cs-suggest-empty{padding:10px 12px;font-size:12.5px;color:var(--ink-soft);text-align:center;}
   .md-nama-suggest-card{border:1px solid #ffd48a;background:#fff8ec;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12.5px;color:var(--ink);}
   .md-nama-suggest-card .row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
   .md-nama-suggest-card .txt{flex:1;min-width:200px;}
@@ -4742,18 +4682,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <select id="rekap-filter-hari" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
         <option value="">Semua Hari</option>
       </select>
-      <!-- BARU -- filter RENTANG tanggal (hari-bulan), terpisah dari dropdown
-           "Semua Hari" di atas (yang cuma bisa pilih 1 hari spesifik).
-           Terapkanfilter() menggabungkan keduanya dgn AND -- kalau dua-duanya
-           diisi sekaligus, hasilnya jadi irisan (biasanya cukup pakai salah
-           satu saja). min/max di-set otomatis dari rentang tanggal yang
-           BENAR-BENAR ada di data (lihat isiUlangDropdownFilter()). -->
-      <div style="display:flex; align-items:center; gap:6px;">
-        <input type="date" id="rekap-filter-hari-dari" title="Dari tanggal" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 8px; font-size:14px;">
-        <span style="color:var(--ink-soft); font-size:13px;">s/d</span>
-        <input type="date" id="rekap-filter-hari-sampai" title="Sampai tanggal" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 8px; font-size:14px;">
-        <button type="button" id="rekap-filter-hari-range-clear" class="md-btn" title="Bersihkan filter rentang tanggal" style="height:44px; padding:0 10px; font-size:13px;">✕</button>
-      </div>
       <!-- BARU -- filter per nama ekspedisi, pola SAMA dgn dropdown CS/
            Status/Hari di sampingnya: opsinya diisi ulang otomatis dari data
            yang benar-benar ada (isiUlangDropdownFilter()), filternya jalan
@@ -4794,11 +4722,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <!-- BARU -- versi kartu utk layar mobile (≤700px), tabel di atas disembunyikan
          lewat CSS & kartu ini yang ditampilkan gantinya (lihat .rekap-mobile-cards). -->
     <div id="rekap-cards" class="rekap-mobile-cards"></div>
-    <!-- BARU -- pagination (25 baris/halaman) supaya daftar tidak memanjang
-         tanpa batas ke bawah -- 1 kontainer dipakai bareng utk tabel desktop
-         maupun kartu mobile (keduanya toggle display lewat CSS yang sama,
-         jadi pagination ini otomatis nempel di bawah versi yang aktif). -->
-    <div id="rekap-pagination" class="md-nama-pagination" style="display:none;"></div>
   </div>
 
   <!-- BARU -- "Follow Up" (F.O/Repeat Order): pola repeat-order per
@@ -5495,7 +5418,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M3 9h18M8 4v16" stroke="var(--primary-green)" stroke-width="1.4"/></svg></div>
           <div class="md-togglerow-text">
             <div class="md-togglerow-label">Aktifkan menu "Rekap Pesanan" di sidebar</div>
-            <div class="md-togglerow-sub">Tabel/kartu rekap 7 hari terakhir (nama customer, CS, varian produk, status, ekspedisi, resi) — tampil di desktop (sidebar, di atas menu Kalkulator) maupun HP (lewat "Aksi cepat" di Beranda). Nonaktif = menunya disembunyikan sepenuhnya dari kedua tempat itu.</div>
+            <div class="md-togglerow-sub">Tabel rekap 7 hari terakhir (nama customer, CS, varian produk, status, ekspedisi, resi) — cuma tampil di versi desktop, di atas menu Kalkulator. Nonaktif = menunya disembunyikan sepenuhnya dari sidebar.</div>
           </div>
           <label class="md-switch">
             <input type="checkbox" id="md-toggle-rekappesanan">
@@ -5505,7 +5428,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="md-togglerow" style="border-top:1px solid var(--line); margin-top:12px; padding-top:12px;">
           <div class="md-togglerow-text">
             <div class="md-togglerow-label">Tampilkan berapa hari terakhir?</div>
-            <div class="md-togglerow-sub">1-25 hari (25 = batas maksimal jendela tampilan ini). Order yang sudah Lunas <b>dan</b> ada resi disimpan 25 hari; order yang belum selesai (belum lunas / resi belum ada) disimpan lebih lama, sampai 90 hari. Data yang sudah kedaluwarsa tidak akan pernah muncul lagi walau angkanya dinaikkan.</div>
+            <div class="md-togglerow-sub">1-25 hari (25 = batas maksimal, sama dengan lama data pesanan tersimpan). Data yang sudah dihapus/kedaluwarsa tidak akan pernah muncul lagi walau angkanya dinaikkan.</div>
           </div>
           <input type="number" id="md-rekappesanan-hari" min="1" max="25" step="1" style="width:70px; height:40px; border:1px solid var(--line); border-radius:8px; padding:0 10px; font-size:15px; text-align:center;">
         </div>
@@ -5970,6 +5893,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
         <div id="md-nama-suggestions"></div>
         <div id="md-nama-cs-suggestions"></div>
+        <datalist id="md-nama-cs-datalist"></datalist>
         <div style="display:flex;gap:8px;margin-bottom:12px;">
           <input type="text" id="md-nama-search" class="md-lock-exempt" placeholder="Cari nama customer/CS..." style="flex:1;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;">
           <button type="button" id="md-nama-toggle-hidden" class="md-lock-exempt" style="flex-shrink:0;height:40px;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:0 14px;font-size:12.5px;cursor:pointer;white-space:nowrap;">🙈 Tersembunyi (<span id="md-nama-hidden-count">0</span>)</button>
@@ -6108,7 +6032,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.52.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.43.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6175,12 +6099,6 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
              sedang diketik punya kemiripan tinggi (9 karakter berurutan yang
              sama) dengan salah satu nama di riwayat Master Nama Pelanggan. -->
         <p id="kt-name-duplicate-warning" class="kt-hint" hidden style="margin-top:8px;background:#fff6e0;border:1px solid #e0a800;border-radius:8px;padding:8px 10px;color:var(--ink);"></p>
-        <!-- BARU -- peringatan nama lama/alias: muncul kalau nama yang
-             diketik PERSIS SAMA dengan salah satu alias (nama lama) di
-             Master Nama, artinya customer ini sudah pernah ganti nama dan
-             sekarang aktif dengan nama lain. Beda dari warning kemiripan
-             di atas (yang cuma "mirip", ini "identik dgn nama lama"). -->
-        <p id="kt-name-alias-warning" class="kt-hint" hidden style="margin-top:8px;background:#fff6e0;border:1px solid #e0a800;border-radius:8px;padding:8px 10px;color:var(--ink);"></p>
         <!-- BARU -- saran ekspedisi berdasarkan riwayat customer ini (GET
              /customer-rate). CUMA muncul kalau ekspedisi tercatat di
              riwayat BEDA dari yang sedang dipilih di form -- kalau sudah
@@ -6195,45 +6113,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <!-- BARU -- Dropship: nota tetap tampil normal, cuma caption di grup
              dapat blok "📦 Dropship / a.n. {Nama Penerima}" tambahan (lihat
              collectNotaPayload & backend sendRincianToGroup). customerName
-             TIDAK pernah diubah oleh field ini -- murni info kirim tambahan.
-             BARU -- disatukan dalam 1 baris flex bareng checkbox Keterangan
-             Tambahan (gap 16px, flex-wrap supaya tetap rapi kalau layar
-             sangat sempit) -- 2 checkbox pendek berdampingan lebih hemat
-             tempat & enak dipindai mata drpd ditumpuk vertikal. -->
-        <div style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px;">
-          <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
-            <input type="checkbox" id="kt-dropship-check" style="margin-top:2px;">
-            <span>📦 Dropship</span>
-          </label>
-          <!-- BARU -- checkbox "Pesan u/ Inventory" (dulu labelnya
-               "Keterangan"): field-nya SENGAJA disembunyikan di belakang
-               checkbox ini (bukan langsung tampil) karena isinya catatan
-               bebas (bisa panjang) -- kalau textarea-nya selalu tampil,
-               popup jadi lebih tinggi dari yang perlu utk pesanan yang
-               memang tidak butuh catatan apa-apa (mayoritas kasus). -->
-          <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
-            <input type="checkbox" id="kt-keterangan-check" style="margin-top:2px;">
-            <span>📝 Pesan u/ Inventory</span>
-          </label>
-        </div>
+             TIDAK pernah diubah oleh field ini -- murni info kirim tambahan. -->
+        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
+          <input type="checkbox" id="kt-dropship-check" style="margin-top:2px;">
+          <span>📦 Dropship</span>
+        </label>
         <div id="kt-dropship-field" hidden style="margin-top:8px;">
-          <label for="kt-dropship-recipient" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Penerima Dropship</label>
-          <input type="text" id="kt-dropship-recipient" class="kt-input" placeholder="Isi nama penerima dropship" autocomplete="off" style="text-transform:uppercase;">
+          <label for="kt-dropship-recipient" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Penerima</label>
+          <input type="text" id="kt-dropship-recipient" class="kt-input" placeholder="Isi nama penerima akhir" autocomplete="off" style="text-transform:uppercase;">
         </div>
-        <!-- BARU -- "Pesan u/ Inventory" (dulu "Keterangan Tambahan"):
-             diisi CS saat bikin Rincian Pemesanan, TIDAK ikut caption/nota
-             (biar tidak bocor ke customer) -- cuma dibaca ulang worker &
-             ditaruh sbg baris terakhir "Pesan dari CS: ..." di DM "siap
-             diproses" ke Logistik (lihat
-             sendRincianToGroup/handleStickerButtonPress). Pakai <textarea>
-             (bukan <input> 1 baris spt Dropship) karena isinya catatan
-             bebas yang bisa lebih dari beberapa kata (mis. instruksi
-             packing/pengiriman khusus). -->
-        <div id="kt-keterangan-field" hidden style="margin-top:8px;">
-          <label for="kt-keterangan-input" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Pesan buat Inventory</label>
-          <textarea id="kt-keterangan-input" class="kt-input" rows="3" placeholder="Tulis pesan buat Inventory di sini, otomatis kekirim ke notifikasi mereka" style="resize:vertical;"></textarea>
-        </div>
-        <p class="kt-hint" style="margin-top:10px;">Dikirim sebagai: <b id="kt-sender-preview">—</b></p>
+        <p class="kt-hint" style="margin-top:10px;">Dikirim sebagai: <b id="kt-sender-preview">—</b> · <button type="button" id="kt-edit-sender" style="background:none;border:none;padding:0;color:var(--primary-green);font-weight:700;text-decoration:underline;cursor:pointer;font-size:11px;">Ubah</button></p>
         <p class="kt-hint" id="kt-status"></p>
       </div>
       <div class="confirm-actionrow">
@@ -6351,116 +6240,9 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.52.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.43.0 <span class="changelog-tag">Sekarang</span></div>
           <ul>
-            <li><b>Menu Rekap Pesanan: filter rentang tanggal (dari-sampai)</b> ditambahkan di sebelah dropdown "Semua Hari" — pilih tanggal awal & akhir untuk melihat pesanan di rentang beberapa hari sekaligus (sebelumnya cuma bisa pilih 1 hari spesifik lewat dropdown). Kalender otomatis dibatasi sesuai rentang tanggal yang benar-benar ada di data, dan ada tombol ✕ untuk membersihkan filter ini dengan cepat.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.51.3</div>
-          <ul>
-            <li><b>Perbaikan bug: popup "Versi Baru Tersedia" bisa muncul berulang-ulang untuk versi yang sama</b> — penyebabnya, sistem mencatat versi sebagai "sudah dilihat" begitu update TERDETEKSI, bukan setelah beneran diterapkan. Kalau reload sempat tidak mulus (banyak tab terbuka, koneksi putus, dll), catatan itu jadi tidak sinkron dengan versi yang benar-benar aktif, sehingga popup yang sama bisa muncul lagi dan lagi. Sekarang catatan itu hanya ditulis berdasarkan versi ASLI yang benar-benar sedang berjalan di halaman, bukan tebakan di awal.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.51.2</div>
-          <ul>
-            <li>Teks pengaturan menu "Rekap Pesanan" di Master Data diperbaiki — sudah tidak akurat lagi soal "cuma tampil di versi desktop" (sekarang juga ada di HP lewat "Aksi cepat"), dan penjelasan retensi data diperjelas: order Lunas + resi ada disimpan 25 hari, order yang belum selesai disimpan sampai 90 hari.</li>
-            <li><b>Rekap Pesanan sekarang dipaginasi</b> (25 baris per halaman, tabel desktop maupun kartu mobile) — tombol "‹ Sebelumnya" / "Selanjutnya ›" muncul otomatis kalau hasil filter lebih dari 25 baris, supaya daftar tidak memanjang tanpa batas ke bawah. Baris TOTAL, ringkasan per-CS/hari/ekspedisi, dan Ekspor CSV/PDF tetap menghitung/menyertakan SEMUA baris hasil filter, bukan cuma halaman yang sedang aktif.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.51.1</div>
-          <ul>
-            <li>Menu Rekap Pesanan: kolom pencarian nama sekarang <b>juga mencocokkan nama alias (nama lama)</b> customer, sama seperti yang sudah diterapkan di Follow Up.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.51.0</div>
-          <ul>
-            <li>Menu Follow Up: kolom pencarian nama sekarang <b>juga mencocokkan nama alias (nama lama)</b> customer, bukan cuma nama aktifnya — CS yang masih ingat nama lama customer tetap ketemu hasilnya.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.50.4</div>
-          <ul>
-            <li>Baris "↳ dulu: ..." di dropdown saran nama popup "Kirim ke Grup Telegram" <b>dihapus lagi</b> — dinilai berpotensi ambigu (bisa terkesan alias milik nama yang cocok, padahal sekadar hasil pencocokan substring). Kotak peringatan alias (muncul kalau nama yang diketik PERSIS SAMA dengan alias tertentu) tidak berubah, tetap ada. Dropdown saran di Master Nama sendiri juga tidak berubah.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.50.3</div>
-          <ul>
-            <li>Teks "A.N." pada info Dropship dikembalikan jadi <b>"a.n."</b> (huruf kecil seperti semula) — di badge kartu mobile Rekap Pesanan, tooltip tabel desktop, dan caption yang dikirim ke grup Telegram.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.50.2</div>
-          <ul>
-            <li>Teks "a.n." pada info Dropship diseragamkan jadi <b>"A.N."</b> (huruf besar) — di badge kartu mobile Rekap Pesanan, tooltip tabel desktop, dan caption yang dikirim ke grup Telegram.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.50.1</div>
-          <ul>
-            <li>Rekap Pesanan (versi kartu mobile): badge <b>"📦 Dropship"</b> sekarang ikut menampilkan nama penerimanya langsung ("📦 Dropship · a.n. {nama}") — sebelumnya nama penerima cuma nongol lewat tooltip yang praktis tidak kebaca di layar sentuh.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.50.0</div>
-          <ul>
-            <li><b>Master Nama: keterangan "Tekan Enter untuk simpan"</b> ditambahkan begitu mode edit/tambah nama alias aktif.</li>
-            <li><b>Nama alias sekarang ikut muncul di 4 tempat baru</b>: Rekap Pesanan (tabel &amp; kartu mobile), popup "📞 Perlu Dihubungi", judul popup "📈 Riwayat Pembelian", serta dropdown saran nama di popup Kirim ke Grup Telegram dan di Master Nama sendiri. Semua pakai baris kecil "↳ dulu: ..." di bawah nama, konsisten dengan yang sudah ada di Follow Up.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.49.0</div>
-          <ul>
-            <li><b>Menu Follow Up: nama alias (nama lama) sekarang ikut ditampilkan</b> — di tabel desktop, kartu mobile, dan popup Detail Customer, muncul baris kecil "↳ dulu: ..." di bawah nama customer kalau customer itu tercatat pernah pakai nama lain di Master Nama. Data diambil dari endpoint yang sudah ada, tidak menambah kuota.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.48.0</div>
-          <ul>
-            <li><b>Master Nama Pelanggan: tombol baru "+ Tambah"</b> di sebelah chip-chip nama lama — sekarang bisa menambahkan alias/nama lama secara manual kapan saja, tidak perlu menunggu kartu saran ketidaksinkronan muncul otomatis dulu.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.47.1</div>
-          <ul>
-            <li>Menu Follow Up — popup Detail Customer, Bagian C: label "kali order" pada kartu "Jumlah order prediksi" diperjelas jadi <b>"kali order lagi"</b>, supaya jelas ini prediksi order KE DEPAN (sisa bulan berjalan), bukan total order yang sudah terjadi.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.47.0</div>
-          <ul>
-            <li>Menu Follow Up — popup "Detail Customer": bagian <b>"Riwayat Order Lunas"</b> (daftar tanggal + qty tiap order) disembunyikan. Bagian A/B/C (parameter, prediksi order berikutnya, prediksi stok) dan Grafik Riwayat tidak berubah, tetap memakai data yang sama seperti biasa.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.46.0</div>
-          <ul>
-            <li><b>Master Nama Pelanggan: nama alias (nama lama) sekarang bisa diedit</b> — sebelumnya cuma bisa dihapus. Ketuk langsung teks nama lama di chip-nya (ditandai garis putus-putus), ubah teksnya, lalu Enter atau ketuk di luar untuk simpan. Tombol ✕ untuk hapus tetap ada seperti biasa.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.45.0</div>
-          <ul>
-            <li><b>Fitur baru: peringatan nama lama (alias)</b> di popup "Kirim ke Grup Telegram" — kalau nama yang diketik CS persis sama dengan nama lama customer (yang sudah pernah diganti lewat "Sinkronkan Nama Customer" di Master Nama), muncul kotak kuning yang bilang nama aktifnya sekarang apa, lengkap tombol "Pakai nama baru" untuk langsung mengisi ulang field.</li>
-            <li><b>Kotak "Customer ini kemungkinan sudah terdaftar"</b> sekarang juga punya tombol "Pakai nama ini" — sebelumnya cuma informasi, sekarang bisa langsung diklik untuk mengisi field dengan nama yang disarankan.</li>
-            <li><b>Perbaikan bug: kotak peringatan tertutup dropdown saran nama</b> — sebelumnya kedua kotak peringatan di atas bisa ketiban dropdown saran nama (tidak kelihatan). Sekarang keduanya gantian: selagi dropdown saran masih terbuka, peringatan disembunyikan dulu; begitu dropdown tertutup (pilih nama / klik di luar), peringatan baru muncul penuh.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.44.0</div>
-          <ul>
-            <li>Label field di popup Dropship diperjelas: <b>"Nama Penerima"</b> diganti jadi <b>"Nama Penerima Dropship"</b> supaya tidak rancu dengan nama customer/kolom lain.</li>
-          </ul>
-        </div>
-        <div class="changelog-item">
-          <div class="changelog-ver">v2.43.0</div>
-          <ul>
-            <li><b>Popup "Kirim ke Grup Telegram": preview "Dikirim sebagai" sekarang tampilkan username/nama Telegram asli</b>, bukan angka ID mentah lagi — tombol "Ubah" di sebelahnya juga dihapus (pengaturan ID Telegram tetap bisa diakses lewat menu "ID Telegram Saya" di footer).</li>
-            <li><b>Field "Nama CS" di form Edit Master Nama sekarang pakai dropdown rekomendasi kustom</b> (desain sendiri, bukan datalist bawaan browser) — tampilannya konsisten di semua perangkat, sama seperti dropdown "Nama Customer" yang sudah ada.</li>
+            <li><b>Rekap Pesanan: badge "diupdate" per field</b> — titik hijau kecil + teks "diupdate" sekarang muncul persis di kolom yang baru berubah (Status, Resi, Invoice, KG, Ekspedisi, atau Varian/Qty), bukan penanda umum di satu tempat. Hilang otomatis 3 jam setelah perubahan.</li>
           </ul>
         </div>
         <div class="changelog-item">
@@ -8951,30 +8733,9 @@ function ensureHtml2Canvas(){
   });
   return _html2canvasLoading;
 }
-// BARU (permintaan "render nota di bawah 1 detik") -- SEBELUMNYA
-// ensureHtml2Canvas() baru dipanggil PERSIS saat CS pertama kali klik
-// Kirim/Unduh/Bagikan (lihat renderCanvas di bawah) -- artinya percobaan
-// render PERTAMA di tiap sesi/tab baru (mis. abis buka app dari homescreen)
-// masih harus nunggu download+parse ~200KB dari cdnjs SEBELUM bisa mulai
-// menggambar nota, walau <link rel="preconnect"> di <head> sudah menyiapkan
-// DNS+TLS lebih awal. Sekarang dipicu SEKALI lagi di sini, saat app selesai
-// dimuat DAN browser sedang idle (requestIdleCallback -- kalau tidak
-// didukung, fallback setTimeout pendek) -- supaya download library ini
-// numpang di waktu browser nganggur, TIDAK bersaing dengan render layar
-// pertama/interaksi awal CS. ensureHtml2Canvas() sendiri sudah aman
-// dipanggil berkali-kali (memo _html2canvasLoading), jadi panggilan dari
-// renderCanvas() nanti otomatis dapat promise yang SAMA / sudah selesai --
-// tidak ada unduhan dobel. Best-effort murni (gagal diam-diam, mis. offline
-// saat app dibuka) -- renderCanvas() TETAP mencoba ulang sendiri seperti
-// biasa kalau ini belum sempat selesai.
-(function schedulePreloadHtml2Canvas(){
-  const start = () => ensureHtml2Canvas().catch(()=>{});
-  if("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 4000 });
-  else setTimeout(start, 1500);
-})();
 function renderCanvas(){
   const run = async () => {
-    const html2canvasReady = ensureHtml2Canvas(); // biasanya SUDAH selesai/lagi jalan dari preload idle di atas -- baris ini cuma jaga-jaga kalau preload itu belum sempat/gagal
+    const html2canvasReady = ensureHtml2Canvas(); // mulai unduh paralel, belum diblokir
     const tab = document.querySelector(".tab-btn.active").dataset.tab;
     const holder = document.getElementById("print-holder");
     const useV2 = getNotaDesignPref() === "baru";
@@ -8982,20 +8743,7 @@ function renderCanvas(){
     // dibangun — ini yang menghilangkan jeda "nunggu foto ke-download"
     // yang sebelumnya bikin Salin/Unduh/Bagikan/Kirim & autosave draft
     // terasa lama (lihat catatan lengkap di ensureProductImagesCached).
-    // BARU -- dijalankan BERSAMAAN (Promise.all) dengan menunggu font
-    // Roboto benar-benar siap (document.fonts.ready), bukan cuma
-    // diasumsikan sudah selesai load dari <link> di <head>. Kalau CS
-    // langsung klik Kirim dalam hitungan detik setelah app dibuka (jaringan
-    // lambat), font Roboto/Roboto Mono mungkin belum sempat kepasang --
-    // tanpa ini, html2canvas bisa menggambar pakai font fallback sesaat
-    // sebelum font asli kepasang, padahal lebar kolom nama produk
-    // (nameColWidth) sudah dihitung di atas asumsi Roboto -- berisiko
-    // teks nabrak kolom Harga di sebelahnya (lihat catatan measureV3NameWidth).
-    // document.fonts.ready HAMPIR SELALU sudah resolved duluan di titik ini
-    // (font di-load sejak <head>, jauh sebelum CS sempat isi form & klik
-    // Kirim), jadi baris ini praktis tidak menambah waktu tunggu nyata.
-    const imgCachePromise = useV2 ? ensureProductImagesCached(getTabProductImageUrls(tab)) : Promise.resolve();
-    await Promise.all([imgCachePromise, document.fonts.ready.catch(()=>{})]);
+    if(useV2) await ensureProductImagesCached(getTabProductImageUrls(tab));
     holder.innerHTML = useV2 ? buildPrintNotaV2(tab) : buildPrintNota(tab);
     // Foto sekarang sudah base64 (data URI) tertanam langsung di HTML kalau
     // sempat ke-cache di atas — tidak perlu nunggu load gambar lagi, jadi
@@ -9214,6 +8962,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   const ekspedisiSuggestEl = document.getElementById("kt-ekspedisi-suggest");
   const statusEl = document.getElementById("kt-status");
   const senderPreview = document.getElementById("kt-sender-preview");
+  const btnEditSender = document.getElementById("kt-edit-sender");
   const btnOpen = document.getElementById("btn-kirim-telegram");
   const btnClose = document.getElementById("kt-close");
   const btnCancel = document.getElementById("kt-cancel");
@@ -9230,55 +8979,6 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       if(!dropshipCheck.checked && dropshipRecipientInput) dropshipRecipientInput.value = "";
     });
   }
-  // BARU -- Keterangan Tambahan (khusus Logistik) -- pola SAMA PERSIS dgn
-  // Dropship di atas: checkbox cuma menampilkan/menyembunyikan field,
-  // dikosongkan lagi begitu di-uncheck (supaya tidak kebawa nyangkut kalau
-  // CS berubah pikiran sebelum kirim).
-  const keteranganCheck = document.getElementById("kt-keterangan-check");
-  const keteranganField = document.getElementById("kt-keterangan-field");
-  const keteranganInput = document.getElementById("kt-keterangan-input");
-  if(keteranganCheck && keteranganField){
-    keteranganCheck.addEventListener("change", ()=>{
-      keteranganField.hidden = !keteranganCheck.checked;
-      if(!keteranganCheck.checked && keteranganInput) keteranganInput.value = "";
-    });
-  }
-  // BARU (Cara A -- "auto-isi Dropship & Pesan u/ Inventory saat Revisi
-  // dicentang") -- begitu checkbox Revisi Pemesanan dicentang (atau nama
-  // customer diedit selagi Revisi sudah tercentang), tanya Worker lewat
-  // /revisi-autofill apakah customer ini punya rincian lama yang MASIH DI
-  // BAWAH 48 JAM -- kalau ada & isinya terisi, langsung isi ulang
-  // checkbox+field Dropship/Pesan u/ Inventory (CS tidak perlu ngetik
-  // ulang). Kalau tidak ada/sudah lewat 48 jam, field DIBIARKAN seperti
-  // sedia kala (tidak dikosongkan paksa -- jaga-jaga CS sudah keburu
-  // ngetik sendiri sebelum hasil autofill ini datang). Debounced 400ms
-  // biar tidak nembak API tiap huruf saat mengetik nama.
-  let revisiAutofillTimer = null;
-  async function checkRevisiAutofill(){
-    if(!revisiCheck || !revisiCheck.checked) return;
-    const nama = nameInput.value.trim();
-    if(!nama || !MASTER_DATA_WORKER_URL) return;
-    try{
-      const res = await fetch(MASTER_DATA_WORKER_URL + "/revisi-autofill?customerName=" + encodeURIComponent(nama), { headers: workerHeaders() });
-      const body = await res.json().catch(()=> ({}));
-      if(body.dropshipRecipient && dropshipCheck && dropshipRecipientInput){
-        dropshipCheck.checked = true;
-        dropshipField.hidden = false;
-        dropshipRecipientInput.value = body.dropshipRecipient;
-        updateSendBtnState();
-      }
-      if(body.keteranganTambahan && keteranganCheck && keteranganInput){
-        keteranganCheck.checked = true;
-        keteranganField.hidden = false;
-        keteranganInput.value = body.keteranganTambahan;
-      }
-    }catch(e){ console.log("Gagal cek auto-isi Revisi:", e); } // best-effort, gagal diam-diam -- CS masih bisa isi manual spt biasa
-  }
-  if(revisiCheck){
-    revisiCheck.addEventListener("change", ()=>{
-      if(revisiCheck.checked) checkRevisiAutofill();
-    });
-  }
   let pendingRevisiTargetMessageId = null; // diisi kalau user sudah pilih dari daftar kandidat (ronde ke-2)
 
   /* ---------- Rekomendasi Nama Customer (riwayat dari server) ----------
@@ -9288,11 +8988,6 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
      itu dibuang dari rekomendasi — soalnya "NEW" cuma berlaku 1x buat
      pesanan pertama. */
   let nameHistory = [];
-  // BARU -- record lengkap Master Nama (name, cs, aliases[]) dari field
-  // `customers` yang SUDAH dikirim /customer-names (dipakai jugadi Master
-  // Nama Pelanggan) -- dipakai khusus utk deteksi alias di atas, TIDAK
-  // menambah panggilan API baru sama sekali.
-  let customerRecords = [];
   // BARU -- true kalau nama yang sedang di field ini didapat dari KLIK
   // kotak rekomendasi (bukan diketik manual) -- dipakai deteksi
   // "customer baru" (kata kunci "NEW" DI AKHIR nama ATAU tidak diklik
@@ -9305,7 +9000,6 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
       const body = await res.json().catch(()=> ({}));
       if(Array.isArray(body.names)) nameHistory = body.names;
-      if(Array.isArray(body.customers)) customerRecords = body.customers;
     }catch(e){ console.log("Gagal ambil riwayat nama customer:", e); }
   }
   function stripNewTag(name){
@@ -9327,35 +9021,6 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
      ketemu dgn cek "includes" biasa. HANYA peringatan, TIDAK memblokir
      apa pun (tidak menonaktifkan tombol kirim, dsb). ---------- */
   const dupWarningEl = document.getElementById("kt-name-duplicate-warning");
-  const aliasWarningEl = document.getElementById("kt-name-alias-warning");
-  // BARU -- tombol "Pakai nama ini"/"Pakai nama baru" di dalam kedua kotak
-  // peringatan ini dirender ulang tiap kali innerHTML-nya diganti, jadi
-  // listener klik-nya dipasang SEKALI lewat delegasi ke elemen induknya
-  // (bukan re-attach tiap render) supaya tidak numpuk/lupa lepas listener.
-  if(dupWarningEl){
-    dupWarningEl.addEventListener("click", (e)=>{
-      const btn = e.target.closest(".kt-warn-use-btn");
-      if(!btn) return;
-      nameInput.value = btn.dataset.useName || "";
-      pickedFromSuggestion = true; // nama dipakai dari saran resmi -> bukan customer baru
-      updateSendBtnState();
-      hideDuplicateWarning();
-      hideAliasWarning();
-      checkEkspedisiSuggestion();
-    });
-  }
-  if(aliasWarningEl){
-    aliasWarningEl.addEventListener("click", (e)=>{
-      const btn = e.target.closest(".kt-warn-use-btn");
-      if(!btn) return;
-      nameInput.value = btn.dataset.useName || "";
-      pickedFromSuggestion = true;
-      updateSendBtnState();
-      hideDuplicateWarning();
-      hideAliasWarning();
-      checkEkspedisiSuggestion();
-    });
-  }
   const DUP_MATCH_LEN = 9;
   function hasIdenticalRun(a, b, len){
     if(a.length < len || b.length < len) return false;
@@ -9400,97 +9065,36 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     if(pickedFromSuggestion){ hideDuplicateWarning(); return; }
     const matched = findRegisteredNameMatch(query);
     if(!matched){ hideDuplicateWarning(); return; }
-    dupWarningEl.innerHTML = `⚠️ Customer ini kemungkinan <b>sudah terdaftar</b> sebagai "${escHtml(matched)}" -- cek dulu sebelum lanjut (cuma peringatan, tidak menghalangi kirim).<br><button type="button" class="kt-warn-use-btn" data-use-name="${escHtml(matched)}" style="margin-top:6px;background:none;border:none;padding:0;color:#8a6d1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:11.5px;">Pakai nama ini</button>`;
+    dupWarningEl.innerHTML = `⚠️ Customer ini kemungkinan <b>sudah terdaftar</b> sebagai "${escHtml(matched)}" -- cek dulu sebelum lanjut (cuma peringatan, tidak menghalangi kirim).`;
     dupWarningEl.hidden = false;
-  }
-
-  /* ---------- BARU -- peringatan nama lama/alias ----------
-     customerRecords (diisi di loadNameHistory dari body.customers, field
-     `aliases` sudah tersedia dari Worker -- lihat Master Nama v2) berisi
-     record { name, cs, aliases[] }. Kalau nama yang diketik PERSIS SAMA
-     (bukan cuma mirip) dengan salah satu `aliases` sebuah record, artinya
-     customer ini sudah pernah ganti nama dan sekarang aktif dgn nama lain
-     (record.name). Beda dari checkDuplicateNameWarning (yang mendeteksi
-     KEMIRIPAN, bukan kecocokan persis ke alias tercatat). ---------- */
-  function hideAliasWarning(){
-    if(!aliasWarningEl) return;
-    aliasWarningEl.hidden = true;
-    aliasWarningEl.innerHTML = "";
-  }
-  function findAliasMatch(query){
-    const q = query.trim().toUpperCase().replace(/\s+/g, " ");
-    if(!q) return null;
-    for(const rec of customerRecords){
-      if(!rec || !Array.isArray(rec.aliases)) continue;
-      const hit = rec.aliases.some(a=> String(a || "").trim().toUpperCase().replace(/\s+/g, " ") === q);
-      if(hit) return rec;
-    }
-    return null;
-  }
-  function checkAliasWarning(query){
-    if(!aliasWarningEl) return;
-    if(pickedFromSuggestion){ hideAliasWarning(); return; }
-    const rec = findAliasMatch(query);
-    if(!rec || !rec.name){ hideAliasWarning(); return; }
-    aliasWarningEl.innerHTML = `⚠️ "${escHtml(query.trim())}" adalah <b>nama lama</b> -- customer ini sekarang terdaftar sebagai "${escHtml(rec.name)}".<br><button type="button" class="kt-warn-use-btn" data-use-name="${escHtml(rec.name)}" style="margin-top:6px;background:none;border:none;padding:0;color:#8a6d1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:11.5px;">Pakai nama baru</button>`;
-    aliasWarningEl.hidden = false;
-  }
-
-  /* ---------- BARU -- cegah 2 kotak peringatan ketutupan dropdown saran
-     ---------- Selagi dropdown saran nama (suggestBox) sedang tampil,
-     kedua kotak peringatan ini SENGAJA disembunyikan dulu (dropdown lebih
-     diprioritaskan karena CS sedang aktif memilih dari daftar). Begitu
-     dropdown tertutup (nama dipilih / blur / query tidak match apa pun),
-     baru kotak peringatan dihitung & ditampilkan normal. Ini mencegah
-     dropdown saran menutupi kotak peringatan seperti yang dilaporkan. */
-  function refreshNameWarnings(query){
-    if(!suggestBox.hidden){ hideDuplicateWarning(); hideAliasWarning(); return; }
-    checkDuplicateNameWarning(query);
-    checkAliasWarning(query);
   }
   function renderSuggestions(query){
     const q = query.trim().toUpperCase();
     if(q.length < 1){ hideSuggestions(); return; }
     const seen = new Set();
     const matches = [];
-    // PERBAIKAN (permintaan "munculkan lagi alias di dropdown ini, tapi
-    // benar") -- SEBELUMNYA sumbernya `nameHistory` (daftar nama flat,
-    // sekadar teks) -- itulah AKAR masalah kenapa baris "↳ dulu: ..."
-    // pernah dicabut lagi: karena sumbernya cuma teks, alias yang
-    // ditampilkan harus dicari lewat lookup TERPISAH yang gampang salah
-    // sambung ke record yang salah kalau ada 2+ nama mengandung substring
-    // yang sama. Sekarang sumbernya `customerRecords` (objek LENGKAP
-    // {name, cs, aliases[]} -- SAMA PERSIS dgn yang dipakai dropdown Master
-    // Nama/Rekap Pesanan/Follow Up, yang sudah lama aman menampilkan
-    // "↳ dulu:") -- setiap alias yang tampil di sini DIJAMIN menempel ke
-    // record customer yang memang cocok, karena datang dari FIELD alias
-    // milik record itu sendiri, bukan hasil lookup nebak-nebak lagi.
-    for(const rec of customerRecords){
-      const clean = stripNewTag(rec && rec.name || "");
-      if(!clean || !clean.toUpperCase().includes(q)) continue;
+    for(const raw of nameHistory){
+      const clean = stripNewTag(raw);
+      if(!clean.toUpperCase().includes(q)) continue;
       const key = clean.toUpperCase();
       if(seen.has(key)) continue;
       seen.add(key);
-      matches.push({ name: clean, aliases: Array.isArray(rec.aliases) ? rec.aliases : [] });
+      matches.push(clean);
       if(matches.length >= 6) break;
     }
     if(!matches.length){ hideSuggestions(); return; }
-    suggestBox.innerHTML = matches.map(m=>{
-      const aliasSub = m.aliases.length
-        ? `<div style="font-size:10.5px;color:var(--ink-soft);margin-top:2px;">↳ dulu: ${escHtml(m.aliases.join(", "))}</div>`
-        : "";
-      return `<div class="kt-suggest-item" style="padding:10px 12px;cursor:pointer;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--line);">${m.name}${aliasSub}</div>`;
-    }).join("");
+    suggestBox.innerHTML = matches.map(name=>
+      `<div class="kt-suggest-item" style="padding:10px 12px;cursor:pointer;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--line);">${name}</div>`
+    ).join("");
     suggestBox.hidden = false;
     Array.from(suggestBox.children).forEach((el, i)=>{
       el.addEventListener("mousedown", (e)=>{
         e.preventDefault(); // supaya input tidak keburu blur sebelum klik diproses
-        nameInput.value = matches[i].name;
+        nameInput.value = matches[i];
         pickedFromSuggestion = true; // BARU -- dipilih dari rekomendasi -> BUKAN customer baru
         hideSuggestions();
         updateSendBtnState();
         checkDuplicateNameWarning(nameInput.value); // PERBAIKAN -- checkDuplicateNameWarning sekarang otomatis skip/sembunyikan warning kalau pickedFromSuggestion true (lihat catatan di definisinya), jadi baris ini aman dipanggil apa adanya -- dulu di sini warning-nya malah SENGAJA dimunculkan lagi, sekarang sudah tidak lagi.
-        checkAliasWarning(nameInput.value); // BARU -- ikut cek alias juga begitu nama dipilih dari saran
         checkEkspedisiSuggestion(); // BARU -- nama dipilih dari daftar, langsung cek saran ekspedisinya
       });
     });
@@ -9548,28 +9152,9 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     };
   }
 
-  // BARU -- preview "Dikirim sebagai" sekarang menampilkan username/nama
-  // tampilan Telegram asli (bukan angka ID mentah lagi). Kalau yang
-  // tersimpan bukan angka (sudah nama/username manual), dipakai apa
-  // adanya. Kalau angka ID, coba resolve ke username asli lewat server
-  // (endpoint /resolve-sender, sama yang dipakai sambutan "Selamat
-  // datang" di beranda) -- gagal/offline -> fallback tampilkan angkanya.
-  let senderPreviewToken = 0;
-  async function refreshSenderPreview(){
+  function refreshSenderPreview(){
     const val = getTelegramSenderId();
-    if(!val){ senderPreview.textContent = "(belum diatur)"; return; }
-    if(!/^\d+$/.test(val)){ senderPreview.textContent = val.replace(/^@/, ""); return; }
-    senderPreview.textContent = val; // tampilkan angkanya dulu sambil nunggu resolve
-    if(!MASTER_DATA_WORKER_URL) return;
-    const myToken = ++senderPreviewToken;
-    try{
-      const res = await fetch(MASTER_DATA_WORKER_URL + "/resolve-sender?senderId=" + encodeURIComponent(val), { headers: workerHeaders() });
-      const body = await res.json().catch(()=> ({}));
-      if(myToken !== senderPreviewToken) return; // modal sudah dibuka ulang/berubah, hasil ini basi
-      if(body && typeof body.label === "string" && body.label.trim()){
-        senderPreview.textContent = body.label.trim().replace(/^@/, "");
-      }
-    }catch(e){ /* gagal resolve -> tetap tampilkan angka ID, tidak apa-apa */ }
+    senderPreview.textContent = val ? val : "(belum diatur)";
   }
 
   /* ---- Cache gambar nota TERAKHIR yang di-render, dikunci per "signature"
@@ -9719,28 +9304,20 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     nameInput.value = nameInput.value.toUpperCase();
     nameInput.setSelectionRange(pos, pos);
     renderSuggestions(nameInput.value);
-    refreshNameWarnings(nameInput.value); // BARU -- gantian dgn dropdown saran (Solusi 2), lihat definisinya
+    checkDuplicateNameWarning(nameInput.value);
     scheduleAutosave();
     // BARU -- cek saran ekspedisi, di-debounce 500ms (jangan tiap huruf)
     clearTimeout(ekspedisiSuggestTimer);
     ekspedisiSuggestTimer = setTimeout(checkEkspedisiSuggestion, 500);
-    // BARU (Cara A) -- kalau Revisi sudah tercentang & nama diedit lagi
-    // (mis. tadinya salah ketik), cek ulang auto-isi Dropship/Pesan u/
-    // Inventory-nya juga, debounce 400ms sama seperti saran ekspedisi.
-    clearTimeout(revisiAutofillTimer);
-    revisiAutofillTimer = setTimeout(checkRevisiAutofill, 400);
   });
   nameInput.addEventListener("blur", ()=>{
-    setTimeout(()=>{
-      hideSuggestions();
-      refreshNameWarnings(nameInput.value); // BARU -- dropdown sudah tertutup, tampilkan peringatan kalau relevan
-    }, 120);
+    setTimeout(hideSuggestions, 120);
     clearTimeout(draftTimer);
     autosaveDraft();
     clearTimeout(ekspedisiSuggestTimer);
     checkEkspedisiSuggestion(); // BARU -- cek sekali lagi begitu selesai ngetik (blur)
   });
-  nameInput.addEventListener("focus", ()=>{ renderSuggestions(nameInput.value); refreshNameWarnings(nameInput.value); });
+  nameInput.addEventListener("focus", ()=>{ renderSuggestions(nameInput.value); checkDuplicateNameWarning(nameInput.value); });
 
   let isSending = false;
   function updateSendBtnState(){
@@ -9769,7 +9346,6 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     updateSendBtnState();
     hideSuggestions();
     hideDuplicateWarning(); // BARU -- reset dulu, popup baru dibuka blm tentu relevan lagi
-    hideAliasWarning();
     hideEkspedisiSuggest(); // BARU -- reset dulu, cek ulang di bawah setelah nama ada isinya
     if(revisiCheck) revisiCheck.checked = false;
     resetRevisiPicker();
@@ -9777,10 +9353,6 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     if(dropshipCheck) dropshipCheck.checked = false;
     if(dropshipField) dropshipField.hidden = true;
     if(dropshipRecipientInput) dropshipRecipientInput.value = "";
-    // BARU -- Keterangan Tambahan: reset tiap kali modal dibuka, sama pola dgn Dropship.
-    if(keteranganCheck) keteranganCheck.checked = false;
-    if(keteranganField) keteranganField.hidden = true;
-    if(keteranganInput) keteranganInput.value = "";
     overlay.hidden = false;
     setTimeout(()=> nameInput.focus(), 50);
     loadNameHistory();
@@ -9810,6 +9382,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   btnClose.addEventListener("click", closeModal);
   btnCancel.addEventListener("click", closeModal);
   overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
+  btnEditSender.addEventListener("click", ()=> document.getElementById("home-link-tgid").click());
   window.__openKirimTelegramModal = openModal;
 
   btnSend.addEventListener("click", async ()=>{
@@ -9829,7 +9402,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       return;
     }
     if(!senderId){
-      statusEl.textContent = "ID Telegram kamu belum diatur — isi dulu lewat menu \"ID Telegram Saya\" di bagian bawah halaman.";
+      statusEl.textContent = "ID Telegram kamu belum diatur — ketuk \"Ubah\" untuk isi dulu.";
       statusEl.style.color = "var(--danger-red)";
       return;
     }
@@ -9876,14 +9449,6 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         // "" (server melewati baris caption Dropship kalau kosong).
         dropshipRecipient: (dropshipCheck && dropshipCheck.checked && dropshipRecipientInput)
           ? dropshipRecipientInput.value.trim().toUpperCase() : "",
-        // BARU -- Keterangan Tambahan (khusus Logistik): pola SAMA PERSIS
-        // dgn dropshipRecipient di atas -- cuma dikirim kalau checkbox
-        // dicentang DAN field-nya terisi, kalau tidak "" (server melewati
-        // baris "Keterangan Tambahan" di DM Logistik kalau kosong). TIDAK
-        // di-uppercase (beda dgn dropshipRecipient) karena isinya kalimat
-        // bebas, bukan nama.
-        keteranganTambahan: (keteranganCheck && keteranganCheck.checked && keteranganInput)
-          ? keteranganInput.value.trim() : "",
       });
 
       // BARU -- teks status beda tergantung jalurnya, supaya CS tahu apa
@@ -9951,7 +9516,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       showMsg("Bukti untuk \"" + customerName + "\" terkirim ke grup Telegram.");
       clearTimeout(draftTimer);
       resetRevisiPicker();
-      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); hideDuplicateWarning(); hideAliasWarning(); }, 900);
+      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); hideDuplicateWarning(); }, 900);
     }catch(e){
       statusEl.textContent = "Gagal mengirim: " + (e.message || e);
       statusEl.style.color = "var(--danger-red)";
@@ -11138,34 +10703,23 @@ if ("serviceWorker" in navigator) {
     }
   }
 
-  // BARU (perbaikan bug "popup update muncul terus-menerus") -- SEBELUMNYA
-  // fungsi ini menulis localStorage.setItem(LS_KEY, versionKey) begitu versi
-  // baru TERDETEKSI, padahal user belum tentu benar-benar klik "Perbarui
-  // Sekarang" (atau reload-nya sempat tidak mulus -- banyak tab terbuka,
-  // koneksi putus, dst). Akibatnya localStorage bisa mencatat "sudah dilihat
-  // vX" padahal halaman yang BENAR-BENAR jalan masih versi lama -> siklus
-  // deteksi berikutnya jadi bingung & popup yang sama bisa muncul berulang.
-  // Sekarang: localStorage HANYA ditulis oleh checkStartupVersionChange()
-  // (yang membaca versi ASLI dari DOM halaman yang sedang berjalan, bukan
-  // asumsi) -- fungsi ini cukup pakai penanda di memori (bukan localStorage)
-  // supaya popup yang SAMA tidak dobel muncul dalam 1 sesi tab yang sama.
-  let lastPopupShownVersion = null;
   async function handleNewWorkerInstalled(newWorker){
     const info = await getUpdateInfo();
     const versionKey = info && info.version ? info.version : null;
     const currentVersion = getCurrentAppVersion();
 
-    // Sudah ditampilkan utk versi yang SAMA di tab/sesi ini -> jangan ulangi.
-    if(versionKey && lastPopupShownVersion === versionKey) return;
+    // Sudah pernah dikasih tahu/diterapkan untuk versi yang SAMA -> jangan ulangi.
+    if(versionKey && localStorage.getItem(LS_KEY) === versionKey) return;
 
     if(versionKey && currentVersion && isPatchOnlyChange(currentVersion, versionKey)){
       // Update PATCH kecil -> terapkan diam-diam, TANPA popup & TANPA reload paksa.
       suppressNextReload = true;
+      localStorage.setItem(LS_KEY, versionKey);
       newWorker.postMessage({ type: "SKIP_WAITING" });
       return;
     }
 
-    if(versionKey) lastPopupShownVersion = versionKey;
+    if(versionKey) localStorage.setItem(LS_KEY, versionKey);
     openPopupPending(newWorker, versionKey, info && info.items);
   }
 
@@ -11429,7 +10983,6 @@ if ("serviceWorker" in navigator) {
     }
   }
   window.addEventListener("popstate", (e)=> applyNavState(e.state));
-  window.__applyNavState = applyNavState; // BARU -- dipanggil blok pemulihan tampilan terakhir di akhir <body>
   try{ history.replaceState({view:"home"}, ""); }catch(e){ /* mode privat/embed kadang blokir History API — app tetap jalan, cuma tombol Kembali fallback ke perilaku browser biasa */ }
 
   function goHome(){
@@ -13678,11 +13231,11 @@ if ("serviceWorker" in navigator) {
 
     function aliasChipsHtml(c){
       const aliases = Array.isArray(c.aliases) ? c.aliases : [];
+      if(!aliases.length) return "";
       return `
         <div class="md-nama-alias-wrap">
           <span class="md-nama-alias-label">↳ Nama lama:</span>
-          ${aliases.map(a=> `<span class="md-alias-chip"><span class="md-alias-text" data-alias="${escapeHtmlNama(a)}" title="Ketuk untuk edit nama lama ini">${escapeHtmlNama(a)}</span><button type="button" class="md-alias-del" data-alias="${escapeHtmlNama(a)}" title="Hapus alias ini (tidak menyentuh data pesanan)">✕</button></span>`).join("")}
-          <button type="button" class="md-alias-add-btn" title="Tambah nama lama secara manual (tanpa harus nunggu saran otomatis)">+ Tambah</button>
+          ${aliases.map(a=> `<span class="md-alias-chip">${escapeHtmlNama(a)}<button type="button" class="md-alias-del" data-alias="${escapeHtmlNama(a)}" title="Hapus alias ini (tidak menyentuh data pesanan)">✕</button></span>`).join("")}
         </div>`;
     }
 
@@ -13714,10 +13267,9 @@ if ("serviceWorker" in navigator) {
                   <input type="text" class="md-nama-edit-input md-nama-edit-customer" value="${escapeHtmlNama(n)}" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
                   <div class="md-nama-cust-suggest" hidden></div>
                 </div>
-                <div class="fld md-nama-cs-wrap">
+                <div class="fld">
                   <div class="fld-label">Nama CS</div>
-                  <input type="text" class="md-nama-edit-input md-nama-edit-cs" value="${escapeHtmlNama(c.cs || "")}" placeholder="(kosong)" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
-                  <div class="md-nama-cs-suggest" hidden></div>
+                  <input type="text" class="md-nama-edit-input md-nama-edit-cs" list="md-nama-cs-datalist" value="${escapeHtmlNama(c.cs || "")}" placeholder="(kosong)" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;">
                 </div>
               </div>
               ${aliasChipsHtml(c)}
@@ -14045,13 +13597,9 @@ if ("serviceWorker" in navigator) {
     // (2) semua nilai `cs` yang SUDAH ada di allCustomers (Master Nama)
     // -- supaya nama yang sudah terbukti terpakai ikut direkomendasikan,
     // bukan cuma yang kebetulan didaftarkan manual duluan.
-    // BARU -- diganti dari <datalist> bawaan browser (tampilannya beda-beda
-    // tiap browser/perangkat dan tidak bisa didandani) jadi dropdown kustom
-    // sendiri, konsisten dengan dropdown "Nama Customer" di atas (kartu,
-    // warna, hover mengikuti desain app). csNameList cuma nyimpen daftar
-    // nama CS-nya; tampilan dropdown-nya ditangani renderCsSuggest() di bawah.
-    let csNameList = [];
     function refreshCsDatalist(){
+      const dl = document.getElementById("md-nama-cs-datalist");
+      if(!dl) return;
       const fromDaftarCs = (Array.isArray(SETTINGS.csList) ? SETTINGS.csList : [])
         .map(c=> c && c.name).filter(Boolean);
       const fromDataTerpakai = (Array.isArray(allCustomers) ? allCustomers : [])
@@ -14064,7 +13612,7 @@ if ("serviceWorker" in navigator) {
         seen.add(key);
         names.push(n);
       }
-      csNameList = names;
+      dl.innerHTML = names.map(n=> `<option value="${escapeHtmlNama(n)}"></option>`).join("");
     }
 
     async function loadNames(){
@@ -14119,21 +13667,13 @@ if ("serviceWorker" in navigator) {
         box.hidden = false;
         return;
       }
-      box.innerHTML = matches.map(c=>{
-        const aliasSub = (Array.isArray(c.aliases) && c.aliases.length)
-          ? `<div style="font-size:10px;color:var(--ink-soft);">↳ dulu: ${escapeHtmlNama(c.aliases.join(", "))}</div>`
-          : "";
-        return `<div class="md-nama-cust-suggest-item" data-name="${escapeHtmlNama(c.name)}">
+      box.innerHTML = matches.map(c=>
+        `<div class="md-nama-cust-suggest-item" data-name="${escapeHtmlNama(c.name)}">
           <span class="ic">👤</span>
-          <div style="flex:1;min-width:0;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span class="txt" style="flex:1;">${highlightMatch(c.name, q)}</span>
-              ${c.cs ? `<span class="cs-tag">${escapeHtmlNama(c.cs)}</span>` : ""}
-            </div>
-            ${aliasSub}
-          </div>
-        </div>`;
-      }).join("");
+          <span class="txt">${highlightMatch(c.name, q)}</span>
+          ${c.cs ? `<span class="cs-tag">${escapeHtmlNama(c.cs)}</span>` : ""}
+        </div>`
+      ).join("");
       box.hidden = false;
     }
     function hideCustSuggest(box){
@@ -14167,67 +13707,6 @@ if ("serviceWorker" in navigator) {
       hideCustSuggest(item.closest(".md-nama-cust-suggest"));
     });
 
-    /* ---------- BARU -- Dropdown rekomendasi nama CS (kustom) ----------
-       Sama polanya dengan dropdown "Nama Customer" di atas: dibuat sendiri
-       (BUKAN <datalist> bawaan browser) supaya tampilannya konsisten dgn
-       desain app di semua perangkat. Sumber saran: csNameList, gabungan
-       Daftar CS resmi + nama CS yang sudah pernah dipakai (lihat
-       refreshCsDatalist()). Muncul begitu field difokus (termasuk saat
-       masih kosong, menampilkan sampai 8 nama teratas), lalu menyaring
-       sambil diketik. */
-    function renderCsSuggest(box, query){
-      const q = query.trim();
-      let matches;
-      if(!q){
-        matches = csNameList.slice(0, 8);
-      }else{
-        const qU = q.toUpperCase();
-        matches = csNameList.filter(n=> n.toUpperCase().includes(qU)).slice(0, 8);
-      }
-      if(!matches.length){
-        box.innerHTML = `<div class="md-nama-cs-suggest-empty">Tidak ada nama CS yang cocok.</div>`;
-        box.hidden = false;
-        return;
-      }
-      box.innerHTML = matches.map(n=>
-        `<div class="md-nama-cs-suggest-item" data-name="${escapeHtmlNama(n)}">
-          <span class="ic">🧑‍💼</span>
-          <span class="txt">${highlightMatch(n, q)}</span>
-        </div>`
-      ).join("");
-      box.hidden = false;
-    }
-    function hideCsSuggest(box){
-      if(!box) return;
-      box.hidden = true;
-      box.innerHTML = "";
-    }
-    listEl.addEventListener("focusin", (e)=>{
-      if(!e.target.classList || !e.target.classList.contains("md-nama-edit-cs")) return;
-      const box = e.target.closest(".md-nama-cs-wrap").querySelector(".md-nama-cs-suggest");
-      renderCsSuggest(box, e.target.value);
-    });
-    listEl.addEventListener("input", (e)=>{
-      if(!e.target.classList || !e.target.classList.contains("md-nama-edit-cs")) return;
-      const box = e.target.closest(".md-nama-cs-wrap").querySelector(".md-nama-cs-suggest");
-      renderCsSuggest(box, e.target.value);
-    });
-    listEl.addEventListener("focusout", (e)=>{
-      if(!e.target.classList || !e.target.classList.contains("md-nama-edit-cs")) return;
-      const box = e.target.closest(".md-nama-cs-wrap").querySelector(".md-nama-cs-suggest");
-      // delay dikit supaya event mousedown di item saran (di bawah) sempat kepencet dulu
-      setTimeout(()=> hideCsSuggest(box), 150);
-    });
-    listEl.addEventListener("mousedown", (e)=>{
-      const item = e.target.closest(".md-nama-cs-suggest-item");
-      if(!item) return;
-      e.preventDefault(); // supaya input tidak keburu blur sebelum nilainya diisi
-      const wrap = item.closest(".md-nama-cs-wrap");
-      const input = wrap ? wrap.querySelector(".md-nama-edit-cs") : null;
-      if(input){ input.value = item.dataset.name; input.focus(); }
-      hideCsSuggest(item.closest(".md-nama-cs-suggest"));
-    });
-
     listEl.addEventListener("click", async (e)=>{
       if(e.target.classList.contains("md-nama-page-prev")){
         currentPage--; render(); return;
@@ -14238,96 +13717,6 @@ if ("serviceWorker" in navigator) {
       const row = e.target.closest(".md-nama-row");
       if(!row) return;
       const name = row.dataset.name;
-
-      // BARU -- edit alias di tempat (Opsi 2: ketuk teksnya langsung).
-      // Chip berubah jadi input kecil; Enter/blur = simpan (panggil
-      // /customer-names/edit-alias), Escape = batal tanpa menyimpan.
-      // BARU -- tambah alias (nama lama) secara MANUAL, tidak perlu nunggu
-      // kartu saran otomatis muncul dulu. Klik "+ Tambah" -> jadi input
-      // kecil, Enter/blur = simpan (panggil /customer-names/add-alias
-      // yang sudah ada, endpoint yg sama dipakai tombol "🔄 Sinkronkan"),
-      // Escape = batal. Kalau teks yang diketik ternyata sudah jadi nama
-      // AKTIF customer lain, endpoint ini otomatis menggabungkan 2 record
-      // itu jadi 1 (perilaku bawaan add-alias, sama seperti Sinkronkan).
-      if(e.target.classList.contains("md-alias-add-btn")){
-        const btn = e.target;
-        const input = document.createElement("input");
-        input.type = "text";
-        input.className = "md-alias-edit-input";
-        input.placeholder = "Nama lama baru";
-        input.autocomplete = "off";
-        const hint = document.createElement("span");
-        hint.className = "md-alias-edit-hint";
-        hint.textContent = "Tekan Enter untuk simpan";
-        btn.replaceWith(input);
-        input.insertAdjacentElement("afterend", hint);
-        input.focus();
-        let settled = false;
-        const saveNewAlias = async ()=>{
-          if(settled) return;
-          settled = true;
-          const newAlias = input.value.trim().toUpperCase();
-          if(!newAlias){ render(); return; }
-          try{
-            const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/add-alias", {
-              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-              body: JSON.stringify({ name, alias: newAlias }),
-            });
-            const data = await res.json();
-            if(!res.ok || data.error) throw new Error(data.error || "Gagal menambah nama lama.");
-            allCustomers = data.customers || allCustomers;
-            render();
-          }catch(err){ showMsg("Gagal menambah nama lama: " + String(err.message || err), true); render(); }
-        };
-        input.addEventListener("keydown", (ev)=>{
-          if(ev.key === "Enter"){ ev.preventDefault(); saveNewAlias(); }
-          if(ev.key === "Escape"){ settled = true; render(); }
-        });
-        input.addEventListener("blur", ()=> saveNewAlias());
-        return;
-      }
-
-      if(e.target.classList.contains("md-alias-text")){
-        const chip = e.target.closest(".md-alias-chip");
-        const oldAlias = e.target.dataset.alias;
-        if(!chip || !oldAlias) return;
-        const input = document.createElement("input");
-        input.type = "text";
-        input.className = "md-alias-edit-input";
-        input.value = oldAlias;
-        input.autocomplete = "off";
-        chip.innerHTML = "";
-        chip.appendChild(input);
-        const hint = document.createElement("span");
-        hint.className = "md-alias-edit-hint";
-        hint.textContent = "Tekan Enter untuk simpan";
-        chip.appendChild(hint);
-        input.focus();
-        input.select();
-        let settled = false;
-        const saveAlias = async ()=>{
-          if(settled) return;
-          settled = true;
-          const newAlias = input.value.trim().toUpperCase();
-          if(!newAlias || newAlias === oldAlias.toUpperCase().trim()){ render(); return; }
-          try{
-            const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names/edit-alias", {
-              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-              body: JSON.stringify({ name, oldAlias, newAlias }),
-            });
-            const data = await res.json();
-            if(!res.ok || data.error) throw new Error(data.error || "Gagal mengubah nama lama.");
-            allCustomers = data.customers || allCustomers;
-            render();
-          }catch(err){ showMsg("Gagal mengubah nama lama: " + String(err.message || err), true); render(); }
-        };
-        input.addEventListener("keydown", (ev)=>{
-          if(ev.key === "Enter"){ ev.preventDefault(); saveAlias(); }
-          if(ev.key === "Escape"){ settled = true; render(); }
-        });
-        input.addEventListener("blur", ()=> saveAlias());
-        return;
-      }
 
       if(e.target.classList.contains("md-alias-del")){
         const alias = e.target.dataset.alias;
@@ -16234,45 +15623,10 @@ if ("serviceWorker" in navigator) {
   const csFilterEl = document.getElementById("rekap-filter-cs");
   const statusFilterEl = document.getElementById("rekap-filter-status");
   const hariFilterEl = document.getElementById("rekap-filter-hari"); // BARU -- filter per hari
-  const hariDariEl = document.getElementById("rekap-filter-hari-dari"); // BARU -- filter rentang tanggal (dari)
-  const hariSampaiEl = document.getElementById("rekap-filter-hari-sampai"); // BARU -- filter rentang tanggal (sampai)
-  const hariRangeClearBtn = document.getElementById("rekap-filter-hari-range-clear");
   const ekspedisiFilterEl = document.getElementById("rekap-filter-ekspedisi"); // BARU -- filter per ekspedisi
   const belumInvoiceEl = document.getElementById("rekap-filter-belumInvoice");
   const csSummaryEl = document.getElementById("rekap-cs-summary");
   const hariSummaryEl = document.getElementById("rekap-hari-summary"); // BARU -- ringkasan total qty per hari
-  // BARU -- pagination (25 baris/halaman) supaya list tidak memanjang ke
-  // bawah tanpa batas. rkPage direset ke 1 tiap kali filter/sort berubah
-  // (lihat listener-nya), TAPI TIDAK direset saat auto-refresh diam-diam
-  // supaya CS yang sedang di halaman 3 tidak tiba-tiba "dilempar" balik
-  // ke halaman 1 tanpa diminta.
-  const RK_PAGE_SIZE = 25;
-  let rkPage = 1;
-  const rkPaginationEl = document.getElementById("rekap-pagination");
-  // BARU -- lookup alias (nama lama), pola SAMA PERSIS dgn fuAliasLookup
-  // di menu Follow Up (endpoint YANG SUDAH ADA /customer-names, 0 endpoint
-  // baru). Scope IIFE ini terpisah dari Follow Up, jadi dibuat salinannya
-  // sendiri di sini -- bukan duplikasi bug, cuma dua modul beda file
-  // scope yang kebetulan butuh info yang sama.
-  let rkAliasLookup = {};
-  async function rkLoadAliasLookup(){
-    if(!MASTER_DATA_WORKER_URL) return;
-    try{
-      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
-      const body = await res.json().catch(()=> ({}));
-      const map = {};
-      (Array.isArray(body.customers) ? body.customers : []).forEach(c=>{
-        if(c && c.name && Array.isArray(c.aliases) && c.aliases.length) map[c.name.trim().toUpperCase()] = c.aliases;
-      });
-      rkAliasLookup = map;
-      if(allRows.length){ renderRekapTable(); } // BARU -- render ulang begitu alias selesai dimuat, tanpa perlu refresh manual
-    }catch(e){ console.log("Gagal ambil daftar alias untuk Rekap Pesanan:", e); }
-  }
-  function rkAliasSubline(customerName){
-    const aliases = rkAliasLookup[(customerName || "").trim().toUpperCase()];
-    if(!aliases || !aliases.length) return "";
-    return `<div style="font-size:10px; color:var(--ink-soft); font-weight:400;">↳ dulu: ${aliases.map(a=> escHtml(a)).join(", ")}</div>`;
-  }
   const ekspedisiSummaryEl = document.getElementById("rekap-ekspedisi-summary"); // BARU -- kartu ringkasan per ekspedisi
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
@@ -16440,21 +15794,6 @@ if ("serviceWorker" in navigator) {
   // sekali (diam-diam), pola SAMA dgn kartu Follow Up -- TAPI cuma kalau
   // belum lewat batas 2 jam (kalau sudah lewat, biarkan popup yang
   // muncul dari startAutoRefresh() yang menangani, bukan langsung fetch).
-  // PERBAIKAN BUG (laporan "app freeze/macet total, harus force close")
-  // -- SEBELUMNYA listener ini fetch sekali TANPA me-reset timer
-  // setInterval 30 detik (startAutoRefresh) -- padahal browser mobile
-  // (terutama WebView Android) MENAHAN (throttle) setInterval selagi
-  // halaman disembunyikan/app diminimize. Begitu app dibuka lagi, timer
-  // yang tertahan itu bisa langsung "kejar setoran" & ikut menembak
-  // fetchAndRenderRekap() PERSIS di waktu yang sama dengan fetch
-  // immediate di bawah ini -- keduanya (fetch+hitung ulang ringkasan dari
-  // SELURUH baris+render ulang tabel) numpuk di momen paling sibuk (app
-  // baru resume, browser sedang repaint) -> main thread terkunci beberapa
-  // detik, kelihatan seperti freeze total. Sekarang startAutoRefresh()
-  // dipanggil ULANG di sini (stopAutoRefresh() di dalamnya otomatis
-  // membersihkan timer lama dulu) SETELAH fetch immediate selesai --
-  // countdown 30 detik jadi mulai bersih dari momen resume ini, timer
-  // lama yang sempat tertahan tidak akan pernah sempat menembak dobel.
   document.addEventListener("visibilitychange", ()=>{
     if(!document.hidden && document.body.classList.contains("showing-rekap")){
       if(rekapOpenedAt && (Date.now() - rekapOpenedAt) >= SESSION_LIMIT_MS){
@@ -16462,26 +15801,19 @@ if ("serviceWorker" in navigator) {
         showSessionTimeoutPopup();
         return;
       }
-      fetchAndRenderRekap({ silent:true }).finally(startAutoRefresh);
+      fetchAndRenderRekap({ silent:true });
     }
   });
   document.getElementById("rekap-refresh-btn").addEventListener("click", fetchAndRenderRekap);
-  searchEl.addEventListener("input", ()=>{ rkPage = 1; renderRekapTable(); });
-  csFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); });
-  statusFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); });
-  hariFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); }); // BARU
-  hariDariEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); }); // BARU -- filter rentang tanggal
-  hariSampaiEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); }); // BARU -- filter rentang tanggal
-  hariRangeClearBtn.addEventListener("click", ()=>{
-    hariDariEl.value = ""; hariSampaiEl.value = "";
-    rkPage = 1; renderRekapTable();
-  });
-  ekspedisiFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); }); // BARU
-  belumInvoiceEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); });
+  searchEl.addEventListener("input", ()=> renderRekapTable());
+  csFilterEl.addEventListener("change", ()=> renderRekapTable());
+  statusFilterEl.addEventListener("change", ()=> renderRekapTable());
+  hariFilterEl.addEventListener("change", ()=> renderRekapTable()); // BARU
+  ekspedisiFilterEl.addEventListener("change", ()=> renderRekapTable()); // BARU
+  belumInvoiceEl.addEventListener("change", ()=> renderRekapTable());
   sortBtn.addEventListener("click", ()=>{
     sortDesc = !sortDesc;
     sortBtn.textContent = sortDesc ? "↓ Terbaru dulu" : "↑ Terlama dulu";
-    rkPage = 1;
     renderRekapTable();
   });
 
@@ -16541,13 +15873,6 @@ if ("serviceWorker" in navigator) {
     if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
     if(hariSet.includes(prevHari)) hariFilterEl.value = prevHari;
     if(ekspedisiSet.includes(prevEkspedisi)) ekspedisiFilterEl.value = prevEkspedisi;
-    // BARU -- batasi kalender rentang tanggal (min/max) sesuai tanggal yang
-    // BENAR-BENAR ada di data (hariSet sudah terurut TERBARU dulu, jadi
-    // elemen pertama = tanggal termuda, terakhir = tertua).
-    if(hariSet.length){
-      const oldest = hariSet[hariSet.length - 1], newest = hariSet[0];
-      [hariDariEl, hariSampaiEl].forEach(el=>{ el.min = oldest; el.max = newest; });
-    }
   }
 
   async function fetchAndRenderRekap(opts){
@@ -16579,7 +15904,6 @@ if ("serviceWorker" in navigator) {
       const savedScrollY = window.scrollY;
       allRows = rowsBaru;
       lastRowsSignature = signatureBaru;
-      rkLoadAliasLookup(); // BARU -- dijalankan lepas (tidak di-await), gagal/lambat tidak menghambat tabel utama tampil
       isiUlangDropdownFilter();
       renderRekapTable();
       if(tableWrapEl) tableWrapEl.scrollLeft = savedScrollLeft;
@@ -16600,36 +15924,22 @@ if ("serviceWorker" in navigator) {
   // Semua filter + sort dijalankan di sisi BROWSER, dari data yang SUDAH
   // diambil (allRows) -- ganti kata kunci/filter/urutan TIDAK memanggil
   // server lagi sama sekali, 0 tambahan kuota baca KV.
-  function rkMatchKeyword(customerName, keyword){
-    if((customerName || "").toLowerCase().includes(keyword)) return true;
-    // BARU -- pencarian juga cocok kalau keyword ketemu di salah satu nama
-    // ALIAS (nama lama) customer itu, bukan cuma nama aktifnya -- sama
-    // pola dgn fuMatchKeyword di menu Follow Up.
-    const aliases = rkAliasLookup[(customerName || "").trim().toUpperCase()];
-    if(aliases && aliases.some(a=> a.toLowerCase().includes(keyword))) return true;
-    return false;
-  }
   function terapkanFilter(){
     const kodeList = daftarKodeSingkatAktif();
     const keyword = searchEl.value.trim().toLowerCase();
     const csPilih = csFilterEl.value;
     const statusPilih = statusFilterEl.value;
     const hariPilih = hariFilterEl.value; // BARU -- filter per hari (value = dateKey YYYY-MM-DD)
-    const hariDari = hariDariEl.value; // BARU -- filter rentang tanggal (dari), format YYYY-MM-DD sama dgn dateKeyDariRow
-    const hariSampai = hariSampaiEl.value; // BARU -- filter rentang tanggal (sampai)
     const ekspedisiPilih = ekspedisiFilterEl.value; // BARU -- filter per ekspedisi
     const belumInvoiceSaja = belumInvoiceEl.checked;
-    let rows = allRows.filter(r=>{
-      const dk = dateKeyDariRow(r); // BARU -- dihitung sekali per baris, dipakai filter Hari & rentang tanggal sekaligus
-      return (!keyword || rkMatchKeyword(r.customer, keyword)) &&
-        (!csPilih || r.cs === csPilih) &&
-        (!statusPilih || r.status === statusPilih) &&
-        (!hariPilih || dk === hariPilih) &&
-        (!hariDari || dk >= hariDari) && // BARU -- perbandingan string YYYY-MM-DD aman diurutkan langsung
-        (!hariSampai || dk <= hariSampai) && // BARU
-        (!ekspedisiPilih || r.ekspedisi === ekspedisiPilih) &&
-        (!belumInvoiceSaja || !r.manualInvoiced);
-    });
+    let rows = allRows.filter(r=>
+      (!keyword || (r.customer||"").toLowerCase().includes(keyword)) &&
+      (!csPilih || r.cs === csPilih) &&
+      (!statusPilih || r.status === statusPilih) &&
+      (!hariPilih || dateKeyDariRow(r) === hariPilih) &&
+      (!ekspedisiPilih || r.ekspedisi === ekspedisiPilih) &&
+      (!belumInvoiceSaja || !r.manualInvoiced)
+    );
     // DIUBAH (permintaan "kalau ada aktivitas taruh paling atas") -- pakai
     // lastActivityAtMs (dari data yang SUDAH dikirim server, 0 field baru
     // yang perlu di-fetch terpisah) -- pesanan yang baru saja ada
@@ -16747,59 +16057,53 @@ if ("serviceWorker" in navigator) {
     cardsEl.innerHTML = rows.map(r=>{
       const isVoid = /void|hoax/i.test(r.status);
       const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline;">${escHtml(r.customer)}</a>`;
-      // BARU -- badge Dropship sekarang ikut menampilkan nama penerima
-      // langsung di kartu (sebelumnya cuma badge "📦 Dropship" polos, nama
-      // penerimanya cuma nongol lewat title="..." tabel desktop -- yang
-      // praktis tidak kebaca di HP karena hover/tooltip tidak berfungsi
-      // di layar sentuh).
+      // BARU -- badge Dropship, pola sama dgn tabel desktop (renderRekapTable).
       const dropshipBadgeMobile = r.dropshipRecipient
-        ? `<div style="margin-top:2px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px;">📦 Dropship · a.n. ${escHtml(r.dropshipRecipient)}</span></div>`
+        ? `<div style="margin-top:2px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px;">📦 Dropship</span></div>`
         : "";
       const varianRingkas = kodeList
         .map(k=> (r.items && r.items[k]) ? `${escHtml(k)} ${r.items[k]}` : null)
         .filter(Boolean).join(", ") || "-";
+      // BARU -- badge kecil "● diupdate" per field, versi kartu mobile
+      // (pola sama dgn tabel desktop, lihat renderRekapTable).
+      const fc = r.fieldsChanged || [];
+      const cbDot = `<span style="width:6px;height:6px;border-radius:50%;background:#1D9E75;display:inline-block;margin-right:3px;"></span>`;
+      const cbText = `<span style="font-size:10px;color:var(--ink-soft);">diupdate</span>`;
+      const cb = (...keys)=> keys.some(k=> fc.includes(k)) ? `<div style="display:flex;align-items:center;margin-top:2px;">${cbDot}${cbText}</div>` : "";
       return `<div class="rc-card${isVoid?" void":""}">
         <div class="rc-card-top">
           <div>
             <div class="rc-card-nama">${namaLink}</div>
-            ${rkAliasSubline(r.customer)}
             ${dropshipBadgeMobile}
             <div class="rc-card-sub">${escHtml(r.cs || "-")} &middot; ${escHtml(r.hari)}, ${escHtml(r.tanggalJam)}</div>
           </div>
-          <span class="fu-badge ${isVoid ? "r" : "g"}">${escHtml(ringkasStatus(r.status))}</span>
+          <div style="text-align:right;">
+            <span class="fu-badge ${isVoid ? "r" : "g"}">${escHtml(ringkasStatus(r.status))}</span>
+            ${cb("status")}
+          </div>
         </div>
         <div style="font-size:13px; margin-top:8px;">${varianRingkas} &middot; Qty <b>${r.totalQty||0}</b></div>
+        ${cb("varian")}
         <div class="rc-card-mid">
           <span><b>${r.resi ? "✅ Resi ada" : "❌ Belum resi"}</b></span>
           <span>${escHtml(r.ekspedisi || "-")}${r.kg ? " &middot; " + escHtml(r.kg) + " kg" : ""}</span>
         </div>
+        <div style="display:flex; justify-content:space-between;">${cb("resi")}${cb("ekspedisi", "kg")}</div>
         <div class="rc-card-bottom">
           <button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:6px 12px; font-size:13px; width:100%;">${r.manualInvoiced ? "✓ Sudah di Invoice" : "Belum di Invoice"}</button>
+          ${cb("invoice")}
         </div>
       </div>`;
     }).join("");
   }
 
-  function renderRekapTable(forFullPrint){
+  function renderRekapTable(){
     const { rows, kodeList, keyword, ekspedisiPilih } = terapkanFilter();
     renderRingkasanCs(rows);
     renderRingkasanHari(rows);
     renderRingkasanEkspedisi(rows, ekspedisiPilih); // BARU
 
     updateStatusLine(rows.length);
-
-    // BARU -- pagination: hitung halaman dari rows FILTER PENUH (bukan
-    // cuma yang tampil), lalu potong jadi pageRows -- TOTAL/ringkasan di
-    // atas tetap dihitung dari `rows` penuh (tidak berubah), yang
-    // dipotong cuma daftar barisnya saja. Kalau forFullPrint true (dipakai
-    // tombol "Ekspor PDF"), pagination DIABAIKAN -- tabel dirender penuh
-    // 1x supaya hasil cetak/PDF tetap berisi SEMUA baris hasil filter,
-    // bukan cuma halaman yang sedang aktif di layar.
-    const totalPages = Math.max(1, Math.ceil(rows.length / RK_PAGE_SIZE));
-    if(rkPage > totalPages) rkPage = totalPages;
-    if(rkPage < 1) rkPage = 1;
-    const pageStart = forFullPrint ? 0 : (rkPage - 1) * RK_PAGE_SIZE;
-    const pageRows = forFullPrint ? rows : rows.slice(pageStart, pageStart + RK_PAGE_SIZE);
 
     const th = (t, w)=> `<th style="border:1px solid var(--line); padding:8px 8px; background:var(--card); text-align:left; position:sticky; top:0;${w?` width:${w};`:""}">${t}</th>`;
     const td = (t, extra, title)=> `<td style="border:1px solid var(--line); padding:7px 8px;${extra||""}"${title ? ` title="${title}"` : ""}>${t}</td>`;
@@ -16841,7 +16145,7 @@ if ("serviceWorker" in navigator) {
         `</tr><tr><td colspan="${10}" style="border:1px solid var(--line); padding:8px 10px; background:#fff8e1; color:#8a6100; font-size:14px;">⚠️ Kolom varian produk belum muncul karena belum ada "Kode Singkat" yang diisi di Master Data &gt; Produk. Isi kolom itu dulu (mis. "HA" untuk Halawa Ayam) supaya kolomnya otomatis muncul di sini.</td></tr></thead>`);
     }
 
-    pageRows.forEach((r, i)=>{
+    rows.forEach((r, i)=>{
       // BARU -- baris Void/Hoax disorot merah muda tipis, langsung
       // kelihatan sekilas tanpa perlu baca teks status satu-satu.
       const rowBg = /void|hoax/i.test(r.status) ? " background:#fdecea;" : "";
@@ -16855,30 +16159,35 @@ if ("serviceWorker" in navigator) {
       const dropshipBadge = r.dropshipRecipient
         ? `<div style="margin-top:3px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px; white-space:nowrap;">📦 Dropship</span></div>`
         : "";
-      const namaCell = namaLink + rkAliasSubline(r.customer) + dropshipBadge;
+      const namaCell = namaLink + dropshipBadge;
       const namaTitle = r.dropshipRecipient ? `${r.customer} · Dropship a.n. ${r.dropshipRecipient}` : r.customer;
-      // BARU -- title="..." supaya kalau masih terpotong di layar sempit,
-      // teks lengkapnya tetap bisa dibaca lewat hover (desktop) / tahan
-      // tap (mobile), tanpa perlu melebarkan kolom.
+      // BARU -- badge kecil "● diupdate" (titik hijau + teks, TANPA
+      // keterangan menit) nempel PERSIS di kolom field yang baru berubah
+      // (lihat markFieldChanged/getFieldChangesForOrders di backend) --
+      // BUKAN di bawah nama customer (itu sudah dipakai badge Dropship).
+      // "varian" (HA/HS/HJ/dst + QTY, sekaligus diganti bareng saat
+      // revisi) diwakili 1 badge di kolom QTY saja, tidak diulang di
+      // setiap kolom kode produk -- supaya tidak berisik.
+      const changeBadge = (fieldKey, center)=> (r.fieldsChanged || []).includes(fieldKey)
+        ? `<div style="display:flex;align-items:center;gap:4px;margin-top:3px;${center ? "justify-content:center;" : ""}"><span style="width:6px;height:6px;border-radius:50%;background:#1D9E75;flex:none;"></span><span style="font-size:10px;color:var(--ink-soft);">diupdate</span></div>`
+        : "";
       html += `<tr style="${rowBg}">` +
-        td(pageStart + i + 1) + td(escHtml(r.tanggalJam), "white-space:nowrap;") +
+        td(i+1) + td(escHtml(r.tanggalJam), "white-space:nowrap;") +
         td(escHtml(r.cs), "white-space:normal; word-break:break-word; max-width:110px;") +
         td(namaCell, "white-space:normal; max-width:240px;", escHtml(namaTitle)) +
         kodeListTampil.map(k=> td(r.items && r.items[k] ? r.items[k] : "-", "text-align:center;")).join("") +
-        td(r.totalQty || 0, "text-align:center; font-weight:600;") +
-        td(escHtml(ringkasStatus(r.status)), "white-space:normal; word-break:break-word; max-width:130px;") + td(escHtml(r.kg), "text-align:center; white-space:nowrap;") +
-        td(escHtml(r.ekspedisi), "white-space:normal; word-break:break-word; max-width:120px;") +
-        td(r.resi ? "✅" : "❌", "text-align:center;") +
-        td(`<button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:5px 10px; font-size:13px;">${r.manualInvoiced ? "✓ Sudah" : "Belum"}</button>`) +
+        td((r.totalQty || 0) + changeBadge("varian", true), "text-align:center; font-weight:600;") +
+        td(escHtml(ringkasStatus(r.status)) + changeBadge("status", false), "white-space:normal; word-break:break-word; max-width:130px;") + td(escHtml(r.kg) + changeBadge("kg", true), "text-align:center; white-space:nowrap;") +
+        td(escHtml(r.ekspedisi) + changeBadge("ekspedisi", false), "white-space:normal; word-break:break-word; max-width:120px;") +
+        td((r.resi ? "✅" : "❌") + changeBadge("resi", true), "text-align:center;") +
+        td(`<button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:5px 10px; font-size:13px;">${r.manualInvoiced ? "✓ Sudah" : "Belum"}</button>${changeBadge("invoice", true)}`) +
         "</tr>";
     });
 
     // Baris TOTAL di paling bawah, dari data yang SEDANG TAMPIL (ikut
     // semua filter aktif, bukan selalu total keseluruhan) -- kolom
     // varian, Total Qty, & KG dijumlah, kolom teks dikosongkan, Resi
-    // ditampilkan sbg "X/Y ✅". SENGAJA dihitung dari `rows` penuh (bukan
-    // pageRows) supaya tetap merepresentasikan seluruh hasil filter, walau
-    // tabelnya sendiri lagi tampil 1 halaman saja.
+    // ditampilkan sbg "X/Y ✅".
     if(rows.length){
       const totalKg = rows.reduce((s,r)=> s + (r.kgNum||0), 0);
       const totalQtySemua = rows.reduce((s,r)=> s + (r.totalQty||0), 0);
@@ -16894,31 +16203,7 @@ if ("serviceWorker" in navigator) {
 
     html += "</tbody>";
     tableEl.innerHTML = html;
-    renderRekapCards(pageRows, kodeList); // BARU -- versi kartu utk layar mobile, data SAMA persis dgn tabel di atas (sudah dipotong per halaman)
-
-    // BARU -- render kontrol pagination di bawah tabel/kartu, cuma tampil
-    // kalau memang lebih dari 1 halaman (rows.length > RK_PAGE_SIZE).
-    // Dilewati sepenuhnya saat forFullPrint (render sementara khusus cetak).
-    if(!forFullPrint && rkPaginationEl){
-      if(rows.length > RK_PAGE_SIZE){
-        rkPaginationEl.style.display = "flex";
-        rkPaginationEl.innerHTML =
-          `<button type="button" id="rekap-page-prev" ${rkPage<=1?"disabled":""}>‹ Sebelumnya</button>` +
-          `<span style="font-size:12.5px; color:var(--ink-soft);">Halaman ${rkPage} dari ${totalPages}</span>` +
-          `<button type="button" id="rekap-page-next" ${rkPage>=totalPages?"disabled":""}>Selanjutnya ›</button>`;
-        const prevBtn = document.getElementById("rekap-page-prev");
-        const nextBtn = document.getElementById("rekap-page-next");
-        if(prevBtn) prevBtn.addEventListener("click", ()=>{
-          if(rkPage > 1){ rkPage--; renderRekapTable(); window.scrollTo(window.scrollX, 0); }
-        });
-        if(nextBtn) nextBtn.addEventListener("click", ()=>{
-          if(rkPage < totalPages){ rkPage++; renderRekapTable(); window.scrollTo(window.scrollX, 0); }
-        });
-      }else{
-        rkPaginationEl.style.display = "none";
-        rkPaginationEl.innerHTML = "";
-      }
-    }
+    renderRekapCards(rows, kodeList); // BARU -- versi kartu utk layar mobile, data SAMA persis dgn tabel di atas
 
     // BARU -- tombol Aksi Invoice sekarang TOGGLE 2 arah (Belum <-> Sudah),
     // bukan cuma 1 arah spt sebelumnya (dulu begitu jadi "Sudah" tidak
@@ -17032,14 +16317,10 @@ if ("serviceWorker" in navigator) {
   // urus page-break otomatis kalau tabelnya panjang). CSS @media print di
   // atas yang urus sembunyikan sidebar/tombol/filter, cuma tabel yg tampil.
   document.getElementById("rekap-export-pdf-btn").addEventListener("click", ()=>{
-    renderRekapTable(true); // BARU -- render penuh sementara (abaikan pagination) supaya PDF berisi SEMUA baris hasil filter
     document.body.classList.add("printing-rekap");
     window.print();
   });
-  window.addEventListener("afterprint", ()=>{
-    document.body.classList.remove("printing-rekap");
-    renderRekapTable(); // BARU -- kembalikan tampilan berhalaman normal setelah selesai cetak/dibatalkan
-  });
+  window.addEventListener("afterprint", ()=> document.body.classList.remove("printing-rekap"));
 })();
 </script>
 
@@ -17068,31 +16349,6 @@ if ("serviceWorker" in navigator) {
   const quickFilterChipTextEl = document.getElementById("followup-quickfilter-chip-text");
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
-  // BARU -- lookup nama alias (nama lama) per customer, diambil dari
-  // endpoint YANG SUDAH ADA (/customer-names, sama dipakai Master Nama &
-  // popup Kirim ke Grup Telegram) -- 0 endpoint baru. Key = nama aktif
-  // customer (UPPERCASE), value = array alias-nya. Dipakai supaya CS yang
-  // buka Follow Up langsung tahu kalau 1 customer ini sebelumnya pernah
-  // pakai nama lain (mis. sesudah "Sinkronkan" di Master Nama).
-  let fuAliasLookup = {};
-  async function fuLoadAliasLookup(){
-    if(!MASTER_DATA_WORKER_URL) return;
-    try{
-      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-names", { headers: workerHeaders() });
-      const body = await res.json().catch(()=> ({}));
-      const map = {};
-      (Array.isArray(body.customers) ? body.customers : []).forEach(c=>{
-        if(c && c.name && Array.isArray(c.aliases) && c.aliases.length) map[c.name.trim().toUpperCase()] = c.aliases;
-      });
-      fuAliasLookup = map;
-      if(allRows.length) renderFollowUpTable(); // BARU -- data alias baru selesai dimuat, render ulang supaya baris "↳ dulu: ..." langsung tampil tanpa perlu refresh manual
-    }catch(e){ console.log("Gagal ambil daftar alias untuk Follow Up:", e); } // gagal -> diam saja, cuma baris alias tidak tampil, fitur lain tidak terganggu
-  }
-  function fuAliasSubline(customerName){
-    const aliases = fuAliasLookup[(customerName || "").trim().toUpperCase()];
-    if(!aliases || !aliases.length) return "";
-    return `<div style="font-size:10.5px; color:var(--ink-soft); font-weight:400; margin-top:1px;">↳ dulu: ${aliases.map(a=> escHtml(a)).join(", ")}</div>`;
-  }
   // BARU -- filter cepat dari klik kartu ringkasan (Total Customer/Jatuh
   // Tempo/Hari Ini/Minggu Ini/Belum Cukup Data). null = tidak ada filter
   // cepat aktif (tampilkan semua, sama seperti klik "Total Customer").
@@ -17354,7 +16610,6 @@ if ("serviceWorker" in navigator) {
       const body = await res.json();
       if(!res.ok) throw new Error(body.error || "Gagal memuat data.");
       const rowsBaru = body.rows || [];
-      fuLoadAliasLookup(); // BARU -- dijalankan lepas (tidak di-await), gagal/lambat tidak menghambat tabel utama tampil
       const signatureBaru = JSON.stringify(rowsBaru);
       // BARU -- ditandai di SINI (sebelum cek berubah/tidak) supaya "X
       // menit yang lalu" mengukur kapan data ini diterima dari server,
@@ -17400,21 +16655,12 @@ if ("serviceWorker" in navigator) {
   // angka di kartu ringkasan (supaya angka di kartu-kartu lain tetap
   // tampil stabil walau salah satu kartu sedang aktif diklik), sedangkan
   // terapkanFilter() (dasar + filter cepat) dipakai utk isi tabel.
-  function fuMatchKeyword(customerName, keyword){
-    if((customerName || "").toLowerCase().includes(keyword)) return true;
-    // BARU -- pencarian juga cocok kalau keyword ketemu di salah satu nama
-    // ALIAS (nama lama) customer itu, bukan cuma nama aktifnya -- supaya
-    // CS yang masih ingat nama lama customer tetap ketemu hasilnya.
-    const aliases = fuAliasLookup[(customerName || "").trim().toUpperCase()];
-    if(aliases && aliases.some(a=> a.toLowerCase().includes(keyword))) return true;
-    return false;
-  }
   function terapkanFilterDasar(){
     const keyword = searchEl.value.trim().toLowerCase();
     const csPilih = csFilterEl.value;
     const statusPilih = statusFilterEl.value;
     return allRows.filter(r=>
-      (!keyword || fuMatchKeyword(r.customer, keyword)) &&
+      (!keyword || (r.customer||"").toLowerCase().includes(keyword)) &&
       (!csPilih || r.cs === csPilih) &&
       (!statusPilih || r.status === statusPilih)
     );
@@ -17477,7 +16723,6 @@ if ("serviceWorker" in navigator) {
         <div class="fc-avatar" style="background:${FU_AVATAR_BG[r.cls] || "var(--primary-green)"};">${escHtml(initial)}</div>
         <div class="fc-info">
           <div class="fc-nama">${escHtml(r.customer)}</div>
-          ${fuAliasSubline(r.customer)}
           <div class="fc-sub">${escHtml(r.cs || "-")} &middot; ${sisaTeks}</div>
         </div>
         <span class="fu-badge ${r.cls}" style="flex-shrink:0;">${escHtml(r.status)}</span>
@@ -17510,7 +16755,7 @@ if ("serviceWorker" in navigator) {
 
     rows.forEach(r=>{
       html += `<tr data-customer="${escHtml(r.customer)}">` +
-        td(escHtml(r.customer) + fuAliasSubline(r.customer), "font-weight:600; white-space:normal; word-break:break-word;", "nm") +
+        td(escHtml(r.customer), "font-weight:600; white-space:normal; word-break:break-word;", "nm") +
         td(escHtml(r.cs || "-")) +
         td(fmtTgl(r.first)) + td(fmtTgl(r.last)) +
         td(r.medGap!==null ? fmtHari(r.medGap) : "-") +
@@ -17544,13 +16789,11 @@ if ("serviceWorker" in navigator) {
     const { p8, nBln, estBln, bulanLabel } = fuHitungPrediksi(r, TODAY);
 
     document.getElementById("followup-detail-nama").textContent = r.customer;
-    document.getElementById("followup-detail-cs").innerHTML = `CS paling sering: ${escHtml(r.cs || "-")}${fuAliasSubline(r.customer)}`;
+    document.getElementById("followup-detail-cs").textContent = `CS paling sering: ${r.cs || "-"}`;
 
-    // BARU -- "Riwayat Order Lunas" (daftar tanggal + qty per order) SENGAJA
-    // disembunyikan dari popup Detail Customer atas permintaan user. Data
-    // r.riwayat sendiri TIDAK dihapus -- tetap dipakai normal oleh Bagian
-    // A/B/C di atas dan oleh Grafik Riwayat (fuRenderChart), cuma daftar
-    // baris tanggal+qty mentahnya yang tidak lagi ditampilkan di sini.
+    const riwayatHtml = (r.riwayat || []).slice().reverse().map(h=>
+      `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--line);"><span>${fmtTgl(h.tanggal)}</span><span>Qty ${h.qty}</span></div>`
+    ).join("") || `<div style="color:var(--ink-soft);">Belum ada riwayat.</div>`;
 
     // BAGIAN A -- Parameter & Asumsi
     const rowsA = [
@@ -17590,7 +16833,7 @@ if ("serviceWorker" in navigator) {
     // BAGIAN C -- Prediksi kebutuhan stok bulan ini
     const bagianCHtml = `
       <div class="fu-stok-grid">
-        <div class="fu-stok-item"><div class="s-label">Jumlah order prediksi ${bulanLabel}</div><div class="s-val">${nBln}</div><div class="s-unit">kali order lagi</div></div>
+        <div class="fu-stok-item"><div class="s-label">Jumlah order prediksi ${bulanLabel}</div><div class="s-val">${nBln}</div><div class="s-unit">kali order</div></div>
         <div class="fu-stok-item" style="background:#fffde7;"><div class="s-label">Estimasi total qty bulan ini</div><div class="s-val" style="font-size:24px;">${fmtNumID(estBln)}</div><div class="s-unit">pcs / unit</div></div>
         <div class="fu-stok-item"><div class="s-label">Rata-rata qty per order</div><div class="s-val">${r.avgQty}</div><div class="s-unit">pcs per order</div></div>
       </div>`;
@@ -17619,6 +16862,9 @@ if ("serviceWorker" in navigator) {
         <div class="fu-bag-hdr">▌ BAGIAN C — PREDIKSI KEBUTUHAN STOK BULAN INI</div>
         ${bagianCHtml}
       </div>
+
+      <div style="font-weight:700; font-size:13px; margin:14px 0 6px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.5px;">Riwayat Order Lunas</div>
+      ${riwayatHtml}
     `;
     detailOverlay.hidden = false;
   }
@@ -17667,8 +16913,7 @@ if ("serviceWorker" in navigator) {
     if(!r) return;
     const hist = (r.riwayat || []).map(h=> ({ d: new Date(h.tanggal), q: h.qty })).sort((a,b)=> a.d - b.d);
     document.getElementById("followup-chart-title").textContent = `📈 Riwayat Pembelian — ${r.customer}`;
-    const chartAliases = fuAliasLookup[(r.customer || "").trim().toUpperCase()];
-    document.getElementById("followup-chart-sub").innerHTML = `${hist.length} order tercatat${hist.length ? " • " + fmtTgl(hist[0].d.toISOString()) + " s/d " + fmtTgl(hist[hist.length-1].d.toISOString()) : ""}${chartAliases && chartAliases.length ? `<br>↳ dulu: ${chartAliases.map(a=> escHtml(a)).join(", ")}` : ""}`;
+    document.getElementById("followup-chart-sub").textContent = `${hist.length} order tercatat${hist.length ? " • " + fmtTgl(hist[0].d.toISOString()) + " s/d " + fmtTgl(hist[hist.length-1].d.toISOString()) : ""}`;
 
     let labels, values, unitLbl, color, isLine;
     if(fuChartMode === "qty"){
@@ -17825,7 +17070,6 @@ if ("serviceWorker" in navigator) {
         `<div data-customer="${escHtml(r.customer)}" style="display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid var(--line); border-radius:9px; padding:10px 12px; cursor:pointer;">
           <div>
             <div style="font-weight:700;">${escHtml(r.customer)}</div>
-            ${fuAliasSubline(r.customer)}
             <div style="font-size:12px; color:var(--ink-soft);">${escHtml(r.cs || "-")} • Terakhir order ${fmtTgl(r.last)}</div>
           </div>
           <div style="color:#c36a00; font-weight:700; white-space:nowrap;">🟠 ${fmtHari(r.sisa)} lagi</div>
@@ -17928,64 +17172,6 @@ if ("serviceWorker" in navigator) {
       syncBackButtonVisibility();
     }catch(e){
       console.log("Telegram BackButton init dilewati:", e);
-    }
-  })();
-</script>
-
-<script>
-  /* ============================================================
-     PEMULIHAN TAMPILAN TERAKHIR SETELAH F5/RELOAD
-     Sebelumnya, F5 SELALU balik ke Beranda karena status "lagi di
-     halaman apa" cuma hidup di memori JS, hilang tiap kali browser
-     reload script dari awal. Sekarang status itu ikut disalin ke
-     localStorage tiap kali berubah (lihat blok pencatat di <head>,
-     dekat bootstrap tema) -- di sinilah nilai itu dibaca lagi (lewat
-     window.__initialLastView, DIBACA SEBELUM sempat ditimpa
-     replaceState({view:"home"}) awal milik modul wizard) lalu dipakai
-     memulihkan tampilan yang sama.
-     SENGAJA ditaruh di paling akhir <body> (setelah modul Wizard,
-     Rekap Pesanan, & Follow Up semuanya selesai memasang
-     window.__applyNavState/__applyRekapView/__applyFollowUpView
-     miliknya) -- kalau dipanggil lebih awal, fungsi2 punya Rekap
-     Pesanan/Follow Up belum tentu sudah terpasang karena kode
-     mereka baru dieksekusi belakangan di file ini.
-     ============================================================ */
-  (function(){
-    try{
-      // Pintasan shortcut (?shortcut=...) lebih diprioritaskan -- itu
-      // aksi eksplisit user baru saja klik ikon di homescreen, jangan
-      // ditimpa tampilan lama sebelum ini (blok shortcut ada di bawah).
-      if(new URLSearchParams(location.search).get("shortcut")) return;
-
-      const state = window.__initialLastView;
-      if(!state || state.view === "home") return; // default memang sudah Beranda, tidak perlu apa2
-      // PERBAIKAN (laporan "app freeze/macet total begitu dibuka lagi,
-      // selalu di Rekap Pesanan") -- SEBELUMNYA "rekap"/"followup" ikut
-      // dipulihkan otomatis persis seperti "wiz" -- padahal keduanya
-      // BEDA SIFAT: begitu dipulihkan, applyRekapView()/applyFollowUpView()
-      // LANGSUNG memicu fetch ke Worker + render tabel penuh dari nol,
-      // PERSIS di detik-detik paling kritis saat index.html (~1MB, satu
-      // file) masih diparse/dieksekusi Chrome/WebView. 2 beban berat itu
-      // numpuk bersamaan -> kemungkinan kuat jadi penyebab freeze yang
-      // dilaporkan. "wiz" (form Grosir/Custom yang lagi diisi) TIDAK
-      // ikut kena -- itu murni tampilan ulang data lokal yang sudah ada
-      // di memori, TIDAK ada fetch jaringan sama sekali, jadi tetap aman
-      // dipulihkan seperti biasa (supaya draft pesanan yang lagi diisi
-      // tidak hilang kalau app tidak sengaja tertutup).
-      if(state.view === "rekap" || state.view === "followup") return; // biarkan default ke Beranda
-
-      // Samakan riwayat browser dgn tampilan yang mau dipulihkan, supaya
-      // tombol/gesture back sesudahnya tetap konsisten mundur ke
-      // Beranda -- bukan nyangkut di entry "home" bawaan awal tadi.
-      try{ history.replaceState(state, ""); }catch(e){}
-
-      setTimeout(function(){
-        if(state.view === "wiz" && state.sheet && window.__applyNavState){
-          window.__applyNavState(state);
-        }
-      }, 60); // delay kecil -- pastikan semua tombol tab & modul terkait sudah siap dipakai (pola sama dgn blok pintasan shortcut di bawah)
-    }catch(e){
-      console.log("Pemulihan tampilan terakhir dilewati:", e);
     }
   })();
 </script>
