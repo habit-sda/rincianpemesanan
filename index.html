@@ -5571,6 +5571,23 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="md-pin-err" id="md-cslist-err"></div>
         <button class="md-btn primary md-lockable" id="md-cslist-add" style="margin-top:10px;">+ Tambah CS</button>
       </div>
+      <div class="md-card" id="md-csmaster-card">
+        <h3>Master Nama CS</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          SEMUA nama CS yang pernah tercatat di riwayat pesanan (bukan cuma yang didaftarkan manual di "Daftar CS" di atas) — bisa diedit atau disembunyikan di sini. Mengubah nama otomatis <b>disinkronkan</b> ke Rekap Pesanan, Follow Up, Master Nama Pelanggan, <b>dan</b> "Daftar CS" di atas sekaligus (kalau namanya kebetulan cocok) — nama lama yang digabung tersimpan sebagai riwayat di bawah nama barunya (chip putus-putus). "🙈 Sembunyikan" bukan hapus permanen — data pesanan lama tidak disentuh, bisa dipulihkan kapan saja. Satu hal yang TIDAK ikut berubah: caption/gambar nota yang <b>sudah terkirim</b> ke grup Telegram sebelumnya (itu teks di gambar lama, apa adanya, sama seperti nota lama lainnya).
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <input type="text" id="md-csmaster-search" class="md-lock-exempt" placeholder="🔍 Cari nama CS..." style="flex:1;min-width:140px;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;background:var(--card);">
+          <button type="button" id="md-csmaster-toggle-hidden" class="md-lock-exempt" style="flex-shrink:0;height:40px;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:0 14px;font-size:12.5px;cursor:pointer;white-space:nowrap;">🙈 Tersembunyi (<span id="md-csmaster-hidden-count">0</span>)</button>
+        </div>
+        <div id="md-csmaster-list"></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+          <input type="text" id="md-csmaster-add-name" placeholder="Nama CS baru (mis. Fulan)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+          <input type="text" inputmode="numeric" id="md-csmaster-add-id" placeholder="Telegram ID (opsional)" style="flex:1; min-width:140px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 12px; font-size:14px; background:var(--card);">
+        </div>
+        <div class="md-pin-err" id="md-csmaster-add-err"></div>
+        <button class="md-btn primary md-lockable" id="md-csmaster-add-btn" style="margin-top:10px;">+ Tambah Nama CS</button>
+      </div>
       <div class="md-card">
         <h3>Mode Gelap</h3>
         <div class="md-togglerow">
@@ -6108,7 +6125,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.67.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.68.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6355,7 +6372,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.67.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.68.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Fitur baru: Master Nama CS</b> — <b>Master Data → Tampilan</b>, di bawah kartu "Daftar CS", sekarang ada kartu baru yang menampilkan SEMUA nama CS yang pernah tercatat di riwayat pesanan (bukan cuma yang didaftarkan manual). Nama bisa diedit/digabungkan — otomatis disinkronkan ke Rekap Pesanan, Follow Up, Master Nama Pelanggan, <b>dan</b> "Daftar CS" sekaligus — atau disembunyikan ("🙈 Sembunyikan", bukan hapus permanen, bisa dipulihkan kapan saja).</li>
+            <li><b>Format caption "Revisi Pemesanan" diubah</b> — saat checkbox "Revisi Pemesanan" dicentang di popup "Kirim ke Grup Telegram"/Salin &amp; Kirim, nama customer (dikasih awalan "✒️") sekarang tampil di baris paling atas caption, baru di bawahnya (setelah baris kosong) baris "Revisi Pemesanan" (emoji 🔄 dihapus). Urutan baris lain (Rp.../CS/Pengirim) tidak berubah. Pesanan normal (tidak direvisi) formatnya tetap sama seperti sebelumnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.67.0</div>
           <ul>
             <li><b>Notifikasi Logistik: nama produk lengkap + satuan</b> — pesan "siap diproses" dan "persiapan stok" ke Logistik sekarang menampilkan nama produk penuh dan satuannya (mis. "Halawa rasa Ayam : 12 Karton"), bukan lagi kode singkatan (mis. "HA : 12"). Tempat lain (Rekap Pesanan, dll) tidak berubah.</li>
             <li><b>Pesan DM ke bot terhapus otomatis setelah 48 jam</b> — baik pesan yang dikirim bot maupun yang Anda ketik sendiri di chat pribadi dengan bot (bukan grup) sekarang otomatis terhapus 48 jam setelah dikirim, sesuai batas maksimal yang diizinkan Telegram sendiri.</li>
@@ -14930,6 +14954,323 @@ if ("serviceWorker" in navigator) {
     window.__renderCsList = renderCsList; // dipanggil ulang setelah pull data server
   })();
 
+  /* ---------- BARU (Sept 2026) -- Master Nama CS ----------
+     SEMUA nama CS yang pernah tercatat di riwayat pesanan (bukan cuma
+     "Daftar CS" manual di atas) -- bisa diedit (gabung/ganti nama) atau
+     disembunyikan. Pola UI SAMA dgn Master Nama Pelanggan (v2) di tab
+     "Master Nama", tapi lebih sederhana (tidak ada kartu saran otomatis
+     -- gabung nama dilakukan manual lewat "✏️ Edit", bukan disarankan).
+     Rename/gabung di sini benar2 MENULIS ULANG data di server (D1
+     customer_order_log, customerMasterV2.cs, & Daftar CS) -- lihat
+     catatan lengkap di Worker (cascadeCsRewrite) kenapa beda dari
+     Master Nama Pelanggan yang cuma alias. */
+  (function(){
+    const listEl = document.getElementById("md-csmaster-list");
+    const searchEl = document.getElementById("md-csmaster-search");
+    const toggleHiddenBtn = document.getElementById("md-csmaster-toggle-hidden");
+    const hiddenCountEl = document.getElementById("md-csmaster-hidden-count");
+    const addNameInput = document.getElementById("md-csmaster-add-name");
+    const addIdInput = document.getElementById("md-csmaster-add-id");
+    const addErrEl = document.getElementById("md-csmaster-add-err");
+    const addBtn = document.getElementById("md-csmaster-add-btn");
+    if(!listEl || !addBtn) return;
+
+    let csActive = [];
+    let csHidden = [];
+    let showHidden = false;
+    let editingName = null;
+    let loaded = false;
+    let currentPage = 1;
+    const PAGE_SIZE = 20;
+
+    function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+    // Sinkronkan SETTINGS.csList (Daftar CS di atas) dari server -- rename/
+    // set-telegram-id di Master CS bisa mengubah settings.csList di server
+    // TANPA lewat pushMasterDataToServer() (ditulis LANGSUNG oleh Worker),
+    // jadi tarik ulang di sini supaya kartu "Daftar CS" & datalist rekomendasi
+    // ikut segar tanpa perlu reload halaman.
+    async function refreshDaftarCsFromServer(){
+      try{
+        const fresh = await fetchMasterDataFromServer();
+        if(fresh && fresh.settings && Array.isArray(fresh.settings.csList)){
+          SETTINGS.csList = fresh.settings.csList;
+          if(window.__lastServerSnapshot && window.__lastServerSnapshot.settings){
+            window.__lastServerSnapshot.settings.csList = fresh.settings.csList;
+          }
+          if(window.__renderCsList) window.__renderCsList();
+        }
+      }catch(e){ console.log("Gagal refresh Daftar CS dari server:", e); }
+    }
+
+    function paginationHtml(totalPages){
+      if(totalPages <= 1) return "";
+      return `
+        <div class="md-nama-pagination">
+          <button type="button" class="md-csmaster-page-prev" ${currentPage<=1?"disabled":""}>‹ Sebelumnya</button>
+          <span class="md-nama-page-info">Halaman ${currentPage} dari ${totalPages}</span>
+          <button type="button" class="md-csmaster-page-next" ${currentPage>=totalPages?"disabled":""}>Selanjutnya ›</button>
+        </div>`;
+    }
+
+    function aliasChipsHtml(r){
+      const aliases = Array.isArray(r.aliases) ? r.aliases : [];
+      if(!aliases.length) return "";
+      return `
+        <div class="md-nama-alias-wrap">
+          <span class="md-nama-alias-label">↳ Nama lama (sudah digabung):</span>
+          ${aliases.map(a=> `<span class="md-alias-chip"><span class="md-alias-text" style="cursor:default;text-decoration:none;">${esc(a)}</span><button type="button" class="md-csmaster-alias-del" data-alias="${esc(a)}" title="Hapus catatan nama lama ini (tidak menyentuh data pesanan)">✕</button></span>`).join("")}
+        </div>`;
+    }
+
+    function getFiltered(){
+      const source = showHidden ? csHidden : csActive;
+      const q = searchEl.value.trim().toLowerCase();
+      if(!q) return source;
+      return source.filter(r=>
+        (r.name || "").toLowerCase().includes(q) ||
+        (r.telegramId || "").toLowerCase().includes(q) ||
+        (Array.isArray(r.aliases) && r.aliases.some(a=> (a||"").toLowerCase().includes(q)))
+      );
+    }
+
+    function render(){
+      if(hiddenCountEl) hiddenCountEl.textContent = csHidden.length;
+      if(toggleHiddenBtn) toggleHiddenBtn.textContent = showHidden ? "👁️ Tampilkan Aktif" : ("🙈 Tersembunyi (" + csHidden.length + ")");
+      if(!loaded){
+        listEl.innerHTML = `<div class="md-quota-loading"><span class="md-quota-spin"></span> Memuat daftar nama CS...</div>`;
+        return;
+      }
+      const filtered = getFiltered();
+      if(!filtered.length){
+        listEl.innerHTML = `<div class="md-hanging-empty">${
+          (showHidden ? csHidden.length : csActive.length)
+            ? "Tidak ada yang cocok dicari."
+            : (showHidden ? "Tidak ada nama CS yang disembunyikan." : "Belum ada nama CS tercatat.")
+        }</div>`;
+        reapplyMdLock("tampilan");
+        return;
+      }
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      if(currentPage > totalPages) currentPage = totalPages;
+      if(currentPage < 1) currentPage = 1;
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+      const rowsHtml = pageItems.map(r=>{
+        const n = r.name;
+        if(!showHidden && n === editingName){
+          return `
+            <div class="md-nama-row v2" data-name="${esc(n)}">
+              <div class="md-nama-fields">
+                <div class="fld"><div class="fld-label">Nama CS</div><input type="text" class="md-csmaster-edit-name" value="${esc(n)}" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;"></div>
+                <div class="fld"><div class="fld-label">Telegram ID</div><input type="text" inputmode="numeric" class="md-csmaster-edit-id" value="${esc(r.telegramId||"")}" placeholder="(kosong)" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;"></div>
+              </div>
+              <div class="md-pin-err md-csmaster-edit-err"></div>
+              ${aliasChipsHtml(r)}
+              <div class="md-nama-row-actions">
+                <button type="button" class="edit md-csmaster-save">💾 Simpan</button>
+                <button type="button" class="del md-csmaster-cancel">Batal</button>
+              </div>
+            </div>`;
+        }
+        if(showHidden){
+          return `
+            <div class="md-nama-row v2" data-name="${esc(n)}">
+              <div class="md-nama-fields">
+                <div class="fld"><div class="fld-label">Nama CS</div><div class="fld-val">${esc(n)}</div></div>
+                <div class="fld"><div class="fld-label">Telegram ID</div><div class="fld-val ${r.telegramId ? "" : "empty"}">${r.telegramId ? esc(r.telegramId) : "(kosong)"}</div></div>
+              </div>
+              <div class="md-nama-row-actions">
+                <button type="button" class="edit md-csmaster-unhide-btn md-lockable">♻️ Pulihkan</button>
+              </div>
+            </div>`;
+        }
+        return `
+          <div class="md-nama-row v2" data-name="${esc(n)}">
+            <div class="md-nama-fields">
+              <div class="fld"><div class="fld-label">Nama CS</div><div class="fld-val">${esc(n)}</div></div>
+              <div class="fld"><div class="fld-label">Telegram ID</div><div class="fld-val ${r.telegramId ? "" : "empty"}">${r.telegramId ? esc(r.telegramId) : "(kosong)"}</div></div>
+            </div>
+            ${aliasChipsHtml(r)}
+            <div class="md-nama-row-actions">
+              <button type="button" class="edit md-csmaster-edit-btn md-lockable">✏️ Edit</button>
+              <button type="button" class="del md-csmaster-del-btn md-lockable">🙈 Sembunyikan</button>
+            </div>
+          </div>`;
+      }).join("");
+
+      listEl.innerHTML = rowsHtml + paginationHtml(totalPages);
+      reapplyMdLock("tampilan");
+    }
+
+    async function loadCsMaster(){
+      if(!MASTER_DATA_WORKER_URL) return;
+      try{
+        const res = await fetch(MASTER_DATA_WORKER_URL + "/cs-names", { headers: workerHeaders() });
+        const data = await res.json();
+        csActive = Array.isArray(data.csNames) ? data.csNames : [];
+        csHidden = Array.isArray(data.hiddenCsNames) ? data.hiddenCsNames : [];
+        loaded = true;
+        render();
+      }catch(e){
+        listEl.innerHTML = `<div class="md-quota-error">Gagal memuat daftar nama CS: ${esc(String(e.message||e))}</div>`;
+      }
+    }
+
+    searchEl.addEventListener("input", ()=>{ currentPage = 1; render(); });
+    toggleHiddenBtn.addEventListener("click", ()=>{
+      showHidden = !showHidden;
+      editingName = null;
+      currentPage = 1;
+      searchEl.value = "";
+      render();
+    });
+
+    listEl.addEventListener("click", async (e)=>{
+      const row = e.target.closest(".md-nama-row");
+      if(!row) return;
+      const name = row.dataset.name;
+
+      if(e.target.classList.contains("md-csmaster-edit-btn")){
+        editingName = name;
+        render();
+        const input = listEl.querySelector(".md-csmaster-edit-name");
+        if(input){ input.focus(); input.select(); }
+        return;
+      }
+      if(e.target.classList.contains("md-csmaster-cancel")){
+        editingName = null;
+        render();
+        return;
+      }
+      if(e.target.classList.contains("md-csmaster-save")){
+        const nameInput = row.querySelector(".md-csmaster-edit-name");
+        const idInput = row.querySelector(".md-csmaster-edit-id");
+        const errEl = row.querySelector(".md-csmaster-edit-err");
+        const newName = nameInput ? nameInput.value.trim() : "";
+        const newId = idInput ? idInput.value.trim() : "";
+        if(errEl) errEl.textContent = "";
+        if(!newName){ if(errEl) errEl.textContent = "Nama CS tidak boleh kosong."; return; }
+        if(newId && !/^\d+$/.test(newId)){ if(errEl) errEl.textContent = "Telegram ID harus berupa angka (bukan username)."; return; }
+        const origRec = csActive.find(r=> r.name === name) || {};
+        try{
+          let finalName = name;
+          let touchedDaftarCs = false;
+          if(newName !== name){
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/cs-names/rename", {
+              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ oldName: name, newName }),
+            });
+            const data = await res.json();
+            if(!res.ok || data.error) throw new Error(data.error || "Gagal menyimpan nama.");
+            csActive = data.csNames || csActive;
+            finalName = newName;
+            if(data.sync && data.sync.daftarCsUpdated) touchedDaftarCs = true;
+          }
+          if(newId !== (origRec.telegramId || "")){
+            const res2 = await fetch(MASTER_DATA_WORKER_URL + "/cs-names/set-telegram-id", {
+              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ name: finalName, telegramId: newId }),
+            });
+            const data2 = await res2.json();
+            if(!res2.ok || data2.error) throw new Error(data2.error || "Gagal menyimpan Telegram ID.");
+            csActive = data2.csNames || csActive;
+            touchedDaftarCs = true;
+          }
+          editingName = null;
+          render();
+          if(touchedDaftarCs) refreshDaftarCsFromServer();
+        }catch(err){
+          if(errEl) errEl.textContent = "Gagal menyimpan: " + String(err.message || err);
+        }
+        return;
+      }
+      if(e.target.classList.contains("md-csmaster-alias-del")){
+        const alias = e.target.dataset.alias;
+        window.showResetConfirm(
+          `Hapus catatan "${alias}" dari riwayat nama lama "${name}"?`,
+          async ()=>{
+            try{
+              const res = await fetch(MASTER_DATA_WORKER_URL + "/cs-names/delete-alias", {
+                method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ name, alias }),
+              });
+              const data = await res.json();
+              if(!res.ok || data.error) throw new Error(data.error || "Gagal menghapus catatan.");
+              csActive = data.csNames || csActive;
+              render();
+            }catch(err){ showMsg("Gagal menghapus catatan: " + String(err.message || err), true); }
+          },
+          { icon: "🗑️", iconBg: "#fdecea", iconColor: "var(--danger-red)",
+            okText: "Ya, Hapus", okColor: "var(--danger-red)",
+            warningText: `Data pesanan yg sudah tergabung TIDAK ikut berubah -- ini cuma catatan riwayat nama lama.` }
+        );
+        return;
+      }
+      if(e.target.classList.contains("md-csmaster-del-btn")){
+        window.showResetConfirm(
+          `Sembunyikan "${name}" dari Master Nama CS?`,
+          async ()=>{
+            try{
+              const res = await fetch(MASTER_DATA_WORKER_URL + "/cs-names/delete", {
+                method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ name }),
+              });
+              const data = await res.json();
+              if(!res.ok || data.error) throw new Error(data.error || "Gagal menyembunyikan.");
+              await loadCsMaster();
+            }catch(err){ showMsg("Gagal menyembunyikan nama CS: " + String(err.message || err), true); }
+          },
+          { icon: "🙈", iconBg: "#fdecea", iconColor: "var(--danger-red)",
+            okText: "Ya, Sembunyikan", okColor: "var(--danger-red)",
+            warningText: `Data pesanan lama TIDAK dihapus -- bisa dipulihkan kapan saja lewat "🙈 Tersembunyi" di atas daftar. Entri "Daftar CS" (kalau ada) TIDAK ikut dihapus di sini.` }
+        );
+        return;
+      }
+      if(e.target.classList.contains("md-csmaster-unhide-btn")){
+        try{
+          const res = await fetch(MASTER_DATA_WORKER_URL + "/cs-names/unhide", {
+            method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify({ name }),
+          });
+          const data = await res.json();
+          if(!res.ok || data.error) throw new Error(data.error || "Gagal memulihkan.");
+          await loadCsMaster();
+          showHidden = false;
+          render();
+        }catch(err){ showMsg("Gagal memulihkan nama CS: " + String(err.message || err), true); }
+        return;
+      }
+      if(e.target.classList.contains("md-csmaster-page-prev")){ currentPage--; render(); return; }
+      if(e.target.classList.contains("md-csmaster-page-next")){ currentPage++; render(); return; }
+    });
+
+    addBtn.addEventListener("click", async ()=>{
+      const name = addNameInput.value.trim();
+      const telegramId = addIdInput.value.trim();
+      addErrEl.textContent = "";
+      if(!name){ addErrEl.textContent = "Nama wajib diisi."; return; }
+      if(telegramId && !/^\d+$/.test(telegramId)){ addErrEl.textContent = "Telegram ID harus berupa angka (bukan username)."; return; }
+      try{
+        const res = await fetch(MASTER_DATA_WORKER_URL + "/cs-names/add", {
+          method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ name, telegramId }),
+        });
+        const data = await res.json();
+        if(!res.ok || data.error) throw new Error(data.error || "Gagal menambahkan.");
+        csActive = data.csNames || csActive;
+        addNameInput.value = ""; addIdInput.value = "";
+        showHidden = false; currentPage = 1;
+        render();
+        if(telegramId) refreshDaftarCsFromServer();
+      }catch(err){ addErrEl.textContent = "Gagal menambahkan: " + String(err.message || err); }
+    });
+
+    render(); // tampilkan status "memuat..." dulu sebelum data pertama datang
+    window.__mdLoadCsMaster = loadCsMaster; // dipanggil saat tab "Tampilan" dibuka
+  })();
+
   /* ---------- link Bantuan (Tampilan) ---------- */
   const bantuanLinkInput = document.getElementById("md-bantuan-link");
   const bantuanErr = document.getElementById("md-bantuan-err");
@@ -15186,6 +15527,7 @@ if ("serviceWorker" in navigator) {
       tab.classList.add("active");
       document.getElementById("md-sec-"+tab.dataset.mdTab).classList.add("active");
       if(tab.dataset.mdTab === "namacustomer" && window.__mdLoadNamaList) window.__mdLoadNamaList();
+      if(tab.dataset.mdTab === "tampilan" && window.__mdLoadCsMaster) window.__mdLoadCsMaster();
     });
   });
 

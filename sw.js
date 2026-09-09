@@ -4,8 +4,18 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v358";
+const CACHE_VERSION = "v359";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v359 -- Fitur baru: Master Nama CS (Master Data > Tampilan, di bawah
+   "Daftar CS") -- semua nama CS yang pernah tercatat di riwayat pesanan
+   sekarang bisa dilihat, diedit/digabung (sinkron ke Rekap Pesanan,
+   Follow Up, Master Nama Pelanggan, & Daftar CS sekaligus), atau
+   disembunyikan (soft-hide, bisa dipulihkan). Lihat getCsMasterList/
+   cascadeCsRewrite di Worker_Rincian_Pemesanan.js. Selain itu, format
+   caption "Revisi Pemesanan" saat Salin & Kirim diubah: nama customer
+   (dikasih awalan "✒️") sekarang di baris paling atas, baris "Revisi
+   Pemesanan" (tanpa emoji 🔄 lagi) dipindah ke bawahnya -- urutan baris
+   lain (Rp/CS/Pengirim) tidak berubah. */
 /* v358 -- Notifikasi Logistik pakai nama produk lengkap + satuan (bukan
    kode singkatan). Pesan DM ke bot (masuk & keluar, chat pribadi saja)
    sekarang terhapus otomatis 48 jam setelah dikirim -- lihat
