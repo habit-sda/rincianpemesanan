@@ -4,8 +4,13 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v357";
+const CACHE_VERSION = "v358";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v358 -- Notifikasi Logistik pakai nama produk lengkap + satuan (bukan
+   kode singkatan). Pesan DM ke bot (masuk & keluar, chat pribadi saja)
+   sekarang terhapus otomatis 48 jam setelah dikirim -- lihat
+   scheduleDmMessageDeletion/cleanupExpiredDmMessages di
+   Worker_Rincian_Pemesanan.js. */
 /* v357 -- Audit keamanan data: kolom Rp di customer_order_log (riwayat
    Follow Up, permanen) sekarang dibersihkan otomatis setelah 90 hari
    (tanggal/Qty/ekspedisi/CS tetap utuh -- Follow Up tidak terganggu).

@@ -6108,7 +6108,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.66.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.67.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6355,7 +6355,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.66.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.67.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Notifikasi Logistik: nama produk lengkap + satuan</b> — pesan "siap diproses" dan "persiapan stok" ke Logistik sekarang menampilkan nama produk penuh dan satuannya (mis. "Halawa rasa Ayam : 12 Karton"), bukan lagi kode singkatan (mis. "HA : 12"). Tempat lain (Rekap Pesanan, dll) tidak berubah.</li>
+            <li><b>Pesan DM ke bot terhapus otomatis setelah 48 jam</b> — baik pesan yang dikirim bot maupun yang Anda ketik sendiri di chat pribadi dengan bot (bukan grup) sekarang otomatis terhapus 48 jam setelah dikirim, sesuai batas maksimal yang diizinkan Telegram sendiri.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.66.0</div>
           <ul>
             <li><b>Audit keamanan data: perlindungan Rp diperkuat</b> — ditemukan celah, kolom nominal (Rp) di riwayat pesanan permanen (`customer_order_log`, sumber Follow Up) ternyata tidak pernah dihapus otomatis, berbeda dari kebijakan retensi 90 hari yang berlaku di tempat lain. Sekarang dibersihkan otomatis setiap hari untuk baris yang lebih tua dari 90 hari — tanggal, Qty, ekspedisi, dan CS tetap utuh permanen (Follow Up tidak terganggu), cuma nominal Rp yang dikosongkan tepat waktu.</li>
             <li><b>Saran ekspedisi lebih akurat untuk pelanggan siklus panjang</b> — sumber datanya dipindah ke riwayat permanen (bukan lagi riwayat 90 hari) untuk customer biasa, supaya pelanggan yang order tiap beberapa bulan sekali tetap dapat rekomendasi ekspedisi yang benar. Nama penerima Dropship tetap pakai riwayat terpisah seperti sebelumnya.</li>
@@ -8395,7 +8402,11 @@ function collectOrderItems(tab){
       // (dari SEBELUM perbaikan Master Data > Produk), data yang dikirim
       // ke bot/server tetap konsisten huruf besar, tanpa CS perlu buka
       // & simpan ulang tiap produk satu-satu dulu.
-      return { nama: sel.value, kodeSingkat: ((p && p.kodeSingkat) || "").toUpperCase(), qty };
+      // BARU (permintaan "notifikasi Logistik pakai nama produk penuh +
+      // satuan, bukan kode singkatan") -- p.satuan (mis. "Karton"/"Pack")
+      // ikut dikirim apa adanya, sama pola dgn nama/kodeSingkat di atas --
+      // dibaca dari Master Data Produk, bukan ditebak/dihitung ulang.
+      return { nama: sel.value, kodeSingkat: ((p && p.kodeSingkat) || "").toUpperCase(), qty, satuan: (p && p.satuan) || "" };
     })
     .filter(Boolean);
 }
