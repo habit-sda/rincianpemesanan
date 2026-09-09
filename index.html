@@ -6108,7 +6108,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.63.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.66.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6216,9 +6216,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <span>📝 Pesan u/ Inventory</span>
           </label>
         </div>
-        <div id="kt-dropship-field" hidden style="margin-top:8px;">
+        <div id="kt-dropship-field" hidden style="margin-top:8px;position:relative;">
           <label for="kt-dropship-recipient" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Penerima Dropship</label>
           <input type="text" id="kt-dropship-recipient" class="kt-input" placeholder="Isi nama penerima dropship" autocomplete="off" style="text-transform:uppercase;">
+          <!-- BARU -- dropdown riwayat nama penerima dropship customer ini
+               (lihat GET /dropship-recipients), murni suggestion, TIDAK
+               ada halaman/kartu Master Data terpisah utk data ini. -->
+          <div id="kt-dropship-recipient-suggest" hidden style="position:absolute;left:0;right:0;top:100%;background:var(--card);border:1px solid var(--line);border-radius:0 0 10px 10px;box-shadow:0 4px 10px rgba(0,0,0,.08);z-index:20;max-height:180px;overflow-y:auto;"></div>
         </div>
         <!-- BARU -- "Pesan u/ Inventory" (dulu "Keterangan Tambahan"):
              diisi CS saat bikin Rincian Pemesanan, TIDAK ikut caption/nota
@@ -6351,7 +6355,26 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.63.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.66.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Audit keamanan data: perlindungan Rp diperkuat</b> — ditemukan celah, kolom nominal (Rp) di riwayat pesanan permanen (`customer_order_log`, sumber Follow Up) ternyata tidak pernah dihapus otomatis, berbeda dari kebijakan retensi 90 hari yang berlaku di tempat lain. Sekarang dibersihkan otomatis setiap hari untuk baris yang lebih tua dari 90 hari — tanggal, Qty, ekspedisi, dan CS tetap utuh permanen (Follow Up tidak terganggu), cuma nominal Rp yang dikosongkan tepat waktu.</li>
+            <li><b>Saran ekspedisi lebih akurat untuk pelanggan siklus panjang</b> — sumber datanya dipindah ke riwayat permanen (bukan lagi riwayat 90 hari) untuk customer biasa, supaya pelanggan yang order tiap beberapa bulan sekali tetap dapat rekomendasi ekspedisi yang benar. Nama penerima Dropship tetap pakai riwayat terpisah seperti sebelumnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.65.0</div>
+          <ul>
+            <li><b>Saran ekspedisi lebih akurat & sadar Dropship</b> — saran "ekspedisi biasanya" di popup Kirim ke Grup Telegram sekarang butuh minimal 3x berturut-turut sebelum jadi rekomendasi (bukan cuma 1x terakhir), dan otomatis update kalau CS ganti ekspedisi baru 3x berturut-turut juga. Kalau pesanan itu Dropship, yang dicek pola ekspedisinya nama penerima Dropship, bukan nama customer/reseller-nya. Saran ini juga sekarang disembunyikan otomatis kalau ada peringatan nama lama/duplikat yang sedang tampil, supaya popup tidak menumpuk lebih dari 1 peringatan sekaligus.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.64.0</div>
+          <ul>
+            <li><b>Dropship: riwayat nama penerima per customer</b> — nama penerima Dropship yang pernah dipakai untuk seorang customer sekarang otomatis tersimpan (D1, tanpa halaman Master Data terpisah). Lain kali centang "📦 Dropship" untuk customer yang sama, muncul dropdown nama-nama penerima yang pernah dipakai, tinggal klik tanpa ketik ulang.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.63.0</div>
           <ul>
             <li><b>Perbaikan performa: render & kirim nota lebih cepat</b> — foto produk (desain nota "baru") sekarang di-preload di waktu app nganggur (sama seperti library render gambar), bukan baru mulai diunduh pas klik Kirim/Unduh/Bagikan — mengurangi jeda render yang sebelumnya konsisten di semua device. Notifikasi Logistik untuk fitur "Kirim Sebelum Lunas" juga tidak lagi menahan respons kirim ke Telegram (jalan di belakang layar).</li>
           </ul>
@@ -9328,7 +9351,56 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     dropshipCheck.addEventListener("change", ()=>{
       dropshipField.hidden = !dropshipCheck.checked;
       if(!dropshipCheck.checked && dropshipRecipientInput) dropshipRecipientInput.value = "";
+      if(dropshipCheck.checked) loadDropshipRecipientSuggestions();
     });
+  }
+  // BARU (permintaan "simpan nama Dropship atas nama customer, munculkan
+  // dropdown kalau nama customer sama diketik lagi") -- saat checkbox
+  // Dropship dicentang & Nama Customer sudah terisi, ambil riwayat nama
+  // penerima yang PERNAH dipakai utk customer ini (GET /dropship-
+  // recipients), tampilkan sbg dropdown di bawah field Nama Penerima.
+  // Server menyimpannya sendiri (fire-and-forget) tiap kali order dgn
+  // dropshipRecipient terisi terkirim -- TIDAK ada halaman Master Data
+  // terpisah utk data ini, murni suplai dropdown ini.
+  const dropshipSuggestBox = document.getElementById("kt-dropship-recipient-suggest");
+  let dropshipSuggestReqSeq = 0;
+  async function loadDropshipRecipientSuggestions(){
+    if(!dropshipSuggestBox) return;
+    const customer = (nameInput.value || "").trim();
+    if(!dropshipCheck.checked || !customer){ dropshipSuggestBox.hidden = true; return; }
+    const seq = ++dropshipSuggestReqSeq; // cegah race kalau nama diketik cepat -- respons lama diabaikan
+    try{
+      const res = await fetch(`${MASTER_DATA_WORKER_URL}/dropship-recipients?customer=${encodeURIComponent(customer)}`, {
+        headers: workerHeaders(),
+      });
+      if(seq !== dropshipSuggestReqSeq) return;
+      const data = await res.json();
+      const recipients = Array.isArray(data?.recipients) ? data.recipients : [];
+      if(!recipients.length){ dropshipSuggestBox.hidden = true; return; }
+      dropshipSuggestBox.innerHTML = recipients.map(r=>
+        `<div class="kt-suggest-item" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line);">${escHtml(r)}</div>`
+      ).join("");
+      dropshipSuggestBox.hidden = false;
+    }catch(e){ dropshipSuggestBox.hidden = true; } // gagal ambil -- diam saja, field tetap bisa diisi manual seperti biasa
+  }
+  if(dropshipSuggestBox){
+    dropshipSuggestBox.addEventListener("click", (e)=>{
+      const item = e.target.closest(".kt-suggest-item");
+      if(!item || !dropshipRecipientInput) return;
+      dropshipRecipientInput.value = item.textContent;
+      dropshipSuggestBox.hidden = true;
+    });
+    document.addEventListener("click", (e)=>{
+      if(dropshipSuggestBox.hidden) return;
+      if(e.target === dropshipRecipientInput || dropshipSuggestBox.contains(e.target)) return;
+      dropshipSuggestBox.hidden = true;
+    });
+    if(dropshipRecipientInput) dropshipRecipientInput.addEventListener("focus", loadDropshipRecipientSuggestions);
+    // Nama customer bisa diisi/diganti SETELAH checkbox Dropship dicentang
+    // -- muat ulang saran tiap kali nama customer berubah, TAPI cuma
+    // kalau checkbox-nya memang sedang dicentang (dropshipField.hidden
+    // dicek di dalam loadDropshipRecipientSuggestions itu sendiri).
+    nameInput.addEventListener("input", ()=>{ if(dropshipCheck && dropshipCheck.checked) loadDropshipRecipientSuggestions(); });
   }
   // BARU -- Keterangan Tambahan (khusus Logistik) -- pola SAMA PERSIS dgn
   // Dropship di atas: checkbox cuma menampilkan/menyembunyikan field,
@@ -9559,9 +9631,13 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
      baru kotak peringatan dihitung & ditampilkan normal. Ini mencegah
      dropdown saran menutupi kotak peringatan seperti yang dilaporkan. */
   function refreshNameWarnings(query){
-    if(!suggestBox.hidden){ hideDuplicateWarning(); hideAliasWarning(); return; }
+    if(!suggestBox.hidden){ hideDuplicateWarning(); hideAliasWarning(); hideEkspedisiSuggest(); return; }
     checkDuplicateNameWarning(query);
     checkAliasWarning(query);
+    // BARU -- dipanggil PALING TERAKHIR, setelah .hidden dup/alias di atas
+    // final -- checkEkspedisiSuggestion() sendiri yang mengecek keduanya
+    // sebelum tampil (lihat catatan di definisinya).
+    checkEkspedisiSuggestion();
   }
   function renderSuggestions(query){
     const q = query.trim().toUpperCase();
@@ -9646,15 +9722,31 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   }
   async function checkEkspedisiSuggestion(){
     hideEkspedisiSuggest();
-    const customerName = stripNewTag(nameInput.value.trim());
-    if(customerName.length < 3 || !MASTER_DATA_WORKER_URL) return;
+    // BARU (permintaan "prioritas -- maks 1 hint tampil bersamaan") --
+    // saran ekspedisi ini PALING RENDAH prioritasnya dibanding peringatan
+    // alias (nama lama) & duplikat (nama mirip) -- kalau salah satu dari
+    // itu sedang tampil, saran ekspedisi TIDAK ditampilkan sama sekali
+    // (bukan cuma ditumpuk di bawahnya). refreshNameWarnings() manggil
+    // fungsi ini SETELAH checkDuplicateNameWarning/checkAliasWarning,
+    // jadi .hidden keduanya di titik ini sudah mencerminkan status final.
+    if((dupWarningEl && !dupWarningEl.hidden) || (aliasWarningEl && !aliasWarningEl.hidden)) return;
+    // BARU (permintaan "kalau Dropship, yang dicek pola ekspedisinya nama
+    // Dropship, bukan nama customer") -- kalau checkbox Dropship
+    // dicentang DAN field Nama Penerima sudah diisi, itu yang dipakai
+    // sbg kunci pengecekan riwayat -- BUKAN customerName. Customer yang
+    // sama bisa dropship ke banyak penerima beda kota, wajar beda
+    // ekspedisi masing-masing, jadi tidak masuk akal dicek dari nama
+    // customer/reseller-nya.
+    const useDropship = !!(dropshipCheck && dropshipCheck.checked && dropshipRecipientInput && dropshipRecipientInput.value.trim());
+    const checkName = useDropship ? stripNewTag(dropshipRecipientInput.value.trim()) : stripNewTag(nameInput.value.trim());
+    if(checkName.length < 3 || !MASTER_DATA_WORKER_URL) return;
     const pfx = getActiveShipFieldsElsePfx();
     const eksSelect = document.getElementById(pfx + "-ekspedisi");
     if(!eksSelect) return;
     const currentVal = (eksSelect.value || "").trim();
     let suggested = "";
     try{
-      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-rate?name=" + encodeURIComponent(customerName), { headers: workerHeaders() });
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-rate?name=" + encodeURIComponent(checkName) + (useDropship ? "&dropship=1" : ""), { headers: workerHeaders() });
       const body = await res.json().catch(()=> ({}));
       suggested = (body.ekspedisi || "").trim();
     }catch(e){ return; } // gagal ambil -> diam saja, tidak mengganggu alur kirim
@@ -9666,7 +9758,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // kalau tidak ketemu, jangan sarankan sesuatu yang tidak bisa dipilih.
     const matchedOption = Array.from(eksSelect.options).find(o=> o.value.trim().toLowerCase() === suggested.toLowerCase());
     if(!matchedOption) return;
-    ekspedisiSuggestEl.innerHTML = `💡 Customer ini biasanya pakai ekspedisi <b>${escHtml(matchedOption.value)}</b>${currentVal ? ` (sekarang: ${escHtml(currentVal)})` : ""}. <u>Klik untuk pakai</u>`;
+    ekspedisiSuggestEl.innerHTML = `💡 ${useDropship ? "Penerima" : "Customer"} ini biasanya pakai ekspedisi <b>${escHtml(matchedOption.value)}</b>${currentVal ? ` (sekarang: ${escHtml(currentVal)})` : ""}. <u>Klik untuk pakai</u>`;
     ekspedisiSuggestEl.hidden = false;
     ekspedisiSuggestEl.onclick = ()=>{
       eksSelect.value = matchedOption.value;
@@ -9881,6 +9973,12 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   if(revisiCheck) revisiCheck.addEventListener("change", ()=> resetRevisiPicker());
   if(dropshipCheck) dropshipCheck.addEventListener("change", updateSendBtnState);
   if(dropshipRecipientInput) dropshipRecipientInput.addEventListener("input", updateSendBtnState);
+  // BARU -- Nama Penerima Dropship ikut memengaruhi hint ekspedisi (lihat
+  // checkEkspedisiSuggestion) -- diketik/diganti sesudah checkbox Dropship
+  // dicentang, jadi perlu dicek ulang tiap kali field ini berubah, bukan
+  // cuma sekali waktu checkbox pertama dicentang.
+  if(dropshipRecipientInput) dropshipRecipientInput.addEventListener("input", checkEkspedisiSuggestion);
+  if(dropshipCheck) dropshipCheck.addEventListener("change", checkEkspedisiSuggestion);
 
   function resetRevisiPicker(){
     pendingRevisiTargetMessageId = null;

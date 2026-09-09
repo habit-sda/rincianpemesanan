@@ -4,8 +4,25 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v354";
+const CACHE_VERSION = "v357";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v357 -- Audit keamanan data: kolom Rp di customer_order_log (riwayat
+   Follow Up, permanen) sekarang dibersihkan otomatis setelah 90 hari
+   (tanggal/Qty/ekspedisi/CS tetap utuh -- Follow Up tidak terganggu).
+   Saran ekspedisi customer biasa dipindah ke sumber permanen ini juga,
+   supaya pelanggan siklus panjang tetap dapat rekomendasi akurat. Lihat
+   scrubOldCustomerOrderLogMoney/getUsualEkspedisiFromOrderLog di
+   Worker_Rincian_Pemesanan.js. */
+/* v356 -- Saran ekspedisi (popup Kirim ke Grup Telegram) sekarang butuh
+   3x berturut-turut (bukan 1x), sadar Dropship (cek nama penerima, bukan
+   customer), dan diprioritaskan di bawah peringatan alias/duplikat (maks
+   1 hint tampil bersamaan). Lihat computeUsualEkspedisi di
+   Worker_Rincian_Pemesanan.js. */
+/* v355 -- Fitur baru: riwayat nama penerima Dropship per customer,
+   tersimpan D1 (tanpa halaman Master Data terpisah), muncul sbg dropdown
+   di field Nama Penerima saat checkbox Dropship dicentang. Lihat
+   addDropshipRecipient/getDropshipRecipients di
+   Worker_Rincian_Pemesanan.js. */
 /* v354 -- Performa: foto produk (desain nota "baru") di-preload di waktu
    idle (app pertama dibuka & tiap pindah tab), bukan baru diunduh pas
    klik Kirim -- mengurangi jeda render nota. Notifikasi Logistik "Kirim
