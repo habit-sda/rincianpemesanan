@@ -4,8 +4,12 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v353";
+const CACHE_VERSION = "v354";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v354 -- Performa: foto produk (desain nota "baru") di-preload di waktu
+   idle (app pertama dibuka & tiap pindah tab), bukan baru diunduh pas
+   klik Kirim -- mengurangi jeda render nota. Notifikasi Logistik "Kirim
+   Sebelum Lunas" juga tidak lagi menahan respons kirim ke Telegram. */
 /* v353 -- Fitur baru: kolom "Probabilitas Masih Aktif" di Follow Up,
    model statistik BG/NBD (Fader-Hardie-Lee 2005), TERPISAH dari prediksi
    median gap yang sudah ada (tidak diubah). Lihat computeFollowUpData di

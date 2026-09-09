@@ -6108,7 +6108,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.62.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.63.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6351,7 +6351,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.62.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.63.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan performa: render & kirim nota lebih cepat</b> — foto produk (desain nota "baru") sekarang di-preload di waktu app nganggur (sama seperti library render gambar), bukan baru mulai diunduh pas klik Kirim/Unduh/Bagikan — mengurangi jeda render yang sebelumnya konsisten di semua device. Notifikasi Logistik untuk fitur "Kirim Sebelum Lunas" juga tidak lagi menahan respons kirim ke Telegram (jalan di belakang layar).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.62.0</div>
           <ul>
             <li><b>Fitur baru: Probabilitas Masih Aktif (Follow Up)</b> — kolom baru di tabel Follow Up & popup detail customer, dihitung pakai model statistik BG/NBD (standar industri untuk prediksi repeat-purchase). Beda dari prediksi tanggal yang sudah ada (median gap, tidak diubah): kolom ini menjawab "apakah customer ini masih aktif sama sekali", supaya CS tidak buang waktu follow-up ke customer yang kemungkinan besar sudah berhenti jadi pelanggan. Di kartu mobile, muncul peringatan "⚠️ Kemungkinan sudah churn" kalau probabilitasnya di bawah 30%.</li>
           </ul>
@@ -8605,6 +8611,15 @@ document.querySelectorAll(".tab-btn[data-tab]").forEach(btn=>{
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
+    // BARU -- preload foto produk tab yang BARU dibuka juga (bukan cuma
+    // tab aktif waktu app pertama dibuka, lihat schedulePreloadProductImages)
+    // -- supaya pindah tab tidak balik kena jeda cold-cache lagi. Best-
+    // effort, tidak menunggu idle (CS baru saja aktif berinteraksi, bukan
+    // waktu nganggur) tapi TETAP tidak diblokir/di-await apa pun di sini
+    // -- murni numpang jalan di background.
+    if(typeof getNotaDesignPref === "function" && getNotaDesignPref() === "baru"){
+      ensureProductImagesCached(getTabProductImageUrls(btn.dataset.tab)).catch(()=>{});
+    }
   });
 });
 
@@ -9029,6 +9044,31 @@ function ensureHtml2Canvas(){
 // biasa kalau ini belum sempat selesai.
 (function schedulePreloadHtml2Canvas(){
   const start = () => ensureHtml2Canvas().catch(()=>{});
+  if("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 4000 });
+  else setTimeout(start, 1500);
+})();
+// BARU (laporan "render gambar nota masih >2 detik, konsisten di semua
+// device") -- preload di atas cuma nyiapin LIBRARY html2canvas (~200KB
+// JS) -- FOTO PRODUK-nya sendiri (dipakai desain nota "baru") SAMA
+// SEKALI BELUM di-preload, baru mulai di-download+diperkecil PERSIS saat
+// renderCanvas() jalan (CS klik Kirim/Unduh/Bagikan pertama kali di sesi
+// itu) -- inilah kemungkinan besar penyumbang jeda 2+ detik yang
+// dilaporkan (network fetch foto, bukan soal kecepatan device -- cocok
+// dgn gejala "konsisten di semua device"). Sekarang foto produk di TAB
+// YANG SEDANG AKTIF ikut di-preload di waktu nganggur yang SAMA (idle
+// callback), jadi begitu CS klik Kirim, ensureProductImagesCached() di
+// renderCanvas() tinggal pakai yang SUDAH ke-cache (early-return di baris
+// `if(!toFetch.length) return;`) -- 0 perubahan ke urutan/logika
+// renderCanvas() itu sendiri, murni "kerjain lebih awal, di waktu
+// nganggur" bukan "pas dibutuhkan mendadak". Best-effort (gagal diam-diam
+// -- renderCanvas() tetap coba ulang sendiri kalau ini belum sempat/gagal).
+(function schedulePreloadProductImages(){
+  const start = () => {
+    if(getNotaDesignPref() !== "baru") return; // desain lama tidak pakai foto produk sama sekali
+    const activeBtn = document.querySelector(".tab-btn.active");
+    if(!activeBtn) return;
+    ensureProductImagesCached(getTabProductImageUrls(activeBtn.dataset.tab)).catch(()=>{});
+  };
   if("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 4000 });
   else setTimeout(start, 1500);
 })();
