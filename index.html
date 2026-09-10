@@ -4799,6 +4799,17 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <select id="rekap-filter-ekspedisi" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
         <option value="">Semua Ekspedisi</option>
       </select>
+      <!-- BARU (permintaan "filter lagi khusus jika aktifkan filter
+           ekspedisi -- semua resi/sudah dibuat/belum dibuat resi") --
+           SENGAJA disembunyikan (hidden) kalau "Semua Ekspedisi" masih
+           terpilih (belum relevan) -- baru muncul begitu 1 ekspedisi
+           spesifik dipilih, lihat wiring toggleRekapResiFilterVisibility()
+           di script. -->
+      <select id="rekap-filter-resi" hidden style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
+        <option value="">Semua Resi</option>
+        <option value="ada">Sudah dibuat resi</option>
+        <option value="belum">Belum dibuat resi</option>
+      </select>
       <label style="display:flex; align-items:center; gap:6px; font-size:15px; white-space:nowrap;">
         <input type="checkbox" id="rekap-filter-belumInvoice" style="width:18px; height:18px;"> Belum di-Invoice saja
       </label>
@@ -6173,7 +6184,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.79.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.80.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6427,7 +6438,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.79.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.80.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Filter "Resi" baru di Rekap Pesanan</b> — muncul otomatis tepat di samping filter Ekspedisi begitu Anda pilih 1 ekspedisi tertentu (tersembunyi kalau masih "Semua Ekspedisi"). Pilihan: Semua Resi / Sudah dibuat resi / Belum dibuat resi — cocok buat lihat cepat pesanan mana di ekspedisi itu yang masih perlu dibuatkan resi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.79.0</div>
           <ul>
             <li><b>Rekap Pesanan: bisa tampilkan sampai 90 hari (sebelumnya maks 25)</b> — pengaturan "Tampilkan berapa hari terakhir?" sekarang bisa diisi 1-90 hari. Pilih lebih dari 25 hari otomatis dapat penjelasan + garis pemisah di tabel (tabel desktop & kartu mobile), supaya jelas kenapa data di rentang itu cuma berisi pesanan belum selesai — tidak lagi terlihat seperti data bolong/hilang misterius. Kebijakan retensi datanya sendiri tidak berubah.</li>
           </ul>
@@ -17274,6 +17291,7 @@ if ("serviceWorker" in navigator) {
   const hariSampaiEl = document.getElementById("rekap-filter-hari-sampai"); // BARU -- filter rentang tanggal (sampai)
   const hariRangeClearBtn = document.getElementById("rekap-filter-hari-range-clear");
   const ekspedisiFilterEl = document.getElementById("rekap-filter-ekspedisi"); // BARU -- filter per ekspedisi
+  const resiFilterEl = document.getElementById("rekap-filter-resi"); // BARU -- filter status resi, cuma relevan pas 1 ekspedisi dipilih
   const belumInvoiceEl = document.getElementById("rekap-filter-belumInvoice");
   const csSummaryEl = document.getElementById("rekap-cs-summary");
   const hariSummaryEl = document.getElementById("rekap-hari-summary"); // BARU -- ringkasan total qty per hari
@@ -17518,7 +17536,16 @@ if ("serviceWorker" in navigator) {
     hariDariEl.value = ""; hariSampaiEl.value = "";
     rkPage = 1; renderRekapTable();
   });
-  ekspedisiFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); }); // BARU
+  // BARU -- filter "Resi" cuma relevan/ditampilkan pas 1 ekspedisi
+  // spesifik dipilih (kalau "Semua Ekspedisi", filter ini disembunyikan &
+  // di-reset ke "Semua Resi" biar tidak nyangkut nyaring diam-diam).
+  function toggleRekapResiFilterVisibility(){
+    const aktif = !!ekspedisiFilterEl.value;
+    resiFilterEl.hidden = !aktif;
+    if(!aktif) resiFilterEl.value = "";
+  }
+  ekspedisiFilterEl.addEventListener("change", ()=>{ toggleRekapResiFilterVisibility(); rkPage = 1; renderRekapTable(); }); // BARU
+  resiFilterEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); });
   belumInvoiceEl.addEventListener("change", ()=>{ rkPage = 1; renderRekapTable(); });
   sortBtn.addEventListener("click", ()=>{
     sortDesc = !sortDesc;
@@ -17583,6 +17610,7 @@ if ("serviceWorker" in navigator) {
     if(statusSet.includes(prevStatus)) statusFilterEl.value = prevStatus;
     if(hariSet.includes(prevHari)) hariFilterEl.value = prevHari;
     if(ekspedisiSet.includes(prevEkspedisi)) ekspedisiFilterEl.value = prevEkspedisi;
+    toggleRekapResiFilterVisibility(); // BARU -- sinkronkan tampil/sembunyi filter Resi dgn nilai ekspedisi yg baru saja dipulihkan
     // BARU -- batasi kalender rentang tanggal (min/max) sesuai tanggal yang
     // BENAR-BENAR ada di data (hariSet sudah terurut TERBARU dulu, jadi
     // elemen pertama = tanggal termuda, terakhir = tertua).
@@ -17662,6 +17690,7 @@ if ("serviceWorker" in navigator) {
     const hariDari = hariDariEl.value; // BARU -- filter rentang tanggal (dari), format YYYY-MM-DD sama dgn dateKeyDariRow
     const hariSampai = hariSampaiEl.value; // BARU -- filter rentang tanggal (sampai)
     const ekspedisiPilih = ekspedisiFilterEl.value; // BARU -- filter per ekspedisi
+    const resiPilih = resiFilterEl.value; // BARU -- "ada"/"belum"/"" (semua), cuma efektif kalau ekspedisiPilih aktif (select-nya disembunyikan kalau tidak)
     const belumInvoiceSaja = belumInvoiceEl.checked;
     let rows = allRows.filter(r=>{
       const dk = dateKeyDariRow(r); // BARU -- dihitung sekali per baris, dipakai filter Hari & rentang tanggal sekaligus
@@ -17672,6 +17701,7 @@ if ("serviceWorker" in navigator) {
         (!hariDari || dk >= hariDari) && // BARU -- perbandingan string YYYY-MM-DD aman diurutkan langsung
         (!hariSampai || dk <= hariSampai) && // BARU
         (!ekspedisiPilih || r.ekspedisi === ekspedisiPilih) &&
+        (!resiPilih || (resiPilih === "ada" ? !!r.resi : !r.resi)) &&
         (!belumInvoiceSaja || !r.manualInvoiced);
     });
     // DIUBAH (permintaan "kalau ada aktivitas taruh paling atas") -- pakai
