@@ -4,8 +4,15 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v369";
+const CACHE_VERSION = "v370";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v370 -- Rekap Pesanan: jendela tampilan dinaikkan dari maks 25 hari
+   jadi 90 hari. Pilih >25 hari otomatis dapat banner penjelasan + garis
+   pemisah di tabel (desktop & mobile) -- supaya rentang yang cuma
+   berisi pesanan belum selesai (yang sudah Lunas+Resi terhapus otomatis
+   setelah 25 hari, kebijakan retensi tidak berubah) tidak terlihat
+   seperti data bolong/hilang. Butuh Worker versi baru juga (batas &
+   field completedOrderRetentionDays). */
 /* v369 -- Kartu baru "Notifikasi Terjadwal Hari Ini" di Dashboard Master
    Data: menampilkan sukses/gagal PERSIS per notifikasi terjadwal
    (khususnya Follow Up ke CS) -- data ini sudah lama dikirim server tapi

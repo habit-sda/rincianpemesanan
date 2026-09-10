@@ -5549,9 +5549,9 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="md-togglerow" style="border-top:1px solid var(--line); margin-top:12px; padding-top:12px;">
           <div class="md-togglerow-text">
             <div class="md-togglerow-label">Tampilkan berapa hari terakhir?</div>
-            <div class="md-togglerow-sub">1-25 hari (25 = batas maksimal jendela tampilan ini). Order yang sudah Lunas <b>dan</b> ada resi disimpan 25 hari; order yang belum selesai (belum lunas / resi belum ada) disimpan lebih lama, sampai 90 hari. Data yang sudah kedaluwarsa tidak akan pernah muncul lagi walau angkanya dinaikkan.</div>
+            <div class="md-togglerow-sub">1-90 hari. Order yang sudah Lunas <b>dan</b> ada resi disimpan 25 hari; order yang belum selesai (belum lunas / resi belum ada) disimpan lebih lama, sampai 90 hari. Pilih lebih dari 25 hari akan tetap rapi — Rekap Pesanan otomatis kasih keterangan & garis pemisah begitu masuk rentang yang cuma berisi pesanan belum selesai. Data yang sudah kedaluwarsa tidak akan pernah muncul lagi walau angkanya dinaikkan.</div>
           </div>
-          <input type="number" id="md-rekappesanan-hari" min="1" max="25" step="1" style="width:70px; height:40px; border:1px solid var(--line); border-radius:8px; padding:0 10px; font-size:15px; text-align:center;">
+          <input type="number" id="md-rekappesanan-hari" min="1" max="90" step="1" style="width:70px; height:40px; border:1px solid var(--line); border-radius:8px; padding:0 10px; font-size:15px; text-align:center;">
         </div>
       </div>
       <div class="md-card">
@@ -6173,7 +6173,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.78.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.79.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6427,7 +6427,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.78.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.79.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Rekap Pesanan: bisa tampilkan sampai 90 hari (sebelumnya maks 25)</b> — pengaturan "Tampilkan berapa hari terakhir?" sekarang bisa diisi 1-90 hari. Pilih lebih dari 25 hari otomatis dapat penjelasan + garis pemisah di tabel (tabel desktop & kartu mobile), supaya jelas kenapa data di rentang itu cuma berisi pesanan belum selesai — tidak lagi terlihat seperti data bolong/hilang misterius. Kebijakan retensi datanya sendiri tidak berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.78.0</div>
           <ul>
             <li><b>Kartu baru "Notifikasi Terjadwal Hari Ini" di Dashboard</b> — sebelumnya status "✅ Terkirim" tidak membedakan "sungguh sampai" dari "sudah dicoba tapi ditolak Telegram diam-diam" (datanya sudah lama tersedia dari server, cuma tidak pernah ditampilkan). Sekarang khusus Follow Up ke CS, kalau ada yang GAGAL, langsung kelihatan jelas: berapa yang sukses, berapa gagal, dan nama CS mana yang gagal + kemungkinan sebabnya.</li>
           </ul>
@@ -7897,7 +7903,7 @@ function loadSettings(){
     if(typeof s.resiAjaTopicId === "string") SETTINGS.resiAjaTopicId = s.resiAjaTopicId.trim();
     if(typeof s.noBuktiTransferReminderEnabled === "boolean") SETTINGS.noBuktiTransferReminderEnabled = s.noBuktiTransferReminderEnabled;
     if(typeof s.rekapPesananEnabled === "boolean") SETTINGS.rekapPesananEnabled = s.rekapPesananEnabled;
-    if(typeof s.rekapPesananHari === "number" && s.rekapPesananHari >= 1 && s.rekapPesananHari <= 25) SETTINGS.rekapPesananHari = s.rekapPesananHari;
+    if(typeof s.rekapPesananHari === "number" && s.rekapPesananHari >= 1 && s.rekapPesananHari <= 90) SETTINGS.rekapPesananHari = s.rekapPesananHari;
     if(typeof s.followUpEnabled === "boolean") SETTINGS.followUpEnabled = s.followUpEnabled;
     if(typeof s.followUpNotifEnabled === "boolean") SETTINGS.followUpNotifEnabled = s.followUpNotifEnabled;
     if(typeof s.followUpNotifTime === "string" && s.followUpNotifTime.trim()) SETTINGS.followUpNotifTime = s.followUpNotifTime.trim();
@@ -13553,7 +13559,7 @@ if ("serviceWorker" in navigator) {
     inputRekapPesananHari.value = SETTINGS.rekapPesananHari;
     inputRekapPesananHari.addEventListener("change", async ()=>{
       let v = parseInt(inputRekapPesananHari.value, 10) || 7;
-      v = Math.max(1, Math.min(25, v));
+      v = Math.max(1, Math.min(90, v));
       inputRekapPesananHari.value = v;
       SETTINGS.rekapPesananHari = v;
       saveSettings();
@@ -17306,6 +17312,12 @@ if ("serviceWorker" in navigator) {
   const ekspedisiSummaryEl = document.getElementById("rekap-ekspedisi-summary"); // BARU -- kartu ringkasan per ekspedisi
   let isLoading = false;
   let allRows = []; // hasil mentah dari server (belum difilter)
+  // BARU (permintaan "biar tidak bolong, kasih keterangan pas pilih >25
+  // hari") -- disimpan dari respons server tiap fetch, dipakai render()
+  // buat nentuin di mana batas retensi order SELESAI TOTAL jatuh (biar
+  // bisa dikasih banner+garis pemisah, BUKAN diam2 keliatan bolong).
+  let completedOrderRetentionDays = 25;
+  let currentHariSetting = 7;
   let sortDesc = true; // true = terbaru dulu (default, sama dgn urutan dari server)
   // BARU -- toggle sembunyikan/tampilkan kolom varian produk di tabel
   // DESKTOP (tombol #rekap-toggle-varian-btn). HANYA mempengaruhi tabel
@@ -17595,6 +17607,8 @@ if ("serviceWorker" in navigator) {
       const body = await res.json();
       if(!res.ok) throw new Error(body.error || "Gagal memuat data.");
       const rowsBaru = body.rows || [];
+      completedOrderRetentionDays = body.completedOrderRetentionDays || 25;
+      currentHariSetting = body.hari || 7;
       const signatureBaru = JSON.stringify(rowsBaru);
       lastFetchedAt = new Date();
       if(silent && signatureBaru === lastRowsSignature){
@@ -17828,7 +17842,15 @@ if ("serviceWorker" in navigator) {
       cardsEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--ink-soft);">Belum ada pesanan yang cocok dengan filter.</div>`;
       return;
     }
-    cardsEl.innerHTML = rows.map(r=>{
+    // BARU (permintaan "kenapa tidak bisa 90 hari, biar tidak bolong") --
+    // banner + garis pemisah versi kartu mobile, SAMA logikanya dgn tabel
+    // desktop di renderRekapTable -- lihat catatan lengkap di sana.
+    const retentionBannerMobile = currentHariSetting > completedOrderRetentionDays
+      ? `<div style="border:1px solid var(--line); border-left:3px solid var(--primary-green); background:#eaf4fb; color:var(--ink); font-size:12.5px; line-height:1.5; border-radius:8px; padding:10px 12px; margin-bottom:10px;">ℹ️ Menampilkan ${currentHariSetting} hari terakhir. Untuk pesanan lebih dari ${completedOrderRetentionDays} hari lalu, yang tampil hanya yang <b>belum selesai</b> — yang sudah Lunas &amp; Resi otomatis terhapus setelah ${completedOrderRetentionDays} hari.</div>`
+      : "";
+    function daysAgoRkCard(ms){ return Math.floor((Date.now() - (ms || 0)) / 86400000); }
+    let retentionDividerShownMobile = false;
+    cardsEl.innerHTML = retentionBannerMobile + rows.flatMap(r=>{
       const isVoid = /void|hoax/i.test(r.status);
       const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline;">${escHtml(r.customer)}</a>`;
       // BARU -- badge Dropship sekarang ikut menampilkan nama penerima
@@ -17863,7 +17885,7 @@ if ("serviceWorker" in navigator) {
         const rel = fmtFieldChangeRelative(fcAt[hit]);
         return `<div style="display:flex;align-items:center;margin-top:2px;" title="${full ? "Diupdate " + escHtml(full) : ""}">${cbDot}<span style="font-size:10px;color:var(--ink-soft);">diupdate${rel ? " · " + escHtml(rel) : ""}</span></div>`;
       };
-      return `<div class="rc-card${isVoid?" void":""}">
+      const cardHtml = `<div class="rc-card${isVoid?" void":""}">
         <div class="rc-card-top">
           <div>
             <div class="rc-card-nama">${namaLink}</div>
@@ -17888,6 +17910,12 @@ if ("serviceWorker" in navigator) {
           ${cb("invoice")}
         </div>
       </div>`;
+      if(!retentionDividerShownMobile && daysAgoRkCard(r.createdAtMs) > completedOrderRetentionDays){
+        retentionDividerShownMobile = true;
+        const dividerHtml = `<div style="text-align:center; font-size:11px; color:var(--ink-soft); padding:6px 0; margin:4px 0; border-top:1px dashed var(--line); border-bottom:1px dashed var(--line);">⏳ &gt;${completedOrderRetentionDays} hari lalu — hanya pesanan belum selesai yang masih tersimpan</div>`;
+        return [dividerHtml, cardHtml];
+      }
+      return [cardHtml];
     }).join("");
   }
 
@@ -17952,7 +17980,26 @@ if ("serviceWorker" in navigator) {
         `</tr><tr><td colspan="${10}" style="border:1px solid var(--line); padding:8px 10px; background:#fff8e1; color:#8a6100; font-size:14px;">⚠️ Kolom varian produk belum muncul karena belum ada "Kode Singkat" yang diisi di Master Data &gt; Produk. Isi kolom itu dulu (mis. "HA" untuk Halawa Ayam) supaya kolomnya otomatis muncul di sini.</td></tr></thead>`);
     }
 
+    // BARU (permintaan "kenapa tidak bisa 90 hari, biar tidak bolong") --
+    // begitu jendela tampilan (currentHariSetting) melebihi batas retensi
+    // order SELESAI TOTAL (completedOrderRetentionDays, defaultnya 25),
+    // kasih tahu JELAS di awal tabel supaya rentang yang datanya makin
+    // jarang di bagian bawah tidak terlihat seperti bug/data hilang
+    // misterius -- lihat mockup yang sudah disetujui user.
+    if(currentHariSetting > completedOrderRetentionDays){
+      html = html.replace("</tr></thead>",
+        `</tr><tr><td colspan="${10 + kodeListTampil.length}" style="border:1px solid var(--line); border-left:3px solid var(--primary-green); padding:10px 12px; background:#eaf4fb; color:var(--ink); font-size:13px; line-height:1.5;">ℹ️ Menampilkan ${currentHariSetting} hari terakhir. Untuk pesanan lebih dari ${completedOrderRetentionDays} hari lalu, yang tampil hanya yang <b>belum selesai</b> (belum lunas / resi belum ada) — yang sudah Lunas &amp; Resi otomatis terhapus setelah ${completedOrderRetentionDays} hari (kebijakan retensi).</td></tr></thead>`);
+    }
+    function daysAgoRk(ms){ return Math.floor((Date.now() - (ms || 0)) / 86400000); }
+    let retentionDividerShown = false;
+
     pageRows.forEach((r, i)=>{
+      // BARU -- garis pemisah SEKALI, pas transisi ke rentang yang cuma
+      // berisi pesanan belum selesai (lihat banner di atas thead).
+      if(!retentionDividerShown && daysAgoRk(r.createdAtMs) > completedOrderRetentionDays){
+        retentionDividerShown = true;
+        html += `<tr><td colspan="${10 + kodeListTampil.length}" style="padding:6px 12px; background:var(--bg); color:var(--ink-soft); font-size:11.5px; border-top:1px dashed var(--line); border-bottom:1px dashed var(--line);">⏳ &gt;${completedOrderRetentionDays} hari lalu — hanya pesanan belum selesai yang masih tersimpan</td></tr>`;
+      }
       // BARU -- baris Void/Hoax disorot merah muda tipis, langsung
       // kelihatan sekilas tanpa perlu baca teks status satu-satu.
       const rowBg = /void|hoax/i.test(r.status) ? " background:#fdecea;" : "";
