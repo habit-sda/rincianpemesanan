@@ -4,8 +4,13 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v365";
+const CACHE_VERSION = "v366";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v366 -- Badge baru 🏷️ di kolom QTY Rekap Pesanan: muncul kalau ada
+   produk dalam pesanan yang belum punya "Kode Singkat" (qty-nya ikut ke
+   total tapi tidak tampil di kolom varian manapun) -- hover/tahan-tap
+   buat lihat nama produk & qty persisnya. Murni frontend, tidak butuh
+   Worker baru (datanya sudah dikirim, cuma belum ditampilkan). */
 /* v365 -- Badge "● diupdate" di Rekap Pesanan dipendekkan: waktu relatif
    singkat ("12m lalu") menggantikan tanggal+jam lengkap yang bikin kolom
    melebar -- detail lengkap tetap ada lewat hover/tahan-tap. Worker versi
