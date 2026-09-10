@@ -5342,6 +5342,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div id="md-status-result" class="md-quota-result"></div>
       </div>
       <div class="md-card">
+        <h3>Notifikasi Terjadwal Hari Ini</h3>
+        <div class="md-note" style="margin-bottom:12px;">Follow Up ke CS, Info Resi Kemarin, & Peringatan Logistik — status "✅ Terkirim" polos SEBELUMNYA tidak membedakan "sungguh sampai" dari "sudah dicoba tapi ditolak Telegram". Sekarang khusus Follow Up (satu-satunya yang mencatat detail sukses/gagal per-CS) ditampilkan lengkap di sini, termasuk nama CS yang gagal & alasannya — supaya bisa langsung ketahuan kalau ada yang tidak benar-benar sampai.</div>
+        <div id="md-notif-hariini"></div>
+      </div>
+      <div class="md-card">
         <h3>Kesehatan Durable Object (Dedupe)</h3>
         <div class="md-note" style="margin-bottom:12px;">Kotak anti-notifikasi-dobel (ORDER_LOCKS) — kalau sering "Bermasalah", sistem otomatis pakai cadangan KV/D1 (tetap aman, cuma sedikit lebih lambat). Pesan error di bawah ini diagnostik ASLI dari Durable Object.</div>
         <div id="md-dedupe-do"></div>
@@ -6168,7 +6173,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.77.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.78.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6422,7 +6427,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.77.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.78.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Kartu baru "Notifikasi Terjadwal Hari Ini" di Dashboard</b> — sebelumnya status "✅ Terkirim" tidak membedakan "sungguh sampai" dari "sudah dicoba tapi ditolak Telegram diam-diam" (datanya sudah lama tersedia dari server, cuma tidak pernah ditampilkan). Sekarang khusus Follow Up ke CS, kalau ada yang GAGAL, langsung kelihatan jelas: berapa yang sukses, berapa gagal, dan nama CS mana yang gagal + kemungkinan sebabnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.77.0</div>
           <ul>
             <li><b>Ikon 🏷️ dipindah ke bawah angka QTY</b> — sebelumnya nempel sejajar di samping angka, kelihatan sempit/mepet. Sekarang jadi baris kecil terpisah di bawahnya (sama pola dengan badge "diupdate"), angka QTY utama tampil bersih sendirian.</li>
           </ul>
@@ -13963,6 +13974,7 @@ if ("serviceWorker" in navigator) {
           ${detailRow("Workers AI (AI)", data.workersAi, workersSub)}
         `;
 
+        renderNotifikasiHariIni(data.notifikasiHariIni);
         renderOrdersMetrics(data.orders);
         renderHangingInvoices(data.orders);
         renderAiWeeklyChart(data.aiWeekly);
@@ -13973,6 +13985,67 @@ if ("serviceWorker" in navigator) {
         pillsEl.hidden = true;
         resultEl.innerHTML = `<div class="md-quota-error">Gagal memuat status: ${String(e.message||e)}</div>`;
       }
+    }
+
+    /* ---- BARU (permintaan "kenapa tidak pernah dapat notifikasi follow
+       up walau dashboard bilang terkirim?") -- sebelumnya data ini SUDAH
+       dikirim Worker di tiap respons /system-status (field
+       notifikasiHariIni, lihat buildNotifikasiHariIniRincian), TAPI
+       index.html TIDAK PERNAH menampilkannya sama sekali -- jadi tidak
+       ada cara ketahuan dari app kalau ternyata SEMUA percobaan kirim
+       gagal (Telegram menolak diam-diam), padahal datanya sudah lama
+       tersedia. Sekarang ditampilkan: khusus "Follow Up" (satu-satunya
+       yang mencatat successCount/failCount per-CS), badge merah muncul
+       kalau ADA yang gagal, lengkap nama CS mana + alasan paling umum. ---- */
+    function renderNotifikasiHariIni(list){
+      const el = document.getElementById("md-notif-hariini");
+      if(!el) return;
+      if(!Array.isArray(list) || !list.length){
+        el.innerHTML = `<div class="md-hanging-empty">Tidak ada notifikasi terjadwal yang aktif (semua toggle nonaktif di Master Data).</div>`;
+        return;
+      }
+      el.innerHTML = list.map(n=>{
+        const jamLabel = n.jamText ? `jam ${escHtml(n.jamText)}` : "";
+        if(!n.sent){
+          return `
+            <div class="md-quota-row">
+              <div class="md-quota-row-head">
+                <span class="md-quota-row-label">${escHtml(n.nama)}</span>
+                <span class="md-quota-badge neutral">⏳ Belum jalan hari ini</span>
+              </div>
+              <div class="md-quota-row-sub">Jadwal ${jamLabel} — belum waktunya, atau menunggu tick cron berikutnya (maks 5 menit).</div>
+            </div>`;
+        }
+        if(typeof n.failCount === "number"){
+          if(n.failCount > 0){
+            const namaGagal = Array.isArray(n.gagalNames) && n.gagalNames.length ? n.gagalNames.map(g=> escHtml(g)).join(", ") : "-";
+            return `
+              <div class="md-quota-row">
+                <div class="md-quota-row-head">
+                  <span class="md-quota-row-label">${escHtml(n.nama)}</span>
+                  <span class="md-quota-badge cooldown">⚠️ ${n.successCount||0} terkirim, ${n.failCount} GAGAL</span>
+                </div>
+                <div class="md-quota-row-sub">Dikirim ${jamLabel}. Gagal ke: <b>${namaGagal}</b> — biasanya karena CS itu belum pernah chat langsung ke bot, atau sempat blokir bot. Minta CS itu kirim pesan apa saja ke bot, lalu coba lagi besok.</div>
+              </div>`;
+          }
+          return `
+            <div class="md-quota-row">
+              <div class="md-quota-row-head">
+                <span class="md-quota-row-label">${escHtml(n.nama)}</span>
+                <span class="md-quota-badge ok">✅ Terkirim ke semua ${n.successCount||0} CS</span>
+              </div>
+              <div class="md-quota-row-sub">Dikirim ${jamLabel}.</div>
+            </div>`;
+        }
+        return `
+          <div class="md-quota-row">
+            <div class="md-quota-row-head">
+              <span class="md-quota-row-label">${escHtml(n.nama)}</span>
+              <span class="md-quota-badge ok">✅ Sudah jalan</span>
+            </div>
+            <div class="md-quota-row-sub">Dijadwalkan ${jamLabel}.</div>
+          </div>`;
+      }).join("");
     }
 
     /* ---- Ide #1: Ringkasan invoice hari ini ---- */

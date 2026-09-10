@@ -4,8 +4,13 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v368";
+const CACHE_VERSION = "v369";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v369 -- Kartu baru "Notifikasi Terjadwal Hari Ini" di Dashboard Master
+   Data: menampilkan sukses/gagal PERSIS per notifikasi terjadwal
+   (khususnya Follow Up ke CS) -- data ini sudah lama dikirim server tapi
+   belum pernah ditampilkan, jadi sebelumnya mustahil tahu dari app kalau
+   ternyata semua percobaan kirim gagal walau status bilang "terkirim". */
 /* v368 -- Ikon 🏷️ (Rekap Pesanan) dipindah ke baris terpisah di bawah
    angka QTY, bukan sejajar di samping -- angka utama tampil bersih. */
 /* v367 -- Tooltip badge 🏷️ (Rekap Pesanan) dirapikan: 1 produk = 1 baris,
