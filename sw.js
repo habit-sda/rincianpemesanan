@@ -4,8 +4,10 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v366";
+const CACHE_VERSION = "v367";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v367 -- Tooltip badge 🏷️ (Rekap Pesanan) dirapikan: 1 produk = 1 baris,
+   bukan digabung koma dalam 1 baris panjang yang melebar. */
 /* v366 -- Badge baru 🏷️ di kolom QTY Rekap Pesanan: muncul kalau ada
    produk dalam pesanan yang belum punya "Kode Singkat" (qty-nya ikut ke
    total tapi tidak tampil di kolom varian manapun) -- hover/tahan-tap

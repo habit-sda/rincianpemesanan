@@ -6168,7 +6168,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.75.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.76.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6422,7 +6422,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.75.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.76.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Tooltip badge 🏷️ dirapikan</b> — sebelumnya daftar produk tanpa Kode Singkat digabung koma jadi 1 baris panjang yang melebar ke samping. Sekarang 1 produk = 1 baris ("Nama Produk: qty"), jadi tooltip-nya jadi kotak pendek & jelas, tidak melebar, dan tidak ambigu produk mana punya qty berapa.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.75.0</div>
           <ul>
             <li><b>Badge 🏷️ baru di kolom QTY (Rekap Pesanan)</b> — muncul kalau ada produk dalam pesanan yang belum punya "Kode Singkat" di Master Data (qty-nya tetap ikut dihitung ke total, tapi sebelumnya tidak jelas kenapa tidak tampil di kolom varian manapun). Hover/tahan-tap badge-nya untuk lihat nama produk & qty persisnya. Berlaku di tabel desktop maupun kartu mobile.</li>
           </ul>
@@ -17721,14 +17727,21 @@ if ("serviceWorker" in navigator) {
   // (lihat itemMap di getRekapPesanan/Worker -- kalau kodeSingkat kosong,
   // key-nya fallback ke NAMA PRODUK APA ADANYA, bukan dibuang). kodeList
   // cuma berisi kode singkat yang SUDAH diisi -- jadi key r.items yang
-  // TIDAK ada di kodeList sudah pasti nama produk tanpa kode. Dikembalikan
-  // teks siap-tampil "Nama Produk (qty)" per item, digabung koma -- null
-  // kalau semua item pesanan ini sudah punya kode (kasus normal).
+  // TIDAK ada di kodeList sudah pasti nama produk tanpa kode. null kalau
+  // semua item pesanan ini sudah punya kode (kasus normal).
+  // DIUBAH (permintaan "terlalu memanjang, jangan sampai melebar") --
+  // SEBELUMNYA digabung koma jadi 1 baris panjang ("A (6), B (5), C (5)")
+  // -- native tooltip browser bikinnya 1 baris horizontal super lebar.
+  // Sekarang 1 PRODUK = 1 BARIS (pakai "\n", DIDUKUNG title="..." browser
+  // -- baris baru literal tetap kebentuk, beda dari HTML biasa yang
+  // menggabungkan whitespace) -- tooltip jadi kotak pendek & jelas, bukan
+  // melebar ke samping, dan tidak ambigu produk mana punya qty berapa
+  // (per baris "Nama Produk: qty", bukan dicampur dalam 1 kalimat).
   function orphanItemsInfo(r, kodeList){
     const items = r.items || {};
     const orphans = Object.keys(items).filter(k=> !kodeList.includes(k) && items[k] > 0);
     if(!orphans.length) return null;
-    return orphans.map(k=> `${k} (${items[k]})`).join(", ");
+    return orphans.map(k=> `${k}: ${items[k]}`).join("\n");
   }
   function renderRekapCards(rows, kodeList){
     if(!cardsEl) return;
@@ -17784,7 +17797,7 @@ if ("serviceWorker" in navigator) {
             ${cb("status")}
           </div>
         </div>
-        <div style="font-size:13px; margin-top:8px;">${varianRingkas} &middot; Qty <b>${r.totalQty||0}</b>${(()=>{ const o = orphanItemsInfo(r, kodeList); return o ? ` <span title="Qty produk tanpa Kode Singkat (ikut ke total, tidak tampil di rincian varian): ${escHtml(o)}" style="cursor:help;">🏷️</span>` : ""; })()}</div>
+        <div style="font-size:13px; margin-top:8px;">${varianRingkas} &middot; Qty <b>${r.totalQty||0}</b>${(()=>{ const o = orphanItemsInfo(r, kodeList); return o ? ` <span title="Produk tanpa Kode Singkat:\n${escHtml(o)}" style="cursor:help;">🏷️</span>` : ""; })()}</div>
         ${cb("varian")}
         <div class="rc-card-mid">
           <span><b>${r.resi ? "✅ Resi ada" : "❌ Belum resi"}</b></span>
@@ -17903,7 +17916,7 @@ if ("serviceWorker" in navigator) {
         td(escHtml(r.cs), "white-space:normal; word-break:break-word; max-width:110px;") +
         td(namaCell, "white-space:normal; max-width:240px;", escHtml(namaTitle)) +
         kodeListTampil.map(k=> td(r.items && r.items[k] ? r.items[k] : "-", "text-align:center;")).join("") +
-        td((r.totalQty || 0) + (()=>{ const o = orphanItemsInfo(r, kodeList); return o ? ` <span title="Qty produk tanpa Kode Singkat (ikut ke total, tidak tampil di kolom varian): ${escHtml(o)}" style="cursor:help;">🏷️</span>` : ""; })() + changeBadge("varian", true), "text-align:center; font-weight:600;") +
+        td((r.totalQty || 0) + (()=>{ const o = orphanItemsInfo(r, kodeList); return o ? ` <span title="Produk tanpa Kode Singkat:\n${escHtml(o)}" style="cursor:help;">🏷️</span>` : ""; })() + changeBadge("varian", true), "text-align:center; font-weight:600;") +
         td(escHtml(ringkasStatus(r.status)) + changeBadge("status", false), "white-space:normal; word-break:break-word; max-width:130px;") + td(escHtml(r.kg) + changeBadge("kg", true), "text-align:center; white-space:nowrap;") +
         td(escHtml(r.ekspedisi) + changeBadge("ekspedisi", false), "white-space:normal; word-break:break-word; max-width:120px;") +
         td((r.resi ? "✅" : "❌") + changeBadge("resi", true), "text-align:center;") +
