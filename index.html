@@ -6168,7 +6168,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.73.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.74.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6422,7 +6422,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.73.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.74.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Badge "● diupdate" dipendekkan</b> — sebelumnya tampil tanggal+jam lengkap ("diupdate · 09 Sep, 19.19.07") yang bikin kolom Status/Invoice melebar. Sekarang pakai waktu relatif singkat ("diupdate · 12m lalu" / "2j lalu") — jam & tanggal lengkap tetap ada lewat hover (desktop) / tahan-tap (mobile). Sekalian perbaikan bug data lama yang sempat tampil "01 Jan, 07.00.00" (sisa transisi sebelum fitur jam aktif).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.73.0</div>
           <ul>
             <li><b>Badge "● diupdate" di Rekap Pesanan sekarang tampilkan jam pasti</b> — sebelumnya cuma tulisan "diupdate" polos tanpa keterangan waktu. Sekarang ikut menampilkan tanggal, jam, menit, dan detik persis kapan field itu berubah (format sama seperti kolom TGL/JAM yang sudah ada) — teks kecil & warna redup seperti sebelumnya, supaya tetap tidak mengganggu fokus ke kolom utama, tapi jelas terbaca kalau ingin dicek. Berlaku di tabel desktop maupun kartu mobile.</li>
           </ul>
@@ -17671,15 +17677,37 @@ if ("serviceWorker" in navigator) {
   // attribute yang SAMA dgn tombol di tabel (rekap-invoice-btn / data-
   // anchor / data-state) supaya listener toggle-nya bisa dipakai bareng
   // (lihat fullpage.querySelectorAll(".rekap-invoice-btn") di bawah).
-  // BARU -- format jam PERSIS badge "● diupdate" (permintaan "munculkan
-  // detik jam hari") -- dipakai bareng oleh renderRekapCards (mobile) &
-  // tabel desktop di bawah, format SAMA PERSIS dgn kolom TGL/JAM yang
-  // sudah ada ("09 Sep, 19.19") + detik, supaya konsisten (bukan format
-  // baru yang beda gaya).
+  // BARU -- format jam PERSIS badge "● diupdate", format SAMA PERSIS dgn
+  // kolom TGL/JAM yang sudah ada ("09 Sep, 19.19") + detik -- dipakai
+  // sbg isi title="..." (hover desktop/tahan-tap mobile), BUKAN lagi
+  // ditulis inline di badge-nya sendiri (lihat fmtFieldChangeRelative di
+  // bawah -- permintaan "tampilannya terlalu melebar, dibuat lebih
+  // simple/ringkas").
   function fmtFieldChangeTime(ms){
     if(!ms) return "";
     try{ return new Date(ms).toLocaleString("id-ID", { timeZone: "Asia/Jakarta", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
     catch(e){ return ""; }
+  }
+  // BARU (permintaan "tampilannya terlalu melebar, ide lain yang lebih
+  // simple" -> dipilih opsi "waktu relatif singkat") -- versi RINGKAS
+  // buat ditulis LANGSUNG di badge (bukan cuma di tooltip) -- jauh lebih
+  // pendek dari tanggal+jam lengkap ("09 Sep, 19.19.07" -> "12m lalu"),
+  // jadi tidak lagi melebarkan kolom Status/Invoice di tabel. Jam+tanggal
+  // PERSIS tetap ada lewat title="..." (fmtFieldChangeTime di atas) buat
+  // yang mau detail. Badge ini cuma tampil selama TTL 3 jam (lihat
+  // FIELD_CHANGE_TTL_SECONDS di Worker) jadi praktis rentangnya cuma
+  // "baru saja" s/d "3j lalu" -- tetap disiapkan sampai satuan hari buat
+  // jaga-jaga kalau TTL-nya nanti diperpanjang.
+  function fmtFieldChangeRelative(ms){
+    if(!ms) return "";
+    const diffMs = Date.now() - ms;
+    if(diffMs < 60 * 1000) return "baru saja";
+    const menit = Math.floor(diffMs / (60 * 1000));
+    if(menit < 60) return `${menit}m lalu`;
+    const jam = Math.floor(menit / 60);
+    if(jam < 24) return `${jam}j lalu`;
+    const hari = Math.floor(jam / 24);
+    return `${hari}h lalu`;
   }
   function renderRekapCards(rows, kodeList){
     if(!cardsEl) return;
@@ -17718,8 +17746,9 @@ if ("serviceWorker" in navigator) {
       const cb = (...keys)=>{
         const hit = keys.find(k=> fc.includes(k));
         if(!hit) return "";
-        const t = fmtFieldChangeTime(fcAt[hit]);
-        return `<div style="display:flex;align-items:center;margin-top:2px;" title="${t ? "Diupdate " + escHtml(t) : ""}">${cbDot}<span style="font-size:10px;color:var(--ink-soft);">diupdate${t ? " · " + escHtml(t) : ""}</span></div>`;
+        const full = fmtFieldChangeTime(fcAt[hit]);
+        const rel = fmtFieldChangeRelative(fcAt[hit]);
+        return `<div style="display:flex;align-items:center;margin-top:2px;" title="${full ? "Diupdate " + escHtml(full) : ""}">${cbDot}<span style="font-size:10px;color:var(--ink-soft);">diupdate${rel ? " · " + escHtml(rel) : ""}</span></div>`;
       };
       return `<div class="rc-card${isVoid?" void":""}">
         <div class="rc-card-top">
@@ -17841,8 +17870,9 @@ if ("serviceWorker" in navigator) {
       const fcAt = r.fieldsChangedAt || {};
       const changeBadge = (fieldKey, center)=>{
         if(!(r.fieldsChanged || []).includes(fieldKey)) return "";
-        const t = fmtFieldChangeTime(fcAt[fieldKey]);
-        return `<div style="display:flex;align-items:center;gap:4px;margin-top:3px;${center ? "justify-content:center;" : ""}" title="${t ? "Diupdate " + t : ""}"><span style="width:6px;height:6px;border-radius:50%;background:#1D9E75;flex:none;"></span><span style="font-size:10px;color:var(--ink-soft);">diupdate${t ? " · " + t : ""}</span></div>`;
+        const full = fmtFieldChangeTime(fcAt[fieldKey]);
+        const rel = fmtFieldChangeRelative(fcAt[fieldKey]);
+        return `<div style="display:flex;align-items:center;gap:4px;margin-top:3px;${center ? "justify-content:center;" : ""}" title="${full ? "Diupdate " + full : ""}"><span style="width:6px;height:6px;border-radius:50%;background:#1D9E75;flex:none;"></span><span style="font-size:10px;color:var(--ink-soft);">diupdate${rel ? " · " + rel : ""}</span></div>`;
       };
       // BARU -- title="..." supaya kalau masih terpotong di layar sempit,
       // teks lengkapnya tetap bisa dibaca lewat hover (desktop) / tahan

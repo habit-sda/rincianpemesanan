@@ -4,8 +4,12 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v364";
+const CACHE_VERSION = "v365";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v365 -- Badge "● diupdate" di Rekap Pesanan dipendekkan: waktu relatif
+   singkat ("12m lalu") menggantikan tanggal+jam lengkap yang bikin kolom
+   melebar -- detail lengkap tetap ada lewat hover/tahan-tap. Worker versi
+   baru juga (guard timestamp basi/1970 dari data transisi). */
 /* v364 -- Badge "● diupdate" di Rekap Pesanan (tabel desktop & kartu
    mobile) sekarang menampilkan jam/menit/detik/tanggal pasti perubahan,
    bukan cuma tulisan "diupdate" polos. Butuh Worker versi baru juga
