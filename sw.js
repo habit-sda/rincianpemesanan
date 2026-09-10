@@ -4,8 +4,10 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v367";
+const CACHE_VERSION = "v368";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v368 -- Ikon 🏷️ (Rekap Pesanan) dipindah ke baris terpisah di bawah
+   angka QTY, bukan sejajar di samping -- angka utama tampil bersih. */
 /* v367 -- Tooltip badge 🏷️ (Rekap Pesanan) dirapikan: 1 produk = 1 baris,
    bukan digabung koma dalam 1 baris panjang yang melebar. */
 /* v366 -- Badge baru 🏷️ di kolom QTY Rekap Pesanan: muncul kalau ada

@@ -6168,7 +6168,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.76.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.77.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6422,7 +6422,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.76.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.77.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Ikon 🏷️ dipindah ke bawah angka QTY</b> — sebelumnya nempel sejajar di samping angka, kelihatan sempit/mepet. Sekarang jadi baris kecil terpisah di bawahnya (sama pola dengan badge "diupdate"), angka QTY utama tampil bersih sendirian.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.76.0</div>
           <ul>
             <li><b>Tooltip badge 🏷️ dirapikan</b> — sebelumnya daftar produk tanpa Kode Singkat digabung koma jadi 1 baris panjang yang melebar ke samping. Sekarang 1 produk = 1 baris ("Nama Produk: qty"), jadi tooltip-nya jadi kotak pendek & jelas, tidak melebar, dan tidak ambigu produk mana punya qty berapa.</li>
           </ul>
@@ -17797,7 +17803,7 @@ if ("serviceWorker" in navigator) {
             ${cb("status")}
           </div>
         </div>
-        <div style="font-size:13px; margin-top:8px;">${varianRingkas} &middot; Qty <b>${r.totalQty||0}</b>${(()=>{ const o = orphanItemsInfo(r, kodeList); return o ? ` <span title="Produk tanpa Kode Singkat:\n${escHtml(o)}" style="cursor:help;">🏷️</span>` : ""; })()}</div>
+        <div style="font-size:13px; margin-top:8px;">${varianRingkas} &middot; Qty <b>${r.totalQty||0}</b></div>${(()=>{ const o = orphanItemsInfo(r, kodeList); return o ? `<div title="Produk tanpa Kode Singkat:\n${escHtml(o)}" style="cursor:help;font-size:12px;margin-top:1px;">🏷️</div>` : ""; })()}
         ${cb("varian")}
         <div class="rc-card-mid">
           <span><b>${r.resi ? "✅ Resi ada" : "❌ Belum resi"}</b></span>
@@ -17916,7 +17922,7 @@ if ("serviceWorker" in navigator) {
         td(escHtml(r.cs), "white-space:normal; word-break:break-word; max-width:110px;") +
         td(namaCell, "white-space:normal; max-width:240px;", escHtml(namaTitle)) +
         kodeListTampil.map(k=> td(r.items && r.items[k] ? r.items[k] : "-", "text-align:center;")).join("") +
-        td((r.totalQty || 0) + (()=>{ const o = orphanItemsInfo(r, kodeList); return o ? ` <span title="Produk tanpa Kode Singkat:\n${escHtml(o)}" style="cursor:help;">🏷️</span>` : ""; })() + changeBadge("varian", true), "text-align:center; font-weight:600;") +
+        td(`<div>${r.totalQty || 0}</div>` + (()=>{ const o = orphanItemsInfo(r, kodeList); return o ? `<div title="Produk tanpa Kode Singkat:\n${escHtml(o)}" style="cursor:help;font-size:11px;line-height:1.2;">🏷️</div>` : ""; })() + changeBadge("varian", true), "text-align:center; font-weight:600;") +
         td(escHtml(ringkasStatus(r.status)) + changeBadge("status", false), "white-space:normal; word-break:break-word; max-width:130px;") + td(escHtml(r.kg) + changeBadge("kg", true), "text-align:center; white-space:nowrap;") +
         td(escHtml(r.ekspedisi) + changeBadge("ekspedisi", false), "white-space:normal; word-break:break-word; max-width:120px;") +
         td((r.resi ? "✅" : "❌") + changeBadge("resi", true), "text-align:center;") +
