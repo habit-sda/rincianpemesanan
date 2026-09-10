@@ -4,8 +4,24 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v359";
+const CACHE_VERSION = "v362";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v362 -- Perbaikan performa besar: 2 fitur di Master Nama Pelanggan
+   (saran penggabungan nama mirip & isi otomatis CS) yang sebelumnya
+   auto-scan SELURUH riwayat pesanan tiap tab dibuka, sekarang jadi
+   tombol manual. Master Nama CS (Worker) juga disederhanakan -- tidak
+   ada lagi auto-scan nama baru berkala, gabung nama cuma lewat rename
+   manual. Lihat catatan getCsMasterList di Worker_Rincian_Pemesanan.js. */
+/* v361 -- Keamanan: Kode Akses (APP_SECRET) tidak lagi hardcode di
+   source index.html. Sekarang diisi manual per HP/browser lewat menu
+   "Kode Akses" di footer (1 popup gabungan dengan "ID Telegram Saya"),
+   tersimpan di localStorage. Worker (raspy-limit-ba21) TIDAK berubah --
+   cuma cara klien menyimpan & mengirim kuncinya yang berubah. */
+/* v360 -- Tombol "↻ Reset" (proxy ke RESET global) sekarang tampil juga
+   di HP, diletakkan paling bawah bar aksi -- di bawah "Lanjut ke
+   pengiriman" -- baik di Mode Tabel (sebelumnya cuma tampil di desktop/
+   tablet) maupun Mode Kasir (bottom sheet keranjang, tombol baru). Desktop/
+   tablet tidak berubah. */
 /* v359 -- Fitur baru: Master Nama CS (Master Data > Tampilan, di bawah
    "Daftar CS") -- semua nama CS yang pernah tercatat di riwayat pesanan
    sekarang bisa dilihat, diedit/digabung (sinkron ke Rekap Pesanan,

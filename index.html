@@ -1492,7 +1492,21 @@
     .wiz-btn-ghost.accent{color:var(--primary-green);border-color:var(--wiz-ghost-border);}
     .wiz-btn-ghost.danger{color:var(--danger-red);border-color:#f3b7ac;}
     .wr-reset-mobile{display:none;}
-    .wiz-reset-proxy{display:none;}
+    /* DIUBAH (permintaan "tambahkan tombol reset di bawah tombol lanjut ke
+       pengiriman, versi mobile") -- SEBELUMNYA .wiz-reset-proxy (tombol
+       "↻ Reset" Mode Tabel) disembunyikan total di HP (display:none),
+       cuma tampil di desktop/tablet. Sekarang ditampilkan lagi khusus HP,
+       full-width (ikut lebar .wiz-cta-bar yang flex-direction:column),
+       DAN diberi "order" paling akhir supaya SELALU tampil PALING BAWAH
+       di bar aksi ini -- di bawah "Lanjut ke pengiriman" -- apa pun
+       urutan tombol lain (+ Tambah produk/Tempel Pesanan) di atasnya.
+       Perilaku klik TIDAK berubah (tetap proxy ke tombol RESET global
+       #btn-reset yang sudah ada, popup konfirmasi yang sama). Desktop/
+       tablet (@media min-width:901px di bawah) TIDAK ikut berubah --
+       override khusus HP ini otomatis kalah begitu lebar layar ≥901px.
+       Lihat wl-reset-${sheet}/pos-cart-reset-full-${sheet}. */
+    .wiz-reset-proxy{display:flex;order:10;}
+    .wiz-cta-bar .wiz-btn-primary{order:1;}
     /* --- CTA sticky di bawah layar: bungkus tombol aksi utama tiap langkah
        wizard supaya selalu terjangkau ibu jari, tidak perlu scroll ke bawah
        dulu (penting di langkah "Tersimpan" yang bisa berisi banyak kartu). --- */
@@ -1689,6 +1703,13 @@
        Pengiriman & Preview Nota sudah ikut tampil di bawah grid+keranjang
        — lihat catatan "Mode Kasir tahap 2" di changelog). */
     .pos-cart-nextship{display:none;}
+    /* BARU -- tombol "↻ Reset" full-width Mode Kasir HP, ditaruh di HTML
+       PERSIS setelah .pos-cart-nextship supaya SELALU tampil di bawahnya
+       (sama pola dengan .pos-cart-nextship sendiri: default disembunyikan
+       di sini, ditata ulang & ditampilkan lewat class "show" khusus di
+       blok media max-width:600px di bawah). Desktop/tablet tidak butuh
+       (sudah ada ikon 🗑️ .pos-cart-reset di header Keranjang). */
+    .pos-cart-reset-full{display:none;}
     .pos-cart-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px;}
     .pos-cart-empty{font-size:12.5px;color:var(--ink-soft);text-align:center;padding:24px 4px;}
     .pos-cart-item{
@@ -1832,6 +1853,22 @@
       }
       .wiz-pos-host .pos-cart-nextship.show{display:block;}
       .wiz-pos-host .pos-cart-nextship:active{filter:brightness(.93);}
+      /* BARU (permintaan "tambahkan tombol reset di bawah tombol lanjut ke
+         pengiriman, versi mobile, Mode Kasir") -- ditaruh di HTML PERSIS
+         setelah .pos-cart-nextship (lihat markup), jadi otomatis SELALU
+         tampil di bawahnya, sama alasannya dengan catatan di atas. Gaya
+         "ghost/danger" (border merah, bukan solid hijau) supaya jelas beda
+         fungsi dari tombol utama "Lanjut ke pengiriman" di atasnya. Klik-nya
+         proxy ke tombol RESET global #btn-reset (lihat wiring JS) -- sama
+         PERSIS perilakunya dengan "↻ Reset" Mode Tabel. */
+      .wiz-pos-host .pos-cart-reset-full{
+        display:none;width:calc(100% - 28px);margin:0 14px 12px;
+        border:1.5px solid var(--danger-red);border-radius:10px;background:var(--card);
+        color:var(--danger-red);font-weight:700;font-size:13.5px;padding:10px 12px;
+        cursor:pointer;
+      }
+      .wiz-pos-host .pos-cart-reset-full.show{display:block;}
+      .wiz-pos-host .pos-cart-reset-full:active{background:var(--paper-dark);}
     }
     .wiz-pcard-nameline{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;}
     .wiz-pcard-name{font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
@@ -5053,6 +5090,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
               </div>
               <div class="pos-cart-list" id="pos-cart-penjualan"></div>
               <button type="button" class="pos-cart-nextship" id="pos-cart-nextship-penjualan">Lanjut ke pengiriman →</button>
+              <button type="button" class="pos-cart-reset-full" id="pos-cart-reset-full-penjualan">↻ Reset</button>
             </div>
           </div>
           <div class="row" style="margin-top:6px;">
@@ -5195,6 +5233,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
               </div>
               <div class="pos-cart-list" id="pos-cart-custom"></div>
               <button type="button" class="pos-cart-nextship" id="pos-cart-nextship-custom">Lanjut ke pengiriman →</button>
+              <button type="button" class="pos-cart-reset-full" id="pos-cart-reset-full-custom">↻ Reset</button>
             </div>
           </div>
           <div class="row" style="margin-top:6px;">
@@ -5980,6 +6019,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-card">
         <h3>Master Nama Pelanggan</h3>
         <div class="md-note" style="margin-bottom:12px;">Daftar Customer + CS terdaftar, dipakai sebagai rekomendasi otomatis di field "Nama Customer" (popup Kirim ke Grup Telegram) <b>DAN</b> otomatis disinkronkan ke Rekap Pesanan &amp; Follow Up: ganti nama di sini akan menggabungkan riwayat lama (sebagai alias) ke nama baru, dan "🙈 Sembunyikan" akan menyembunyikan customer itu dari Rekap Pesanan/Follow Up (bukan hapus permanen — bisa dipulihkan kapan saja).</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <button type="button" id="md-nama-check-suggest-btn" style="flex:1;min-width:160px;height:40px;border:1px solid var(--line);background:var(--card);border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;">🔍 Cek Saran Penggabungan</button>
+          <button type="button" id="md-nama-autofill-cs-btn" class="md-lockable" style="flex:1;min-width:160px;height:40px;border:1px solid var(--line);background:var(--card);border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;">✨ Isi Otomatis CS</button>
+        </div>
         <div class="followup-stats-grid" id="md-nama-suggest-stats" style="display:none;"></div>
         <div class="followup-quickfilter-chip" id="md-nama-suggest-quickfilter-chip">
           <span id="md-nama-suggest-quickfilter-chip-text"></span>
@@ -6125,12 +6168,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.68.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.71.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
+      <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="home-link-appkey" class="changelog-link">Kode Akses</button></span>
     </div>
     <div class="telegram-bot-ui" style="margin-top:2px;opacity:.6;font-size:11px;cursor:pointer;text-decoration:underline;" id="footer-tgid-sub"></div>
+    <div style="margin-top:2px;opacity:.6;font-size:11px;cursor:pointer;text-decoration:underline;" id="footer-appkey-sub"></div>
   </footer>
 
   <!-- ================= POPUP KONFIRMASI RESET ================= -->
@@ -6149,11 +6194,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
   </div>
 
-  <!-- ================= POPUP ATUR ID TELEGRAM (per-device, lokal) ================= -->
+  <!-- ================= POPUP ATUR ID TELEGRAM & KODE AKSES (per-device, lokal) ================= -->
   <div id="tgid-overlay" class="calc-overlay" hidden>
-    <div class="calc-popup confirm-popup" role="dialog" aria-label="Atur ID Telegram">
+    <div class="calc-popup confirm-popup" role="dialog" aria-label="Atur ID Telegram &amp; Kode Akses">
       <div class="calc-head">
-        <span>ID Telegram Saya</span>
+        <span>ID Telegram &amp; Kode Akses</span>
         <button id="tgid-close" class="calc-close" aria-label="Tutup">✕</button>
       </div>
       <div class="confirm-body">
@@ -6165,10 +6210,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <input type="text" id="tgid-topic-input" class="kt-input" placeholder="Kosongkan kalau grup tidak pakai Topics" autocomplete="off" inputmode="numeric">
         <p class="kt-hint">Isi kalau grup Telegram-mu pakai fitur Topics dan bukti mau otomatis masuk ke sub-menu tertentu.</p>
         <p class="kt-hint" id="tgid-status"></p>
+        <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
+        <label for="appkey-input" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Kode Akses</label>
+        <input type="password" id="appkey-input" class="kt-input" placeholder="Tempel/ketik kode akses di sini" autocomplete="off">
+        <p class="kt-hint">Kunci yang menghubungkan app ini ke server (Master Data, Rekap Pesanan, Follow Up, dll) — minta nilainya ke admin. Diisi sekali per HP/browser, terpisah dari ID Telegram di atas.</p>
+        <p class="kt-hint" id="appkey-status"></p>
       </div>
       <div class="confirm-actionrow">
         <button id="tgid-cancel" class="calc-actbtn calc-clearbtn">Tutup</button>
-        <button id="tgid-save" class="calc-actbtn confirm-okbtn kt-okbtn">Simpan</button>
+        <button id="tgid-save" class="calc-actbtn confirm-okbtn kt-okbtn">Simpan &amp; Periksa</button>
       </div>
     </div>
   </div>
@@ -6372,7 +6422,25 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.68.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.71.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan performa besar: kuota baca database (D1) yang boros</b> — 2 fitur di "Master Nama Pelanggan" (🔍 saran penggabungan nama mirip & ✨ isi otomatis CS) sebelumnya scan SELURUH riwayat pesanan setiap kali tab ini dibuka. Sekarang keduanya jadi <b>tombol manual</b> ("🔍 Cek Saran Penggabungan" / "✨ Isi Otomatis CS") — tidak lagi jalan otomatis. Fitur "Master Nama CS" (baru kemarin) juga disederhanakan: tidak ada lagi auto-scan nama baru dari riwayat pesanan — nama lama jadi alias HANYA saat Anda rename manual.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.70.0</div>
+          <ul>
+            <li><b>Keamanan: Kode Akses tidak lagi hardcode di source code</b> — sebelumnya kunci yang melindungi semua data ke server (`APP_SECRET`) ditulis langsung di file `index.html`, jadi ikut terlihat siapa saja yang buka "View Page Source". Sekarang diisi manual sekali per HP/browser lewat menu <b>"Kode Akses"</b> di footer (satu popup dengan "ID Telegram Saya") — tersimpan lokal di HP, tidak pernah ada di source code lagi. Wajib diisi ulang oleh semua yang pakai app ini.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.69.0</div>
+          <ul>
+            <li><b>Tombol "↻ Reset" sekarang tampil di HP</b> — di kartu "Rincian Pemesanan" (tab Penjualan &amp; Custom), tombol ini sebelumnya cuma muncul di desktop/tablet. Sekarang tampil juga di HP, diletakkan paling bawah bar aksi (di bawah "Lanjut ke pengiriman") baik di <b>Mode Tabel</b> maupun <b>Mode Kasir</b> (bottom sheet keranjang). Fungsinya sama seperti tombol RESET di header — mengosongkan semua isian tab yang aktif, lewat popup konfirmasi yang sama.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.68.0</div>
           <ul>
             <li><b>Fitur baru: Master Nama CS</b> — <b>Master Data → Tampilan</b>, di bawah kartu "Daftar CS", sekarang ada kartu baru yang menampilkan SEMUA nama CS yang pernah tercatat di riwayat pesanan (bukan cuma yang didaftarkan manual). Nama bisa diedit/digabungkan — otomatis disinkronkan ke Rekap Pesanan, Follow Up, Master Nama Pelanggan, <b>dan</b> "Daftar CS" sekaligus — atau disembunyikan ("🙈 Sembunyikan", bukan hapus permanen, bisa dipulihkan kapan saja).</li>
             <li><b>Format caption "Revisi Pemesanan" diubah</b> — saat checkbox "Revisi Pemesanan" dicentang di popup "Kirim ke Grup Telegram"/Salin &amp; Kirim, nama customer (dikasih awalan "✒️") sekarang tampil di baris paling atas caption, baru di bawahnya (setelah baris kosong) baris "Revisi Pemesanan" (emoji 🔄 dihapus). Urutan baris lain (Rp.../CS/Pengirim) tidak berubah. Pesanan normal (tidak direvisi) formatnya tetap sama seperti sebelumnya.</li>
@@ -8025,23 +8093,54 @@ if(window.matchMedia){
    (offline fallback) — tidak akan error.
    ============================================================ */
 const MASTER_DATA_WORKER_URL = "https://raspy-limit-ba21.rincian-pemesanan.workers.dev";
-// Harus SAMA PERSIS dengan APP_SECRET yang di-set di worker lewat
-// `wrangler secret put APP_SECRET`. Tanpa ini, semua panggilan ke
-// worker akan ditolak (401) begitu APP_SECRET diaktifkan di sana.
-// CATATAN: karena file ini statis & dibuka langsung di browser, nilai
-// ini tetap terlihat siapa saja yang buka "View Page Source" — ini
-// menutup akses acak/asal ketemu URL, BUKAN pengganti login sungguhan.
-const APP_SECRET = "281207767041cf19440c0b849f4d5027";
+/* ============================================================
+   DIUBAH (permintaan "app secret jangan hardcode di source, input
+   manual seperti ID Telegram Saya") -- SEBELUMNYA nilai APP_SECRET
+   ditulis LANGSUNG di sini (const APP_SECRET = "..."), jadi otomatis
+   ikut ter-upload ke repo GitHub (termasuk kalau repo-nya publik) dan
+   terlihat siapa saja yang buka "View Page Source" -- gerbang X-App-
+   Secret di Worker jadi percuma begitu ada yang iseng lihat source.
+
+   Sekarang polanya SAMA PERSIS dengan getTelegramSenderId/
+   setTelegramSenderId di bawah (localStorage, per HP/browser, diisi
+   manual sekali lewat menu "Kode Akses" di footer) -- source code app
+   ini SENDIRI TIDAK PERNAH lagi menyimpan nilai kuncinya. Beda dari ID
+   Telegram (yang punya auto-deteksi lewat Telegram Mini App), Kode
+   Akses SENGAJA TIDAK auto-diisi dari mana pun -- WAJIB diketik manual,
+   karena ini kunci keamanan sungguhan (bukan cuma label), dan sumber
+   auto-deteksi Telegram (tg.initDataUnsafe) sendiri TIDAK terverifikasi
+   ("unsafe") jadi tidak pantas dipakai buat hal sepenting ini.
+   ============================================================ */
+const APP_ACCESS_KEY_STORAGE = "habit_app_access_key";
+function getAppAccessKey(){
+  try{ return (localStorage.getItem(APP_ACCESS_KEY_STORAGE) || "").trim(); }catch(e){ return ""; }
+}
+function setAppAccessKey(val){
+  try{ localStorage.setItem(APP_ACCESS_KEY_STORAGE, (val || "").trim()); }catch(e){}
+}
 // Helper: gabungkan header X-App-Secret ke setiap request ke worker,
-// supaya tidak perlu diketik ulang manual di tiap fetch().
+// supaya tidak perlu diketik ulang manual di tiap fetch(). Nilainya
+// dibaca ULANG tiap kali dipanggil (bukan disalin ke variabel sekali di
+// awal) -- supaya begitu user simpan Kode Akses baru lewat menu footer,
+// SEMUA pemanggilan berikutnya otomatis ikut pakai nilai terbaru tanpa
+// perlu reload (reload tetap dilakukan setelah Simpan demi kebersihan
+// state lain, tapi bukan karena helper ini butuh itu).
 function workerHeaders(extra){
-  return Object.assign({ "X-App-Secret": APP_SECRET }, extra || {});
+  return Object.assign({ "X-App-Secret": getAppAccessKey() }, extra || {});
 }
 
 async function fetchMasterDataFromServer(){
   if(!MASTER_DATA_WORKER_URL) return null;
   try{
     const res = await fetch(MASTER_DATA_WORKER_URL + "/master-data", { headers: workerHeaders() });
+    // BARU -- deteksi KHUSUS 401 (Kode Akses kosong/salah, lihat menu
+    // footer "Kode Akses") supaya bisa ditandai beda dari sekadar
+    // "offline"/gagal network biasa -- dipakai window.__refreshAppAccessKeySub
+    // (kalau modulnya sudah siap) buat kasih tahu user lewat sub-teks di
+    // footer, BUKAN bikin app crash/berhenti (tetap fail-soft seperti
+    // sebelumnya, cuma sinkron server-nya yang tertunda sampai diisi benar).
+    window.__appAccessKeyInvalid = (res.status === 401);
+    if(window.__refreshAppAccessKeySub) window.__refreshAppAccessKeySub();
     if(!res.ok) return null;
     return await res.json();
   }catch(e){
@@ -9310,14 +9409,27 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   }
 });
 
-/* ============ menu "ID Telegram Saya" (disimpan lokal per device) ============ */
+/* ============ menu "ID Telegram Saya" + "Kode Akses" (disimpan lokal
+   per device, 1 popup gabungan #tgid-overlay -- 2 tombol footer beda
+   sama-sama buka popup yang sama) ============
+   Kode Akses: lihat catatan besar di dekat definisi getAppAccessKey/
+   workerHeaders -- ini pengganti APP_SECRET yang dulu hardcode di
+   source. Beda dari ID Telegram (yang ada auto-deteksi): Kode Akses
+   TIDAK ada auto-deteksi, WAJIB diisi manual, dan "Simpan & Periksa"
+   AKTIF memverifikasi Kode Akses ke server (bukan cuma disimpan
+   mentah) supaya user langsung tahu benar/salah, bukan baru ketahuan
+   nanti pas fitur lain tiba-tiba gagal sinkron. */
 (function(){
   const overlay = document.getElementById("tgid-overlay");
   const input = document.getElementById("tgid-input");
   const topicInput = document.getElementById("tgid-topic-input");
   const statusEl = document.getElementById("tgid-status");
   const subEl = document.getElementById("footer-tgid-sub");
-  const btnOpen = document.getElementById("home-link-tgid");
+  const appkeyInput = document.getElementById("appkey-input");
+  const appkeyStatusEl = document.getElementById("appkey-status");
+  const appkeySubEl = document.getElementById("footer-appkey-sub");
+  const btnOpenTgid = document.getElementById("home-link-tgid");
+  const btnOpenAppkey = document.getElementById("home-link-appkey");
   const btnClose = document.getElementById("tgid-close");
   const btnCancel = document.getElementById("tgid-cancel");
   const btnSave = document.getElementById("tgid-save");
@@ -9326,10 +9438,26 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     const val = getTelegramSenderId();
     subEl.textContent = val ? val : "Belum diatur — ketuk untuk isi";
   }
+  function refreshAppkeySub(){
+    if(!appkeySubEl) return;
+    const val = getAppAccessKey();
+    if(!val){
+      appkeySubEl.textContent = "Belum diatur — ketuk untuk isi";
+      appkeySubEl.style.color = "";
+    } else if(window.__appAccessKeyInvalid){
+      appkeySubEl.textContent = "❌ Kode ditolak server — ketuk untuk perbaiki";
+      appkeySubEl.style.color = "var(--danger-red)";
+    } else {
+      appkeySubEl.textContent = "Tersimpan di HP ini";
+      appkeySubEl.style.color = "";
+    }
+  }
   function openModal(){
     input.value = getTelegramSenderId();
     topicInput.value = getTelegramTopicId();
     statusEl.textContent = "";
+    if(appkeyInput) appkeyInput.value = getAppAccessKey();
+    if(appkeyStatusEl){ appkeyStatusEl.textContent = ""; appkeyStatusEl.style.color = ""; }
     const autoNote = document.getElementById("tgid-autonote");
     if(autoNote) autoNote.hidden = !TELEGRAM_SENDER_AUTO_DETECTED;
     overlay.hidden = false;
@@ -9337,12 +9465,15 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   }
   function closeModal(){ overlay.hidden = true; }
 
-  btnOpen.addEventListener("click", openModal);
+  btnOpenTgid.addEventListener("click", openModal);
   subEl.addEventListener("click", openModal);
+  if(btnOpenAppkey) btnOpenAppkey.addEventListener("click", openModal);
+  if(appkeySubEl) appkeySubEl.addEventListener("click", openModal);
   btnClose.addEventListener("click", closeModal);
   btnCancel.addEventListener("click", closeModal);
   overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
-  btnSave.addEventListener("click", ()=>{
+  btnSave.addEventListener("click", async ()=>{
+    // ---- bagian ID Telegram (perilaku lama, tidak berubah) ----
     const val = input.value.trim();
     if(val && /^\d+$/.test(val)){
       statusEl.textContent = "ID Telegram terdeteksi — nanti dicoba otomatis diubah jadi username asli kamu saat kirim (asal kamu memang member grup Telegram-nya).";
@@ -9356,11 +9487,59 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     refreshSub();
     applySettingsToDom();
     if(window.__refreshHomeGreeting) window.__refreshHomeGreeting();
-    setTimeout(closeModal, 900);
+
+    // ---- bagian Kode Akses (BARU -- diverifikasi ke server, cuma kalau diisi) ----
+    const appkeyVal = appkeyInput ? appkeyInput.value.trim() : "";
+    if(!appkeyInput || !appkeyStatusEl){
+      setTimeout(closeModal, 900);
+      return;
+    }
+    if(!appkeyVal){
+      // Dikosongkan/tidak diubah -- tidak wajib diisi ulang tiap Simpan,
+      // popup tetap boleh ditutup normal (cuma bagian ID Telegram tersimpan).
+      setTimeout(closeModal, 900);
+      return;
+    }
+    if(!MASTER_DATA_WORKER_URL){
+      appkeyStatusEl.textContent = "URL server belum dikonfigurasi di app ini.";
+      appkeyStatusEl.style.color = "var(--danger-red)";
+      return;
+    }
+    setAppAccessKey(appkeyVal);
+    btnSave.disabled = true;
+    appkeyStatusEl.textContent = "Memeriksa Kode Akses ke server...";
+    appkeyStatusEl.style.color = "";
+    try{
+      const remote = await fetchMasterDataFromServer();
+      if(remote){
+        appkeyStatusEl.textContent = "✅ Kode benar & tersimpan — memuat ulang halaman...";
+        appkeyStatusEl.style.color = "var(--primary-green)";
+        refreshAppkeySub();
+        setTimeout(()=> window.location.reload(), 900);
+      } else if(window.__appAccessKeyInvalid){
+        appkeyStatusEl.textContent = "❌ Kode ditolak server (401) — cek lagi nilainya ke admin.";
+        appkeyStatusEl.style.color = "var(--danger-red)";
+        refreshAppkeySub();
+        btnSave.disabled = false;
+      } else {
+        appkeyStatusEl.textContent = "Tersimpan di HP ini, tapi server tidak bisa dihubungi sekarang (offline?) — coba lagi nanti.";
+        appkeyStatusEl.style.color = "";
+        refreshAppkeySub();
+        setTimeout(closeModal, 1200);
+        btnSave.disabled = false;
+      }
+    }catch(e){
+      appkeyStatusEl.textContent = "Tersimpan di HP ini, tapi gagal memeriksa ke server: " + String(e.message || e);
+      appkeyStatusEl.style.color = "";
+      refreshAppkeySub();
+      btnSave.disabled = false;
+    }
   });
 
   refreshSub();
+  refreshAppkeySub();
   window.__refreshTelegramSenderSub = refreshSub;
+  window.__refreshAppAccessKeySub = refreshAppkeySub;
   window.__openTelegramSenderModal = openModal;
 })();
 
@@ -14306,14 +14485,31 @@ if ("serviceWorker" in navigator) {
       }catch(e){ console.log("Gagal ambil saran ketidaksinkronan:", e); }
     }
 
-    /* ---------- BARU -- AUTO-ISI nama CS (bukan sekadar saran) ----------
-       Permintaan user: "jangan sarankan, tapi langsung isi, kalau tidak
-       sesuai bisa saya edit" -- jadi tiap kali tab Master Nama dibuka,
-       Worker langsung mengisi `cs` yang MASIH KOSONG pakai CS yang paling
-       sering menangani transaksi customer itu (customer_order_log).
-       Endpoint /customer-names/cs-autofill di Worker SENGAJA hanya
-       menyentuh yang kosong -- begitu Anda edit manual (atau sudah
-       keisi otomatis), TIDAK akan pernah ditimpa balik lagi. */
+    // BARU -- tombol manual "🔍 Cek Saran Penggabungan" (SEBELUMNYA auto-
+    // jalan tiap buka tab, lihat catatan di window.__mdLoadNamaList soal
+    // kenapa diubah jadi manual -- endpoint ini scan SELURUH
+    // customer_order_log via SELECT DISTINCT customer_name).
+    (function(){
+      const btn = document.getElementById("md-nama-check-suggest-btn");
+      if(!btn) return;
+      btn.addEventListener("click", async ()=>{
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Memeriksa...";
+        try{ await loadSuggestions(); }
+        finally{ btn.disabled = false; btn.textContent = original; }
+      });
+    })();
+
+    /* ---------- AUTO-ISI nama CS (bukan sekadar saran) ----------
+       Worker mengisi `cs` yang MASIH KOSONG pakai CS yang paling sering
+       menangani transaksi customer itu (customer_order_log). Endpoint
+       /customer-names/cs-autofill di Worker SENGAJA hanya menyentuh yang
+       kosong -- begitu Anda edit manual (atau sudah keisi otomatis),
+       TIDAK akan pernah ditimpa balik lagi.
+       DIUBAH -- SEBELUMNYA jalan otomatis tiap tab ini dibuka; sekarang
+       murni manual lewat tombol "✨ Isi Otomatis CS" (lihat wiring di
+       bawah definisi fungsinya) -- lihat catatan di window.__mdLoadNamaList. */
     const csAutofillNoteEl = document.getElementById("md-nama-cs-suggestions");
     async function autofillCsAndReload(){
       if(!MASTER_DATA_WORKER_URL) return;
@@ -14326,11 +14522,27 @@ if ("serviceWorker" in navigator) {
         if(csAutofillNoteEl){
           csAutofillNoteEl.innerHTML = (data && data.filled > 0)
             ? `<div class="md-nama-dedupe-note">✓ ${data.filled} nama CS otomatis disinkronkan dari riwayat transaksi. Kalau ada yang kurang pas, tinggal "✏️ Edit" — sekali diedit tidak akan ditimpa balik lagi.</div>`
-            : "";
+            : `<div class="md-nama-dedupe-note">Tidak ada yang perlu diisi — semua customer aktif sudah punya CS (atau belum ada riwayat transaksi ber-CS).</div>`;
         }
         render(); // tampilkan hasil autofill terbaru di daftar tanpa perlu refresh manual
       }catch(e){ console.log("Gagal autofill CS:", e); }
     }
+
+    // BARU -- tombol manual "✨ Isi Otomatis CS" (SEBELUMNYA auto-jalan tiap
+    // buka tab, lihat catatan di window.__mdLoadNamaList soal kenapa
+    // diubah jadi manual). Query di endpoint ini scan SELURUH
+    // customer_order_log -- SENGAJA tidak lagi dipanggil otomatis.
+    (function(){
+      const btn = document.getElementById("md-nama-autofill-cs-btn");
+      if(!btn) return;
+      btn.addEventListener("click", async ()=>{
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Memproses...";
+        try{ await autofillCsAndReload(); }
+        finally{ btn.disabled = false; btn.textContent = original; }
+      });
+    })();
 
     // BARU -- isi <datalist> rekomendasi nama CS di form edit dari Daftar CS
     // terdaftar (Master Data > Tampilan > SETTINGS.csList, sumber SAMA dgn
@@ -14756,10 +14968,16 @@ if ("serviceWorker" in navigator) {
     // loadNames() selesai dulu, supaya render() TERAKHIR selalu yang sudah
     // ter-autofill, bukan tergantung untung-untungan urutan network.
 
+    // DIUBAH (permintaan "jangan auto tiap buka tab, jadi tombol manual saja"
+    // -- lihat audit boros kuota baca D1) -- SEBELUMNYA autofillCsAndReload()
+    // & loadSuggestions() dipanggil OTOMATIS setiap kali tab ini dibuka,
+    // masing-masing lewat query D1 yang scan SELURUH customer_order_log
+    // tanpa cache. Sekarang KEDUANYA murni manual lewat tombol "✨ Isi
+    // Otomatis CS" / "🔍 Cek Saran Penggabungan" di atas -- tab ini kalau
+    // dibuka HANYA loadNames() (baca data yang sudah tersimpan, murah)
+    // + refreshCsDatalist(), TIDAK ada lagi scan D1 otomatis sama sekali.
     window.__mdLoadNamaList = async ()=>{
       await loadNames();
-      await autofillCsAndReload();
-      loadSuggestions();
       refreshCsDatalist();
     };
   })();
@@ -16390,6 +16608,20 @@ if ("serviceWorker" in navigator) {
       if(shipTab) shipTab.click();
     });
   });
+  // BARU (permintaan "tambahkan tombol reset di bawah tombol lanjut ke
+  // pengiriman, versi mobile, Mode Kasir") -- proxy ke tombol RESET global
+  // #btn-reset (popup konfirmasi "Kosongkan semua isian di tab ini?"),
+  // sama PERSIS dengan wl-reset-${sheet} di Mode Tabel -- BUKAN cuma
+  // mengosongkan keranjang (itu sudah ada lewat ikon 🗑️ di header
+  // Keranjang/resetPosCart di atas).
+  ["penjualan","custom"].forEach(sheet=>{
+    const btn = document.getElementById("pos-cart-reset-full-"+sheet);
+    if(!btn) return;
+    btn.addEventListener("click", ()=>{
+      const el = document.getElementById("btn-reset");
+      if(el) el.click();
+    });
+  });
   function posCartItemHtml(sheet, tr, i){
     const name = tr.querySelector("select.prod").value;
     const qty = parseFloat(tr.querySelector("input.qty").value) || 0;
@@ -16434,6 +16666,15 @@ if ("serviceWorker" in navigator) {
     if(resetBtn) resetBtn.classList.toggle("show", filled.length > 0);
     const nextShipBtn = document.getElementById("pos-cart-nextship-"+sheet);
     if(nextShipBtn) nextShipBtn.classList.toggle("show", filled.length > 0);
+    // BARU (permintaan "tambahkan tombol reset di bawah tombol lanjut ke
+    // pengiriman, versi mobile, Mode Kasir") -- tombol "↻ Reset" full-width
+    // di bottom sheet HP, persis di bawah "Lanjut ke pengiriman →". Sama
+    // seperti nextShipBtn di atas, cuma tampil kalau keranjang ada isinya.
+    // Klik-nya proxy ke tombol RESET global (#btn-reset) -- lihat wiring
+    // di dekat pos-cart-nextship di bawah -- BUKAN cuma kosongkan
+    // keranjang (itu sudah ada lewat ikon 🗑️ di header Keranjang/resetPosCart).
+    const resetFullBtn = document.getElementById("pos-cart-reset-full-"+sheet);
+    if(resetFullBtn) resetFullBtn.classList.toggle("show", filled.length > 0);
     host.innerHTML = filled.length
       ? filled.map(o=> posCartItemHtml(sheet, o.tr, o.i)).join("") + (fullMsg ? `<div class="pos-cart-full-msg">${escHtml(fullMsg)}</div>` : ``)
       : `<div class="pos-cart-empty">Keranjang masih kosong.<br>Klik produk di sebelah kiri untuk menambah.</div>`;
