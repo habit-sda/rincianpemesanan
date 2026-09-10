@@ -4,8 +4,11 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v362";
+const CACHE_VERSION = "v363";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v363 -- Master Nama CS: field "Nama CS" saat "✏️ Edit" sekarang punya
+   dropdown saran nama (sama seperti di Master Nama Pelanggan), supaya
+   gampang pilih nama yang mau digabungkan. */
 /* v362 -- Perbaikan performa besar: 2 fitur di Master Nama Pelanggan
    (saran penggabungan nama mirip & isi otomatis CS) yang sebelumnya
    auto-scan SELURUH riwayat pesanan tiap tab dibuka, sekarang jadi

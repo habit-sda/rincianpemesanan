@@ -6168,7 +6168,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.71.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.72.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6422,7 +6422,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.71.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.72.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Master Nama CS: dropdown saran nama saat "✏️ Edit"</b> — field "Nama CS" sekarang menampilkan daftar nama CS yang sudah ada (sama seperti dropdown "Nama CS" di Master Nama Pelanggan) begitu diketuk/diketik, supaya lebih gampang memilih nama yang mau digabungkan alih-alih ketik manual dari nol.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.71.0</div>
           <ul>
             <li><b>Perbaikan performa besar: kuota baca database (D1) yang boros</b> — 2 fitur di "Master Nama Pelanggan" (🔍 saran penggabungan nama mirip & ✨ isi otomatis CS) sebelumnya scan SELURUH riwayat pesanan setiap kali tab ini dibuka. Sekarang keduanya jadi <b>tombol manual</b> ("🔍 Cek Saran Penggabungan" / "✨ Isi Otomatis CS") — tidak lagi jalan otomatis. Fitur "Master Nama CS" (baru kemarin) juga disederhanakan: tidak ada lagi auto-scan nama baru dari riwayat pesanan — nama lama jadi alias HANYA saat Anda rename manual.</li>
           </ul>
@@ -15281,7 +15287,7 @@ if ("serviceWorker" in navigator) {
           return `
             <div class="md-nama-row v2" data-name="${esc(n)}">
               <div class="md-nama-fields">
-                <div class="fld"><div class="fld-label">Nama CS</div><input type="text" class="md-csmaster-edit-name" value="${esc(n)}" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;"></div>
+                <div class="fld md-nama-cs-wrap"><div class="fld-label">Nama CS</div><input type="text" class="md-csmaster-edit-name" value="${esc(n)}" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;"><div class="md-nama-cs-suggest" hidden></div></div>
                 <div class="fld"><div class="fld-label">Telegram ID</div><input type="text" inputmode="numeric" class="md-csmaster-edit-id" value="${esc(r.telegramId||"")}" placeholder="(kosong)" autocomplete="off" style="width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:13px;"></div>
               </div>
               <div class="md-pin-err md-csmaster-edit-err"></div>
@@ -15483,6 +15489,66 @@ if ("serviceWorker" in navigator) {
         render();
         if(telegramId) refreshDaftarCsFromServer();
       }catch(err){ addErrEl.textContent = "Gagal menambahkan: " + String(err.message || err); }
+    });
+
+    // BARU (permintaan "kenapa tidak ada saran nama untuk digabungkan?")
+    // -- dropdown saran nama di field "Nama CS" saat mode Edit, KHUSUS
+    // buat bantu Anda menggabungkan (rename ke nama yang SUDAH ada -> jadi
+    // alias). Sumbernya SEMUA nama di Master CS ini sendiri (aktif MAUPUN
+    // yang lagi disembunyikan -- keduanya tetap sah jadi target gabung),
+    // MINUS nama yang sedang diedit sendiri. Pola & gaya visual SAMA
+    // PERSIS dgn dropdown "Nama CS" di Master Nama Pelanggan (reuse class
+    // CSS .md-nama-cs-suggest yang sama), tapi wiring event-nya sendiri
+    // (terpisah dari listEl Master Nama Pelanggan) supaya tidak salah sasaran.
+    function csMasterSuggestSource(excludeName){
+      const all = csActive.concat(csHidden).map(r=> r && r.name).filter(Boolean);
+      const excl = (excludeName || "").trim().toLowerCase();
+      const seen = new Set(); const out = [];
+      for(const n of all){
+        const k = n.trim().toLowerCase();
+        if(!k || k === excl || seen.has(k)) continue;
+        seen.add(k); out.push(n);
+      }
+      return out;
+    }
+    function renderCsMasterSuggest(box, query, excludeName){
+      const q = (query || "").trim();
+      const source = csMasterSuggestSource(excludeName);
+      const matches = q
+        ? source.filter(n=> n.toUpperCase().includes(q.toUpperCase())).slice(0, 8)
+        : source.slice(0, 8);
+      if(!matches.length){
+        box.innerHTML = `<div class="md-nama-cs-suggest-empty">${q ? "Tidak ada nama CS lain yang cocok." : "Belum ada nama CS lain untuk digabungkan."}</div>`;
+        box.hidden = false;
+        return;
+      }
+      box.innerHTML = matches.map(n=> `<div class="md-nama-cs-suggest-item" data-name="${esc(n)}"><span class="ic">🧑‍💼</span><span class="txt">${esc(n)}</span></div>`).join("");
+      box.hidden = false;
+    }
+    function hideCsMasterSuggest(box){ if(!box) return; box.hidden = true; box.innerHTML = ""; }
+    listEl.addEventListener("focusin", (e)=>{
+      if(!e.target.classList || !e.target.classList.contains("md-csmaster-edit-name")) return;
+      const box = e.target.closest(".md-nama-cs-wrap").querySelector(".md-nama-cs-suggest");
+      renderCsMasterSuggest(box, e.target.value, editingName);
+    });
+    listEl.addEventListener("input", (e)=>{
+      if(!e.target.classList || !e.target.classList.contains("md-csmaster-edit-name")) return;
+      const box = e.target.closest(".md-nama-cs-wrap").querySelector(".md-nama-cs-suggest");
+      renderCsMasterSuggest(box, e.target.value, editingName);
+    });
+    listEl.addEventListener("focusout", (e)=>{
+      if(!e.target.classList || !e.target.classList.contains("md-csmaster-edit-name")) return;
+      const box = e.target.closest(".md-nama-cs-wrap").querySelector(".md-nama-cs-suggest");
+      // delay dikit supaya event mousedown di item saran (di bawah) sempat kepencet dulu
+      setTimeout(()=> hideCsMasterSuggest(box), 150);
+    });
+    listEl.addEventListener("mousedown", (e)=>{
+      const item = e.target.closest(".md-nama-cs-suggest-item");
+      if(!item) return;
+      const wrap = item.closest(".md-nama-cs-wrap");
+      const input = wrap ? wrap.querySelector(".md-csmaster-edit-name") : null;
+      if(input) input.value = item.dataset.name;
+      hideCsMasterSuggest(item.closest(".md-nama-cs-suggest"));
     });
 
     render(); // tampilkan status "memuat..." dulu sebelum data pertama datang
