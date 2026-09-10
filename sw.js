@@ -4,8 +4,13 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v363";
+const CACHE_VERSION = "v364";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v364 -- Badge "● diupdate" di Rekap Pesanan (tabel desktop & kartu
+   mobile) sekarang menampilkan jam/menit/detik/tanggal pasti perubahan,
+   bukan cuma tulisan "diupdate" polos. Butuh Worker versi baru juga
+   (markFieldChanged/getFieldChangesForOrders sekarang menyimpan &
+   mengembalikan timestamp, bukan cuma penanda ya/tidak). */
 /* v363 -- Master Nama CS: field "Nama CS" saat "✏️ Edit" sekarang punya
    dropdown saran nama (sama seperti di Master Nama Pelanggan), supaya
    gampang pilih nama yang mau digabungkan. */

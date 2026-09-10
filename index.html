@@ -6168,7 +6168,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.72.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.73.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6422,7 +6422,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.72.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.73.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Badge "● diupdate" di Rekap Pesanan sekarang tampilkan jam pasti</b> — sebelumnya cuma tulisan "diupdate" polos tanpa keterangan waktu. Sekarang ikut menampilkan tanggal, jam, menit, dan detik persis kapan field itu berubah (format sama seperti kolom TGL/JAM yang sudah ada) — teks kecil & warna redup seperti sebelumnya, supaya tetap tidak mengganggu fokus ke kolom utama, tapi jelas terbaca kalau ingin dicek. Berlaku di tabel desktop maupun kartu mobile.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.72.0</div>
           <ul>
             <li><b>Master Nama CS: dropdown saran nama saat "✏️ Edit"</b> — field "Nama CS" sekarang menampilkan daftar nama CS yang sudah ada (sama seperti dropdown "Nama CS" di Master Nama Pelanggan) begitu diketuk/diketik, supaya lebih gampang memilih nama yang mau digabungkan alih-alih ketik manual dari nol.</li>
           </ul>
@@ -17665,6 +17671,16 @@ if ("serviceWorker" in navigator) {
   // attribute yang SAMA dgn tombol di tabel (rekap-invoice-btn / data-
   // anchor / data-state) supaya listener toggle-nya bisa dipakai bareng
   // (lihat fullpage.querySelectorAll(".rekap-invoice-btn") di bawah).
+  // BARU -- format jam PERSIS badge "● diupdate" (permintaan "munculkan
+  // detik jam hari") -- dipakai bareng oleh renderRekapCards (mobile) &
+  // tabel desktop di bawah, format SAMA PERSIS dgn kolom TGL/JAM yang
+  // sudah ada ("09 Sep, 19.19") + detik, supaya konsisten (bukan format
+  // baru yang beda gaya).
+  function fmtFieldChangeTime(ms){
+    if(!ms) return "";
+    try{ return new Date(ms).toLocaleString("id-ID", { timeZone: "Asia/Jakarta", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
+    catch(e){ return ""; }
+  }
   function renderRekapCards(rows, kodeList){
     if(!cardsEl) return;
     if(!rows.length){
@@ -17686,11 +17702,25 @@ if ("serviceWorker" in navigator) {
         .map(k=> (r.items && r.items[k]) ? `${escHtml(k)} ${r.items[k]}` : null)
         .filter(Boolean).join(", ") || "-";
       // BARU -- badge kecil "● diupdate" per field, versi kartu mobile
-      // (pola sama dgn tabel desktop).
+      // (pola sama dgn tabel desktop). DIUBAH (permintaan "munculkan detik
+      // jam hari di badge") -- sekarang ikut nampilin jam PERSIS field itu
+      // berubah (r.fieldsChangedAt), format SAMA PERSIS dgn kolom TGL/JAM
+      // yg sudah ada ("09 Sep, 19.19") + detik -- konsisten, bukan format
+      // baru. Tetap 1 baris kecil (10px, warna muted) -- TIDAK menambah
+      // ukuran/warna mencolok, jadi tidak mengalihkan fokus dari kolom
+      // utama (Customer/Status/dll), tapi tetap jelas terbaca kalau
+      // memang mau dicek. Kalau jam-nya kebetulan belum ada (data lama,
+      // sebelum fitur jam ini aktif) -- teks "diupdate" tetap tampil apa
+      // adanya tanpa jam, TIDAK error/kosong.
       const fc = r.fieldsChanged || [];
-      const cbDot = `<span style="width:6px;height:6px;border-radius:50%;background:#1D9E75;display:inline-block;margin-right:3px;"></span>`;
-      const cbText = `<span style="font-size:10px;color:var(--ink-soft);">diupdate</span>`;
-      const cb = (...keys)=> keys.some(k=> fc.includes(k)) ? `<div style="display:flex;align-items:center;margin-top:2px;">${cbDot}${cbText}</div>` : "";
+      const fcAt = r.fieldsChangedAt || {};
+      const cbDot = `<span style="width:6px;height:6px;border-radius:50%;background:#1D9E75;display:inline-block;margin-right:3px;flex:none;"></span>`;
+      const cb = (...keys)=>{
+        const hit = keys.find(k=> fc.includes(k));
+        if(!hit) return "";
+        const t = fmtFieldChangeTime(fcAt[hit]);
+        return `<div style="display:flex;align-items:center;margin-top:2px;" title="${t ? "Diupdate " + escHtml(t) : ""}">${cbDot}<span style="font-size:10px;color:var(--ink-soft);">diupdate${t ? " · " + escHtml(t) : ""}</span></div>`;
+      };
       return `<div class="rc-card${isVoid?" void":""}">
         <div class="rc-card-top">
           <div>
@@ -17796,16 +17826,24 @@ if ("serviceWorker" in navigator) {
         : "";
       const namaCell = namaLink + rkAliasSubline(r.customer) + dropshipBadge;
       const namaTitle = r.dropshipRecipient ? `${r.customer} · Dropship a.n. ${r.dropshipRecipient}` : r.customer;
-      // BARU -- badge kecil "● diupdate" (titik hijau + teks, TANPA
-      // keterangan menit) nempel PERSIS di kolom field yang baru berubah
-      // (lihat markFieldChanged/getFieldChangesForOrders di backend) --
-      // BUKAN di bawah nama customer (itu sudah dipakai badge Dropship &
-      // alias). "varian" (HA/HS/HJ/dst + QTY, sekaligus diganti bareng
-      // saat revisi) diwakili 1 badge di kolom QTY saja, tidak diulang di
-      // setiap kolom kode produk -- supaya tidak berisik.
-      const changeBadge = (fieldKey, center)=> (r.fieldsChanged || []).includes(fieldKey)
-        ? `<div style="display:flex;align-items:center;gap:4px;margin-top:3px;${center ? "justify-content:center;" : ""}"><span style="width:6px;height:6px;border-radius:50%;background:#1D9E75;flex:none;"></span><span style="font-size:10px;color:var(--ink-soft);">diupdate</span></div>`
-        : "";
+      // BARU -- badge kecil "● diupdate" nempel PERSIS di kolom field yang
+      // baru berubah (lihat markFieldChanged/getFieldChangesForOrders di
+      // backend) -- BUKAN di bawah nama customer (itu sudah dipakai badge
+      // Dropship & alias). "varian" (HA/HS/HJ/dst + QTY, sekaligus diganti
+      // bareng saat revisi) diwakili 1 badge di kolom QTY saja, tidak
+      // diulang di setiap kolom kode produk -- supaya tidak berisik.
+      // DIUBAH (permintaan "munculkan detik jam hari di badge") -- ikut
+      // nampilin jam PERSIS (r.fieldsChangedAt), 1 baris kecil (10px,
+      // warna muted, SAMA gaya dgn teks "diupdate"-nya) -- TIDAK menambah
+      // ukuran/warna mencolok supaya tidak mengalihkan fokus dari isi
+      // kolom utama, tapi tetap jelas terbaca; title="..." juga diisi
+      // supaya hover (desktop) nampilin versi lengkapnya juga.
+      const fcAt = r.fieldsChangedAt || {};
+      const changeBadge = (fieldKey, center)=>{
+        if(!(r.fieldsChanged || []).includes(fieldKey)) return "";
+        const t = fmtFieldChangeTime(fcAt[fieldKey]);
+        return `<div style="display:flex;align-items:center;gap:4px;margin-top:3px;${center ? "justify-content:center;" : ""}" title="${t ? "Diupdate " + t : ""}"><span style="width:6px;height:6px;border-radius:50%;background:#1D9E75;flex:none;"></span><span style="font-size:10px;color:var(--ink-soft);">diupdate${t ? " · " + t : ""}</span></div>`;
+      };
       // BARU -- title="..." supaya kalau masih terpotong di layar sempit,
       // teks lengkapnya tetap bisa dibaca lewat hover (desktop) / tahan
       // tap (mobile), tanpa perlu melebarkan kolom.
