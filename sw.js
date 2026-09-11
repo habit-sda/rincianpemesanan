@@ -4,8 +4,13 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v371";
+const CACHE_VERSION = "v372";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v372 -- Perbaikan bug: tag "NEW" (penanda pesanan pertama) sempat
+   dibuang sebelum sempat dikirim ke grup -- sekarang tampil lagi persis
+   sesuai maksudnya (cuma di order pertama, otomatis hilang sendiri di
+   order berikutnya). Murni frontend, tidak butuh Worker baru (Worker
+   sudah benar sebelumnya). */
 /* v371 -- Filter "Resi" baru di Rekap Pesanan (Semua/Sudah dibuat/Belum
    dibuat resi), muncul otomatis begitu 1 ekspedisi spesifik dipilih di
    filter Ekspedisi di sampingnya. Murni frontend, tidak butuh Worker baru. */

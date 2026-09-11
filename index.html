@@ -6184,7 +6184,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.80.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.81.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6438,7 +6438,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.80.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.81.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug: tag "NEW" hilang saat kirim ke grup</b> — sebelumnya "NEW" (penanda pesanan pertama customer) sudah dibuang duluan sebelum sempat dikirim, padahal seharusnya tetap tampil di caption saat itu SAJA (order pertama), lalu otomatis tidak muncul lagi di order-order berikutnya. Sudah diperbaiki — sekarang muncul persis sesuai maksudnya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.80.0</div>
           <ul>
             <li><b>Filter "Resi" baru di Rekap Pesanan</b> — muncul otomatis tepat di samping filter Ekspedisi begitu Anda pilih 1 ekspedisi tertentu (tersembunyi kalau masih "Semua Ekspedisi"). Pilihan: Semua Resi / Sudah dibuat resi / Belum dibuat resi — cocok buat lihat cepat pesanan mana di ekspedisi itu yang masih perlu dibuatkan resi.</li>
           </ul>
@@ -10350,14 +10356,25 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   }
 
   btnSend.addEventListener("click", async ()=>{
-    // BARU -- sama seperti autosaveDraft(): buang "NEW" sebelum benar-benar
-    // dikirim & tersimpan, supaya tidak nempel permanen di nama customer.
-    const rawNameBeforeStrip = nameInput.value.trim();
-    const customerName = stripNewTag(rawNameBeforeStrip);
+    // DIUBAH (permintaan "kenapa NEW hilang pas kirim ke grup? -- harusnya
+    // tampil pas customer baru saja") -- SEBELUMNYA "NEW" dibuang DI SINI
+    // (sebelum kirim), jadi caption yang terkirim ke grup & data yang
+    // tersimpan (dibaca Rekap Pesanan) IKUT kehilangan "NEW"-nya --
+    // padahal Worker SUDAH benar membuang "NEW" sendiri, TAPI cuma di 2
+    // tempat yang memang perlu (daftar rekomendasi nama via
+    // addCustomerNameToHistory, & pendaftaran ke Master Nama Pelanggan
+    // via maybeRegisterNewCustomer -- keduanya sudah panggil
+    // stripNewTag()/normCustName() sendiri secara internal). Jadi
+    // pembuangan DI SINI itu REDUNDAN sekaligus jadi penyebab "NEW"
+    // hilang dari tempat yang SEHARUSNYA tetap tampil (caption ke grup +
+    // Rekap Pesanan). Sekarang nama dikirim APA ADANYA (dgn "NEW" kalau
+    // memang diketik) -- Worker yang urus buang/pertahankan "NEW" sesuai
+    // konteksnya masing-masing, bukan dibuang paksa di sini.
+    const customerName = nameInput.value.trim();
     // BARU -- deteksi "customer baru" (otomatis terdaftar ke Master Nama
     // sbg milik CS yang input): kata kunci "NEW" di akhir nama, ATAU CS
     // TIDAK klik dari kotak rekomendasi saat mau kirim.
-    const isNewCustomer = /\s*NEW\s*$/i.test(rawNameBeforeStrip) || !pickedFromSuggestion;
+    const isNewCustomer = /\s*NEW\s*$/i.test(customerName) || !pickedFromSuggestion;
     const senderId = getTelegramSenderId();
     if(!customerName){
       statusEl.textContent = "Nama customer wajib diisi.";
