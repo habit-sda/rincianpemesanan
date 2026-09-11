@@ -6184,7 +6184,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.81.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.82.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6438,7 +6438,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.81.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.82.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Indikator "teks" di kolom Resi Rekap Pesanan</b> — resi yang dikonfirmasi lewat laporan teks (fitur "sudah kirim"/"sudah diambil sendiri" di grup Resi, tanpa foto) sekarang tampil beda (kuning + label "teks") dari resi via foto asli (hijau polos seperti biasa) — supaya bisa dianalisa mana yang masih perlu dicek ulang buktinya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.81.0</div>
           <ul>
             <li><b>Perbaikan bug: tag "NEW" hilang saat kirim ke grup</b> — sebelumnya "NEW" (penanda pesanan pertama customer) sudah dibuang duluan sebelum sempat dikirim, padahal seharusnya tetap tampil di caption saat itu SAJA (order pertama), lalu otomatis tidak muncul lagi di order-order berikutnya. Sudah diperbaiki — sekarang muncul persis sesuai maksudnya.</li>
           </ul>
@@ -17948,7 +17954,7 @@ if ("serviceWorker" in navigator) {
         <div style="font-size:13px; margin-top:8px;">${varianRingkas} &middot; Qty <b>${r.totalQty||0}</b></div>${(()=>{ const o = orphanItemsInfo(r, kodeList); return o ? `<div title="Produk tanpa Kode Singkat:\n${escHtml(o)}" style="cursor:help;font-size:12px;margin-top:1px;">🏷️</div>` : ""; })()}
         ${cb("varian")}
         <div class="rc-card-mid">
-          <span><b>${r.resi ? "✅ Resi ada" : "❌ Belum resi"}</b></span>
+          <span><b>${r.resi ? (r.resiMethod === "teks" ? "✅ Resi ada (teks)" : "✅ Resi ada") : "❌ Belum resi"}</b></span>
           <span>${escHtml(r.ekspedisi || "-")}${r.kg ? " &middot; " + escHtml(r.kg) + " kg" : ""}</span>
         </div>
         <div style="display:flex; justify-content:space-between;">${cb("resi")}${cb("ekspedisi", "kg")}</div>
@@ -18092,7 +18098,19 @@ if ("serviceWorker" in navigator) {
         td(`<div>${r.totalQty || 0}</div>` + (()=>{ const o = orphanItemsInfo(r, kodeList); return o ? `<div title="Produk tanpa Kode Singkat:\n${escHtml(o)}" style="cursor:help;font-size:11px;line-height:1.2;">🏷️</div>` : ""; })() + changeBadge("varian", true), "text-align:center; font-weight:600;") +
         td(escHtml(ringkasStatus(r.status)) + changeBadge("status", false), "white-space:normal; word-break:break-word; max-width:130px;") + td(escHtml(r.kg) + changeBadge("kg", true), "text-align:center; white-space:nowrap;") +
         td(escHtml(r.ekspedisi) + changeBadge("ekspedisi", false), "white-space:normal; word-break:break-word; max-width:120px;") +
-        td((r.resi ? "✅" : "❌") + changeBadge("resi", true), "text-align:center;") +
+        // DIUBAH (permintaan "indikator resi foto vs teks, agar bisa
+        // dianalisa mana yang ada bukti foto vs cuma laporan teks") --
+        // r.resiMethod ("foto"/"teks"/null) dari server. "foto" (termasuk
+        // SEMUA data lama sebelum fitur teks ini ada) tetap tampil ✅
+        // hijau polos SAMA PERSIS seperti sebelumnya (TIDAK ada perubahan
+        // visual utk kasus paling umum) -- CUMA "teks" yang dapat tampilan
+        // beda (kuning + label kecil "teks") supaya gampang dibedakan
+        // sekilas mana yang masih perlu bukti foto menyusul/dicek ulang.
+        td((r.resi
+          ? (r.resiMethod === "teks"
+              ? `<div><span style="display:inline-block;background:#fff3cd;color:#8a6100;border-radius:4px;padding:1px 7px;font-size:13px;">✅</span></div><div style="font-size:9.5px;color:#8a6100;margin-top:1px;">teks</div>`
+              : "✅")
+          : "❌") + changeBadge("resi", true), "text-align:center;") +
         td(`<button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:5px 10px; font-size:13px;">${r.manualInvoiced ? "✓ Sudah" : "Belum"}</button>${changeBadge("invoice", true)}`) +
         "</tr>";
     });

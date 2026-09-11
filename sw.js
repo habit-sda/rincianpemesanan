@@ -4,8 +4,11 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v372";
+const CACHE_VERSION = "v373";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v373 -- Indikator "teks" di kolom Resi Rekap Pesanan (beda dari resi
+   foto asli) -- pasangan fitur "sudah kirim/sudah diambil sendiri" (grup
+   Resi, tombol pilih nama) di Worker v385. Butuh Worker baru juga. */
 /* v372 -- Perbaikan bug: tag "NEW" (penanda pesanan pertama) sempat
    dibuang sebelum sempat dikirim ke grup -- sekarang tampil lagi persis
    sesuai maksudnya (cuma di order pertama, otomatis hilang sendiri di
