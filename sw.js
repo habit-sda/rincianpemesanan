@@ -4,8 +4,20 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v373";
+const CACHE_VERSION = "v374";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v374 -- Perbaikan performa Rekap Pesanan, terutama terasa di HP:
+   (1) signature pembanding "data berubah atau tidak" (dipakai auto-refresh
+   tiap 30 detik) sebelumnya JSON.stringify() SELURUH baris -- sekarang
+   cuma gabungan beberapa field pendek yang memang jadi penanda perubahan
+   (anchorId/lastActivityAtMs/manualInvoiced/resi/fieldsChanged), hasil
+   banding sama persis tapi jauh lebih murah dihitung; (2) kolom pencarian
+   sekarang di-debounce 300ms (sebelumnya render ulang penuh tiap 1 huruf
+   diketik); (3) tabel desktop & kartu mobile sekarang saling skip sesuai
+   layout yang sedang aktif (sebelumnya keduanya SELALU dibangun penuh
+   walau salah satunya disembunyikan CSS) -- otomatis dibangun ulang kalau
+   breakpoint dilewati (resize/putar layar). Murni optimisasi, TIDAK ada
+   perubahan hasil tampilan/data. Tidak butuh Worker baru. */
 /* v373 -- Indikator "teks" di kolom Resi Rekap Pesanan (beda dari resi
    foto asli) -- pasangan fitur "sudah kirim/sudah diambil sendiri" (grup
    Resi, tombol pilih nama) di Worker v385. Butuh Worker baru juga. */
