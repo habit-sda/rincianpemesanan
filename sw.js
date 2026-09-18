@@ -4,8 +4,18 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v374";
+const CACHE_VERSION = "v375";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v375 -- Perbaikan bug: kartu "Preview nota" di langkah Review (wizard
+   Pengiriman, tampil di HP maupun desktop) tidak pernah menampilkan baris
+   Ekspedisi -- daftar ringkasannya cuma Total qty/Total berat/Subtotal/
+   Ongkir/Diskon Ongkir, barisnya memang tidak pernah ditulis. Gambar nota
+   PNG asli (hasil Unduh/Bagikan/Kirim) SUDAH BENAR dari dulu, jadi ini
+   murni salah tampil di layar preview sebelum download -- bikin user
+   kira pilihan ekspedisinya tidak tersimpan. Ditambahkan baris "Ekspedisi"
+   persis di bawah "Total berat" (urutan sama dgn di gambar nota asli).
+   Murni frontend, tidak butuh Worker baru. SENGAJA TIDAK dipaksa (bukan
+   darurat/keamanan) -- pakai alur normal (popup "Perbarui Sekarang"). */
 /* v374 -- Perbaikan performa Rekap Pesanan, terutama terasa di HP:
    (1) signature pembanding "data berubah atau tidak" (dipakai auto-refresh
    tiap 30 detik) sebelumnya JSON.stringify() SELURUH baris -- sekarang
