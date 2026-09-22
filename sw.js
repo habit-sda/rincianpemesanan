@@ -4,8 +4,18 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v375";
+const CACHE_VERSION = "v376";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v376 -- Sinkron dgn Worker Rincian Pemesanan v403 (perbaikan bug status
+   pembayaran yang belum mengurangi "kelebihan bayar sebelumnya"). Gambar
+   nota (kedua desain, lama & baru): angka besar di baris "Total
+   pembayaran"/"Grand Total" sekarang menampilkan angka KURANG BAYAR
+   (bukan lagi Grand Total kotor) kalau ada kelebihan bayar sebelumnya
+   yang masih menyisakan kurang bayar. Tidak ada kelebihan sebelumnya
+   (atau sudah Lunas/Kembalian) -> tetap Grand Total seperti biasa, tidak
+   berubah. Butuh Worker v403 juga supaya field baru ini (headlineTxt)
+   ikut dipakai saat nota dirender lewat server (toggle "Render nota lewat
+   server"). */
 /* v375 -- Perbaikan bug: kartu "Preview nota" di langkah Review (wizard
    Pengiriman, tampil di HP maupun desktop) tidak pernah menampilkan baris
    Ekspedisi -- daftar ringkasannya cuma Total qty/Total berat/Subtotal/

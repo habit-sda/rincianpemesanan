@@ -8999,6 +8999,14 @@ function buildPrintNota(tab){
   const isKembalian = statusLabel === "Kembalian";
   const signPrefix = isKurang ? "-" : "";
   const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#188038");
+  // PERBAIKAN v403 -- kalau ada kelebihan bayar sebelumnya DAN masih ada
+  // sisa kurang bayar (isKurang), angka yang ditampilkan di baris Grand
+  // Total besar diganti jadi angka kurang bayar itu (selisihFmt), BUKAN lagi
+  // Grand Total kotor -- supaya customer/AI mengacu ke angka yang memang
+  // masih harus dibayar. Kalau tidak ada kelebihan sebelumnya (atau sudah
+  // Lunas/Kembalian, tidak ada "kurang bayar" tersisa), tetap Grand Total
+  // seperti biasa (rule awal).
+  const grandtotalDisplay = isKurang ? selisihFmt : grandtotal;
 
   return `
     <div class="pnota">
@@ -9027,7 +9035,7 @@ function buildPrintNota(tab){
           <div class="pnota-sline"><span class="l">Diskon Ongkir</span><span class="v">${diskonongkir}</span></div>
         </div>
       </div>
-      <div class="pnota-grand"><span class="l">Grand Total</span><span class="v">${grandtotal}</span></div>
+      <div class="pnota-grand"><span class="l">Grand Total</span><span class="v">${grandtotalDisplay}</span></div>
       ${kelebihan!==0 ? `<div class="pnota-pay">
         <div class="pnota-payline"><span class="l">Kelebihan bayar sebelumnya</span><span class="v">${kelebihanFmt}</span></div>
         <div class="pnota-payline pnota-status" style="color:${statusColor}"><span class="l">${statusLabel}</span><span class="v">${signPrefix}${selisihFmt}</span></div>
@@ -9145,11 +9153,21 @@ function collectNotaV2Data(tab){
   const statusColor = isKurang ? "#c5221f" : (isKembalian ? "#1a73e8" : "#00845F");
   const statusBg = isKurang ? "#fdecea" : (isKembalian ? "#e8f0fe" : "#D9ECD4");
   const statusBorder = isKurang ? "#f3b4ae" : (isKembalian ? "#aac9f7" : "#bfe0c9");
+  // PERBAIKAN v403 -- angka headline "Total pembayaran" di gambar nota:
+  // kalau ada kelebihan bayar sebelumnya DAN masih ada sisa kurang bayar
+  // (isKurang), tampilkan angka kurang bayar itu (selisihFmt), bukan lagi
+  // Grand Total kotor -- supaya customer/AI mengacu ke angka yang memang
+  // masih harus dibayar. Tidak ada kelebihan sebelumnya (atau sudah
+  // Lunas/Kembalian) -> tetap Grand Total seperti biasa (rule awal).
+  // Field ini WAJIB tetap ada namanya "headlineTxt" -- dibaca APA ADANYA
+  // oleh buildNotaHtmlDariData() di Worker_Rincian_Pemesanan.js (lihat
+  // catatan sinkronisasi manual di komentar atas collectNotaV2Data).
+  const headlineTxt = isKurang ? selisihFmt : grandtotalTxt;
 
   return {
     cardWidth, nameColWidth, items, hari, tgl, jamTxt,
     totalqty, totalberat, ekspedisi, subtotal, ongkir, diskonOngkir,
-    grandtotalTxt, kelebihan, kelebihanFmt, statusLabel, selisihFmt,
+    grandtotalTxt, headlineTxt, kelebihan, kelebihanFmt, statusLabel, selisihFmt,
     signPrefix, statusColor, statusBg, statusBorder,
     logoImg: ORDER_LOGO_IMG, // dikirim apa adanya supaya logo di gambar server 100% sama, bukan tebakan
   };
@@ -9210,7 +9228,7 @@ function buildPrintNotaV2(tab){
       </div>
       <div class="v3-grand">
         <span class="l">Total pembayaran</span>
-        <span class="v">${d.grandtotalTxt}</span>
+        <span class="v">${d.headlineTxt}</span>
       </div>
       ${d.kelebihan!==0 ? `<div style="margin-top:16px;padding:16px 20px;border-radius:12px;background:${d.statusBg};border:1.5px solid ${d.statusBorder};display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;justify-content:space-between;font-size:18px;color:#3f3f3d;"><span>Kelebihan bayar sebelumnya</span><strong style="color:#171717;">${d.kelebihanFmt}</strong></div>
