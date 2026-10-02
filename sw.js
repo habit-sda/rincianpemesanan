@@ -4,8 +4,17 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v376";
+const CACHE_VERSION = "v377";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v377 -- (app v2.83.0) Perbaikan bug tombol RESET: "Kelebihan bayar"
+   kelihatan tidak ikut ter-reset. Nilainya sebenarnya sudah jadi 0, tapi
+   (1) tanda merah/hijau field Kelebihan bayar, Ongkir/Kg & Ongkir Manual
+   tidak ikut di-refresh (nilai di-set lewat JS, event "input" tidak
+   jalan), dan (2) di desktop kolom Kelebihan bayar di step Pengiriman
+   tidak di-render ulang kalau kursor masih di dalamnya, jadi angka lama
+   tetap tampil. doReset() sekarang refresh indikator & lepas fokus dulu.
+   Murni frontend, tidak butuh Worker baru. Alur normal (popup
+   "Perbarui Sekarang"), tidak dipaksa. */
 /* v376 -- Sinkron dgn Worker Rincian Pemesanan v403 (perbaikan bug status
    pembayaran yang belum mengurangi "kelebihan bayar sebelumnya"). Gambar
    nota (kedua desain, lama & baru): angka besar di baris "Total

@@ -6184,7 +6184,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.82.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.83.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6438,7 +6438,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.82.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.83.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug: "Kelebihan bayar" seperti tidak ikut ter-reset</b> — setelah menekan RESET, kolom Kelebihan bayar sekarang benar-benar kosong dan tanda merahnya hilang (sebelumnya tanda merah / angka lama masih tampil walau nilainya sudah 0). Tanda pada Ongkir/Kg &amp; Ongkir Manual juga ikut bersih.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.82.0</div>
           <ul>
             <li><b>Indikator "teks" di kolom Resi Rekap Pesanan</b> — resi yang dikonfirmasi lewat laporan teks (fitur "sudah kirim"/"sudah diambil sendiri" di grup Resi, tanpa foto) sekarang tampil beda (kuning + label "teks") dari resi via foto asli (hijau polos seperti biasa) — supaya bisa dianalisa mana yang masih perlu dicek ulang buktinya.</li>
           </ul>
@@ -10935,6 +10941,27 @@ calc("penjualan"); calc("custom");
     }
 
     calc(activeTab);
+
+    // PERBAIKAN v411 -- tanda visual merah "Kelebihan bayar" (& hijau
+    // Rate/Ongkir Manual) dulu TIDAK ikut hilang setelah RESET: nilai
+    // field-nya di-set lewat JS (bukan ketikan), jadi event "input" yang
+    // biasanya memicu refreshAllOngkirIndicators() tidak pernah jalan.
+    // Kelas "is-filled" nyangkut -> kelihatan seperti kelebihan bayar
+    // masih ada, padahal nilainya sudah 0. Panggil manual di sini.
+    if(window.__refreshOngkirIndicators) window.__refreshOngkirIndicators();
+
+    // PERBAIKAN v411 -- di desktop, renderStep() sengaja TIDAK me-render
+    // ulang step Pengiriman kalau kursor masih ada di dalamnya (supaya
+    // tidak memotong ketikan). Akibatnya kalau user baru isi Kelebihan
+    // bayar lalu RESET tanpa fokus pindah (Safari/Mac, atau tombol proxy
+    // Reset yang memanggil btn-reset.click() secara program), kolom
+    // ws-kelebihanval tetap menampilkan angka lama walau nilai aslinya
+    // sudah 0. Lepas fokus dulu supaya step Pengiriman ikut dikosongkan.
+    {
+      const shipHost = document.querySelector(`#wiz-${activeTab} .wiz-step[data-wstep="ship"]`);
+      const ae = document.activeElement;
+      if(shipHost && ae && shipHost.contains(ae) && ae.blur) ae.blur();
+    }
 
     // Simpan ulang draft (sekarang sudah kosong untuk tab ini) supaya
     // kalau nanti halaman di-reload/dibuka lagi, tidak "menghidupkan lagi"
