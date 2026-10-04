@@ -5582,7 +5582,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="md-card" id="md-followup-notif-card">
         <h3>📞 Notifikasi Follow Up ke CS</h3>
         <div class="md-note" style="margin-bottom:12px;">
-          Tiap pagi, <b>semua orang di Daftar CS</b> (di bawah) dapat DM yang <b>sama persis</b> — daftar SEMUA customer yang jadwal Follow Up-nya (prediksi order berikutnya, dari menu "Follow Up" di atas) jatuh PERSIS hari ini, tidak peduli itu customer siapa punya (gaya sama seperti Info Resi Kemarin di Daftar Logistik). Kalau hari ini tidak ada customer yang jadwalnya jatuh hari ini, tidak ada DM terkirim.
+          Tiap pagi, <b>semua orang di Daftar CS</b> (di bawah) dapat DM yang <b>sama persis</b> — daftar SEMUA customer yang jadwal Follow Up-nya (prediksi order berikutnya, dari menu "Follow Up" di atas) jatuh PERSIS hari ini, tidak peduli itu customer siapa punya (gaya sama seperti Info Resi Kemarin di Daftar Logistik). Di pesan yang sama juga ada <b>susulan</b> jadwal hari libur yang terlewat (mis. jadwal hari Minggu ikut dikirim Senin) dan daftar ringkas <b>persiapan besok</b> (hari Sabtu: jadwal Minggu + Senin). DM hanya tidak dikirim kalau hari ini, susulan, dan besok semuanya kosong.
         </div>
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:12px;">
           <input type="checkbox" id="md-followup-notif-toggle" style="width:18px; height:18px;">
@@ -6272,9 +6272,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <p id="kt-ekspedisi-suggest" class="kt-hint" hidden style="margin-top:8px;background:#eaf6ee;border:1px solid var(--primary-green);border-radius:8px;padding:8px 10px;color:var(--ink);cursor:pointer;"></p>
         <label style="display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
           <input type="checkbox" id="kt-revisi-check" style="margin-top:2px;">
-          <span>Revisi Pemesanan — hapus rincian pemesanan <b>lama</b> atas nama customer ini (nama harus persis sama), diganti rincian baru yang ini.</span>
+          <span>Revisi Pemesanan — rincian pemesanan <b>lama</b> atas nama customer ini (nama harus persis sama) <b>diperbarui di tempat</b> dengan rincian ini. Bukti transfer yang sudah di-reply tetap terhubung &amp; status pembayaran dihitung ulang otomatis.</span>
         </label>
         <div id="kt-revisi-picker" hidden style="margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);"></div>
+        <!-- BARU v414 -- info saldo deposit customer (auto-isi "Kelebihan bayar sebelumnya") -->
+        <div id="kt-deposit-hint" hidden style="margin-top:10px;border:1px solid var(--primary-green);border-radius:10px;padding:10px;background:#eaf6ee;font-size:12.5px;color:var(--ink);"></div>
         <!-- BARU -- Dropship: nota tetap tampil normal, cuma caption di grup
              dapat blok "📦 Dropship / a.n. {Nama Penerima}" tambahan (lihat
              collectNotaPayload & backend sendRincianToGroup). customerName
@@ -9771,6 +9773,85 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       if(revisiCheck.checked) checkRevisiAutofill();
     });
   }
+  /* ---- BARU v414 -- DEPOSIT OTOMATIS. Begitu nama customer diketik,
+     tanya saldo deposit customer itu (GET /customer-deposit). Kalau ada
+     saldo & field "Kelebihan bayar sebelumnya" masih 0, field itu diisi
+     otomatis (maks. sebesar Grand Total) -- gambar nota ikut terhitung
+     ulang karena nilainya diubah lewat event "input" yang sama dgn ketikan
+     manual. CS bisa batalkan lewat tombol "Jangan pakai". Saldo baru
+     benar-benar dipotong di server SETELAH rincian terkirim. Tidak aktif
+     saat Revisi Pemesanan dicentang (revisi tidak memotong saldo). ---- */
+  const depositHint = document.getElementById("kt-deposit-hint");
+  let depositTimer = null;
+  let depositAutoFill = null; // { pfx, nama, nilai } -- yang diisi otomatis oleh fitur ini
+  let depositDitolakUntuk = ""; // nama customer yang saldonya ditolak CS ("Jangan pakai")
+  function depositPfx(){
+    const tab = (document.querySelector(".tab-btn.active") || {}).dataset;
+    return tab && tab.tab === "penjualan" ? "pj" : "cs";
+  }
+  function setKelebihanField(pfx, nilai){
+    const el = document.getElementById(pfx + "-kelebihan");
+    if(!el) return;
+    el.value = nilai > 0 ? Number(nilai).toLocaleString("id-ID") : "0";
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  function hideDepositHint(){
+    if(depositHint){ depositHint.hidden = true; depositHint.innerHTML = ""; }
+  }
+  function batalkanDepositAutoFill(){
+    if(depositAutoFill){
+      const el = document.getElementById(depositAutoFill.pfx + "-kelebihan");
+      // hanya dikosongkan kalau nilainya masih persis yang diisi otomatis (CS belum mengubah manual)
+      if(el && parseRp(el.value) === depositAutoFill.nilai) setKelebihanField(depositAutoFill.pfx, 0);
+      depositAutoFill = null;
+    }
+  }
+  function scheduleDepositCheck(){
+    clearTimeout(depositTimer);
+    depositTimer = setTimeout(checkCustomerDeposit, 450);
+  }
+  async function checkCustomerDeposit(){
+    const nama = nameInput.value.trim();
+    if(depositAutoFill && depositAutoFill.nama !== nama) batalkanDepositAutoFill();
+    if(!nama || !MASTER_DATA_WORKER_URL || (revisiCheck && revisiCheck.checked)){ hideDepositHint(); return; }
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/customer-deposit?customerName=" + encodeURIComponent(nama), { headers: workerHeaders() });
+      const body = await res.json().catch(()=> ({}));
+      if(nameInput.value.trim() !== nama) return; // nama sudah berubah lagi selagi menunggu
+      const saldo = Number(body.saldo) || 0;
+      if(saldo <= 0){ hideDepositHint(); return; }
+      const pfx = depositPfx();
+      const el = document.getElementById(pfx + "-kelebihan");
+      const sekarang = el ? (parseRp(el.value) || 0) : 0;
+      const grand = parseRp((document.getElementById(pfx + "-grandtotal") || {}).textContent || "") || 0;
+      const rp = (n)=> "Rp" + Number(n).toLocaleString("id-ID");
+      if(!depositHint) return;
+      if(sekarang === 0 && depositDitolakUntuk !== nama){
+        const pakai = grand > 0 ? Math.min(saldo, grand) : saldo;
+        setKelebihanField(pfx, pakai);
+        depositAutoFill = { pfx, nama, nilai: pakai };
+        depositHint.innerHTML = `💰 Saldo deposit <b>${nama}</b>: ${rp(saldo)}.<br>Otomatis dipakai <b>${rp(pakai)}</b> sebagai "Kelebihan bayar sebelumnya" (nota ikut diperbarui). `;
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "calc-actbtn calc-clearbtn";
+        btn.style.cssText = "margin-top:8px;font-size:12px;";
+        btn.textContent = "Jangan pakai saldo";
+        btn.addEventListener("click", ()=>{
+          depositDitolakUntuk = nama;
+          batalkanDepositAutoFill();
+          depositHint.innerHTML = `Saldo deposit ${rp(saldo)} TIDAK dipakai untuk rincian ini.`;
+        });
+        depositHint.appendChild(btn);
+      }else if(depositAutoFill && depositAutoFill.nama === nama){
+        return; // sudah diisi otomatis sebelumnya, biarkan
+      }else{
+        depositHint.innerHTML = `💰 Customer ini punya saldo deposit ${rp(saldo)}. Field "Kelebihan bayar sebelumnya" sudah terisi ${rp(sekarang)}, tidak diubah otomatis.`;
+      }
+      depositHint.hidden = false;
+    }catch(e){ console.log("Gagal cek saldo deposit:", e); } // best-effort
+  }
+  nameInput.addEventListener("input", scheduleDepositCheck);
+  if(revisiCheck) revisiCheck.addEventListener("change", ()=>{ if(revisiCheck.checked){ batalkanDepositAutoFill(); hideDepositHint(); } else scheduleDepositCheck(); });
+
   let pendingRevisiTargetMessageId = null; // diisi kalau user sudah pilih dari daftar kandidat (ronde ke-2)
 
   /* ---------- Rekomendasi Nama Customer (riwayat dari server) ----------
@@ -10318,6 +10399,8 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     hideEkspedisiSuggest(); // BARU -- reset dulu, cek ulang di bawah setelah nama ada isinya
     if(revisiCheck) revisiCheck.checked = false;
     resetRevisiPicker();
+    // BARU v414 -- deposit: kembalikan isian otomatis lama (kalau ada), cek ulang utk nama saat ini
+    batalkanDepositAutoFill(); depositDitolakUntuk = ""; hideDepositHint(); scheduleDepositCheck();
     // BARU -- Dropship: reset tiap kali modal dibuka, sama pola dgn revisi.
     if(dropshipCheck) dropshipCheck.checked = false;
     if(dropshipField) dropshipField.hidden = true;
@@ -10542,14 +10625,21 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       }
       if(!res.ok || !body.ok) throw new Error(body.message || body.error || ("HTTP " + res.status));
 
-      statusEl.textContent = body.revisiDeleted
+      // DIUBAH v412 -- revisi edit di tempat (revisiInPlace)
+      statusEl.textContent = body.revisiInPlace
+        ? `Rincian lama (${body.revisiInPlace.waktu || "-"}) sudah diperbarui di grup. Status: ${body.revisiInPlace.status || "-"}${body.revisiInPlace.perluKonfirmasi ? " — Finance perlu Konfirmasi ulang." : ""}${body.warning ? " ⚠️ " + body.warning : ""}`
+        : body.revisiDeleted
         ? `Rincian lama (${body.revisiDeleted.waktu}) sudah dihapus, rincian baru berhasil dikirim ke grup Telegram.`
         : "Berhasil dikirim ke grup Telegram.";
       statusEl.style.color = "var(--primary-green)";
-      showMsg("Bukti untuk \"" + customerName + "\" terkirim ke grup Telegram.");
+      showMsg(body.revisiInPlace
+        ? "Rincian \"" + customerName + "\" direvisi — " + (body.revisiInPlace.status || "") + (body.revisiInPlace.perluKonfirmasi ? " (Finance perlu Konfirmasi ulang)" : "")
+        : "Bukti untuk \"" + customerName + "\" terkirim ke grup Telegram."); // DIUBAH v412
       clearTimeout(draftTimer);
       resetRevisiPicker();
-      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); hideDuplicateWarning(); hideAliasWarning(); }, 900);
+      // BARU v414 -- saldo deposit sudah terpakai di rincian ini; jangan sampai terbawa ke rincian berikutnya
+      if(depositAutoFill){ setKelebihanField(depositAutoFill.pfx, 0); depositAutoFill = null; }
+      setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); hideDuplicateWarning(); hideAliasWarning(); hideDepositHint(); }, 900);
     }catch(e){
       statusEl.textContent = "Gagal mengirim: " + (e.message || e);
       statusEl.style.color = "var(--danger-red)";
@@ -10567,7 +10657,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     revisiPicker.innerHTML = "";
     const title = document.createElement("p");
     title.style.cssText = "margin:0 0 8px;font-size:12px;font-weight:700;color:var(--ink-soft);";
-    title.textContent = "Pilih rincian lama yang mau diganti:";
+    title.textContent = "Pilih rincian lama yang mau direvisi:";
     revisiPicker.appendChild(title);
     candidates.forEach((c)=>{
       const btn = document.createElement("button");
@@ -10576,7 +10666,9 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       btn.style.cssText = "display:block;width:100%;text-align:left;margin-bottom:6px;font-size:12.5px;";
       const total = (typeof c.totalTagihan === "number" && c.totalTagihan > 0)
         ? " · Rp" + c.totalTagihan.toLocaleString("id-ID") : "";
-      btn.textContent = (c.waktu || "(waktu tidak diketahui)") + total;
+      // BARU v412 -- tampilkan status pembayaran supaya tidak salah pilih
+      const statusLabel = c.lunas ? " · 💯 lunas" : (c.hasPayment ? " · ada pembayaran" : " · belum dibayar");
+      btn.textContent = (c.waktu || "(waktu tidak diketahui)") + total + statusLabel;
       btn.addEventListener("click", ()=>{
         pendingRevisiTargetMessageId = c.messageId;
         revisiPicker.hidden = true;
