@@ -9780,7 +9780,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
      sudah di-ACC Finance) yang belum ditempel ke rincian mana pun. CS
      MENCENTANG sendiri deposit mana yang ditempel ke rincian ini; setelah
      Kirim, Worker menempelkan bukti itu ke rincian spt transfer biasa.
-     Tidak aktif saat Revisi Pemesanan dicentang. ---- */
+     v417: juga aktif saat Revisi (ditempel setelah revisi tersimpan), + info deposit belum ACC & nama mirip. ---- */
   const depositHint = document.getElementById("kt-deposit-hint");
   let depositTimer = null;
   const depositPilihan = new Set();
@@ -9794,39 +9794,55 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   }
   async function cekDepositMenunggu(){
     const nama = nameInput.value.trim();
-    if(!nama || !MASTER_DATA_WORKER_URL || (revisiCheck && revisiCheck.checked)){ hideDepositHint(); return; }
+    if(!nama || !MASTER_DATA_WORKER_URL){ hideDepositHint(); return; }
     try{
       const res = await fetch(MASTER_DATA_WORKER_URL + "/deposit-pending?customerName=" + encodeURIComponent(nama), { headers: workerHeaders() });
       const body = await res.json().catch(()=> ({}));
       if(nameInput.value.trim() !== nama) return; // nama sudah berubah lagi selagi menunggu
       const list = Array.isArray(body.deposits) ? body.deposits : [];
+      const belumAcc = Array.isArray(body.menungguAcc) ? body.menungguAcc : []; // v417
+      const mirip = Array.isArray(body.mirip) ? body.mirip : [];               // v417
       hideDepositHint();
-      if(!list.length || !depositHint) return;
-      const rp = (n)=> "Rp" + Number(n || 0).toLocaleString("id-ID");
-      const judul = document.createElement("div");
-      judul.style.cssText = "font-weight:700;margin-bottom:6px;";
-      judul.textContent = `📎 Ada ${list.length} deposit menunggu rincian untuk ${nama}. Centang yang mau ditempel ke rincian ini:`;
-      depositHint.appendChild(judul);
-      list.forEach(dep=>{
-        const lab = document.createElement("label");
-        lab.style.cssText = "display:flex;align-items:center;gap:8px;cursor:pointer;margin:4px 0;";
-        const cb = document.createElement("input");
-        cb.type = "checkbox"; cb.value = String(dep.id);
-        cb.addEventListener("change", ()=>{ if(cb.checked) depositPilihan.add(dep.id); else depositPilihan.delete(dep.id); });
-        const t = document.createElement("span");
-        t.textContent = `${rp(dep.nominal)} · ${dep.tanggal || "-"}${dep.isCash ? " · tunai" : ""} · ACC ${dep.accBy || "Finance"}`;
-        lab.appendChild(cb); lab.appendChild(t);
-        depositHint.appendChild(lab);
-      });
-      const cat = document.createElement("div");
-      cat.style.cssText = "margin-top:6px;font-size:11.5px;color:var(--ink-soft);";
-      cat.textContent = "Bukti transfernya akan di-reply ke rincian & dihitung otomatis (lunas/kurang/lebih). \"Kelebihan bayar sebelumnya\" tidak diubah.";
-      depositHint.appendChild(cat);
+      if((!list.length && !belumAcc.length && !mirip.length) || !depositHint) return;
+      const rp = (n)=> n != null ? "Rp" + Number(n || 0).toLocaleString("id-ID") : "nominal belum diisi";
+      const modeRevisi = !!(revisiCheck && revisiCheck.checked);
+      const baris = (teks, gaya)=>{ const el = document.createElement("div"); el.style.cssText = gaya || ""; el.textContent = teks; depositHint.appendChild(el); return el; };
+      if(list.length){
+        baris(modeRevisi
+          ? `📎 Ada ${list.length} deposit menunggu rincian untuk ${nama}. Centang yang mau ditempel ke rincian yang direvisi:`
+          : `📎 Ada ${list.length} deposit menunggu rincian untuk ${nama}. Centang yang mau ditempel ke rincian ini:`, "font-weight:700;margin-bottom:6px;");
+        list.forEach(dep=>{
+          const lab = document.createElement("label");
+          lab.style.cssText = "display:flex;align-items:center;gap:8px;cursor:pointer;margin:4px 0;";
+          const cb = document.createElement("input");
+          cb.type = "checkbox"; cb.value = String(dep.id);
+          cb.addEventListener("change", ()=>{ if(cb.checked) depositPilihan.add(dep.id); else depositPilihan.delete(dep.id); });
+          const t = document.createElement("span");
+          t.textContent = `${rp(dep.nominal)} · ${dep.tanggal || "-"}${dep.isCash ? " · tunai" : ""} · ACC ${dep.accBy || "Finance"}`;
+          lab.appendChild(cb); lab.appendChild(t);
+          depositHint.appendChild(lab);
+        });
+        baris(modeRevisi
+          ? "Revisi disimpan dulu, baru bukti deposit di-reply ke rincian yang sama & dihitung otomatis. \"Kelebihan bayar sebelumnya\" tidak diubah."
+          : "Bukti transfernya akan di-reply ke rincian & dihitung otomatis (lunas/kurang/lebih). \"Kelebihan bayar sebelumnya\" tidak diubah.", "margin-top:6px;font-size:11.5px;color:var(--ink-soft);");
+      }
+      // v417 -- deposit atas nama SAMA tapi belum di-ACC Finance: info (tidak bisa dicentang)
+      if(belumAcc.length){
+        baris(`⏳ ${belumAcc.length} deposit ${nama} belum di-ACC Finance (belum bisa ditempel):`, `font-weight:700;${list.length ? "margin-top:10px;" : ""}margin-bottom:4px;color:#8a6d00;`);
+        belumAcc.forEach(dep=> baris(`• ${rp(dep.nominal)} · ${dep.tanggal || "-"} · cs ${dep.cs || "-"}`, "margin:2px 0 2px 6px;"));
+        baris("Setelah di-ACC, tempel dari tombol \"📎 Tempel ke rincian\" di pesan deposit (grup), atau lewat Revisi.", "font-size:11.5px;color:var(--ink-soft);margin-top:4px;");
+      }
+      // v417 -- deposit atas nama MIRIP: peringatan supaya nama disamakan (nama harus 100% sama)
+      if(mirip.length){
+        baris("⚠️ Ada deposit atas nama MIRIP:", `font-weight:700;${(list.length || belumAcc.length) ? "margin-top:10px;" : ""}margin-bottom:4px;color:var(--danger-red);`);
+        mirip.forEach(dep=> baris(`• ${dep.nama} — ${rp(dep.nominal)} · ${dep.tanggal || "-"} · ${dep.status || ""}`, "margin:2px 0 2px 6px;"));
+        baris("Kalau itu customer yang sama, samakan nama rincian persis seperti nama deposit supaya bisa dicentang.", "font-size:11.5px;color:var(--ink-soft);margin-top:4px;");
+      }
       depositHint.hidden = false;
     }catch(e){ console.log("Gagal cek deposit menunggu:", e); } // best-effort
   }
   nameInput.addEventListener("input", scheduleDepositCheck);
-  if(revisiCheck) revisiCheck.addEventListener("change", ()=>{ if(revisiCheck.checked) hideDepositHint(); else scheduleDepositCheck(); });
+  if(revisiCheck) revisiCheck.addEventListener("change", ()=>{ scheduleDepositCheck(); }); // v417 -- deposit juga bisa ditempel saat Revisi
 
   let pendingRevisiTargetMessageId = null; // diisi kalau user sudah pilih dari daftar kandidat (ronde ke-2)
 
@@ -10520,7 +10536,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         totalBeratLabel,
         items,
         isRevisi: !!(revisiCheck && revisiCheck.checked),
-        depositIds: (revisiCheck && revisiCheck.checked) ? [] : [...depositPilihan], // BARU v416
+        depositIds: [...depositPilihan], // v416, v417 -- juga saat Revisi (ditempel setelah revisi tersimpan)
         revisiTargetMessageId: pendingRevisiTargetMessageId,
         isNewCustomer, // BARU -- lihat catatan deteksi di atas
         // BARU -- Dropship: customerName TETAP dikirim apa adanya di atas

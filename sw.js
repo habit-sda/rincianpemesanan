@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v380";
+const CACHE_VERSION = "v381";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* v377 -- (app v2.83.0) Perbaikan bug tombol RESET: "Kelebihan bayar"
    kelihatan tidak ikut ter-reset. Nilainya sebenarnya sudah jadi 0, tapi
