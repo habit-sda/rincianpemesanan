@@ -6276,6 +6276,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </label>
         <div id="kt-revisi-picker" hidden style="margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);"></div>
         <!-- BARU v416 -- daftar deposit menunggu rincian (dicentang CS utk ditempel ke rincian ini) -->
+        <div id="kt-dobel-hint" hidden style="margin-top:10px;border:1px solid #e0a800;border-radius:10px;padding:10px;background:#fff6e0;font-size:12.5px;color:var(--ink);"></div>
         <div id="kt-deposit-hint" hidden style="margin-top:10px;border:1px solid var(--primary-green);border-radius:10px;padding:10px;background:#eaf6ee;font-size:12.5px;color:var(--ink);"></div>
         <!-- BARU -- Dropship: nota tetap tampil normal, cuma caption di grup
              dapat blok "📦 Dropship / a.n. {Nama Penerima}" tambahan (lihat
@@ -9846,6 +9847,65 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
 
   let pendingRevisiTargetMessageId = null; // diisi kalau user sudah pilih dari daftar kandidat (ronde ke-2)
 
+  /* ---- v422 -- ANTI RINCIAN DOBEL. Begitu nama diketik, cek apakah sudah ada rincian atas
+     nama yg sama 24 jam terakhir (dan siapa CS pemilik customer ini). Kalau ada, CS WAJIB
+     memilih: Revisi rincian itu / Ini pesanan baru / Batal, sebelum bisa Kirim. kirimId =
+     kode unik per sesi Kirim supaya kiriman ulang (sinyal putus) tidak jadi rincian kedua. ---- */
+  const dobelHint = document.getElementById("kt-dobel-hint");
+  let dobelInfo = null, konfirmasiDobel = false, dobelTimer = null;
+  let kirimIdSesi = null;
+  const buatKirimId = ()=> { try{ return crypto.randomUUID(); }catch(e){ return Date.now().toString(36) + Math.random().toString(36).slice(2); } };
+  function hideDobelHint(){ if(dobelHint){ dobelHint.hidden = true; dobelHint.innerHTML = ""; } dobelInfo = null; konfirmasiDobel = false; }
+  function scheduleDobelCheck(){ clearTimeout(dobelTimer); dobelTimer = setTimeout(cekRincianDobel, 500); }
+  function renderDobelHint(){
+    if(!dobelHint) return;
+    dobelHint.innerHTML = "";
+    const info = dobelInfo;
+    const adaKembar = !!(info && info.kembar && info.kembar.length);
+    if(!info || (!adaKembar && !info.bedaPemilik) || (revisiCheck && revisiCheck.checked)){ dobelHint.hidden = true; return; }
+    const el = (tag, css, teks)=>{ const x = document.createElement(tag); if(css) x.style.cssText = css; if(teks != null) x.textContent = teks; dobelHint.appendChild(x); return x; };
+    if(info.bedaPemilik) el("div", `margin-bottom:${adaKembar ? "8px" : "0"};`, `👤 Customer ini dipegang ${info.pemilikCs}. Sudah koordinasi?`);
+    if(adaKembar){
+      const identik = info.kembar.some(k=> k.identik);
+      dobelHint.style.borderColor = identik ? "var(--danger-red)" : "#e0a800";
+      dobelHint.style.background = identik ? "#fdecea" : "#fff6e0";
+      el("div", "font-weight:700;margin-bottom:4px;", identik ? "⛔ Kemungkinan besar DOBEL — sudah ada rincian dengan total yang sama:" : "⚠️ Sudah ada rincian atas nama ini (24 jam terakhir):");
+      info.kembar.forEach(k=> el("div", "margin:2px 0 2px 6px;", `• ${k.waktu} oleh ${k.oleh} — Rp${Number(k.total || 0).toLocaleString("id-ID")}${k.totalQtyLabel ? " · " + k.totalQtyLabel : ""}${k.status ? " · " + k.status : ""}`));
+      if(konfirmasiDobel){
+        el("div", "margin-top:6px;font-weight:700;color:var(--primary-green);", "✔️ Ditandai PESANAN BARU — boleh Kirim.");
+      }else{
+        const baris = el("div", "margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;");
+        const tombol = (teks, fn)=>{ const b = document.createElement("button"); b.type = "button"; b.className = "calc-actbtn"; b.style.cssText = "font-size:12.5px;"; b.textContent = teks; b.addEventListener("click", fn); baris.appendChild(b); };
+        tombol("✏️ Revisi rincian itu", ()=>{
+          const k = info.kembar[0];
+          if(revisiCheck){ revisiCheck.checked = true; revisiCheck.dispatchEvent(new Event("change")); }
+          pendingRevisiTargetMessageId = Number(k.anchorId);
+          dobelHint.hidden = true;
+          statusEl.textContent = `Mode Revisi: rincian ${k.waktu} (${k.oleh}) akan DIPERBARUI, bukan dikirim baru. Lanjutkan isi & tekan Kirim.`;
+          statusEl.style.color = "";
+        });
+        tombol("➕ Ini pesanan baru", ()=>{ konfirmasiDobel = true; renderDobelHint(); });
+        tombol("✖️ Batal", ()=>{ btnCancel.click(); });
+      }
+    }
+    dobelHint.hidden = false;
+  }
+  async function cekRincianDobel(){
+    const nama = nameInput.value.trim();
+    if(!nama || !MASTER_DATA_WORKER_URL){ hideDobelHint(); return; }
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/cek-rincian-dobel?customerName=" + encodeURIComponent(nama) + "&senderId=" + encodeURIComponent(getTelegramSenderId() || ""), { headers: workerHeaders() });
+      const body = await res.json().catch(()=> ({}));
+      if(nameInput.value.trim() !== nama) return; // nama sudah berubah lagi
+      const sebelumnya = konfirmasiDobel && dobelInfo && dobelInfo.nama === nama;
+      dobelInfo = { nama, kembar: Array.isArray(body.kembar) ? body.kembar : [], pemilikCs: body.pemilikCs || "", bedaPemilik: !!body.bedaPemilik };
+      konfirmasiDobel = sebelumnya;
+      renderDobelHint();
+    }catch(e){ console.log("Gagal cek rincian dobel:", e); } // best-effort; server tetap menjaga
+  }
+  nameInput.addEventListener("input", ()=>{ konfirmasiDobel = false; scheduleDobelCheck(); });
+  if(revisiCheck) revisiCheck.addEventListener("change", ()=>{ renderDobelHint(); });
+
   /* ---------- Rekomendasi Nama Customer (riwayat dari server) ----------
      BARU (permintaan "ubah sugesti jika ketik 1 huruf") -- SEBELUMNYA
      baru muncul mulai 3 huruf, sekarang muncul mulai 1 huruf saja. Kalau
@@ -10393,6 +10453,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     resetRevisiPicker();
     // BARU v416 -- deposit menunggu rincian: reset & cek ulang utk nama saat ini
     hideDepositHint(); scheduleDepositCheck();
+    hideDobelHint(); scheduleDobelCheck(); kirimIdSesi = buatKirimId(); // v422 -- anti rincian dobel
     // BARU -- Dropship: reset tiap kali modal dibuka, sama pola dgn revisi.
     if(dropshipCheck) dropshipCheck.checked = false;
     if(dropshipField) dropshipField.hidden = true;
@@ -10507,6 +10568,15 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       sendInventoryNotifNow = await askInventoryTiming();
     }
 
+    // v422 -- sudah ada rincian atas nama ini dalam 24 jam & CS belum memilih -> wajib pilih dulu
+    if(!(revisiCheck && revisiCheck.checked) && dobelInfo && dobelInfo.kembar && dobelInfo.kembar.length && !konfirmasiDobel){
+      statusEl.textContent = "Sudah ada rincian atas nama ini hari ini — pilih dulu: ✏️ Revisi rincian itu / ➕ Ini pesanan baru / ✖️ Batal.";
+      statusEl.style.color = "var(--danger-red)";
+      renderDobelHint();
+      if(dobelHint) dobelHint.scrollIntoView({ block: "nearest" });
+      return;
+    }
+    if(!kirimIdSesi) kirimIdSesi = buatKirimId();
     revisiPicker.hidden = true; // sembunyikan picker (TANPA hapus pendingRevisiTargetMessageId kalau user baru pilih)
     btnSend.disabled = true; btnCancel.disabled = true; isSending = true;
     statusEl.style.color = "";
@@ -10538,6 +10608,8 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         isRevisi: !!(revisiCheck && revisiCheck.checked),
         depositIds: [...depositPilihan], // v416, v417 -- juga saat Revisi (ditempel setelah revisi tersimpan)
         revisiTargetMessageId: pendingRevisiTargetMessageId,
+        kirimId: kirimIdSesi,              // v422 -- anti-kirim-ulang
+        konfirmasiDobel: !!konfirmasiDobel, // v422 -- CS sudah memilih "Ini pesanan baru"
         isNewCustomer, // BARU -- lihat catatan deteksi di atas
         // BARU -- Dropship: customerName TETAP dikirim apa adanya di atas
         // (tidak pernah diubah field ini). dropshipRecipient cuma dikirim
@@ -10600,6 +10672,20 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         body = await res.json().catch(()=>({}));
       }
 
+      // ---- v422 -- server menolak: rincian atas nama yg sama baru saja dikirim CS lain ----
+      if(!res.ok && body.dobel){
+        dobelInfo = { nama: customerName, kembar: Array.isArray(body.kembar) ? body.kembar : [], pemilikCs: "", bedaPemilik: false };
+        konfirmasiDobel = false;
+        renderDobelHint();
+        statusEl.textContent = body.error || "Rincian atas nama ini baru saja dikirim.";
+        statusEl.style.color = "var(--danger-red)";
+        return;
+      }
+      if(!res.ok && body.sedangDiproses){
+        statusEl.textContent = body.error || "Rincian ini sedang dikirim, tunggu sebentar.";
+        statusEl.style.color = "var(--danger-red)";
+        return;
+      }
       // ---- Fitur Revisi Pemesanan: server minta user PILIH salah satu dari
       // beberapa rincian lama yang masih aktif, sebelum benar-benar kirim. ----
       if(!res.ok && body.needsSelection && Array.isArray(body.candidates) && body.candidates.length){
@@ -10617,6 +10703,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         return;
       }
       if(!res.ok || !body.ok) throw new Error(body.message || body.error || ("HTTP " + res.status));
+      kirimIdSesi = null; // v422 -- sesi selesai; kiriman berikutnya = sesi baru
 
       // DIUBAH v412 -- revisi edit di tempat (revisiInPlace)
       statusEl.textContent = body.revisiInPlace
@@ -18148,6 +18235,7 @@ if ("serviceWorker" in navigator) {
         <div style="display:flex; justify-content:space-between;">${cb("resi")}${cb("ekspedisi", "kg")}</div>
         <div class="rc-card-bottom">
           <button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:6px 12px; font-size:13px; width:100%;">${r.manualInvoiced ? "✓ Sudah di Invoice" : "Belum di Invoice"}</button>
+          <button class="md-btn rekap-hapus-btn" data-anchor="${escHtml(r.anchorId)}" style="height:auto; padding:6px 12px; font-size:13px; width:100%; margin-top:6px;">🗑️ Hapus rincian</button>
           ${cb("invoice")}
         </div>
       </div>`;
@@ -18305,7 +18393,7 @@ if ("serviceWorker" in navigator) {
               ? `<div><span style="display:inline-block;background:#fff3cd;color:#8a6100;border-radius:4px;padding:1px 7px;font-size:13px;">✅</span></div><div style="font-size:9.5px;color:#8a6100;margin-top:1px;">teks</div>`
               : "✅")
           : "❌") + changeBadge("resi", true), "text-align:center;") +
-        td(`<button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:5px 10px; font-size:13px;">${r.manualInvoiced ? "✓ Sudah" : "Belum"}</button>${changeBadge("invoice", true)}`) +
+        td(`<button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:5px 10px; font-size:13px;">${r.manualInvoiced ? "✓ Sudah" : "Belum"}</button>${changeBadge("invoice", true)}<button class="md-btn rekap-hapus-btn" data-anchor="${escHtml(r.anchorId)}" title="Hapus rincian ini (dobel/salah)" style="height:auto; padding:5px 8px; font-size:13px; margin-left:6px;">🗑️</button>`) +
         "</tr>";
     });
 
@@ -18374,6 +18462,35 @@ if ("serviceWorker" in navigator) {
     // BARU -- query dari `fullpage` (bukan cuma `tableEl`), supaya tombol
     // invoice di KARTU mobile (#rekap-cards) ikut kepasang listener yang
     // sama persis dgn di tabel desktop, tanpa duplikasi logic.
+    // v421 -- tombol 🗑️ Hapus rincian (dobel/salah). Sama dgn reply "del" ke rinciannya di grup:
+    // data dihapus tuntas (Rekap, Follow Up, pembayaran) & foto rincian di grup ikut dihapus.
+    fullpage.querySelectorAll(".rekap-hapus-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const anchorId = btn.dataset.anchor;
+        const row = allRows.find(r=> r.anchorId === anchorId);
+        const nama = row && row.customer ? row.customer : "pesanan ini";
+        const info = row ? `${nama} — ${row.tanggalJam || ""}${row.cs ? " · " + row.cs : ""}` : nama;
+        window.showResetConfirm(`Hapus rincian ${info}? Data pesanan, pembayaran & Follow Up-nya ikut terhapus, dan foto rinciannya di grup juga dihapus.`, async ()=>{
+          btn.disabled = true; const lbl = btn.textContent; btn.textContent = "…";
+          try{
+            const res = await fetch(MASTER_DATA_WORKER_URL + "/rekap-pesanan-hapus", {
+              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ anchorId, customerName: row ? row.customer : "" }),
+            });
+            const body = await res.json().catch(()=> ({}));
+            if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
+            allRows = allRows.filter(r=> r.anchorId !== anchorId);
+            renderRekapTable();
+            statusEl.textContent = `🗑️ Rincian ${nama} dihapus.` + (body.fotoTerhapus ? " Foto di grup ikut dihapus." : (body.sebab ? ` Foto di grup: ${body.sebab}.` : ""));
+            statusEl.style.color = "var(--primary-green)";
+          }catch(e){
+            btn.disabled = false; btn.textContent = lbl;
+            statusEl.textContent = "⚠️ Gagal menghapus: " + ((e && e.message) || e);
+            statusEl.style.color = "var(--danger-red)";
+          }
+        }, { icon: "🗑", iconBg: "#fdecea", iconColor: "var(--danger-red)", okText: "Ya, Hapus", okColor: "var(--danger-red)", warningText: "Tidak bisa dibatalkan." });
+      });
+    });
     fullpage.querySelectorAll(".rekap-invoice-btn").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const anchorId = btn.dataset.anchor;
@@ -18736,7 +18853,8 @@ if ("serviceWorker" in navigator) {
     const bStart = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
     const bEnd = new Date(TODAY.getFullYear(), TODAY.getMonth()+1, 0);
     const last = r.last ? new Date(r.last) : null;
-    const medGap = r.medGap;
+    // v419 -- langkah prediksi order = RITME TERBARU customer ini (server: r.ritme), cadangan median.
+    const medGap = (r.ritme !== null && r.ritme !== undefined) ? r.ritme : r.medGap;
     const avgQty = r.avgQty || 0;
 
     const p8 = [];
@@ -19035,7 +19153,11 @@ if ("serviceWorker" in navigator) {
       ["Tanggal Order Pertama", fmtTgl(r.first), false],
       ["Tanggal Order Terakhir", fmtTgl(r.last), false],
       ["Rata-Rata Gap (hari)", r.avgGap!==null ? fmtHari(r.avgGap) : "-", false],
-      ["Median Gap (hari) ⭐", r.medGap!==null ? fmtHari(r.medGap) : "-", true],
+      ["Median Gap (hari)", r.medGap!==null ? fmtHari(r.medGap) : "-", false],
+      // v419 -- metode follow up per customer
+      ["Ritme Order Terbaru (hari) ⭐", (r.ritme!==null && r.ritme!==undefined) ? fmtHari(r.ritme) : "-", true],
+      ["Jadwal Follow Up 📞", r.pred ? `${fmtTgl(r.pred)}${(r.predOrder && r.pred !== r.predOrder) ? ` (${fuDDiff(r.pred, r.predOrder)} hari sebelum perkiraan order ${fmtTgl(r.predOrder)})` : ""}` : "-", true],
+      ["Metode Follow Up", r.metodeFU === "adaptif" ? "Per customer: ritme terbaru − ½ × sebaran jarak order customer ini (makin tidak menentu, makin awal dihubungi)" : (r.metodeFU === "median" ? "Baru 2 order: pakai jarak order itu" : "-"), false],
       ["Rata-Rata Qty/Order", `${r.avgQty}`, false],
       // BARU -- keyakinan prediksi, dari variasi (CV) histori gap customer
       // ini sendiri. Nilai CV mentahnya diikutkan di kurung buat yang mau
@@ -19060,7 +19182,8 @@ if ("serviceWorker" in navigator) {
         const s = p.s;
         const sf = s<0?"#fdecea":s===0?"#fdecea":s<=3?"#fff2e0":s<=7?"#fffde7":"#e6f4ea";
         const tc = s<0?"#c00000":s<=3?"#7b3f00":s<=7?"#7b6000":"var(--primary-green)";
-        const rumus = k===0 ? "= Tgl_Terakhir + Median_Gap" : `= Prediksi_Ke${k} + Median_Gap`;
+        const namaLangkah = (r.ritme!==null && r.ritme!==undefined) ? "Ritme" : "Median_Gap"; // v419
+        const rumus = k===0 ? `= Tgl_Terakhir + ${namaLangkah}` : `= Prediksi_Ke${k} + ${namaLangkah}`;
         return `<tr>
           <td style="font-weight:700;">Ke-${k+1}</td>
           <td>${fmtTgl(p.d.toISOString())}</td>
@@ -19084,13 +19207,15 @@ if ("serviceWorker" in navigator) {
         <span class="fu-badge ${r.cls}" style="font-size:13px; padding:6px 14px;">${escHtml(r.status)}</span>
       </div>
 
+      ${fuHtmlHasil(r)}
+
       <div class="fu-bagian">
         <div class="fu-bag-hdr">▌ BAGIAN A — PARAMETER &amp; ASUMSI <span>Data historis customer</span></div>
         <table class="fu-ptbl">${tblAHtml}</table>
       </div>
 
       <div class="fu-bagian">
-        <div class="fu-bag-hdr">▌ BAGIAN B — PREDIKSI 8 ORDER BERIKUTNYA <span>Berdasarkan median gap</span></div>
+        <div class="fu-bag-hdr">▌ BAGIAN B — PREDIKSI 8 ORDER BERIKUTNYA <span>Berdasarkan ritme order terbaru customer ini</span></div>
         <div class="fu-ptbl2-wrap">
           <table class="fu-ptbl2">
             <thead><tr><th>Prediksi Ke-</th><th>Perkiraan Tanggal</th><th>Hari dari Sekarang</th><th>Status</th><th>Rumus</th></tr></thead>
@@ -19106,6 +19231,43 @@ if ("serviceWorker" in navigator) {
     `;
     detailOverlay.hidden = false;
   }
+  /* ---- v420 -- HASIL FOLLOW UP (sama dgn tombol di DM Follow Up). Kalau customer langsung
+     order, tidak perlu menekan apa pun: begitu rincian dibuat, sistem tahu sendiri. ---- */
+  const FU_LABEL_HASIL = { m: "📅 Minggu depan", b: "⏳ Belum butuh", t: "🚫 Tidak aktif" };
+  function fuHtmlHasil(r){
+    if(r.sudahOrder){
+      return `<div class="fu-bagian"><div class="fu-bag-hdr">▌ HASIL FOLLOW UP</div>
+        <div style="padding:8px 2px;">✅ Customer ini <b>sudah order lagi</b> (rincian ${r.belumLunasTerakhir ? fmtTgl(r.belumLunasTerakhir + "T12:00:00+07:00") : ""}, menunggu lunas) — tidak perlu di-follow up.</div></div>`;
+    }
+    const h = r.hasilFU;
+    const info = h
+      ? `<div style="margin-bottom:8px;">Hasil terakhir: <b>${escHtml(h.label)}</b> — dicatat ${escHtml(h.oleh || "CS")} ${fmtTgl(h.tanggal + "T12:00:00+07:00")}${h.jadwal ? `, dihubungi lagi <b>${fmtTgl(h.jadwal + "T12:00:00+07:00")}</b>` : ""}.</div>`
+      : `<div style="margin-bottom:8px; color:var(--ink-soft);">Sudah menghubungi customer ini? Catat hasilnya supaya jadwal berikutnya menyesuaikan.</div>`;
+    const tombol = ["m", "b", "t"].map(k=> `<button type="button" class="tab-btn" data-fuhasil="${k}" style="margin:0 6px 6px 0;">${FU_LABEL_HASIL[k]}</button>`).join("")
+      + (h ? `<button type="button" class="tab-btn" data-fuhasil="hapus" style="margin:0 6px 6px 0;">↩️ Hapus catatan</button>` : "");
+    return `<div class="fu-bagian"><div class="fu-bag-hdr">▌ HASIL FOLLOW UP <span>📅 = dihubungi lagi 7 hari · ⏳ = ½ ritme (7–30 hari) · 🚫 = keluar dari jadwal</span></div>
+      <div style="padding:6px 2px;">${info}<div>${tombol}</div><div id="fu-hasil-status" style="font-size:12px; margin-top:4px;"></div></div></div>`;
+  }
+  document.getElementById("followup-detail-body").addEventListener("click", async (e)=>{
+    const btn = e.target.closest && e.target.closest("[data-fuhasil]");
+    if(!btn || !CUR_FU) return;
+    const hasil = btn.getAttribute("data-fuhasil");
+    const nama = CUR_FU.customer;
+    if(hasil === "t" && !confirm(`Tandai ${nama} TIDAK AKTIF? Customer ini keluar dari jadwal Follow Up sampai order lagi.`)) return;
+    const st = document.getElementById("fu-hasil-status");
+    if(st){ st.textContent = "Menyimpan…"; st.style.color = "var(--primary-green)"; }
+    btn.disabled = true;
+    try{
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/followup-hasil", { method: "POST", headers: { ...workerHeaders(), "Content-Type": "application/json" }, body: JSON.stringify({ customer: nama, hasil }) });
+      const body = await res.json().catch(()=> ({}));
+      if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
+      await fetchAndRenderFollowUp({ silent: false });
+      if(!detailOverlay.hidden) bukaDetailCustomer(nama);
+    }catch(err){
+      if(st){ st.textContent = "Gagal menyimpan: " + (err.message || err); st.style.color = "var(--danger-red)"; }
+      btn.disabled = false;
+    }
+  });
   function tutupDetailCustomer(){
     detailOverlay.hidden = true;
     if(window.__closeFollowUpChart) window.__closeFollowUpChart(); // ikut tutup grafik kalau lagi terbuka
