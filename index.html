@@ -17527,6 +17527,72 @@ if ("serviceWorker" in navigator) {
   const BOT_USERNAME = "Rp_habit_bot"; // SAMA dgn MINI_APP_BOT_USERNAME di Worker -- dipakai link "klik nama -> /status"
   const fullpage = document.getElementById("rekap-fullpage");
   const statusEl = document.getElementById("rekap-status");
+  /* ---- v425 -- menu kecil saat nama customer diklik ---- */
+  let __menuNamaEl = null;
+  function tutupMenuNamaRekap(){ if(__menuNamaEl){ __menuNamaEl.remove(); __menuNamaEl = null; } }
+  document.addEventListener("click", (e)=>{ if(__menuNamaEl && !__menuNamaEl.contains(e.target)) tutupMenuNamaRekap(); });
+  document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") tutupMenuNamaRekap(); });
+  window.addEventListener("scroll", tutupMenuNamaRekap, true);
+  window.addEventListener("resize", tutupMenuNamaRekap);
+  function bukaMenuNamaRekap(anchorEl, anchorId){
+    tutupMenuNamaRekap();
+    const row = allRows.find(r=> String(r.anchorId) === String(anchorId));
+    if(!row) return;
+    const m = document.createElement("div");
+    m.setAttribute("role", "menu"); m.id = "rekap-nama-pop";
+    m.style.cssText = "position:fixed; z-index:10050; background:var(--paper,#fff); color:var(--ink); border:1px solid var(--line,#ddd); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.18); padding:6px; min-width:220px; font-size:14px;";
+    const judul = document.createElement("div");
+    judul.textContent = row.customer || "-";
+    judul.style.cssText = "font-weight:700; font-size:12.5px; color:var(--ink-soft); padding:6px 10px 4px; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;";
+    m.appendChild(judul);
+    const item = (teks, warna, fn)=>{
+      const b = document.createElement("button");
+      b.type = "button"; b.setAttribute("role", "menuitem");
+      b.textContent = teks;
+      b.style.cssText = `display:block; width:100%; text-align:left; background:none; border:0; border-radius:7px; padding:9px 10px; cursor:pointer; font:inherit; color:${warna || "inherit"};`;
+      b.addEventListener("mouseenter", ()=> b.style.background = "rgba(0,0,0,.06)");
+      b.addEventListener("mouseleave", ()=> b.style.background = "none");
+      b.addEventListener("click", (e)=>{ e.stopPropagation(); tutupMenuNamaRekap(); fn(); });
+      m.appendChild(b);
+    };
+    item("📊 Cek status di bot", null, ()=>{
+      window.open(`https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (row.customer || ""))}`, "_blank", "noopener");
+    });
+    item("🗑️ Hapus rincian ini", "var(--danger-red)", ()=> hapusRincianRekap(anchorId));
+    document.body.appendChild(m);
+    __menuNamaEl = m;
+    // posisikan di bawah nama, tetap di dalam layar
+    const r = anchorEl.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+    let left = Math.min(r.left, window.innerWidth - w - 8); left = Math.max(8, left);
+    let top = r.bottom + 4; if(top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 4);
+    m.style.left = left + "px"; m.style.top = top + "px";
+    const pertama = m.querySelector("button"); if(pertama) pertama.focus();
+  }
+  // Hapus rincian (dobel/salah) -- sama dgn reply "del" ke rinciannya di grup: data dihapus tuntas
+  // (Rekap, Follow Up, pembayaran) & foto rincian di grup ikut dihapus.
+  function hapusRincianRekap(anchorId){
+    const row = allRows.find(r=> String(r.anchorId) === String(anchorId));
+    const nama = row && row.customer ? row.customer : "pesanan ini";
+    const info = row ? `${nama} — ${row.tanggalJam || ""}${row.cs ? " · " + row.cs : ""}` : nama;
+    window.showResetConfirm(`Hapus rincian ${info}? Data pesanan, pembayaran & Follow Up-nya ikut terhapus, dan foto rinciannya di grup juga dihapus.`, async ()=>{
+      statusEl.textContent = `Menghapus rincian ${nama}…`; statusEl.style.color = "";
+      try{
+        const res = await fetch(MASTER_DATA_WORKER_URL + "/rekap-pesanan-hapus", {
+          method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ anchorId, customerName: row ? row.customer : "" }),
+        });
+        const body = await res.json().catch(()=> ({}));
+        if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
+        allRows = allRows.filter(r=> String(r.anchorId) !== String(anchorId));
+        renderRekapTable();
+        statusEl.textContent = `🗑️ Rincian ${nama} dihapus.` + (body.fotoTerhapus ? " Foto di grup ikut dihapus." : (body.sebab ? ` Foto di grup: ${body.sebab}.` : ""));
+        statusEl.style.color = "var(--primary-green)";
+      }catch(e){
+        statusEl.textContent = "⚠️ Gagal menghapus: " + ((e && e.message) || e);
+        statusEl.style.color = "var(--danger-red)";
+      }
+    }, { icon: "🗑", iconBg: "#fdecea", iconColor: "var(--danger-red)", okText: "Ya, Hapus", okColor: "var(--danger-red)", warningText: "Tidak bisa dibatalkan." });
+  }
   const tableEl = document.getElementById("rekap-table");
   const cardsEl = document.getElementById("rekap-cards"); // BARU -- kontainer kartu versi mobile
   const searchEl = document.getElementById("rekap-search");
@@ -18180,7 +18246,7 @@ if ("serviceWorker" in navigator) {
     let retentionDividerShownMobile = false;
     cardsEl.innerHTML = retentionBannerMobile + rows.flatMap(r=>{
       const isVoid = /void|hoax/i.test(r.status);
-      const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline;">${escHtml(r.customer)}</a>`;
+      const namaLink = `<a href="#" class="rekap-nama-menu" data-anchor="${escHtml(r.anchorId)}" style="color:var(--primary-green); text-decoration:underline;">${escHtml(r.customer)}</a>`; // v425 -- klik = menu
       // BARU -- badge Dropship sekarang ikut menampilkan nama penerima
       // langsung di kartu (sebelumnya cuma badge "📦 Dropship" polos, nama
       // penerimanya cuma nongol lewat title="..." tabel desktop -- yang
@@ -18235,7 +18301,6 @@ if ("serviceWorker" in navigator) {
         <div style="display:flex; justify-content:space-between;">${cb("resi")}${cb("ekspedisi", "kg")}</div>
         <div class="rc-card-bottom">
           <button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:6px 12px; font-size:13px; width:100%;">${r.manualInvoiced ? "✓ Sudah di Invoice" : "Belum di Invoice"}</button>
-          <button class="md-btn rekap-hapus-btn" data-anchor="${escHtml(r.anchorId)}" style="height:auto; padding:6px 12px; font-size:13px; width:100%; margin-top:6px;">🗑️ Hapus rincian</button>
           ${cb("invoice")}
         </div>
       </div>`;
@@ -18341,7 +18406,7 @@ if ("serviceWorker" in navigator) {
       // BARU -- nama customer jadi link, buka DM ke bot dgn teks
       // "/status <nama>" SUDAH TERISI (Telegram tidak izinkan auto-kirim
       // dari link demi keamanan -- orangnya tetap perlu tap kirim sendiri).
-      const namaLink = `<a href="https://t.me/${BOT_USERNAME}?text=${encodeURIComponent("/status " + (r.customer||""))}" target="_blank" rel="noopener" style="color:var(--primary-green); text-decoration:underline; word-break:break-word;">${escHtml(r.customer)}</a>`;
+      const namaLink = `<a href="#" class="rekap-nama-menu" data-anchor="${escHtml(r.anchorId)}" style="color:var(--primary-green); text-decoration:underline; word-break:break-word;">${escHtml(r.customer)}</a>`; // v425 -- klik = menu
       // BARU -- badge "📦 Dropship" di BAWAH nama (bukan di samping, biar
       // tidak melebarkan kolom Customer) -- teks jelas terbaca (bukan cuma
       // ikon polos), muncul HANYA kalau r.dropshipRecipient terisi.
@@ -18393,7 +18458,7 @@ if ("serviceWorker" in navigator) {
               ? `<div><span style="display:inline-block;background:#fff3cd;color:#8a6100;border-radius:4px;padding:1px 7px;font-size:13px;">✅</span></div><div style="font-size:9.5px;color:#8a6100;margin-top:1px;">teks</div>`
               : "✅")
           : "❌") + changeBadge("resi", true), "text-align:center;") +
-        td(`<button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:5px 10px; font-size:13px;">${r.manualInvoiced ? "✓ Sudah" : "Belum"}</button>${changeBadge("invoice", true)}<button class="md-btn rekap-hapus-btn" data-anchor="${escHtml(r.anchorId)}" title="Hapus rincian ini (dobel/salah)" style="height:auto; padding:5px 8px; font-size:13px; margin-left:6px;">🗑️</button>`) +
+        td(`<button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:5px 10px; font-size:13px;">${r.manualInvoiced ? "✓ Sudah" : "Belum"}</button>${changeBadge("invoice", true)}`) +
         "</tr>";
     });
 
@@ -18464,31 +18529,11 @@ if ("serviceWorker" in navigator) {
     // sama persis dgn di tabel desktop, tanpa duplikasi logic.
     // v421 -- tombol 🗑️ Hapus rincian (dobel/salah). Sama dgn reply "del" ke rinciannya di grup:
     // data dihapus tuntas (Rekap, Follow Up, pembayaran) & foto rincian di grup ikut dihapus.
-    fullpage.querySelectorAll(".rekap-hapus-btn").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const anchorId = btn.dataset.anchor;
-        const row = allRows.find(r=> r.anchorId === anchorId);
-        const nama = row && row.customer ? row.customer : "pesanan ini";
-        const info = row ? `${nama} — ${row.tanggalJam || ""}${row.cs ? " · " + row.cs : ""}` : nama;
-        window.showResetConfirm(`Hapus rincian ${info}? Data pesanan, pembayaran & Follow Up-nya ikut terhapus, dan foto rinciannya di grup juga dihapus.`, async ()=>{
-          btn.disabled = true; const lbl = btn.textContent; btn.textContent = "…";
-          try{
-            const res = await fetch(MASTER_DATA_WORKER_URL + "/rekap-pesanan-hapus", {
-              method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }),
-              body: JSON.stringify({ anchorId, customerName: row ? row.customer : "" }),
-            });
-            const body = await res.json().catch(()=> ({}));
-            if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
-            allRows = allRows.filter(r=> r.anchorId !== anchorId);
-            renderRekapTable();
-            statusEl.textContent = `🗑️ Rincian ${nama} dihapus.` + (body.fotoTerhapus ? " Foto di grup ikut dihapus." : (body.sebab ? ` Foto di grup: ${body.sebab}.` : ""));
-            statusEl.style.color = "var(--primary-green)";
-          }catch(e){
-            btn.disabled = false; btn.textContent = lbl;
-            statusEl.textContent = "⚠️ Gagal menghapus: " + ((e && e.message) || e);
-            statusEl.style.color = "var(--danger-red)";
-          }
-        }, { icon: "🗑", iconBg: "#fdecea", iconColor: "var(--danger-red)", okText: "Ya, Hapus", okColor: "var(--danger-red)", warningText: "Tidak bisa dibatalkan." });
+    // v425 -- klik NAMA customer -> menu kecil: 📊 Cek status di bot (fungsi lama) & 🗑️ Hapus rincian ini.
+    fullpage.querySelectorAll(".rekap-nama-menu").forEach(link=>{
+      link.addEventListener("click", (e)=>{
+        e.preventDefault(); e.stopPropagation();
+        bukaMenuNamaRekap(link, link.dataset.anchor);
       });
     });
     fullpage.querySelectorAll(".rekap-invoice-btn").forEach(btn=>{
