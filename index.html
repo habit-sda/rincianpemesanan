@@ -1208,6 +1208,42 @@
        fiturnya identik (parameter, prediksi 8 order, prediksi stok). */
     .fu-bagian{border-radius:8px; overflow:hidden; margin-top:14px; border:1px solid var(--line);}
     .fu-bagian .fu-bag-hdr{background:var(--primary-green); color:#fff; padding:8px 15px; font-size:11px; font-weight:700; letter-spacing:.5px;}
+    /* v430 -- kartu HASIL FOLLOW UP (dirapikan: ringkasan pembelian + 3 kartu pilihan) */
+    .fuh-body{padding:14px 15px 12px;}
+    .fuh-stats{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-bottom:14px;}
+    .fuh-stat{border:1px solid var(--line); border-radius:10px; padding:9px 11px; background:rgba(127,127,127,.04); min-width:0;}
+    .fuh-stat .k{font-size:10.5px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .fuh-stat .v{font-size:15px; font-weight:800; margin-top:3px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .fuh-stat .s{font-size:11.5px; color:var(--ink-soft); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .fuh-last{display:flex; align-items:center; gap:10px; border-radius:10px; padding:9px 12px; margin-bottom:12px; background:rgba(0,132,95,.08); border:1px solid rgba(0,132,95,.25); font-size:13px;}
+    .fuh-last .t{flex:1; min-width:0;}
+    .fuh-undo{background:none; border:0; padding:4px 2px; font:inherit; font-size:12px; font-weight:700; color:var(--ink-soft); cursor:pointer; white-space:nowrap; text-decoration:underline;}
+    .fuh-undo:hover{color:var(--danger-red);}
+    .fuh-tanya{font-size:13px; font-weight:700; margin:0 0 8px; color:var(--ink);}
+    .fuh-opsi{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px;}
+    .fuh-btn{--c:#1a73e8; display:flex; flex-direction:column; align-items:flex-start; gap:6px; text-align:left; padding:12px; border-radius:12px; border:1.5px solid var(--line); background:var(--card); color:var(--ink); font:inherit; cursor:pointer; transition:border-color .15s, box-shadow .15s, transform .15s; position:relative; min-width:0;}
+    .fuh-btn:hover{border-color:var(--c); box-shadow:0 4px 14px rgba(0,0,0,.08); transform:translateY(-1px);}
+    .fuh-btn:focus-visible{outline:2px solid var(--c); outline-offset:2px;}
+    .fuh-btn:disabled{opacity:.55; cursor:wait; transform:none;}
+    .fuh-btn .ic{width:32px; height:32px; border-radius:9px; display:grid; place-items:center; font-size:17px; background:color-mix(in srgb, var(--c) 13%, transparent);}
+    .fuh-btn .tx{display:flex; flex-direction:column; gap:3px; min-width:0;}
+    .fuh-btn .jd{font-size:14px; font-weight:800; line-height:1.25;}
+    .fuh-btn .ds{font-size:12px; color:var(--ink-soft); line-height:1.35;}
+    .fuh-btn .tg{font-size:11.5px; font-weight:700; color:var(--c); margin-top:auto;}
+    .fuh-btn.dipilih{border-color:var(--c); background:color-mix(in srgb, var(--c) 7%, var(--card));}
+    .fuh-btn.dipilih::after{content:"✓ Terakhir dipilih"; position:absolute; top:10px; right:10px; font-size:10px; font-weight:800; color:var(--c);}
+    .fuh-btn.m{--c:#1a73e8;} .fuh-btn.b{--c:#e37400;} .fuh-btn.t{--c:#c5221f;}
+    .fuh-status{font-size:12px; margin-top:8px; min-height:1em;}
+    .fuh-done{display:flex; gap:10px; align-items:flex-start; border-radius:10px; padding:11px 12px; background:rgba(0,132,95,.08); border:1px solid rgba(0,132,95,.25); font-size:13px;}
+    @media (max-width:560px){
+      .fuh-stats{grid-template-columns:1fr 1fr;}
+      .fuh-stats .fuh-stat:last-child{grid-column:1 / -1;}
+      .fuh-opsi{grid-template-columns:1fr;}
+      .fuh-btn{display:grid; grid-template-columns:32px minmax(0,1fr); column-gap:12px; row-gap:6px; align-items:start; padding:12px;}
+      .fuh-btn .ic{grid-row:1 / span 2;}
+      .fuh-btn .tg{grid-column:2; margin-top:0;}
+      .fuh-btn.dipilih::after{top:12px; right:12px;}
+    }
     .fu-bagian .fu-bag-hdr span{opacity:.75; font-weight:400; font-size:10px; margin-left:6px;}
     .fu-ptbl{width:100%; border-collapse:collapse;}
     .fu-ptbl tr:nth-child(even){background:var(--paper, #f7f8f6);}
@@ -17568,6 +17604,47 @@ if ("serviceWorker" in navigator) {
     m.style.left = left + "px"; m.style.top = top + "px";
     const pertama = m.querySelector("button"); if(pertama) pertama.focus();
   }
+  /* ---- v427 -- klik badge 📦 Dropship -> kotak kecil berisi nama penerima + tombol salin ---- */
+  function bukaInfoDropshipRekap(anchorEl, anchorId){
+    tutupMenuNamaRekap();
+    const row = allRows.find(r=> String(r.anchorId) === String(anchorId));
+    if(!row || !row.dropshipRecipient) return;
+    const m = document.createElement("div");
+    m.setAttribute("role", "dialog"); m.id = "rekap-dropship-pop";
+    m.style.cssText = "position:fixed; z-index:10050; background:var(--paper,#fff); color:var(--ink); border:1px solid #e0a800; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.18); padding:10px 12px; min-width:220px; max-width:300px; font-size:14px;";
+    const lab = document.createElement("div");
+    lab.textContent = "📦 Penerima Dropship";
+    lab.style.cssText = "font-size:11.5px; font-weight:700; color:#7a4a00;";
+    const nama = document.createElement("div");
+    nama.className = "rekap-dropship-nama";
+    nama.textContent = row.dropshipRecipient;
+    nama.style.cssText = "font-weight:800; font-size:15px; margin:3px 0 2px; word-break:break-word; user-select:all;";
+    const via = document.createElement("div");
+    via.textContent = "via " + (row.customer || "-");
+    via.style.cssText = "font-size:11.5px; color:var(--ink-soft); word-break:break-word;";
+    const salin = document.createElement("button");
+    salin.type = "button"; salin.textContent = "📋 Salin nama";
+    salin.style.cssText = "margin-top:8px; font:inherit; font-size:12.5px; font-weight:700; background:#fff1d6; color:#7a4a00; border:1px solid #e0a800; border-radius:7px; padding:5px 10px; cursor:pointer;";
+    salin.addEventListener("click", async (e)=>{
+      e.stopPropagation();
+      let ok = false;
+      try{ await navigator.clipboard.writeText(row.dropshipRecipient); ok = true; }catch(err){
+        try{ const t = document.createElement("textarea"); t.value = row.dropshipRecipient; t.style.cssText = "position:fixed;opacity:0;"; document.body.appendChild(t); t.select(); ok = document.execCommand("copy"); t.remove(); }catch(err2){}
+      }
+      salin.textContent = ok ? "✅ Tersalin" : "⚠️ Gagal salin";
+    });
+    m.append(lab, nama, via, salin);
+    m.addEventListener("click", (e)=> e.stopPropagation());
+    document.body.appendChild(m);
+    __menuNamaEl = m; // pakai mekanisme tutup yang sama (klik luar / Esc / scroll)
+    const r = anchorEl.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+    // kalau dibuka ke atas, taruh di atas NAMA customer (bukan di atas badge) supaya nama tidak tertutup
+    const namaEl = anchorEl.parentElement && anchorEl.parentElement.parentElement ? anchorEl.parentElement.parentElement.querySelector(".rekap-nama-menu") : null;
+    const atas = namaEl ? Math.min(namaEl.getBoundingClientRect().top, r.top) : r.top;
+    let left = Math.min(r.left, window.innerWidth - w - 8); left = Math.max(8, left);
+    let top = r.bottom + 4; if(top + h > window.innerHeight - 8) top = Math.max(8, atas - h - 4);
+    m.style.left = left + "px"; m.style.top = top + "px";
+  }
   // Hapus rincian (dobel/salah) -- sama dgn reply "del" ke rinciannya di grup: data dihapus tuntas
   // (Rekap, Follow Up, pembayaran) & foto rincian di grup ikut dihapus.
   function hapusRincianRekap(anchorId){
@@ -18253,7 +18330,7 @@ if ("serviceWorker" in navigator) {
       // praktis tidak kebaca di HP karena hover/tooltip tidak berfungsi
       // di layar sentuh).
       const dropshipBadgeMobile = r.dropshipRecipient
-        ? `<div style="margin-top:2px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px;">📦 Dropship · a.n. ${escHtml(r.dropshipRecipient)}</span></div>`
+        ? `<div style="margin-top:2px;"><button type="button" class="rekap-dropship-btn" data-anchor="${escHtml(r.anchorId)}" style="display:inline-block; font:inherit; text-align:left; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px; cursor:pointer;">📦 Dropship · a.n. ${escHtml(r.dropshipRecipient)}</button></div>`
         : "";
       const varianRingkas = kodeList
         .map(k=> (r.items && r.items[k]) ? `${escHtml(k)} ${r.items[k]}` : null)
@@ -18411,7 +18488,7 @@ if ("serviceWorker" in navigator) {
       // tidak melebarkan kolom Customer) -- teks jelas terbaca (bukan cuma
       // ikon polos), muncul HANYA kalau r.dropshipRecipient terisi.
       const dropshipBadge = r.dropshipRecipient
-        ? `<div style="margin-top:3px;"><span style="display:inline-block; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px; white-space:nowrap;">📦 Dropship</span></div>`
+        ? `<div style="margin-top:3px;"><button type="button" class="rekap-dropship-btn" data-anchor="${escHtml(r.anchorId)}" title="Klik untuk lihat nama penerima" style="display:inline-block; font:inherit; font-size:10.5px; font-weight:700; color:#7a4a00; background:#fff1d6; border:1px solid #e0a800; border-radius:6px; padding:1px 7px; white-space:nowrap; cursor:pointer;">📦 Dropship ▾</button></div>`
         : "";
       const namaCell = namaLink + rkAliasSubline(r.customer) + dropshipBadge;
       const namaTitle = r.dropshipRecipient ? `${r.customer} · Dropship a.n. ${r.dropshipRecipient}` : r.customer;
@@ -18530,6 +18607,14 @@ if ("serviceWorker" in navigator) {
     // v421 -- tombol 🗑️ Hapus rincian (dobel/salah). Sama dgn reply "del" ke rinciannya di grup:
     // data dihapus tuntas (Rekap, Follow Up, pembayaran) & foto rincian di grup ikut dihapus.
     // v425 -- klik NAMA customer -> menu kecil: 📊 Cek status di bot (fungsi lama) & 🗑️ Hapus rincian ini.
+    fullpage.querySelectorAll(".rekap-dropship-btn").forEach(btn=>{ // v427
+      btn.addEventListener("click", (e)=>{
+        e.preventDefault(); e.stopPropagation();
+        if(__menuNamaEl && __menuNamaEl.id === "rekap-dropship-pop" && __menuNamaEl.dataset.anchor === btn.dataset.anchor){ tutupMenuNamaRekap(); return; }
+        bukaInfoDropshipRekap(btn, btn.dataset.anchor);
+        if(__menuNamaEl) __menuNamaEl.dataset.anchor = btn.dataset.anchor;
+      });
+    });
     fullpage.querySelectorAll(".rekap-nama-menu").forEach(link=>{
       link.addEventListener("click", (e)=>{
         e.preventDefault(); e.stopPropagation();
@@ -19280,18 +19365,47 @@ if ("serviceWorker" in navigator) {
      order, tidak perlu menekan apa pun: begitu rincian dibuat, sistem tahu sendiri. ---- */
   const FU_LABEL_HASIL = { m: "📅 Minggu depan", b: "⏳ Belum butuh", t: "🚫 Tidak aktif" };
   function fuHtmlHasil(r){
+    // v430 -- dirapikan: ringkasan pembelian (terakhir beli, ritme, jadwal) + 3 kartu pilihan
+    const hariIni = new Date(); hariIni.setHours(12, 0, 0, 0);
+    const ritme = (r.ritme !== null && r.ritme !== undefined) ? r.ritme : r.medGap;
+    const riw = (r.riwayat || []).slice().sort((a, b)=> new Date(a.tanggal) - new Date(b.tanggal));
+    const qtyAkhir = riw.length ? riw[riw.length - 1].qty : null;
+    const lalu = r.last ? fuDDiff(r.last, hariIni) : null;
+    const teksLalu = lalu === null ? "" : (lalu <= 0 ? "hari ini" : `${fmtHari(lalu)} lalu`);
+    const sisaJadwal = r.pred ? fuDDiff(hariIni, r.pred) : null;
+    const teksJadwal = sisaJadwal === null ? "" : (sisaJadwal < 0 ? `terlambat ${fmtHari(-sisaJadwal)}` : (sisaJadwal === 0 ? "hari ini" : `${fmtHari(sisaJadwal)} lagi`));
+    const stats = `<div class="fuh-stats">
+        <div class="fuh-stat"><div class="k">🛒 Terakhir beli</div><div class="v">${r.last ? fmtTgl(r.last) : "-"}</div><div class="s">${escHtml(teksLalu)}${qtyAkhir !== null && qtyAkhir !== undefined ? ` · ${fmtNumID(qtyAkhir)} pcs` : ""}</div></div>
+        <div class="fuh-stat"><div class="k">🔁 Ritme order</div><div class="v">${ritme ? "± " + fmtHari(ritme) : "-"}</div><div class="s">${r.jumlahOrder ? `dari ${r.jumlahOrder} order lunas` : ""}</div></div>
+        <div class="fuh-stat"><div class="k">📞 Jadwal follow up</div><div class="v">${r.pred ? fmtTgl(r.pred) : "-"}</div><div class="s" style="${sisaJadwal !== null && sisaJadwal < 0 ? "color:var(--danger-red); font-weight:700;" : ""}">${escHtml(teksJadwal)}</div></div>
+      </div>`;
+    const hdr = `<div class="fu-bag-hdr">▌ HASIL FOLLOW UP</div>`;
     if(r.sudahOrder){
-      return `<div class="fu-bagian"><div class="fu-bag-hdr">▌ HASIL FOLLOW UP</div>
-        <div style="padding:8px 2px;">✅ Customer ini <b>sudah order lagi</b> (rincian ${r.belumLunasTerakhir ? fmtTgl(r.belumLunasTerakhir + "T12:00:00+07:00") : ""}, menunggu lunas) — tidak perlu di-follow up.</div></div>`;
+      return `<div class="fu-bagian">${hdr}<div class="fuh-body">${stats}
+        <div class="fuh-done"><span style="font-size:18px;">✅</span><div>Customer ini <b>sudah order lagi</b>${r.belumLunasTerakhir ? ` (rincian ${fmtTgl(r.belumLunasTerakhir + "T12:00:00+07:00")}, menunggu lunas)` : ""}. Tidak perlu di-follow up.</div></div>
+      </div></div>`;
     }
     const h = r.hasilFU;
-    const info = h
-      ? `<div style="margin-bottom:8px;">Hasil terakhir: <b>${escHtml(h.label)}</b> — dicatat ${escHtml(h.oleh || "CS")} ${fmtTgl(h.tanggal + "T12:00:00+07:00")}${h.jadwal ? `, dihubungi lagi <b>${fmtTgl(h.jadwal + "T12:00:00+07:00")}</b>` : ""}.</div>`
-      : `<div style="margin-bottom:8px; color:var(--ink-soft);">Sudah menghubungi customer ini? Catat hasilnya supaya jadwal berikutnya menyesuaikan.</div>`;
-    const tombol = ["m", "b", "t"].map(k=> `<button type="button" class="tab-btn" data-fuhasil="${k}" style="margin:0 6px 6px 0;">${FU_LABEL_HASIL[k]}</button>`).join("")
-      + (h ? `<button type="button" class="tab-btn" data-fuhasil="hapus" style="margin:0 6px 6px 0;">↩️ Hapus catatan</button>` : "");
-    return `<div class="fu-bagian"><div class="fu-bag-hdr">▌ HASIL FOLLOW UP <span>📅 = dihubungi lagi 7 hari · ⏳ = ½ ritme (7–30 hari) · 🚫 = keluar dari jadwal</span></div>
-      <div style="padding:6px 2px;">${info}<div>${tombol}</div><div id="fu-hasil-status" style="font-size:12px; margin-top:4px;"></div></div></div>`;
+    const tglPlus = (n)=> fmtTgl(fuAddD(hariIni, n).toISOString());
+    const nB = ritme ? Math.min(30, Math.max(7, Math.round(ritme / 2))) : null;
+    const opsi = [
+      { k: "m", ic: "📅", jd: "Minggu depan", ds: "Sedang tidak bisa, hubungi lagi minggu depan.", tg: `Dihubungi lagi ${tglPlus(7)}` },
+      { k: "b", ic: "⏳", jd: "Belum butuh", ds: "Stok masih ada. Jadwal ulang ½ ritme (7–30 hari).", tg: nB ? `Dihubungi lagi ${tglPlus(nB)} (${nB} hari)` : "Dihubungi lagi 7–30 hari" },
+      { k: "t", ic: "🚫", jd: "Tidak aktif", ds: "Berhenti/pindah. Keluar dari jadwal sampai order lagi.", tg: "Tidak dihubungi lagi" },
+    ];
+    const kartu = opsi.map(o=> `<button type="button" class="fuh-btn ${o.k}${h && h.kode === o.k ? " dipilih" : ""}" data-fuhasil="${o.k}">
+        <span class="ic">${o.ic}</span>
+        <span class="tx"><span class="jd">${o.jd}</span><span class="ds">${o.ds}</span></span>
+        <span class="tg">${escHtml(o.tg)}</span>
+      </button>`).join("");
+    const terakhir = h
+      ? `<div class="fuh-last"><span style="font-size:16px;">📝</span><div class="t">Terakhir: <b>${escHtml(h.label)}</b> oleh ${escHtml(h.oleh || "CS")}, ${fmtTgl(h.tanggal + "T12:00:00+07:00")}${h.jadwal ? ` · dihubungi lagi <b>${fmtTgl(h.jadwal + "T12:00:00+07:00")}</b>` : ""}</div><button type="button" class="fuh-undo" data-fuhasil="hapus" title="Batalkan catatan ini">↩️ Hapus catatan</button></div>`
+      : "";
+    return `<div class="fu-bagian">${hdr}<div class="fuh-body">${stats}${terakhir}
+      <div class="fuh-tanya">${h ? "Catat hasil terbaru:" : "Sudah menghubungi customer ini? Pilih hasilnya:"}</div>
+      <div class="fuh-opsi">${kartu}</div>
+      <div id="fu-hasil-status" class="fuh-status"></div>
+    </div></div>`;
   }
   document.getElementById("followup-detail-body").addEventListener("click", async (e)=>{
     const btn = e.target.closest && e.target.closest("[data-fuhasil]");
@@ -19301,7 +19415,8 @@ if ("serviceWorker" in navigator) {
     if(hasil === "t" && !confirm(`Tandai ${nama} TIDAK AKTIF? Customer ini keluar dari jadwal Follow Up sampai order lagi.`)) return;
     const st = document.getElementById("fu-hasil-status");
     if(st){ st.textContent = "Menyimpan…"; st.style.color = "var(--primary-green)"; }
-    btn.disabled = true;
+    const semuaBtn = document.querySelectorAll("#followup-detail-body [data-fuhasil]");
+    semuaBtn.forEach(b=> b.disabled = true);
     try{
       const res = await fetch(MASTER_DATA_WORKER_URL + "/followup-hasil", { method: "POST", headers: { ...workerHeaders(), "Content-Type": "application/json" }, body: JSON.stringify({ customer: nama, hasil }) });
       const body = await res.json().catch(()=> ({}));
@@ -19310,7 +19425,7 @@ if ("serviceWorker" in navigator) {
       if(!detailOverlay.hidden) bukaDetailCustomer(nama);
     }catch(err){
       if(st){ st.textContent = "Gagal menyimpan: " + (err.message || err); st.style.color = "var(--danger-red)"; }
-      btn.disabled = false;
+      semuaBtn.forEach(b=> b.disabled = false);
     }
   });
   function tutupDetailCustomer(){
