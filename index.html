@@ -10744,10 +10744,10 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       // DIUBAH v412 -- revisi edit di tempat (revisiInPlace)
       statusEl.textContent = body.revisiInPlace
         ? `Rincian lama (${body.revisiInPlace.waktu || "-"}) sudah diperbarui di grup. Status: ${body.revisiInPlace.status || "-"}${body.revisiInPlace.perluKonfirmasi ? " — Finance perlu Konfirmasi ulang." : ""}${body.warning ? " ⚠️ " + body.warning : ""}`
-        : body.revisiDeleted
+        : (body.revisiDeleted
         ? `Rincian lama (${body.revisiDeleted.waktu}) sudah dihapus, rincian baru berhasil dikirim ke grup Telegram.`
-        : "Berhasil dikirim ke grup Telegram.";
-      statusEl.style.color = "var(--primary-green)";
+        : "Berhasil dikirim ke grup Telegram.") + (body.warning ? " ⚠️ " + body.warning : ""); // v435 -- peringatan (mis. ID Topik salah) ikut tampil
+      statusEl.style.color = body.warning ? "#b26a00" : "var(--primary-green)";
       showMsg(body.revisiInPlace
         ? "Rincian \"" + customerName + "\" direvisi — " + (body.revisiInPlace.status || "") + (body.revisiInPlace.perluKonfirmasi ? " (Finance perlu Konfirmasi ulang)" : "")
         : "Bukti untuk \"" + customerName + "\" terkirim ke grup Telegram."); // DIUBAH v412
@@ -10761,6 +10761,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         if(okDep.length) statusEl.textContent += ` 📎 ${okDep.length} deposit (Rp${totalDep.toLocaleString("id-ID")}) ditempel ke rincian.`;
         if(gagalDep.length) statusEl.textContent += ` ⚠️ ${gagalDep.length} deposit gagal ditempel — cek grup.`;
       }
+      if(body.warning && !body.revisiInPlace) alert("⚠️ " + body.warning); // v435 -- jangan sampai terlewat (popup segera tertutup)
       setTimeout(()=>{ overlay.hidden = true; nameInput.value = ""; hideSuggestions(); hideDuplicateWarning(); hideAliasWarning(); hideDepositHint(); }, 900);
     }catch(e){
       statusEl.textContent = "Gagal mengirim: " + (e.message || e);
