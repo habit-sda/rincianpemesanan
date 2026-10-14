@@ -5628,6 +5628,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <label for="md-followup-notif-time" style="font-size:13.5px; color:var(--ink-soft);">Jam kirim (WIB)</label>
           <input type="time" id="md-followup-notif-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
         </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-top:12px;">
+          <label for="md-followup-batas" style="font-size:13.5px; color:var(--ink-soft);">Maksimal customer per hari</label>
+          <input type="number" id="md-followup-batas" min="1" max="50" step="1" inputmode="numeric" style="width:80px; height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
+        </div>
+        <div class="md-note" style="margin-top:8px;">Kalau jadwal hari itu lebih banyak, sisanya otomatis digeser ke hari kerja berikutnya. Didahulukan: jadwal dari catatan CS, lalu yang paling lama menunggu, lalu customer yang paling bernilai.</div>
       </div>
       <div class="md-card">
         <h3>🖥️ Render Nota Lewat Server (Browserless)</h3>
@@ -7948,7 +7953,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -7981,6 +7986,7 @@ function loadSettings(){
     if(typeof s.followUpEnabled === "boolean") SETTINGS.followUpEnabled = s.followUpEnabled;
     if(typeof s.followUpNotifEnabled === "boolean") SETTINGS.followUpNotifEnabled = s.followUpNotifEnabled;
     if(typeof s.followUpNotifTime === "string" && s.followUpNotifTime.trim()) SETTINGS.followUpNotifTime = s.followUpNotifTime.trim();
+    if(typeof s.followUpBatasHarian === "number" && s.followUpBatasHarian >= 1 && s.followUpBatasHarian <= 50) SETTINGS.followUpBatasHarian = Math.round(s.followUpBatasHarian); // v438
     if(typeof s.noBuktiTransferReminderTime === "string" && s.noBuktiTransferReminderTime.trim()) SETTINGS.noBuktiTransferReminderTime = s.noBuktiTransferReminderTime.trim();
     if(s.stickerReactionsEnabled && typeof s.stickerReactionsEnabled === "object"){
       ["konfirmasi","hoax","deposit","void"].forEach(k=>{
@@ -13915,6 +13921,18 @@ if ("serviceWorker" in navigator) {
     toggleFollowUpNotif.addEventListener("change", saveFollowUpNotif);
     inputFollowUpNotifTime.addEventListener("change", saveFollowUpNotif);
   }
+  // v438 -- batas follow up per hari (dibaca Worker: computeFollowUpData)
+  const inputFollowUpBatas = document.getElementById("md-followup-batas");
+  if(inputFollowUpBatas){
+    inputFollowUpBatas.value = SETTINGS.followUpBatasHarian || 7;
+    inputFollowUpBatas.addEventListener("change", async ()=>{
+      const n = Math.round(Number(inputFollowUpBatas.value));
+      if(!(n >= 1 && n <= 50)){ inputFollowUpBatas.value = SETTINGS.followUpBatasHarian || 7; alert("Isi angka 1 sampai 50."); return; }
+      SETTINGS.followUpBatasHarian = n;
+      saveSettings();
+      await confirmMasterDataSave(`Follow Up dibatasi maksimal ${n} customer per hari.`);
+    });
+  }
 
   const toggleStickyFormBtns = document.getElementById("md-toggle-stickyformbtns");
   if(toggleStickyFormBtns){
@@ -18796,7 +18814,8 @@ if ("serviceWorker" in navigator) {
     jatuh: "🔴 Jatuh Tempo",
     hariIni: "🟠 Follow Up Hari Ini",
     minggu: "🟡 Follow Up Minggu Ini",
-    belumCukup: "⚪ Belum Cukup Data"
+    belumCukup: "⚪ Belum Cukup Data",
+    baru: "🆕 Customer Baru (1x order)"
   };
   function cocokQuickFilter(r){
     if(!quickFilter) return true;
@@ -18804,6 +18823,7 @@ if ("serviceWorker" in navigator) {
     if(quickFilter === "hariIni") return r.sisa!==null && r.sisa===0;
     if(quickFilter === "minggu") return r.sisa!==null && r.sisa>=0 && r.sisa<=7;
     if(quickFilter === "belumCukup") return r.sisa===null;
+    if(quickFilter === "baru") return !!r.customerBaru; // v438
     return true;
   }
   function updateQuickFilterChip(){
@@ -19145,6 +19165,7 @@ if ("serviceWorker" in navigator) {
       box("hariIni", hariIni, "🟠 Follow Up Hari Ini", "#c46b00") +
       box("minggu", minggu, "🟡 Follow Up Minggu Ini", "#7b6000") +
       box("belumCukup", belumCukup, "⚪ Belum Cukup Data", "#555") +
+      box("baru", rowsDasar.filter(r=> r.customerBaru).length, "🆕 Customer Baru (1x order)", "#1976d2") + // v438
       `<div class="followup-stat-box"><div class="num">${fmtNumID(totQty)}</div><div class="lbl">📦 Est. Qty Stok Bulan Ini</div></div>`;
     updateQuickFilterChip();
   }
@@ -19156,6 +19177,15 @@ if ("serviceWorker" in navigator) {
   // per customer & tap kartu buka detail lengkap (Desain 2). Data SAMA
   // PERSIS dgn tabel (rows yang sudah difilter/quick-filter yang sama).
   const FU_AVATAR_BG = { r:"var(--danger-red, #c00000)", o:"#c46b00", y:"#7b6000", b:"#1976d2", g:"var(--primary-green)", gr:"#888" };
+  // v438 -- keterangan jadwal: customer baru / follow up ulang / digeser karena batas harian
+  function fuLabelJadwal(r){
+    const t = [];
+    if(r.customerBaru) t.push(`<span style="background:#e3f0fd;color:#1565c0;border-radius:6px;padding:1px 6px;">🆕 Baru${r.riwayat && r.riwayat[0] ? " · qty " + escHtml(String(r.riwayat[0].qty)) : ""}</span>`);
+    if(r.percobaan && r.percobaan > 1 && r.percobaanMaks > 1 && r.sisa !== null) t.push(`<span style="background:#fff3e0;color:#a35a00;border-radius:6px;padding:1px 6px;">🔁 ulang ke-${r.percobaan}/${r.percobaanMaks}</span>`);
+    if(r.digeser > 0 && r.sisa !== null) t.push(`<span style="background:#f1f1f1;color:#555;border-radius:6px;padding:1px 6px;" title="Jadwal asli ${escHtml(r.jadwalAsli || "")}">⏩ digeser ${r.digeser} hr</span>`);
+    if(r.hasilFU && r.hasilFU.catatan) t.push(`<span style="background:#eef7ee;color:#2e7d32;border-radius:6px;padding:1px 6px;" title="${escHtml(r.hasilFU.catatan)}">📝${r.hasilFU.ai && r.hasilFU.ai.tanggal ? " 🤖" : ""}</span>`);
+    return t.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;font-size:10.5px;font-weight:600;">${t.join("")}</div>` : "";
+  }
   function renderFollowUpCards(rows){
     if(!cardsEl) return;
     if(!rows.length){
@@ -19179,6 +19209,7 @@ if ("serviceWorker" in navigator) {
           <div class="fc-nama">${escHtml(r.customer)}</div>
           ${fuAliasSubline(r.customer)}
           <div class="fc-sub">${escHtml(r.cs || "-")} &middot; ${sisaTeks}</div>
+          ${fuLabelJadwal(r)}
           ${churnWarn}
         </div>
         <span class="fu-badge ${r.cls}" style="flex-shrink:0;">${escHtml(r.status)}</span>
@@ -19233,7 +19264,7 @@ if ("serviceWorker" in navigator) {
         ? `<span style="font-weight:700;color:${r.pAlive>=70?"var(--text-success)":r.pAlive>=30?"var(--text-warning)":"var(--text-danger)"};">${r.pAlive}%</span>`
         : "-";
       html += `<tr data-customer="${escHtml(r.customer)}">` +
-        td(escHtml(r.customer) + fuAliasSubline(r.customer), "font-weight:600; white-space:normal; word-break:break-word;", "nm") +
+        td(escHtml(r.customer) + fuAliasSubline(r.customer) + fuLabelJadwal(r), "font-weight:600; white-space:normal; word-break:break-word;", "nm") +
         td(escHtml(r.cs || "-")) +
         td(fmtTgl(r.first)) + td(fmtTgl(r.last)) +
         td(r.medGap!==null ? fmtHari(r.medGap) : "-") +
@@ -19288,7 +19319,7 @@ if ("serviceWorker" in navigator) {
       // v419 -- metode follow up per customer
       ["Ritme Order Terbaru (hari) ⭐", (r.ritme!==null && r.ritme!==undefined) ? fmtHari(r.ritme) : "-", true],
       ["Jadwal Follow Up 📞", r.pred ? `${fmtTgl(r.pred)}${(r.predOrder && r.pred !== r.predOrder) ? ` (${fuDDiff(r.pred, r.predOrder)} hari sebelum perkiraan order ${fmtTgl(r.predOrder)})` : ""}` : "-", true],
-      ["Metode Follow Up", r.metodeFU === "adaptif" ? "Per customer: ritme terbaru − ½ × sebaran jarak order customer ini (makin tidak menentu, makin awal dihubungi)" : (r.metodeFU === "median" ? "Baru 2 order: pakai jarak order itu" : "-"), false],
+      ["Metode Follow Up", r.customerBaru ? `Customer baru (1x order, qty ${r.riwayat && r.riwayat[0] ? r.riwayat[0].qty : "-"}): hari ke-${r.jarakBaru || "-"} setelah order pertama (qty ≥21: 21 hari, 4–20: 30 hari, 1–3: 45 hari), diulang tiap 30 hari maks 3x` : (r.metodeFU === "adaptif" ? "Per customer: ritme terbaru − ¾ × sebaran jarak order customer ini (makin tidak menentu, makin awal dihubungi). Belum ada catatan hasil → diulang tiap 10 hari, maks 3x" : (r.metodeFU === "median" ? "Baru 2 order: pakai jarak order itu. Belum ada catatan hasil → diulang tiap 10 hari, maks 3x" : "-")), false],
       ["Rata-Rata Qty/Order", `${r.avgQty}`, false],
       // BARU -- keyakinan prediksi, dari variasi (CV) histori gap customer
       // ini sendiri. Nilai CV mentahnya diikutkan di kurung buat yang mau
@@ -19399,11 +19430,24 @@ if ("serviceWorker" in navigator) {
         <span class="tx"><span class="jd">${o.jd}</span><span class="ds">${o.ds}</span></span>
         <span class="tg">${escHtml(o.tg)}</span>
       </button>`).join("");
+    // v438 -- catatan terakhir + hasil baca AI
+    const aiInfo = (h && h.catatan) ? (()=>{
+      const a = h.ai || {};
+      const st = a.status === "selesai" ? (a.tanggal ? `🤖 dijadwal ${fmtTgl(a.tanggal + "T12:00:00+07:00")}${a.alasan ? " — " + escHtml(a.alasan) : ""} (${String(a.sumber || "").startsWith("lokal") ? "AI lokal" : "AI online"})` : `🤖 ${escHtml(a.alasan || "tidak ada waktu di catatan")}, pakai jadwal bawaan`)
+        : a.status === "gagal" ? "🤖 AI gagal membaca, pakai jadwal bawaan"
+        : (a.status === "antre" || a.status === "diambil") ? "🤖 sedang dibaca AI…" : "";
+      return `<div class="fuh-last" style="margin-top:6px;"><span style="font-size:16px;">🗒️</span><div class="t">Catatan: “${escHtml(h.catatan)}”${st ? `<br><span style="font-size:12px;color:var(--ink-soft);">${st}</span>` : ""}</div></div>`;
+    })() : "";
+    const kotakCatatan = `<div style="margin:8px 0 4px;">
+        <label for="fu-catatan-input" style="font-size:12.5px;color:var(--ink-soft);display:block;margin-bottom:4px;">Catatan (opsional) — tanggal follow up berikutnya diatur otomatis dari catatan ini</label>
+        <textarea id="fu-catatan-input" rows="2" maxlength="300" placeholder='mis. "tunggu gajian tgl 25" / "stok habis akhir bulan"' style="width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:14px;background:var(--card);color:inherit;resize:vertical;"></textarea>
+      </div>`;
     const terakhir = h
       ? `<div class="fuh-last"><span style="font-size:16px;">📝</span><div class="t">Terakhir: <b>${escHtml(h.label)}</b> oleh ${escHtml(h.oleh || "CS")}, ${fmtTgl(h.tanggal + "T12:00:00+07:00")}${h.jadwal ? ` · dihubungi lagi <b>${fmtTgl(h.jadwal + "T12:00:00+07:00")}</b>` : ""}</div><button type="button" class="fuh-undo" data-fuhasil="hapus" title="Batalkan catatan ini">↩️ Hapus catatan</button></div>`
       : "";
-    return `<div class="fu-bagian">${hdr}<div class="fuh-body">${stats}${terakhir}
+    return `<div class="fu-bagian">${hdr}<div class="fuh-body">${stats}${terakhir}${aiInfo}
       <div class="fuh-tanya">${h ? "Catat hasil terbaru:" : "Sudah menghubungi customer ini? Pilih hasilnya:"}</div>
+      ${kotakCatatan}
       <div class="fuh-opsi">${kartu}</div>
       <div id="fu-hasil-status" class="fuh-status"></div>
     </div></div>`;
@@ -19419,7 +19463,10 @@ if ("serviceWorker" in navigator) {
     const semuaBtn = document.querySelectorAll("#followup-detail-body [data-fuhasil]");
     semuaBtn.forEach(b=> b.disabled = true);
     try{
-      const res = await fetch(MASTER_DATA_WORKER_URL + "/followup-hasil", { method: "POST", headers: { ...workerHeaders(), "Content-Type": "application/json" }, body: JSON.stringify({ customer: nama, hasil }) });
+      const catEl = document.getElementById("fu-catatan-input");
+      const catatan = catEl ? catEl.value.trim() : "";
+      let olehId = ""; try{ olehId = getTelegramSenderId(); }catch(_e){}
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/followup-hasil", { method: "POST", headers: { ...workerHeaders(), "Content-Type": "application/json" }, body: JSON.stringify({ customer: nama, hasil, catatan, olehId }) }); // v438 -- + catatan & ID Telegram pencatat
       const body = await res.json().catch(()=> ({}));
       if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
       await fetchAndRenderFollowUp({ silent: false });
