@@ -19433,34 +19433,72 @@ if ("serviceWorker" in navigator) {
     // v438 -- catatan terakhir + hasil baca AI
     const aiInfo = (h && h.catatan) ? (()=>{
       const a = h.ai || {};
-      const st = a.status === "selesai" ? (a.tanggal ? `🤖 dijadwal ${fmtTgl(a.tanggal + "T12:00:00+07:00")}${a.alasan ? " — " + escHtml(a.alasan) : ""} (${String(a.sumber || "").startsWith("lokal") ? "AI lokal" : "AI online"})` : `🤖 ${escHtml(a.alasan || "tidak ada waktu di catatan")}, pakai jadwal bawaan`)
-        : a.status === "gagal" ? "🤖 AI gagal membaca, pakai jadwal bawaan"
-        : (a.status === "antre" || a.status === "diambil") ? "🤖 sedang dibaca AI…" : "";
+      const st = a.status === "selesai" ? (a.tanggal ? `📅 Jadwal ikut catatan: ${fmtTgl(a.tanggal + "T12:00:00+07:00")}` : "Catatan tidak menyebut tanggal/hari, jadi jadwal ikut tombol")
+        : a.status === "gagal" ? "Catatan belum berhasil dibaca, jadi jadwal ikut tombol"
+        : (a.status === "antre" || a.status === "diambil") ? "⏳ Catatan sedang dibaca, jadwal diperbarui sebentar lagi…" : "";
       return `<div class="fuh-last" style="margin-top:6px;"><span style="font-size:16px;">🗒️</span><div class="t">Catatan: “${escHtml(h.catatan)}”${st ? `<br><span style="font-size:12px;color:var(--ink-soft);">${st}</span>` : ""}</div></div>`;
     })() : "";
-    const kotakCatatan = `<div style="margin:8px 0 4px;">
-        <label for="fu-catatan-input" style="font-size:12.5px;color:var(--ink-soft);display:block;margin-bottom:4px;">Catatan (opsional) — tanggal follow up berikutnya diatur otomatis dari catatan ini</label>
-        <textarea id="fu-catatan-input" rows="2" maxlength="300" placeholder='mis. "tunggu gajian tgl 25" / "stok habis akhir bulan"' style="width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:14px;background:var(--card);color:inherit;resize:vertical;"></textarea>
-      </div>`;
+    // v440 -- kotak catatan muncul SETELAH tombol hasil ditekan (lihat fuBukaKotakCatatan)
+    const kotakCatatan = `<div id="fu-catatan-panel" hidden></div>`;
     const terakhir = h
       ? `<div class="fuh-last"><span style="font-size:16px;">📝</span><div class="t">Terakhir: <b>${escHtml(h.label)}</b> oleh ${escHtml(h.oleh || "CS")}, ${fmtTgl(h.tanggal + "T12:00:00+07:00")}${h.jadwal ? ` · dihubungi lagi <b>${fmtTgl(h.jadwal + "T12:00:00+07:00")}</b>` : ""}</div><button type="button" class="fuh-undo" data-fuhasil="hapus" title="Batalkan catatan ini">↩️ Hapus catatan</button></div>`
       : "";
     return `<div class="fu-bagian">${hdr}<div class="fuh-body">${stats}${terakhir}${aiInfo}
-      <div class="fuh-tanya">${h ? "Catat hasil terbaru:" : "Sudah menghubungi customer ini? Pilih hasilnya:"}</div>
-      ${kotakCatatan}
+      <div class="fuh-tanya">${h ? "Sudah dihubungi lagi? Pilih hasil terbarunya:" : "Sudah menghubungi customer ini? Pilih hasilnya:"}</div>
       <div class="fuh-opsi">${kartu}</div>
+      ${kotakCatatan}
       <div id="fu-hasil-status" class="fuh-status"></div>
     </div></div>`;
   }
+  // v440 -- langkah 2 setelah pilih hasil: catatan opsional, lalu Simpan
+  const FU_CONTOH_CATATAN = ["tunggu gajian tgl 25", "hubungi lagi hari Jumat", "stok habis akhir bulan", "minggu depan"];
+  function fuBukaKotakCatatan(hasil){
+    const panel = document.getElementById("fu-catatan-panel");
+    if(!panel || !CUR_FU) return;
+    document.querySelectorAll("#followup-detail-body [data-fuhasil]").forEach(b=> b.classList.toggle("dipilih", b.getAttribute("data-fuhasil") === hasil));
+    const label = { m: "📅 Minggu depan", b: "⏳ Belum butuh", t: "🚫 Tidak aktif" }[hasil] || hasil;
+    let punyaId = false; try{ punyaId = !!getTelegramSenderId(); }catch(_e){}
+    const tidakAktif = hasil === "t";
+    panel.hidden = false;
+    panel.innerHTML = `<div style="margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card);">
+      <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${escHtml(label)} — ada catatan?</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;">${tidakAktif
+        ? "Boleh tulis alasannya (opsional), mis. \"toko tutup\" atau \"pindah supplier\"."
+        : "Boleh dikosongkan. Kalau catatan menyebut <b>tanggal atau hari</b>, jadwal follow up berikutnya ikut catatan itu. Kalau tidak, ikut tombol yang dipilih."}</div>
+      <textarea id="fu-catatan-input" rows="2" maxlength="300" placeholder="${tidakAktif ? "Alasan (opsional)" : "Contoh: tunggu gajian tgl 25"}" style="width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:15px;background:var(--card);color:inherit;resize:vertical;"></textarea>
+      ${tidakAktif ? "" : `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${FU_CONTOH_CATATAN.map(c=> `<button type="button" class="fu-contoh-catatan" data-isi="${escHtml(c)}" style="border:1px solid var(--line);background:transparent;border-radius:999px;padding:4px 10px;font-size:12.5px;cursor:pointer;color:inherit;">${escHtml(c)}</button>`).join("")}</div>`}
+      ${(!punyaId && !tidakAktif) ? `<div style="font-size:12px;margin-top:8px;padding:7px 9px;border-radius:8px;background:#fff8e1;color:#8a6100;">💡 Isi dulu <b>ID Telegram Saya</b> (di bagian paling bawah app) supaya kamu dapat kabar jadwalnya di Telegram.</div>` : ""}
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button type="button" id="fu-catatan-simpan" data-hasil="${hasil}" style="flex:1;height:42px;border:none;border-radius:9px;background:var(--primary-green);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">💾 Simpan</button>
+        <button type="button" id="fu-catatan-batal" style="height:42px;padding:0 16px;border:1px solid var(--line);border-radius:9px;background:transparent;color:inherit;font-size:14px;cursor:pointer;">Batal</button>
+      </div>
+    </div>`;
+    const ta = document.getElementById("fu-catatan-input");
+    if(ta){ ta.focus(); }
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
   document.getElementById("followup-detail-body").addEventListener("click", async (e)=>{
-    const btn = e.target.closest && e.target.closest("[data-fuhasil]");
+    const contoh = e.target.closest && e.target.closest(".fu-contoh-catatan");
+    if(contoh){ const ta = document.getElementById("fu-catatan-input"); if(ta){ ta.value = contoh.getAttribute("data-isi"); ta.focus(); } return; }
+    if(e.target.closest && e.target.closest("#fu-catatan-batal")){
+      const panel = document.getElementById("fu-catatan-panel"); if(panel){ panel.hidden = true; panel.innerHTML = ""; }
+      document.querySelectorAll("#followup-detail-body [data-fuhasil]").forEach(b=> b.classList.toggle("dipilih", !!(CUR_FU && CUR_FU.hasilFU && CUR_FU.hasilFU.kode === b.getAttribute("data-fuhasil"))));
+      return;
+    }
+    const pilih = e.target.closest && e.target.closest("[data-fuhasil]");
+    if(pilih && CUR_FU){
+      const h0 = pilih.getAttribute("data-fuhasil");
+      if(h0 === "t" && !confirm(`Tandai ${CUR_FU.customer} TIDAK AKTIF? Customer ini keluar dari jadwal Follow Up sampai order lagi.`)) return;
+      fuBukaKotakCatatan(h0);
+      return;
+    }
+    const btn = e.target.closest && e.target.closest("#fu-catatan-simpan");
     if(!btn || !CUR_FU) return;
-    const hasil = btn.getAttribute("data-fuhasil");
+    const hasil = btn.getAttribute("data-hasil");
     const nama = CUR_FU.customer;
-    if(hasil === "t" && !confirm(`Tandai ${nama} TIDAK AKTIF? Customer ini keluar dari jadwal Follow Up sampai order lagi.`)) return;
     const st = document.getElementById("fu-hasil-status");
     if(st){ st.textContent = "Menyimpan…"; st.style.color = "var(--primary-green)"; }
-    const semuaBtn = document.querySelectorAll("#followup-detail-body [data-fuhasil]");
+    const semuaBtn = document.querySelectorAll("#followup-detail-body [data-fuhasil], #fu-catatan-simpan, #fu-catatan-batal");
     semuaBtn.forEach(b=> b.disabled = true);
     try{
       const catEl = document.getElementById("fu-catatan-input");
@@ -19471,6 +19509,11 @@ if ("serviceWorker" in navigator) {
       if(!res.ok || !body.ok) throw new Error(body.error || ("HTTP " + res.status));
       await fetchAndRenderFollowUp({ silent: false });
       if(!detailOverlay.hidden) bukaDetailCustomer(nama);
+      const st2 = document.getElementById("fu-hasil-status");
+      if(st2){
+        st2.textContent = body.aiAntre ? "✅ Tersimpan! Catatannya lagi dibaca, jadwal berikutnya diperbarui dalam beberapa menit." : "✅ Tersimpan!";
+        st2.style.color = "var(--primary-green)";
+      }
     }catch(err){
       if(st){ st.textContent = "Gagal menyimpan: " + (err.message || err); st.style.color = "var(--danger-red)"; }
       semuaBtn.forEach(b=> b.disabled = false);
