@@ -4,8 +4,14 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v392";
+const CACHE_VERSION = "v393";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v393 -- (app v2.84.0) (1) Perbaikan bug tombol Kirim mati di popup
+   "Kirim ke Grup Telegram" saat Dropship: nama penerima yang dipilih dari
+   dropdown riwayat di-set lewat JS tanpa event "input", jadi
+   updateSendBtnState() tidak jalan & tombol tetap disabled. (2) Popup
+   Kirim ke Grup Telegram bisa di-scroll (judul & tombol tetap di tempat).
+   Murni frontend, tidak butuh Worker baru. */
 /* v377 -- (app v2.83.0) Perbaikan bug tombol RESET: "Kelebihan bayar"
    kelihatan tidak ikut ter-reset. Nilainya sebenarnya sudah jadi 0, tapi
    (1) tanda merah/hijau field Kelebihan bayar, Ongkir/Kg & Ongkir Manual

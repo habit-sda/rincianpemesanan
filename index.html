@@ -2147,6 +2147,23 @@
      observer di script utama, bukan per-popup manual, supaya berlaku
      konsisten ke SEMUA popup di app tanpa perlu ubah tiap tombol buka/tutup. */
   body.has-open-overlay{overflow:hidden;position:fixed;inset:0;width:100%;}
+  /* v2.84.0 -- popup "Kirim ke Grup Telegram" bisa di-scroll kalau isinya
+     memanjang (peringatan dobel/deposit, Dropship, Pesan u/ Inventory,
+     daftar Revisi, dll). Sebelumnya .calc-popup overflow:hidden TANPA
+     max-height + body terkunci (has-open-overlay) -> bagian bawah popup
+     terpotong & tidak bisa digeser. Sekarang judul & tombol Batal/Kirim
+     tetap di tempat, cuma ISI tengahnya yang di-scroll. Khusus #kt-overlay
+     saja, popup lain tidak disentuh. */
+  #kt-overlay .calc-popup{display:flex;flex-direction:column;max-height:calc(100vh - 124px);max-height:calc(100dvh - 124px);}
+  #kt-overlay .calc-head,#kt-overlay .confirm-actionrow{flex-shrink:0;}
+  #kt-overlay .confirm-actionrow{padding-top:12px;border-top:1px solid var(--line);}
+  #kt-overlay .confirm-body{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+  @media (max-width:480px){
+    #kt-overlay .calc-popup{max-height:calc(100vh - 90px);max-height:calc(100dvh - 90px);}
+  }
+  /* v2.84.0 -- tombol Kirim yang sedang nonaktif sekarang KELIHATAN nonaktif
+     (sebelumnya tampil hijau penuh walau disabled, jadi terkesan "rusak"). */
+  #kt-send:disabled{opacity:.45;cursor:not-allowed;}
   .md-pinbox{
     width:100%;max-width:320px;background:var(--card);border-radius:16px;padding:26px 22px;text-align:center;
     max-height:calc(var(--tg-vh) - 32px);overflow-y:auto;-webkit-overflow-scrolling:touch;
@@ -6225,7 +6242,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.83.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.84.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6482,7 +6499,14 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.83.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.84.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Perbaikan bug: tombol Kirim tidak berfungsi saat Dropship</b> — kalau nama penerima Dropship dipilih dari daftar riwayat (bukan diketik), tombol Kirim tetap mati walau nama sudah terisi. Sekarang langsung aktif begitu nama dipilih. Tombol Kirim yang sedang nonaktif juga sekarang tampil pudar supaya jelas kelihatan.</li>
+            <li><b>Popup "Kirim ke Grup Telegram" bisa di-scroll</b> — kalau isinya memanjang (peringatan, Dropship, Pesan u/ Inventory, dll), bagian tengah popup bisa digeser; judul dan tombol Batal/Kirim tetap kelihatan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.83.0</div>
           <ul>
             <li><b>Perbaikan bug: "Kelebihan bayar" seperti tidak ikut ter-reset</b> — setelah menekan RESET, kolom Kelebihan bayar sekarang benar-benar kosong dan tanda merahnya hilang (sebelumnya tanda merah / angka lama masih tampil walau nilainya sudah 0). Tanda pada Ongkir/Kg &amp; Ongkir Manual juga ikut bersih.</li>
           </ul>
@@ -9746,6 +9770,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         `<div class="kt-suggest-item" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line);">${escHtml(r)}</div>`
       ).join("");
       dropshipSuggestBox.hidden = false;
+      try{ dropshipSuggestBox.scrollIntoView({ block: "nearest" }); }catch(_){} // v2.84.0 -- popup sekarang bisa di-scroll
     }catch(e){ dropshipSuggestBox.hidden = true; } // gagal ambil -- diam saja, field tetap bisa diisi manual seperti biasa
   }
   if(dropshipSuggestBox){
@@ -9754,6 +9779,14 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       if(!item || !dropshipRecipientInput) return;
       dropshipRecipientInput.value = item.textContent;
       dropshipSuggestBox.hidden = true;
+      // PERBAIKAN v2.84.0 -- nilai di-set lewat JS TIDAK memicu event
+      // "input", jadi updateSendBtnState() (yang menghidupkan tombol Kirim
+      // saat Dropship dicentang + nama penerima terisi) tidak pernah jalan
+      // -> tombol Kirim tetap disabled walau nama penerima sudah terisi
+      // (kasus: customer yang sudah punya riwayat penerima, mis. SALMAN AL
+      // FARISI -> RUSMIATI, dipilih dari dropdown). Picu "input" manual
+      // supaya tombol Kirim & saran ekspedisi ikut diperbarui.
+      dropshipRecipientInput.dispatchEvent(new Event("input", { bubbles: true }));
     });
     document.addEventListener("click", (e)=>{
       if(dropshipSuggestBox.hidden) return;
@@ -10468,6 +10501,10 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   if(revisiCheck) revisiCheck.addEventListener("change", ()=> resetRevisiPicker());
   if(dropshipCheck) dropshipCheck.addEventListener("change", updateSendBtnState);
   if(dropshipRecipientInput) dropshipRecipientInput.addEventListener("input", updateSendBtnState);
+  // v2.84.0 -- jaring pengaman: autofill browser / pilih dari menu kadang
+  // cuma memicu "change"/"blur", bukan "input".
+  if(dropshipRecipientInput) dropshipRecipientInput.addEventListener("change", updateSendBtnState);
+  if(dropshipRecipientInput) dropshipRecipientInput.addEventListener("blur", ()=> setTimeout(updateSendBtnState, 150));
   // BARU -- Nama Penerima Dropship ikut memengaruhi hint ekspedisi (lihat
   // checkEkspedisiSuggestion) -- diketik/diganti sesudah checkbox Dropship
   // dicentang, jadi perlu dicek ulang tiap kali field ini berubah, bukan
