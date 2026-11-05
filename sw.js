@@ -4,8 +4,15 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v393";
+const CACHE_VERSION = "v396";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v396 -- Forecast Penjualan Qty: tambah Keyakinan (%) + Rentang konservatif-optimis (Prob. Aktif x konsistensi ritme order). Murni frontend.
+   */
+/* v395 -- Follow Up: kartu baru "Forecast Penjualan Qty" (Karton & Pack) bulan berjalan vs realisasi s/d hari ini + bulan depan. Murni frontend (butuh Worker v454 utk pemisahan Pack).
+   */
+/* v394 -- Menu Follow Up: (1) kartu/filter baru "Terlewat 2 Minggu Terakhir" (jadwal follow up lewat 1-14 hari)
+   (2) panel "Potensi Qty Penjualan" dalam Karton & Pack + kolom Rata² Karton/Pack di tabel, kartu mobile & popup detail.
+   BUTUH Worker v454 (kolom qty_karton/qty_pack); tanpa Worker baru, Pack tampil 0 & semua qty dihitung sbg Karton. */
 /* v393 -- (app v2.84.0) (1) Perbaikan bug tombol Kirim mati di popup
    "Kirim ke Grup Telegram" saat Dropship: nama penerima yang dipilih dari
    dropdown riwayat di-set lewat JS tanpa event "input", jadi

@@ -1143,7 +1143,34 @@
     body.showing-followup .panel,
     body.showing-followup details.region{display:none !important;}
     body.showing-followup #followup-fullpage{display:block;}
-    .followup-stats-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:14px;}
+    .followup-stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:14px;}
+    /* v454 -- panel "Potensi Qty Penjualan" (Karton & Pack) di halaman Follow Up */
+    /* v455 -- kartu Forecast Penjualan (bulan berjalan & bulan depan vs realisasi) */
+    .followup-forecast{margin-bottom:14px; border:2px solid var(--line); border-radius:10px; padding:12px; background:var(--paper,#f7f8f6);}
+    .followup-forecast:empty{display:none;}
+    .ff-title{font-weight:800; font-size:14px; margin-bottom:8px;}
+    .ff-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px;}
+    .ff-card{background:var(--card,#fff); border:1px solid var(--line); border-radius:8px; padding:12px;}
+    .ff-card h4{margin:0 0 8px; font-size:13px;}
+    .ff-unit{margin-bottom:10px;}
+    .ff-unit:last-child{margin-bottom:0;}
+    .ff-unit .ff-lbl{display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:3px;}
+    .ff-bar{height:10px; background:#e6e9e4; border-radius:6px; overflow:hidden;}
+    .ff-bar > span{display:block; height:100%; background:var(--primary-green);}
+    .ff-rows{display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px 12px; font-size:11.5px; color:var(--ink-soft); margin-top:4px;}
+    .ff-rows b{color:var(--ink,#222);}
+    .followup-potensi{margin-bottom:14px; border:2px solid var(--line); border-radius:10px; padding:12px; background:var(--paper,#f7f8f6);}
+    .followup-potensi:empty{display:none;}
+    .followup-potensi-title{font-weight:800; font-size:14px; margin-bottom:8px;}
+    .followup-potensi-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:8px;}
+    .fp-box{background:var(--card,#fff); border:1px solid var(--line); border-radius:8px; padding:10px; user-select:none;}
+    .fp-box.clickable{cursor:pointer;}
+    .fp-box.clickable:hover{border-color:var(--primary-green);}
+    .fp-box .fp-judul{font-size:12px; font-weight:700;}
+    .fp-box .fp-sub{font-size:11px; color:var(--ink-soft); margin-bottom:6px;}
+    .fp-box .fp-baris{display:flex; justify-content:space-between; font-size:13px;}
+    .fp-box .fp-baris b{color:var(--primary-green); font-size:15px;}
+    .followup-potensi-note{font-size:11px; color:var(--ink-soft); margin-top:8px;}
     @media(max-width:700px){.followup-stats-grid{grid-template-columns:1fr 1fr 1fr;}}
     .followup-stat-box{background:var(--paper, #f7f8f6); border:2px solid var(--line); border-radius:10px; padding:12px 10px; text-align:center;}
     .followup-stat-box .num{font-size:22px; font-weight:800; color:var(--primary-green);}
@@ -4923,6 +4950,8 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="followup-status" style="color:var(--primary-green); flex:1 1 200px; min-width:160px;"></div>
     </div>
     <div class="followup-stats-grid" id="followup-stats-grid"></div>
+    <div class="followup-forecast" id="followup-forecast"></div>
+    <div class="followup-potensi" id="followup-potensi"></div>
     <div class="followup-quickfilter-chip" id="followup-quickfilter-chip">
       <span id="followup-quickfilter-chip-text"></span>
       <button type="button" id="followup-quickfilter-clear">✕ Hapus filter</button>
@@ -18809,6 +18838,8 @@ if ("serviceWorker" in navigator) {
   const csFilterEl = document.getElementById("followup-filter-cs");
   const statusFilterEl = document.getElementById("followup-filter-status");
   const statsGridEl = document.getElementById("followup-stats-grid");
+  const potensiEl = document.getElementById("followup-potensi"); // v454
+  const forecastEl = document.getElementById("followup-forecast"); // v455
   const cardsEl = document.getElementById("followup-cards"); // BARU -- kontainer kartu versi mobile
   const BOT_USERNAME = "Rp_habit_bot"; // SAMA dgn di script Rekap Pesanan -- dipakai tombol "Hubungi" di kartu mobile
   const quickFilterChipEl = document.getElementById("followup-quickfilter-chip");
@@ -18849,6 +18880,7 @@ if ("serviceWorker" in navigator) {
   let quickFilter = null;
   const QUICK_FILTER_LABEL = {
     jatuh: "🔴 Jatuh Tempo",
+    terlewat: "⏰ Terlewat 2 Minggu Terakhir", // v454
     hariIni: "🟠 Follow Up Hari Ini",
     minggu: "🟡 Follow Up Minggu Ini",
     belumCukup: "⚪ Belum Cukup Data",
@@ -18857,6 +18889,7 @@ if ("serviceWorker" in navigator) {
   function cocokQuickFilter(r){
     if(!quickFilter) return true;
     if(quickFilter === "jatuh") return r.sisa!==null && r.sisa<0;
+    if(quickFilter === "terlewat") return r.sisa!==null && r.sisa<0 && r.sisa>=-14; // v454 -- jadwal follow up lewat 1-14 hari yang lalu
     if(quickFilter === "hariIni") return r.sisa!==null && r.sisa===0;
     if(quickFilter === "minggu") return r.sisa!==null && r.sisa>=0 && r.sisa<=7;
     if(quickFilter === "belumCukup") return r.sisa===null;
@@ -18879,6 +18912,10 @@ if ("serviceWorker" in navigator) {
     const box = e.target.closest(".followup-stat-box.clickable");
     if(!box) return;
     setQuickFilter(box.dataset.filter === "total" ? null : box.dataset.filter);
+  });
+  potensiEl.addEventListener("click", (e)=>{ // v454 -- klik kotak potensi = filter tabel yang sama
+    const box = e.target.closest(".fp-box.clickable");
+    if(box) setQuickFilter(box.dataset.filter);
   });
   document.getElementById("followup-quickfilter-clear").addEventListener("click", ()=>{
     quickFilter = null;
@@ -19037,6 +19074,13 @@ if ("serviceWorker" in navigator) {
   // dihitung PERSIS seperti fungsi process() di RepeatOrder_Calculator.html
   // (Bagian B & C), tapi berbasis data dari server (medGap, avgQty, last)
   // dan tanggal HARI INI di perangkat customer (bukan tanggal acuan Excel).
+  // v454 -- rata-rata qty per order dipisah Karton & Pack. Kalau Worker lama (belum kirim avgKarton/avgPack)
+  // semua dianggap Karton supaya tampilan tidak kosong/rusak.
+  function fuQtyPerOrder(r){
+    const adaBk = typeof r.avgKarton === "number" || typeof r.avgPack === "number";
+    return adaBk ? { kt: r.avgKarton || 0, pk: r.avgPack || 0 } : { kt: r.avgQty || 0, pk: 0 };
+  }
+  function fuFmtKP(v){ return fmtNumID(Math.round((Number(v) || 0) * 10) / 10); }
   function fuHitungPrediksi(r, TODAY){
     const bStart = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
     const bEnd = new Date(TODAY.getFullYear(), TODAY.getMonth()+1, 0);
@@ -19072,7 +19116,9 @@ if ("serviceWorker" in navigator) {
       }
     }
     const estBln = Math.round(nBln * avgQty);
-    return { p8, nBln, estBln, bulanLabel: TODAY.toLocaleDateString("id-ID", { month:"long", year:"numeric" }) };
+    const perOrder = fuQtyPerOrder(r); // v454
+    const estKarton = Math.round(nBln * perOrder.kt * 10) / 10, estPack = Math.round(nBln * perOrder.pk * 10) / 10;
+    return { p8, nBln, estBln, estKarton, estPack, bulanLabel: TODAY.toLocaleDateString("id-ID", { month:"long", year:"numeric" }) };
   }
 
   function isiUlangDropdownFilter(){
@@ -19183,6 +19229,7 @@ if ("serviceWorker" in navigator) {
     // memang dimaksudkan sbg sorotan yg beririsan, bukan kategori eksklusif.
     const hariIni = rowsDasar.filter(r=> r.sisa!==null && r.sisa===0).length;
     const minggu = rowsDasar.filter(r=> r.sisa!==null && r.sisa>=0 && r.sisa<=7).length;
+    const terlewat = rowsDasar.filter(r=> r.sisa!==null && r.sisa<0 && r.sisa>=-14).length; // v454
     const belumCukup = rowsDasar.filter(r=> r.sisa===null).length;
     // BARU -- kotak ke-6 "Est. Qty Stok Bulan Ini", pola SAMA dgn
     // stats-grid di RepeatOrder_Calculator.html (total estBln semua
@@ -19199,12 +19246,124 @@ if ("serviceWorker" in navigator) {
     statsGridEl.innerHTML =
       box("total", total, "Total Customer") +
       box("jatuh", jatuh, "🔴 Jatuh Tempo", "var(--danger-red)") +
+      box("terlewat", terlewat, "⏰ Terlewat 2 Minggu", "#b71c1c") + // v454
       box("hariIni", hariIni, "🟠 Follow Up Hari Ini", "#c46b00") +
       box("minggu", minggu, "🟡 Follow Up Minggu Ini", "#7b6000") +
       box("belumCukup", belumCukup, "⚪ Belum Cukup Data", "#555") +
       box("baru", rowsDasar.filter(r=> r.customerBaru).length, "🆕 Customer Baru (1x order)", "#1976d2") + // v438
       `<div class="followup-stat-box"><div class="num">${fmtNumID(totQty)}</div><div class="lbl">📦 Est. Qty Stok Bulan Ini</div></div>`;
+    renderForecast(rowsDasar); // v455
+    renderPotensi(rowsDasar, TODAY); // v454
     updateQuickFilterChip();
+  }
+
+  // v455 -- FORECAST PENJUALAN Karton & Pack: bulan berjalan (realisasi s/d hari ini + sisa prediksi) &
+  // bulan depan, dari ritme order tiap customer. Semua perhitungan memakai tanggal WIB.
+  function fuYMD(d){ const x = new Date(new Date(d).getTime() + 7*3600e3); return x.getUTCFullYear()*10000 + (x.getUTCMonth()+1)*100 + x.getUTCDate(); }
+  function fuBulanIdx(ymd){ return Math.floor(ymd/10000)*12 + (Math.floor(ymd/100)%100 - 1); }
+  function fuBulanBatas(idx){ const y = Math.floor(idx/12), m = idx%12; return { start: y*10000+(m+1)*100+1, end: y*10000+(m+1)*100+new Date(Date.UTC(y, m+1, 0)).getUTCDate() }; }
+  function fuBulanNama(idx){ return new Date(Date.UTC(Math.floor(idx/12), idx%12, 15)).toLocaleDateString("id-ID", { month:"long", year:"numeric", timeZone:"UTC" }); }
+  function hitungForecast(rows){
+    const todayY = fuYMD(Date.now()), curIdx = fuBulanIdx(todayY), nextIdx = curIdx + 1, prevIdx = curIdx - 1;
+    const z = ()=> ({ kt: 0, pk: 0 });
+    const real = z(), sisa = z(), depan = z(), lalu = z(), sisaC = z(), depanC = z(); // v456 -- sisaC/depanC = qty tertimbang keyakinan (skenario konservatif)
+    let nReal = 0, nSisa = 0, nDepan = 0;
+    rows.forEach(r=>{
+      const q = fuQtyPerOrder(r);
+      // realisasi = order LUNAS tercatat (r.riwayat); fallback seluruh qty = Karton utk Worker lama
+      (r.riwayat || []).forEach(h=>{
+        const idx = fuBulanIdx(fuYMD(h.tanggal));
+        const kt = (typeof h.kt === "number") ? h.kt : (h.qty || 0), pk = (typeof h.pk === "number") ? h.pk : 0;
+        if(idx === curIdx){ real.kt += kt; real.pk += pk; nReal++; }
+        else if(idx === prevIdx){ lalu.kt += kt; lalu.pk += pk; }
+      });
+      const step = Math.round((r.ritme !== null && r.ritme !== undefined) ? r.ritme : (r.medGap || 0));
+      if(!r.last || step < 1) return;
+      const w = (typeof r.pAlive === "number") ? Math.max(0, Math.min(1, r.pAlive/100)) : 1; // peluang masih aktif
+      // v456 -- keyakinan per customer = Prob. Aktif x konsistensi ritme order (tinggi .9 / sedang .7 / rendah .45 / belum diketahui .5)
+      const cert = w * ({ tinggi: 0.9, sedang: 0.7, rendah: 0.45 }[r.confidence] || 0.5);
+      let d = new Date(r.last);
+      if(r.sudahOrder){ // sudah order, menunggu lunas -> dihitung sbg order sisa bulan berjalan (bobot penuh)
+        const pend = r.belumLunasTerakhir ? new Date(r.belumLunasTerakhir + "T00:00:00+07:00") : d;
+        if(fuBulanIdx(fuYMD(pend)) === curIdx){ sisa.kt += q.kt; sisa.pk += q.pk; nSisa++; sisaC.kt += q.kt; sisaC.pk += q.pk; }
+        d = pend;
+      }
+      let tertunda = false;
+      for(let i = 0; i < 60; i++){
+        d = new Date(d.getTime() + step*86400000);
+        let y = fuYMD(d);
+        if(y < todayY){ // prediksi sudah lewat tapi belum order -> 1x "tertunda" (dibobot peluang aktif), lalu hitung ulang dari hari ini
+          if(!tertunda && !r.sudahOrder){ tertunda = true; sisa.kt += q.kt*w; sisa.pk += q.pk*w; nSisa += w; sisaC.kt += q.kt*cert; sisaC.pk += q.pk*cert; }
+          d = new Date(Date.now()); continue;
+        }
+        const idx = fuBulanIdx(y);
+        if(idx > nextIdx) break;
+        if(idx === curIdx){ sisa.kt += q.kt; sisa.pk += q.pk; nSisa++; sisaC.kt += q.kt*cert; sisaC.pk += q.pk*cert; }
+        else if(idx === nextIdx){ depan.kt += q.kt*w; depan.pk += q.pk*w; nDepan += w; depanC.kt += q.kt*cert; depanC.pk += q.pk*cert; }
+      }
+    });
+    return { curIdx, nextIdx, real, sisa, depan, lalu, sisaC, depanC, nReal, nSisa, nDepan, todayY };
+  }
+  function renderForecast(rowsDasar){
+    const f = hitungForecast(rowsDasar);
+    const tot = { kt: f.real.kt + f.sisa.kt, pk: f.real.pk + f.sisa.pk };
+    const persen = (a, b)=> b > 0 ? Math.min(100, Math.round(a / b * 100)) : 0;
+    const hariKe = f.todayY % 100, hariTotal = fuBulanBatas(f.curIdx).end % 100;
+    const unit = (ikon, nama, a, b, ekstra)=>
+      `<div class="ff-unit"><div class="ff-lbl"><span>${ikon} ${nama}</span><span>${persen(a, b)}%</span></div>` +
+      `<div class="ff-bar"><span style="width:${persen(a, b)}%"></span></div>` + ekstra + `</div>`;
+    // v456 -- keyakinan = qty tertimbang keyakinan / forecast (realisasi = pasti, jadi keyakinan naik seiring bulan berjalan)
+    const kyk = (rendah, tinggi)=>{
+      if(!(tinggi > 0)) return `<div class="ff-rows"><span>Keyakinan <b>-</b></span></div>`;
+      const p = Math.max(0, Math.min(100, Math.round(rendah / tinggi * 100)));
+      const lv = p >= 70 ? ["Tinggi", "var(--text-success, #2e7d32)"] : p >= 45 ? ["Sedang", "var(--text-warning, #a35a00)"] : ["Rendah", "var(--text-danger, #c00000)"];
+      return `<div class="ff-rows"><span>Rentang <b>${fuFmtKP(rendah)} – ${fuFmtKP(tinggi)}</b></span><span>Keyakinan <b style="color:${lv[1]};">${p}% (${lv[0]})</b></span></div>`;
+    };
+    const cur = (ikon, nama, k)=> unit(ikon, nama, f.real[k], tot[k],
+      `<div class="ff-rows"><span>Realisasi <b>${fuFmtKP(f.real[k])}</b></span><span>Sisa prediksi <b>${fuFmtKP(f.sisa[k])}</b></span><span>Forecast <b>${fuFmtKP(tot[k])}</b></span></div>` +
+      kyk(f.real[k] + f.sisaC[k], tot[k]));
+    const nxt = (ikon, nama, k)=> unit(ikon, nama, f.depan[k], tot[k] || f.depan[k],
+      `<div class="ff-rows"><span>Forecast <b>${fuFmtKP(f.depan[k])}</b></span><span>vs bulan berjalan <b>${tot[k] > 0 ? (f.depan[k] >= tot[k] ? "+" : "") + Math.round((f.depan[k]-tot[k])/tot[k]*100) + "%" : "-"}</b></span><span>Bulan lalu <b>${fuFmtKP(f.lalu[k])}</b></span></div>` + kyk(f.depanC[k], f.depan[k]));
+    forecastEl.innerHTML =
+      `<div class="ff-title">📈 Forecast Penjualan Qty — Karton &amp; Pack</div>` +
+      `<div class="ff-grid">` +
+        `<div class="ff-card"><h4>Bulan berjalan: ${escHtml(fuBulanNama(f.curIdx))} <span style="font-weight:400;color:var(--ink-soft);">(hari ke-${hariKe}/${hariTotal})</span></h4>` +
+          cur("📦", "Karton", "kt") + cur("🛍️", "Pack", "pk") + `</div>` +
+        `<div class="ff-card"><h4>Bulan depan: ${escHtml(fuBulanNama(f.nextIdx))}</h4>` +
+          nxt("📦", "Karton", "kt") + nxt("🛍️", "Pack", "pk") + `</div>` +
+      `</div>` +
+      `<div class="followup-potensi-note">Realisasi = order Lunas bulan ini s/d hari ini. Sisa prediksi = order yang diperkirakan masuk sampai akhir bulan (customer yang sudah lewat jadwal dihitung 1x, dibobot Prob. Aktif; yang sudah order & menunggu lunas dihitung penuh). Bulan depan dibobot Prob. Aktif. Qty per order = rata-rata historis customer. <b>Keyakinan</b> = Prob. Aktif × konsistensi ritme order tiap customer (tinggi/sedang/rendah); <b>Rentang</b> = skenario konservatif (tertimbang keyakinan) sampai optimis (= Forecast). Ikut filter pencarian/CS di atas.</div>`;
+  }
+
+  // v454 -- POTENSI QTY PENJUALAN (Karton & Pack). Per kelompok customer: potensi = rata-rata qty per order
+  // customer itu (dipisah Karton/Pack) x 1 order, kecuali "Bulan Ini" = rata-rata x perkiraan jumlah order bulan ini.
+  function renderPotensi(rowsDasar, TODAY){
+    const seg = (filterFn)=>{
+      let n = 0, kt = 0, pk = 0;
+      rowsDasar.forEach(r=>{ if(!filterFn(r)) return; const q = fuQtyPerOrder(r); n++; kt += q.kt; pk += q.pk; });
+      return { n, kt, pk };
+    };
+    const terlewat = seg(r=> r.sisa!==null && r.sisa<0 && r.sisa>=-14);
+    const hariIni = seg(r=> r.sisa!==null && r.sisa===0);
+    const minggu = seg(r=> r.sisa!==null && r.sisa>=0 && r.sisa<=7);
+    let nBlnCust = 0, blnKt = 0, blnPk = 0, bulanLabel = TODAY.toLocaleDateString("id-ID", { month:"long", year:"numeric" });
+    rowsDasar.forEach(r=>{ const p = fuHitungPrediksi(r, TODAY); if(p.nBln > 0){ nBlnCust++; blnKt += p.estKarton; blnPk += p.estPack; } });
+    const adaEstimasi = rowsDasar.some(r=> r.qtyBkEstimasi);
+    const kotak = (judul, sub, d, filterKey)=>
+      `<div class="fp-box${filterKey?" clickable":""}"${filterKey?` data-filter="${filterKey}"`:""}>` +
+        `<div class="fp-judul">${judul}</div><div class="fp-sub">${sub}</div>` +
+        `<div class="fp-baris"><span>📦 Karton</span><b>${fuFmtKP(d.kt)}</b></div>` +
+        `<div class="fp-baris"><span>🛍️ Pack</span><b>${fuFmtKP(d.pk)}</b></div></div>`;
+    potensiEl.innerHTML =
+      `<div class="followup-potensi-title">💰 Potensi Qty Penjualan (Karton &amp; Pack)</div>` +
+      `<div class="followup-potensi-grid">` +
+        kotak("⏰ Terlewat 2 Minggu", `${terlewat.n} customer belum di-follow up`, terlewat, "terlewat") +
+        kotak("🟠 Follow Up Hari Ini", `${hariIni.n} customer`, hariIni, "hariIni") +
+        kotak("🟡 Follow Up Minggu Ini", `${minggu.n} customer (0–7 hari)`, minggu, "minggu") +
+        kotak("🎯 Perkiraan " + escHtml(bulanLabel), `${nBlnCust} customer diperkirakan order`, { kt: blnKt, pk: blnPk }, null) +
+      `</div>` +
+      `<div class="followup-potensi-note">Potensi = rata-rata qty per order tiap customer × 1 order (kolom "Bulan" = × perkiraan jumlah order bulan ini). Ikut filter pencarian/CS di atas. Klik kotak untuk memfilter tabel.` +
+      (adaEstimasi ? ` Riwayat lama yang belum tercatat terpisah dihitung sebagai Karton — jalankan /backfill-customer-order-log di Worker agar Pack terbaca akurat.` : "") + `</div>`;
   }
 
   // BARU -- versi KARTU dari tabel Follow Up, khusus layar mobile (≤700px,
@@ -19246,6 +19405,7 @@ if ("serviceWorker" in navigator) {
           <div class="fc-nama">${escHtml(r.customer)}</div>
           ${fuAliasSubline(r.customer)}
           <div class="fc-sub">${escHtml(r.cs || "-")} &middot; ${sisaTeks}</div>
+          <div class="fc-sub">📦 ${fuFmtKP(fuQtyPerOrder(r).kt)} Karton &middot; 🛍️ ${fuFmtKP(fuQtyPerOrder(r).pk)} Pack /order</div>
           ${fuLabelJadwal(r)}
           ${churnWarn}
         </div>
@@ -19278,10 +19438,11 @@ if ("serviceWorker" in navigator) {
       // bukan cuma "kapan prediksi order berikutnya".
       th("Prob. Aktif", "85px") +
       th("Qty Rata²", "70px") +
+      th("Rata² Karton", "80px") + th("Rata² Pack", "80px") + // v454
       "</tr></thead><tbody>";
 
     if(!rows.length){
-      html += `<tr><td colspan="10" style="border:1px solid var(--line); padding:16px; text-align:center; color:var(--ink-soft);">Belum ada customer dengan riwayat pesanan Lunas yang cocok dengan filter.</td></tr>`;
+      html += `<tr><td colspan="12" style="border:1px solid var(--line); padding:16px; text-align:center; color:var(--ink-soft);">Belum ada customer dengan riwayat pesanan Lunas yang cocok dengan filter.</td></tr>`;
     }
 
     rows.forEach(r=>{
@@ -19310,6 +19471,7 @@ if ("serviceWorker" in navigator) {
         td(`<span class="fu-badge ${r.cls}">${escHtml(r.status)}</span>`) +
         td(pAliveHtml, "text-align:center;") +
         td(r.avgQty, "text-align:center;") +
+        td(fuFmtKP(fuQtyPerOrder(r).kt), "text-align:center;") + td(fuFmtKP(fuQtyPerOrder(r).pk), "text-align:center;") + // v454
         "</tr>";
     });
     html += "</tbody>";
@@ -19333,7 +19495,7 @@ if ("serviceWorker" in navigator) {
     if(!r) return;
     CUR_FU = r;
     const TODAY = new Date();
-    const { p8, nBln, estBln, bulanLabel } = fuHitungPrediksi(r, TODAY);
+    const { p8, nBln, estBln, estKarton, estPack, bulanLabel } = fuHitungPrediksi(r, TODAY);
 
     document.getElementById("followup-detail-nama").textContent = r.customer;
     document.getElementById("followup-detail-cs").innerHTML = `CS paling sering: ${escHtml(r.cs || "-")}${fuAliasSubline(r.customer)}`;
@@ -19358,6 +19520,7 @@ if ("serviceWorker" in navigator) {
       ["Jadwal Follow Up 📞", r.pred ? `${fmtTgl(r.pred)}${(r.predOrder && r.pred !== r.predOrder) ? ` (${fuDDiff(r.pred, r.predOrder)} hari sebelum perkiraan order ${fmtTgl(r.predOrder)})` : ""}` : "-", true],
       ["Metode Follow Up", r.customerBaru ? `Customer baru (1x order, qty ${r.riwayat && r.riwayat[0] ? r.riwayat[0].qty : "-"}): hari ke-${r.jarakBaru || "-"} setelah order pertama (qty ≥21: 21 hari, 4–20: 30 hari, 1–3: 45 hari), diulang tiap 30 hari maks 3x` : (r.metodeFU === "adaptif" ? "Per customer: ritme terbaru − ¾ × sebaran jarak order customer ini (makin tidak menentu, makin awal dihubungi), paling cepat 60% ritme setelah order terakhir. Belum ada catatan hasil → diulang tiap 10 hari, maks 3x" : (r.metodeFU === "median" ? "Baru 2 order: pakai jarak order itu. Belum ada catatan hasil → diulang tiap 10 hari, maks 3x" : "-")), false],
       ["Rata-Rata Qty/Order", `${r.avgQty}`, false],
+      ["Rata-Rata Karton / Pack per Order", `${fuFmtKP(fuQtyPerOrder(r).kt)} Karton · ${fuFmtKP(fuQtyPerOrder(r).pk)} Pack${r.qtyBkEstimasi ? " (sebagian riwayat lama dihitung sbg Karton)" : ""}`, false], // v454
       // BARU -- keyakinan prediksi, dari variasi (CV) histori gap customer
       // ini sendiri. Nilai CV mentahnya diikutkan di kurung buat yang mau
       // lihat angka pastinya, bukan cuma label.
@@ -19398,6 +19561,7 @@ if ("serviceWorker" in navigator) {
       <div class="fu-stok-grid">
         <div class="fu-stok-item"><div class="s-label">Jumlah order prediksi ${bulanLabel}</div><div class="s-val">${nBln}</div><div class="s-unit">kali order lagi</div></div>
         <div class="fu-stok-item" style="background:#fffde7;"><div class="s-label">Estimasi total qty bulan ini</div><div class="s-val" style="font-size:24px;">${fmtNumID(estBln)}</div><div class="s-unit">pcs / unit</div></div>
+        <div class="fu-stok-item"><div class="s-label">Estimasi bulan ini</div><div class="s-val" style="font-size:20px;">${fuFmtKP(estKarton)} Karton</div><div class="s-unit">${fuFmtKP(estPack)} Pack</div></div>
         <div class="fu-stok-item"><div class="s-label">Rata-rata qty per order</div><div class="s-val">${r.avgQty}</div><div class="s-unit">pcs per order</div></div>
       </div>`;
 
