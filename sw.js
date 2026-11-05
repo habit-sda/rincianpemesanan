@@ -4,8 +4,15 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v399";
+const CACHE_VERSION = "v402";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v402 -- (app v2.86.0) Menu Follow Up dibagi 2 tab: "Follow Up" & "Forecast" (kartu Forecast Penjualan Qty pindah ke tab sendiri). Murni frontend.
+   */
+/* v401 -- (app v2.85.0) Forecast Penjualan Qty (Karton & Pack): angka utama = NILAI HARAPAN (bukan pesimis), rumus dipilih otomatis lewat
+   uji mundur (backtest) tiap data baru + kalibrasi otomatis, rentang = error historis nyata, komponen customer baru, panel "Uji akurasi".
+   BUTUH Worker v457 (avgKarton/avgPack 3 desimal + parameter BG/NBD per baris); tanpa Worker baru tetap jalan, uji mundur memakai Prob. Aktif = 100%. */
+/* v400 -- Kartu Forecast: bagian "Metode" (ringkasan 1 baris + penjelasan langkah per langkah, bisa dilipat). Murni frontend.
+   */
 /* v399 -- Follow Up: kartu Forecast & Potensi bisa dibuka/tutup (ketuk judul); default tertutup di HP dgn ringkasan 1-2 baris. Murni frontend.
    */
 /* v398 -- Forecast Penjualan Qty: angka utama = skenario PESIMIS (tertimbang keyakinan); optimis jadi batas atas rentang.

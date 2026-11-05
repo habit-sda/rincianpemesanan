@@ -1143,6 +1143,14 @@
     body.showing-followup .panel,
     body.showing-followup details.region{display:none !important;}
     body.showing-followup #followup-fullpage{display:block;}
+    /* v402 -- Follow Up dibagi 2 tab: "Follow Up" (kartu ringkasan, potensi, tabel/kartu customer) & "Forecast" (kartu Forecast Penjualan Qty).
+       Murni tampilan: elemen & id lama tidak diubah, cuma disembunyikan lewat atribut data-fu-tab di #followup-fullpage. */
+    .fu-tabs{display:flex; gap:6px; margin:6px 0 12px; border-bottom:2px solid var(--line);}
+    .fu-tab{flex:1 1 0; max-width:260px; min-height:44px; padding:0 14px; margin-bottom:-2px; background:none; border:0; border-bottom:3px solid transparent; font:inherit; font-size:15px; font-weight:700; color:var(--ink-soft); cursor:pointer; -webkit-tap-highlight-color:transparent;}
+    .fu-tab:hover{color:var(--primary-green);}
+    .fu-tab.active{color:var(--primary-green); border-bottom-color:var(--primary-green);}
+    #followup-fullpage[data-fu-tab="forecast"] .fu-pane-followup{display:none !important;}
+    #followup-fullpage[data-fu-tab="followup"] .fu-pane-forecast{display:none !important;}
     .followup-stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:14px;}
     /* v454 -- panel "Potensi Qty Penjualan" (Karton & Pack) di halaman Follow Up */
     /* v455 -- kartu Forecast Penjualan (bulan berjalan & bulan depan vs realisasi) */
@@ -1166,6 +1174,12 @@
     .fp-summary{display:none; font-size:13px; color:var(--ink-soft); padding:0 0 6px; line-height:1.5;}
     .fp-summary b{color:var(--primary-green);}
     .fp-body{margin-top:4px;}
+    .ff-metode-ringkas{font-size:12.5px; margin:10px 0 6px; padding:8px 10px; background:#eaf7ee; border-left:3px solid var(--primary-green); border-radius:6px; line-height:1.5;}
+    .ff-metode{font-size:12px; color:var(--ink-soft); border:1px solid var(--line); border-radius:8px; padding:6px 10px; background:var(--card,#fff);}
+    .ff-metode summary{cursor:pointer; font-weight:700; color:var(--ink,#222); min-height:32px; display:flex; align-items:center;}
+    .ff-metode ol{margin:6px 0 8px; padding-left:18px; line-height:1.55;}
+    .ff-metode li{margin-bottom:4px;}
+    .ff-metode-batas{font-size:11px; padding-top:6px; border-top:1px dashed var(--line);}
     .fp-tutup .fp-body{display:none;}
     .fp-tutup .fp-summary{display:block;}
     .fp-tutup .fp-chev{transform:rotate(-90deg);}
@@ -4943,36 +4957,41 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
   <!-- BARU -- "Follow Up" (F.O/Repeat Order): pola repeat-order per
        customer dari pesanan yang PERNAH 100% Lunas (permanen di D1,
        tidak ikut kadaluarsa 25 hari seperti Rekap Pesanan). -->
-  <div id="followup-fullpage" hidden style="font-size:16px;">
+  <div id="followup-fullpage" hidden style="font-size:16px;" data-fu-tab="followup">
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
       <button type="button" id="followup-back-btn" class="tab-btn" style="flex:0 0 auto;">← Kembali</button>
       <div style="flex:1; color:var(--ink-soft);">Dihitung dari pesanan yang PERNAH 100% Lunas. Pesanan yang belum Lunas tetap dicatat tapi tidak ikut dihitung ke pola.</div>
+    </div>
+    <!-- v402 -- tab Follow Up / Forecast -->
+    <div class="fu-tabs" id="followup-tabs" role="tablist">
+      <button type="button" class="fu-tab active" data-fu-tab="followup" role="tab" aria-selected="true">📞 Follow Up</button>
+      <button type="button" class="fu-tab" data-fu-tab="forecast" role="tab" aria-selected="false">📈 Forecast</button>
     </div>
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:10px 0 14px;">
       <input type="text" id="followup-search" placeholder="Cari nama customer…" style="flex:1; min-width:220px; height:44px; border:1px solid var(--line); border-radius:9px; padding:0 14px; font-size:16px;">
       <select id="followup-filter-cs" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
         <option value="">Semua CS</option>
       </select>
-      <select id="followup-filter-status" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
+      <select id="followup-filter-status" class="fu-pane-followup" style="height:44px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:15px;">
         <option value="">Semua Status</option>
       </select>
-      <button class="md-btn" id="followup-contact-btn" style="white-space:nowrap; height:44px;">📞 Perlu Dihubungi</button>
+      <button class="md-btn fu-pane-followup" id="followup-contact-btn" style="white-space:nowrap; height:44px;">📞 Perlu Dihubungi</button>
       <button class="md-btn" id="followup-refresh-btn" style="white-space:nowrap; height:44px;">🔄 Muat ulang</button>
       <div id="followup-status" style="color:var(--primary-green); flex:1 1 200px; min-width:160px;"></div>
     </div>
-    <div class="followup-stats-grid" id="followup-stats-grid"></div>
-    <div class="followup-forecast" id="followup-forecast"></div>
-    <div class="followup-potensi" id="followup-potensi"></div>
-    <div class="followup-quickfilter-chip" id="followup-quickfilter-chip">
+    <div class="followup-stats-grid fu-pane-followup" id="followup-stats-grid"></div>
+    <div class="followup-forecast fu-pane-forecast" id="followup-forecast"></div>
+    <div class="followup-potensi fu-pane-followup" id="followup-potensi"></div>
+    <div class="followup-quickfilter-chip fu-pane-followup" id="followup-quickfilter-chip">
       <span id="followup-quickfilter-chip-text"></span>
       <button type="button" id="followup-quickfilter-clear">✕ Hapus filter</button>
     </div>
-    <div style="overflow-x:auto; border:1px solid var(--line); border-radius:10px;" id="followup-table-wrap">
+    <div class="fu-pane-followup" style="overflow-x:auto; border:1px solid var(--line); border-radius:10px;" id="followup-table-wrap">
       <table id="followup-table" style="border-collapse:collapse; width:100%; white-space:nowrap;"></table>
     </div>
     <!-- BARU -- versi kartu utk layar mobile (≤700px), tabel di atas disembunyikan
          lewat CSS & kartu ini yang ditampilkan gantinya (lihat .followup-mobile-cards). -->
-    <div id="followup-cards" class="followup-mobile-cards"></div>
+    <div id="followup-cards" class="followup-mobile-cards fu-pane-followup"></div>
   </div>
 
   <!-- Detail 1 customer (klik baris di tabel Follow Up) -->
@@ -6282,7 +6301,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.84.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.86.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6539,7 +6558,23 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.84.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.86.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Menu Follow Up dibagi jadi 2 tab</b> — tab <b>Follow Up</b> (kartu ringkasan, potensi qty, daftar customer) dan tab <b>Forecast</b> (Forecast Penjualan Qty Karton &amp; Pack). Kotak pencarian dan filter CS tetap berlaku untuk kedua tab; pilihan tab terakhir diingat.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.85.0</div>
+          <ul>
+            <li><b>Forecast Penjualan Qty (Karton &amp; Pack) jauh lebih akurat</b> — angka utama sekarang <b>nilai harapan</b> (yang paling mungkin terjadi), bukan lagi skenario pesimis. Skenario pesimis tetap ditampilkan sebagai pembanding konservatif.</li>
+            <li><b>Uji mundur otomatis</b> — forecast "diputar ulang" untuk bulan-bulan lalu (hanya memakai data sebelum tanggal uji), dibandingkan dengan realisasi, lalu rumus dengan error terkecil dipilih sebagai angka utama. Karton dan Pack dipilih terpisah. Hasil lengkapnya ada di panel "Uji akurasi forecast".</li>
+            <li><b>Kalibrasi otomatis</b> — bila selama ini forecast cenderung kebesaran/kekecilan, angkanya digeser mengikuti selisih bulan-bulan sebelumnya. Makin banyak data masuk, pilihan rumus dan kalibrasi ikut menyesuaikan sendiri.</li>
+            <li><b>Rentang berdasarkan error nyata</b> — rentang kini = angka utama ± error historis hasil uji mundur (menggantikan "Keyakinan" lama). Customer baru (1x order) ikut dihitung lewat komponen tersendiri.</li>
+            <li><b>Perbaikan Pack bernilai 0</b> — rata-rata Karton/Pack per order dari server kini dikirim 3 desimal (sebelumnya dibulatkan 1 desimal sehingga Pack yang jarang order terbaca 0). Butuh Worker v457.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.84.0</div>
           <ul>
             <li><b>Perbaikan bug: tombol Kirim tidak berfungsi saat Dropship</b> — kalau nama penerima Dropship dipilih dari daftar riwayat (bukan diketik), tombol Kirim tetap mati walau nama sudah terisi. Sekarang langsung aktif begitu nama dipilih. Tombol Kirim yang sedang nonaktif juga sekarang tampil pudar supaya jelas kelihatan.</li>
             <li><b>Popup "Kirim ke Grup Telegram" bisa di-scroll</b> — kalau isinya memanjang (peringatan, Dropship, Pesan u/ Inventory, dll), bagian tengah popup bisa digeser; judul dan tombol Batal/Kirim tetap kelihatan.</li>
@@ -19295,10 +19330,235 @@ if ("serviceWorker" in navigator) {
     return true;
   }
   forecastEl.addEventListener("click", (e)=> fuKlikToggle(e, forecastEl));
+  // v402 -- tab Follow Up / Forecast (ingat pilihan terakhir; cuma ganti tampilan, tidak memanggil server)
+  (function(){
+    const page = document.getElementById("followup-fullpage");
+    const bar = document.getElementById("followup-tabs");
+    if(!page || !bar) return;
+    function pilihTab(key){
+      if(key !== "forecast") key = "followup";
+      page.dataset.fuTab = key;
+      bar.querySelectorAll(".fu-tab").forEach(b=>{
+        const on = b.dataset.fuTab === key;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", String(on));
+      });
+      try{ localStorage.setItem("fu_tab", key); }catch(err){}
+    }
+    bar.addEventListener("click", (e)=>{
+      const b = e.target.closest(".fu-tab");
+      if(b){ pilihTab(b.dataset.fuTab); window.scrollTo(0,0); }
+    });
+    let awal = "followup";
+    try{ awal = localStorage.getItem("fu_tab") || "followup"; }catch(err){}
+    pilihTab(awal);
+  })();
+  // v457 -- ===== FORECAST AKURAT: nilai harapan + uji mundur (backtest) + kalibrasi otomatis =====
+  // Alur: (1) tiap kali data customer masuk, forecast "diputar ulang" utk bulan-bulan lalu (hanya memakai data SEBELUM tanggal
+  // uji, jadi tidak curang), lalu dibandingkan dgn realisasi. (2) Varian rumus dgn error terkecil dipakai sbg angka utama
+  // (Karton & Pack dipilih TERPISAH). (3) Faktor kalibrasi (rasio realisasi/prediksi dari bulan-bulan sebelumnya) menggeser
+  // prediksi otomatis; makin banyak data -> makin tepat. Semua dihitung ulang di browser, tanpa beban tambahan ke Worker.
+  const FU_EWMA = 0.35;                 // sama dgn FU_EWMA_ALPHA di Worker (ritme order = rata-rata bergerak, order terbaru lebih berbobot)
+  const FU_CUTS = [5, 10, 15, 20, 25];  // hari dalam bulan tempat forecast diuji
+  const FU_VARIAN = [
+    { id: "pes",      nama: "Pesimis (Prob. Aktif × konsistensi)", pendek: "Pesimis" },
+    { id: "pesK",     nama: "Pesimis × kalibrasi",                 pendek: "Pesimis terkalibrasi" },
+    { id: "har",      nama: "Nilai harapan (Prob. Aktif)",         pendek: "Nilai harapan" },
+    { id: "harBaru",  nama: "Harapan + customer baru",             pendek: "Harapan + customer baru" },
+    { id: "harK",     nama: "Harapan × kalibrasi",                 pendek: "Harapan terkalibrasi" },
+    { id: "harBaruK", nama: "(Harapan + customer baru) × kalibrasi", pendek: "Harapan + baru, terkalibrasi" }
+  ];
+  function fuDayOf(ymd){ return Math.round(Date.UTC(Math.floor(ymd/10000), Math.floor(ymd/100)%100 - 1, ymd%100) / 86400000); }
+  // BG/NBD: peluang customer masih aktif pada saat T (rumus sama dgn Worker: bgnbdPAlive)
+  function fuPAlive(bg, x, tx, T){
+    if(!bg) return 1;
+    const term = x > 0 ? (bg.a / (bg.b + Math.max(x,1) - 1)) * Math.pow((bg.alpha + T)/(bg.alpha + tx), bg.r + x) : 0;
+    const p = 1 / (1 + term);
+    return isFinite(p) ? Math.max(0, Math.min(1, p)) : 1;
+  }
+  // riwayat order Lunas tiap customer -> [{d: nomor hari, kt, pk}] urut tanggal
+  function fuSiapkanCust(rows){
+    const out = [];
+    rows.forEach(r=>{
+      const rw = (r.riwayat || []).map(h=>({
+        d: fuDayOf(fuYMD(h.tanggal)),
+        kt: (typeof h.kt === "number") ? h.kt : (h.qty || 0),
+        pk: (typeof h.pk === "number") ? h.pk : 0
+      })).sort((a,b)=> a.d - b.d);
+      if(rw.length) out.push(rw);
+    });
+    return out;
+  }
+  // jumlah qty seluruh customer pada rentang hari [a,b] (utk realisasi aktual)
+  function fuIndeksGlobal(custs){
+    const all = [];
+    custs.forEach(c=> c.forEach(o=> all.push(o)));
+    all.sort((a,b)=> a.d - b.d);
+    const days = all.map(o=> o.d), ck = [0], cp = [0];
+    all.forEach(o=>{ ck.push(ck[ck.length-1] + o.kt); cp.push(cp[cp.length-1] + o.pk); });
+    const upper = (x)=>{ let lo = 0, hi = days.length; while(lo < hi){ const m = (lo + hi) >> 1; if(days[m] <= x) lo = m + 1; else hi = m; } return lo; };
+    return { firstDay: days.length ? days[0] : 0, sum: (a, b)=>{ const i = upper(a - 1), j = upper(b); return { kt: ck[j] - ck[i], pk: cp[j] - cp[i] }; } };
+  }
+  // aliran customer BARU (order pertamanya): rata-rata qty/hari dari 180 hari terakhir. Customer yang baru 1x order tidak punya ritme,
+  // jadi tanpa komponen ini forecast pasti kekecilan. Awal data diabaikan (customer lama yang baru "terlihat" pertama kali).
+  function fuBaruLambda(custs, asOf, firstDay){
+    const wStart = Math.max(asOf - 180, firstDay + 120), span = asOf - wStart;
+    if(span < 60) return { kt: 0, pk: 0 };
+    let kt = 0, pk = 0;
+    custs.forEach(c=>{ const o = c[0]; if(o.d > wStart && o.d <= asOf){ kt += o.kt; pk += o.pk; } });
+    return { kt: kt / span, pk: pk / span };
+  }
+  // simulasi forecast "pada hari asOf" memakai HANYA order sampai asOf. wins = jendela [awal,akhir] berurutan (hari).
+  // Hasil per jendela: E = nilai harapan (x Prob. Aktif), P = pesimis (x Prob. Aktif x konsistensi ritme).
+  function fuSimulasi(custs, asOf, wins, bg){
+    const res = wins.map(()=> ({ E: { kt: 0, pk: 0 }, P: { kt: 0, pk: 0 } }));
+    const maxEnd = wins[wins.length - 1][1];
+    const tambah = (slot, qk, qp, w, cert)=>{ slot.E.kt += qk * w; slot.E.pk += qp * w; slot.P.kt += qk * cert; slot.P.pk += qp * cert; };
+    custs.forEach(c=>{
+      let n = 0; while(n < c.length && c[n].d <= asOf) n++;
+      if(n < 2) return;
+      let ritme = 0, sk = 0, sp = 0, sg = 0, sg2 = 0;
+      for(let i = 0; i < n; i++){
+        sk += c[i].kt; sp += c[i].pk;
+        if(i > 0){ const g = c[i].d - c[i-1].d; ritme = (i === 1) ? g : FU_EWMA * g + (1 - FU_EWMA) * ritme; sg += g; sg2 += g * g; }
+      }
+      const step = Math.round(ritme); if(step < 1) return;
+      const m = n - 1, meanG = sg / m;
+      let cf = 0.5; // konsistensi ritme (sama dgn aturan Worker: CV jarak order <=0,4 tinggi, <=0,8 sedang, selain itu rendah)
+      if(m >= 2 && meanG > 0){ const cv = Math.round(Math.sqrt(Math.max(0, sg2 / m - meanG * meanG)) / meanG * 10) / 10; cf = cv <= 0.4 ? 0.9 : (cv <= 0.8 ? 0.7 : 0.45); }
+      const qk = sk / n, qp = sp / n;
+      const w = bg ? fuPAlive(bg, n - 1, c[n-1].d - c[0].d, asOf - c[0].d) : 1, cert = w * cf;
+      let d = c[n-1].d, tert = false;
+      for(let i = 0; i < 60; i++){
+        d += step;
+        if(d <= asOf){ if(!tert){ tert = true; tambah(res[0], qk, qp, w, cert); } d = asOf; continue; } // jadwal sudah lewat, belum order -> dihitung 1x
+        if(d > maxEnd) break;
+        for(let wi = 0; wi < wins.length; wi++){ if(d >= wins[wi][0] && d <= wins[wi][1]){ tambah(res[wi], qk, qp, w, cert); break; } }
+      }
+    });
+    return res;
+  }
+  // faktor kalibrasi = rasio realisasi/prediksi dari uji-uji SEBELUMNYA pada hari-uji yang sama (diperhalus, dibatasi 0,5-1,6)
+  function fuKfaktor(prevTests, kind, u, cut, base){
+    let a = 0, p = 0; const bln = new Set();
+    prevTests.forEach(t=>{
+      if(t.cut !== cut) return;
+      const x = t[kind]; if(!x) return;
+      a += x.act[u]; p += (base === "P" ? x.P[u] : x.E[u] + (base === "EN" ? x.N[u] : 0)); bln.add(t.B);
+    });
+    if(!(p > 0) || bln.size < 2) return 1;
+    const n = bln.size, k = 1 + (a / p - 1) * n / (n + 2);
+    return Math.max(0.5, Math.min(1.6, k));
+  }
+  function fuKSemua(prev, kind, u, cut){ return { P: fuKfaktor(prev, kind, u, cut, "P"), E: fuKfaktor(prev, kind, u, cut, "E"), EN: fuKfaktor(prev, kind, u, cut, "EN") }; }
+  function fuPredVarian(id, x, u, k){
+    switch(id){
+      case "pes": return x.P[u];
+      case "pesK": return x.P[u] * k.P;
+      case "har": return x.E[u];
+      case "harBaru": return x.E[u] + x.N[u];
+      case "harK": return x.E[u] * k.E;
+      default: return (x.E[u] + x.N[u]) * k.EN;
+    }
+  }
+  function fuEvalBacktest(tests){
+    const acc = {};
+    tests.forEach(t=>{
+      ["cur", "next"].forEach(kind=>{
+        const x = t[kind]; if(!x) return;
+        // jalan-maju (walk-forward): kalibrasi hanya dari bulan yang SUDAH selesai saat uji ini dilakukan
+        const prev = tests.filter(q=> q.B < t.B - (kind === "next" ? 1 : 0));
+        ["kt", "pk"].forEach(u=>{
+          const kk = fuKSemua(prev, kind, u, t.cut);
+          FU_VARIAN.forEach(v=>{
+            const key = kind + "|" + u + "|" + v.id + "|" + t.cut;
+            const a = acc[key] || (acc[key] = { ae: 0, se: 0, act: 0, n: 0 });
+            const pr = fuPredVarian(v.id, x, u, kk);
+            a.ae += Math.abs(pr - x.act[u]); a.se += pr - x.act[u]; a.act += x.act[u]; a.n++;
+          });
+        });
+      });
+    });
+    return acc;
+  }
+  function fuRingkas(acc, kind, u, id){
+    let ae = 0, se = 0, act = 0, n = 0;
+    FU_CUTS.forEach(c=>{ const a = acc[kind + "|" + u + "|" + id + "|" + c]; if(a){ ae += a.ae; se += a.se; act += a.act; n += a.n; } });
+    return { wape: act > 0 ? ae / act : null, bias: act > 0 ? se / act : null, n };
+  }
+  // pilih varian dgn error terkecil (harus mengalahkan pilihan sebelumnya >3% supaya tidak gonta-ganti karena kebetulan)
+  function fuPilihVarian(acc, kind, u){
+    const base = fuRingkas(acc, kind, u, "har");
+    if(base.n < 6 || base.wape === null) return { id: "har", ringkas: base, cukup: false };
+    let best = "har", bestR = base;
+    ["pes", "pesK", "harBaru", "harK", "harBaruK"].forEach(id=>{
+      const r = fuRingkas(acc, kind, u, id);
+      if(r.wape !== null && r.wape < bestR.wape * 0.97){ best = id; bestR = r; }
+    });
+    return { id: best, ringkas: bestR, cukup: true };
+  }
+  let fuBtCache = { key: "", val: null };
+  function fuBacktest(rowsAll, curIdx, todayY){
+    let nOrder = 0; rowsAll.forEach(r=>{ nOrder += (r.riwayat || []).length; });
+    const key = rowsAll.length + ":" + nOrder + ":" + curIdx + ":" + todayY;
+    if(fuBtCache.key === key && fuBtCache.val) return fuBtCache.val;
+    const bgRow = rowsAll.find(r=> r && r.bgnbd), bg = bgRow ? bgRow.bgnbd : null;
+    const custs = fuSiapkanCust(rowsAll), gl = fuIndeksGlobal(custs), tests = [];
+    for(let k = 1; k <= 12; k++){
+      const B = curIdx - k, bs = fuBulanBatas(B), cs = fuDayOf(bs.start), ce = fuDayOf(bs.end);
+      if(!gl.firstDay || cs < gl.firstDay + 150) break;   // butuh >=150 hari riwayat sebelum bulan uji
+      const nb = fuBulanBatas(B + 1), ns = fuDayOf(nb.start), ne = fuDayOf(nb.end), nextOk = (B + 1) <= curIdx - 1;
+      FU_CUTS.forEach(cut=>{
+        const asOf = cs + cut - 1;
+        const sim = fuSimulasi(custs, asOf, [[asOf + 1, ce], [ns, ne]], bg), baru = fuBaruLambda(custs, asOf, gl.firstDay);
+        const rem = ce - asOf, hr = ne - ns + 1;
+        tests.push({
+          B, cut,
+          cur: { act: gl.sum(asOf + 1, ce), E: sim[0].E, P: sim[0].P, N: { kt: baru.kt * rem, pk: baru.pk * rem } },
+          next: nextOk ? { act: gl.sum(ns, ne), E: sim[1].E, P: sim[1].P, N: { kt: baru.kt * hr, pk: baru.pk * hr } } : null
+        });
+      });
+    }
+    const acc = fuEvalBacktest(tests);
+    const pilih = { cur: { kt: fuPilihVarian(acc, "cur", "kt"), pk: fuPilihVarian(acc, "cur", "pk") }, next: { kt: fuPilihVarian(acc, "next", "kt"), pk: fuPilihVarian(acc, "next", "pk") } };
+    const val = { tests, acc, pilih, firstDay: gl.firstDay, nBulan: new Set(tests.map(t=> t.B)).size };
+    fuBtCache = { key, val };
+    return val;
+  }
+  // angka forecast AKHIR (yang tampil di kartu) dari hasil hitungForecast (live) + uji mundur
+  function fuForecastAkhir(rowsFiltered, rowsAll, f){
+    const bt = fuBacktest(rowsAll, f.curIdx, f.todayY);
+    const todayDay = fuDayOf(f.todayY), ce = fuDayOf(fuBulanBatas(f.curIdx).end);
+    const nb = fuBulanBatas(f.nextIdx), nHari = fuDayOf(nb.end) - fuDayOf(nb.start) + 1;
+    const lam = fuBaruLambda(fuSiapkanCust(rowsFiltered), todayDay, bt.firstDay);
+    const hariKe = f.todayY % 100;
+    const cut = FU_CUTS.reduce((b, c)=> Math.abs(c - hariKe) < Math.abs(b - hariKe) ? c : b, FU_CUTS[0]);
+    const out = { bt, cur: {}, next: {} };
+    ["kt", "pk"].forEach(u=>{
+      ["cur", "next"].forEach(kind=>{
+        const cur = kind === "cur";
+        const x = { E: { [u]: cur ? f.sisaE[u] : f.depanE[u] }, P: { [u]: cur ? f.sisaC[u] : f.depanC[u] }, N: { [u]: lam[u] * (cur ? Math.max(0, ce - todayDay) : nHari) } };
+        const kk = fuKSemua(bt.tests, kind, u, cut);
+        const pil = bt.pilih[kind][u];
+        const pred = Math.max(0, fuPredVarian(pil.id, x, u, kk));
+        const real = cur ? f.real[u] : 0, total = real + pred;
+        const pesTotal = real + x.P[u];
+        let e = pil.cukup && pil.ringkas.wape !== null ? Math.max(0.08, Math.min(0.9, pil.ringkas.wape)) : null, lo, hi, errPct = null;
+        if(e !== null){
+          lo = real + pred * (1 - e); hi = real + pred * (1 + e);
+          errPct = cur ? (total > 0 ? e * pred / total : 0) : e;   // utk bulan berjalan: error relatif thd TOTAL bulan (realisasi sudah pasti)
+        }else{ lo = Math.min(pesTotal, total); hi = total * 1.2; }
+        out[kind][u] = { total, lo, hi, errPct, pes: pesTotal, varian: pil.id, n: pil.ringkas.n, cukup: pil.cukup, baru: x.N[u], k: pil.id === "harK" ? kk.E : (pil.id === "harBaruK" ? kk.EN : (pil.id === "pesK" ? kk.P : 1)) };
+      });
+    });
+    return out;
+  }
+
   function hitungForecast(rows){
     const todayY = fuYMD(Date.now()), curIdx = fuBulanIdx(todayY), nextIdx = curIdx + 1, prevIdx = curIdx - 1;
     const z = ()=> ({ kt: 0, pk: 0 });
-    const real = z(), sisa = z(), depan = z(), lalu = z(), sisaC = z(), depanC = z(); // v456 -- sisaC/depanC = qty tertimbang keyakinan (skenario konservatif)
+    const real = z(), sisa = z(), depan = z(), lalu = z(), sisaC = z(), depanC = z(), sisaE = z(), depanE = z(); // v457 -- sisaE/depanE = nilai harapan (hanya bobot Prob. Aktif)
+    // // v456 -- sisaC/depanC = qty tertimbang keyakinan (skenario konservatif)
     let nReal = 0, nSisa = 0, nDepan = 0;
     rows.forEach(r=>{
       const q = fuQtyPerOrder(r);
@@ -19317,7 +19577,7 @@ if ("serviceWorker" in navigator) {
       let d = new Date(r.last);
       if(r.sudahOrder){ // sudah order, menunggu lunas -> dihitung sbg order sisa bulan berjalan (bobot penuh)
         const pend = r.belumLunasTerakhir ? new Date(r.belumLunasTerakhir + "T00:00:00+07:00") : d;
-        if(fuBulanIdx(fuYMD(pend)) === curIdx){ sisa.kt += q.kt; sisa.pk += q.pk; nSisa++; sisaC.kt += q.kt; sisaC.pk += q.pk; }
+        if(fuBulanIdx(fuYMD(pend)) === curIdx){ sisa.kt += q.kt; sisa.pk += q.pk; nSisa++; sisaC.kt += q.kt; sisaC.pk += q.pk; sisaE.kt += q.kt; sisaE.pk += q.pk; }
         d = pend;
       }
       let tertunda = false;
@@ -19325,42 +19585,77 @@ if ("serviceWorker" in navigator) {
         d = new Date(d.getTime() + step*86400000);
         let y = fuYMD(d);
         if(y < todayY){ // prediksi sudah lewat tapi belum order -> 1x "tertunda" (dibobot peluang aktif), lalu hitung ulang dari hari ini
-          if(!tertunda && !r.sudahOrder){ tertunda = true; sisa.kt += q.kt*w; sisa.pk += q.pk*w; nSisa += w; sisaC.kt += q.kt*cert; sisaC.pk += q.pk*cert; }
+          if(!tertunda && !r.sudahOrder){ tertunda = true; sisa.kt += q.kt*w; sisa.pk += q.pk*w; nSisa += w; sisaC.kt += q.kt*cert; sisaC.pk += q.pk*cert; sisaE.kt += q.kt*w; sisaE.pk += q.pk*w; }
           d = new Date(Date.now()); continue;
         }
         const idx = fuBulanIdx(y);
         if(idx > nextIdx) break;
-        if(idx === curIdx){ sisa.kt += q.kt; sisa.pk += q.pk; nSisa++; sisaC.kt += q.kt*cert; sisaC.pk += q.pk*cert; }
-        else if(idx === nextIdx){ depan.kt += q.kt*w; depan.pk += q.pk*w; nDepan += w; depanC.kt += q.kt*cert; depanC.pk += q.pk*cert; }
+        if(idx === curIdx){ sisa.kt += q.kt; sisa.pk += q.pk; nSisa++; sisaC.kt += q.kt*cert; sisaC.pk += q.pk*cert; sisaE.kt += q.kt*w; sisaE.pk += q.pk*w; }
+        else if(idx === nextIdx){ depan.kt += q.kt*w; depan.pk += q.pk*w; nDepan += w; depanC.kt += q.kt*cert; depanC.pk += q.pk*cert; depanE.kt += q.kt*w; depanE.pk += q.pk*w; }
       }
     });
-    return { curIdx, nextIdx, real, sisa, depan, lalu, sisaC, depanC, nReal, nSisa, nDepan, todayY };
+    return { curIdx, nextIdx, real, sisa, depan, lalu, sisaC, depanC, sisaE, depanE, nReal, nSisa, nDepan, todayY };
+  }
+  // v457 -- cadangan kalau mesin uji mundur gagal: tampilkan nilai harapan apa adanya (tanpa kalibrasi)
+  function fuForecastCadangan(f){
+    const mk = (cur, u)=>{
+      const real = cur ? f.real[u] : 0, E = cur ? f.sisaE[u] : f.depanE[u], pes = real + (cur ? f.sisaC[u] : f.depanC[u]);
+      return { total: real + E, lo: Math.min(pes, real + E), hi: (real + E) * 1.2, errPct: null, pes, varian: "har", n: 0, cukup: false, baru: 0, k: 1 };
+    };
+    return { bt: null, cur: { kt: mk(true, "kt"), pk: mk(true, "pk") }, next: { kt: mk(false, "kt"), pk: mk(false, "pk") } };
+  }
+  // v457 -- panel "Uji akurasi": WAPE (error rata-rata) & bias tiap varian rumus dari uji mundur
+  function fuPanelUji(bt){
+    if(!bt || !bt.tests.length){
+      return `<details class="ff-metode"><summary>🎯 Uji akurasi forecast (uji mundur)</summary><div class="ff-metode-batas">Belum cukup riwayat untuk uji mundur (butuh sekitar 5 bulan data order Lunas). Selama itu angka utama = nilai harapan tanpa kalibrasi. Uji berjalan otomatis begitu data cukup.</div></details>`;
+    }
+    const pct = (v)=> v === null ? "-" : Math.round(v * 100) + "%";
+    const bias = (v)=> v === null ? "" : ` <span style="color:var(--ink-soft);font-size:11px;">(${v >= 0 ? "+" : ""}${Math.round(v * 100)}%)</span>`;
+    const cell = (kind, u, id)=>{
+      const r = fuRingkas(bt.acc, kind, u, id), on = bt.pilih[kind][u].id === id && bt.pilih[kind][u].cukup;
+      return `<td style="padding:3px 6px;text-align:center;white-space:nowrap;${on ? "background:rgba(46,125,50,.15);font-weight:700;" : ""}">${pct(r.wape)}${bias(r.bias)}${on ? " ✅" : ""}</td>`;
+    };
+    const baris = FU_VARIAN.map(v=> `<tr><td style="padding:3px 6px;">${escHtml(v.nama)}</td>${cell("cur", "kt", v.id)}${cell("next", "kt", v.id)}${cell("cur", "pk", v.id)}${cell("next", "pk", v.id)}</tr>`).join("");
+    return `<details class="ff-metode"><summary>🎯 Uji akurasi forecast (uji mundur ${bt.nBulan} bulan, ${bt.tests.length} pengujian)</summary>` +
+      `<div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:12px;width:100%;">` +
+      `<thead><tr><th style="text-align:left;padding:3px 6px;">Varian rumus</th><th style="padding:3px 6px;">📦 Sisa bulan</th><th style="padding:3px 6px;">📦 Bulan depan</th><th style="padding:3px 6px;">🛍️ Sisa bulan</th><th style="padding:3px 6px;">🛍️ Bulan depan</th></tr></thead><tbody>${baris}</tbody></table></div>` +
+      `<div class="ff-metode-batas">Angka besar = error rata-rata (WAPE, makin kecil makin akurat). Angka kecil dalam kurung = bias (+ cenderung kebesaran, − cenderung kekecilan). ✅ = varian yang dipakai sebagai angka utama (error terkecil; Karton &amp; Pack dipilih terpisah). ` +
+      `Dihitung ulang otomatis setiap data order baru masuk, jadi pilihan rumus dan faktor kalibrasi ikut menyesuaikan kondisi terbaru. Catatan: uji memakai Prob. Aktif &amp; label konsistensi terkini dan hanya order Lunas, jadi sedikit lebih optimis dari kondisi sebenarnya. Ikut semua customer (tidak terpengaruh filter).</div></details>`;
   }
   function renderForecast(rowsDasar){
     const f = hitungForecast(rowsDasar);
-    // v398 -- ANGKA UTAMA = skenario PESIMIS (realisasi + sisa tertimbang keyakinan); optimis (tanpa bobot keyakinan) hanya batas atas rentang
-    const tot = { kt: f.real.kt + f.sisaC.kt, pk: f.real.pk + f.sisaC.pk };
-    const totO = { kt: f.real.kt + f.sisa.kt, pk: f.real.pk + f.sisa.pk };
+    let fa = null;
+    try{ fa = fuForecastAkhir(rowsDasar, allRows, f); }catch(e){ console.log("Uji mundur forecast dilewati:", e); }
+    if(!fa) fa = fuForecastCadangan(f);
     const persen = (a, b)=> b > 0 ? Math.min(100, Math.round(a / b * 100)) : 0;
     const hariKe = f.todayY % 100, hariTotal = fuBulanBatas(f.curIdx).end % 100;
+    const namaVarian = (id)=> { const v = FU_VARIAN.find(x=> x.id === id); return v ? v.pendek : id; };
     const unit = (ikon, nama, a, b, ekstra, tanpaPersen)=>
       `<div class="ff-unit"><div class="ff-lbl"><span>${ikon} ${nama}</span><span>${tanpaPersen ? "" : persen(a, b) + "%"}</span></div>` +
       `<div class="ff-bar"><span style="width:${persen(a, b)}%"></span></div>` + ekstra + `</div>`;
-    // v456 -- keyakinan = qty tertimbang keyakinan / forecast (realisasi = pasti, jadi keyakinan naik seiring bulan berjalan)
-    const kyk = (rendah, tinggi)=>{
-      if(!(tinggi > 0)) return `<div class="ff-rows"><span>Keyakinan <b>-</b></span></div>`;
-      const p = Math.max(0, Math.min(100, Math.round(rendah / tinggi * 100)));
-      const lv = p >= 70 ? ["Tinggi", "var(--text-success, #2e7d32)"] : p >= 45 ? ["Sedang", "var(--text-warning, #a35a00)"] : ["Rendah", "var(--text-danger, #c00000)"];
-      return `<div class="ff-rows"><span>Rentang pesimis–optimis <b>${fuFmtKP(rendah)} – ${fuFmtKP(tinggi)}</b></span><span>Keyakinan <b style="color:${lv[1]};">${p}% (${lv[0]})</b></span></div>`;
+    // akurasi = error historis hasil uji mundur (menggantikan "Keyakinan" lama yang hanya perkiraan)
+    const akur = (o)=>{
+      if(o.errPct === null) return `<span>Akurasi <b>belum cukup data uji</b></span>`;
+      const p = Math.round(o.errPct * 100);
+      const lv = p <= 20 ? ["Tinggi", "var(--text-success, #2e7d32)"] : p <= 40 ? ["Sedang", "var(--text-warning, #a35a00)"] : ["Rendah", "var(--text-danger, #c00000)"];
+      return `<span>Error historis <b style="color:${lv[1]};">±${p}% (${lv[0]})</b></span>`;
     };
-    const cur = (ikon, nama, k)=> unit(ikon, nama, f.real[k], tot[k],
-      `<div class="ff-rows"><span>Realisasi <b>${fuFmtKP(f.real[k])}</b></span><span>Sisa prediksi <b>${fuFmtKP(f.sisaC[k])}</b></span><span>Forecast pesimis <b>${fuFmtKP(tot[k])}</b></span></div>` +
-      kyk(tot[k], totO[k]));
-    const nxt = (ikon, nama, k)=> unit(ikon, nama, f.depanC[k], Math.max(tot[k], f.depanC[k]),
-      `<div class="ff-rows"><span>Forecast pesimis <b>${fuFmtKP(f.depanC[k])}</b></span><span>vs bulan berjalan <b>${tot[k] > 0 ? (f.depanC[k] >= tot[k] ? "+" : "") + Math.round((f.depanC[k]-tot[k])/tot[k]*100) + "%" : "-"}</b></span><span>Bulan lalu <b>${fuFmtKP(f.lalu[k])}</b></span></div>` + kyk(f.depanC[k], f.depan[k]), true); // v397 -- bulan depan: bar = forecast vs bulan berjalan, tanpa label % (bisa menyesatkan)
+    const baris2 = (o)=>
+      `<div class="ff-rows"><span>Rentang <b>${fuFmtKP(o.lo)} – ${fuFmtKP(o.hi)}</b></span>${akur(o)}</div>` +
+      `<div class="ff-rows" style="color:var(--ink-soft);"><span>Pesimis (konservatif) <b>${fuFmtKP(o.pes)}</b></span><span>Metode <b>${escHtml(namaVarian(o.varian))}</b></span></div>`;
+    const cur = (ikon, nama, u)=>{
+      const o = fa.cur[u];
+      return unit(ikon, nama, f.real[u], o.total,
+        `<div class="ff-rows"><span>Realisasi <b>${fuFmtKP(f.real[u])}</b></span><span>Sisa prediksi <b>${fuFmtKP(Math.max(0, o.total - f.real[u]))}</b></span><span>Forecast <b>${fuFmtKP(o.total)}</b></span></div>` + baris2(o));
+    };
+    const nxt = (ikon, nama, u)=>{
+      const o = fa.next[u], c = fa.cur[u].total;
+      return unit(ikon, nama, o.total, Math.max(c, o.total),
+        `<div class="ff-rows"><span>Forecast <b>${fuFmtKP(o.total)}</b></span><span>vs bulan berjalan <b>${c > 0 ? (o.total >= c ? "+" : "") + Math.round((o.total - c) / c * 100) + "%" : "-"}</b></span><span>Bulan lalu <b>${fuFmtKP(f.lalu[u])}</b></span></div>` + baris2(o), true);
+    };
     forecastEl.innerHTML =
-      fuToggleHead("forecast", `📈 Forecast Penjualan Qty <span style="font-weight:400;color:var(--ink-soft);font-size:12px;">(pesimis)</span>`) +
-      `<div class="fp-summary">${escHtml(fuBulanNama(f.curIdx))}: 📦 <b>${fuFmtKP(tot.kt)}</b> Karton · 🛍️ <b>${fuFmtKP(tot.pk)}</b> Pack<br>${escHtml(fuBulanNama(f.nextIdx))}: 📦 <b>${fuFmtKP(f.depanC.kt)}</b> · 🛍️ <b>${fuFmtKP(f.depanC.pk)}</b></div>` +
+      fuToggleHead("forecast", `📈 Forecast Penjualan Qty <span style="font-weight:400;color:var(--ink-soft);font-size:12px;">(nilai harapan, dikalibrasi otomatis)</span>`) +
+      `<div class="fp-summary">${escHtml(fuBulanNama(f.curIdx))}: 📦 <b>${fuFmtKP(fa.cur.kt.total)}</b> Karton · 🛍️ <b>${fuFmtKP(fa.cur.pk.total)}</b> Pack<br>${escHtml(fuBulanNama(f.nextIdx))}: 📦 <b>${fuFmtKP(fa.next.kt.total)}</b> · 🛍️ <b>${fuFmtKP(fa.next.pk.total)}</b></div>` +
       `<div class="fp-body">` +
       `<div class="ff-grid">` +
         `<div class="ff-card"><h4>Bulan berjalan: ${escHtml(fuBulanNama(f.curIdx))} <span style="font-weight:400;color:var(--ink-soft);">(hari ke-${hariKe}/${hariTotal})</span></h4>` +
@@ -19368,7 +19663,18 @@ if ("serviceWorker" in navigator) {
         `<div class="ff-card"><h4>Bulan depan: ${escHtml(fuBulanNama(f.nextIdx))}</h4>` +
           nxt("📦", "Karton", "kt") + nxt("🛍️", "Pack", "pk") + `</div>` +
       `</div>` +
-      `<div class="followup-potensi-note">Realisasi = order Lunas bulan ini s/d hari ini. Sisa prediksi = order yang diperkirakan masuk sampai akhir bulan (customer yang sudah lewat jadwal dihitung 1x, dibobot Prob. Aktif; yang sudah order & menunggu lunas dihitung penuh). Bulan depan dibobot Prob. Aktif. Qty per order = rata-rata historis customer. <b>Keyakinan</b> = Prob. Aktif × konsistensi ritme order tiap customer (tinggi/sedang/rendah); <b>Forecast = skenario PESIMIS</b> (tertimbang keyakinan). <b>Rentang</b> = pesimis sampai optimis (tanpa bobot keyakinan). Ikut filter pencarian/CS di atas.</div></div>`;
+      `<div class="ff-metode-ringkas">🧮 <b>Metode:</b> ritme order tiap customer × rata-rata qty per order × Prob. Aktif = <b>nilai harapan</b>. Rumus final dipilih otomatis dari uji mundur (error terkecil) &amp; dikalibrasi dari bulan-bulan sebelumnya — Karton dan Pack dipilih terpisah.</div>` +
+      `<details class="ff-metode" open><summary>ℹ️ Penjelasan metode forecast</summary><ol>` +
+        `<li><b>Ritme order</b> — jarak hari antar-order tiap customer (rata-rata bergerak, order terbaru lebih berbobot).</li>` +
+        `<li><b>Prediksi order</b> — tanggal order terakhir + ritme, diulang berantai sampai akhir bulan depan.</li>` +
+        `<li><b>Qty per order</b> — rata-rata Karton dan Pack per order historis customer itu (Pack dihitung dari SEMUA order customer, jadi customer yang jarang order Pack tetap tersumbang sebagian kecil).</li>` +
+        `<li><b>Bulan berjalan</b> = Realisasi (order Lunas s/d hari ini, pasti) + Sisa prediksi sampai akhir bulan. Customer yang jadwalnya sudah lewat tapi belum order dihitung 1x; yang sudah order &amp; menunggu lunas dihitung penuh.</li>` +
+        `<li><b>Nilai harapan</b> — tiap order prediksi dikali <b>Prob. Aktif</b> (model BG/NBD), yaitu peluang customer itu memang masih aktif. Ini angka paling mungkin terjadi (bukan skenario terburuk).</li>` +
+        `<li><b>Customer baru</b> — komponen tambahan dari rata-rata qty order pertama customer baru per hari (180 hari terakhir), karena customer 1x order belum punya ritme.</li>` +
+        `<li><b>Kalibrasi otomatis</b> — rasio realisasi ÷ prediksi pada bulan-bulan sebelumnya (hari uji yang sama) dipakai untuk menggeser prediksi bila selama ini cenderung kebesaran/kekecilan.</li>` +
+        `<li><b>Rentang &amp; error historis</b> — rentang = angka utama ± error rata-rata (WAPE) varian terpilih pada uji mundur. <b>Pesimis</b> = angka konservatif lama (Prob. Aktif × konsistensi ritme), ditampilkan sebagai pembanding.</li>` +
+      `</ol><div class="ff-metode-batas">Keterbatasan: musim/promo belum diperhitungkan; riwayat lama yang belum terpisah Karton/Pack dihitung sebagai Karton (jalankan /backfill-customer-order-log di Worker); akurasi Pack mengikuti sedikitnya data Pack. Angka utama mengikuti filter pencarian/CS di atas, sedangkan pemilihan rumus &amp; kalibrasi memakai semua customer.</div></details>` +
+      fuPanelUji(fa.bt) + `</div>`;
     fuTerapkanPanel(forecastEl, "forecast");
   }
 
