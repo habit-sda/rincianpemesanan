@@ -4,8 +4,14 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v396";
+const CACHE_VERSION = "v399";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v399 -- Follow Up: kartu Forecast & Potensi bisa dibuka/tutup (ketuk judul); default tertutup di HP dgn ringkasan 1-2 baris. Murni frontend.
+   */
+/* v398 -- Forecast Penjualan Qty: angka utama = skenario PESIMIS (tertimbang keyakinan); optimis jadi batas atas rentang.
+   */
+/* v397 -- Forecast bulan depan: bar tanpa label % (membingungkan), bar = forecast vs bulan berjalan.
+   */
 /* v396 -- Forecast Penjualan Qty: tambah Keyakinan (%) + Rentang konservatif-optimis (Prob. Aktif x konsistensi ritme order). Murni frontend.
    */
 /* v395 -- Follow Up: kartu baru "Forecast Penjualan Qty" (Karton & Pack) bulan berjalan vs realisasi s/d hari ini + bulan depan. Murni frontend (butuh Worker v454 utk pemisahan Pack).

@@ -1159,8 +1159,19 @@
     .ff-bar > span{display:block; height:100%; background:var(--primary-green);}
     .ff-rows{display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px 12px; font-size:11.5px; color:var(--ink-soft); margin-top:4px;}
     .ff-rows b{color:var(--ink,#222);}
+    /* v399 -- kartu Forecast & Potensi bisa dibuka/tutup (default tertutup di HP) */
+    .fp-toggle{display:flex; width:100%; align-items:center; justify-content:space-between; gap:8px; min-height:44px; padding:0; margin:0; background:none; border:0; font:inherit; color:inherit; text-align:left; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+    .fp-toggle .fp-judul-t{font-weight:800; font-size:14px;}
+    .fp-toggle .fp-chev{flex:0 0 auto; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:var(--card,#fff); border:1px solid var(--line); font-size:14px; transition:transform .2s ease;}
+    .fp-summary{display:none; font-size:13px; color:var(--ink-soft); padding:0 0 6px; line-height:1.5;}
+    .fp-summary b{color:var(--primary-green);}
+    .fp-body{margin-top:4px;}
+    .fp-tutup .fp-body{display:none;}
+    .fp-tutup .fp-summary{display:block;}
+    .fp-tutup .fp-chev{transform:rotate(-90deg);}
     .followup-potensi{margin-bottom:14px; border:2px solid var(--line); border-radius:10px; padding:12px; background:var(--paper,#f7f8f6);}
     .followup-potensi:empty{display:none;}
+    div.followup-forecast, div.followup-potensi{padding-top:2px; padding-bottom:8px;}
     .followup-potensi-title{font-weight:800; font-size:14px; margin-bottom:8px;}
     .followup-potensi-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:8px;}
     .fp-box{background:var(--card,#fff); border:1px solid var(--line); border-radius:8px; padding:10px; user-select:none;}
@@ -18914,6 +18925,7 @@ if ("serviceWorker" in navigator) {
     setQuickFilter(box.dataset.filter === "total" ? null : box.dataset.filter);
   });
   potensiEl.addEventListener("click", (e)=>{ // v454 -- klik kotak potensi = filter tabel yang sama
+    if(fuKlikToggle(e, potensiEl)) return;
     const box = e.target.closest(".fp-box.clickable");
     if(box) setQuickFilter(box.dataset.filter);
   });
@@ -19263,6 +19275,26 @@ if ("serviceWorker" in navigator) {
   function fuBulanIdx(ymd){ return Math.floor(ymd/10000)*12 + (Math.floor(ymd/100)%100 - 1); }
   function fuBulanBatas(idx){ const y = Math.floor(idx/12), m = idx%12; return { start: y*10000+(m+1)*100+1, end: y*10000+(m+1)*100+new Date(Date.UTC(y, m+1, 0)).getUTCDate() }; }
   function fuBulanNama(idx){ return new Date(Date.UTC(Math.floor(idx/12), idx%12, 15)).toLocaleDateString("id-ID", { month:"long", year:"numeric", timeZone:"UTC" }); }
+  // v399 -- buka/tutup kartu. Status disimpan per perangkat (localStorage, aman kalau diblokir); default: tertutup di HP, terbuka di desktop.
+  function fuPanelBuka(key){
+    try{ const v = localStorage.getItem("fu_panel_" + key); if(v === "1") return true; if(v === "0") return false; }catch(e){}
+    return !(window.matchMedia && window.matchMedia("(max-width:700px)").matches);
+  }
+  function fuToggleHead(key, judulHtml){
+    const buka = fuPanelBuka(key);
+    return `<button type="button" class="fp-toggle" data-panel="${key}" aria-expanded="${buka}"><span class="fp-judul-t">${judulHtml}</span><span class="fp-chev" aria-hidden="true">▾</span></button>`;
+  }
+  function fuTerapkanPanel(el, key){ el.classList.toggle("fp-tutup", !fuPanelBuka(key)); }
+  function fuKlikToggle(e, el){
+    const btn = e.target.closest(".fp-toggle");
+    if(!btn || !el.contains(btn)) return false;
+    const key = btn.dataset.panel, buka = !fuPanelBuka(key);
+    try{ localStorage.setItem("fu_panel_" + key, buka ? "1" : "0"); }catch(err){}
+    fuTerapkanPanel(el, key);
+    btn.setAttribute("aria-expanded", String(buka));
+    return true;
+  }
+  forecastEl.addEventListener("click", (e)=> fuKlikToggle(e, forecastEl));
   function hitungForecast(rows){
     const todayY = fuYMD(Date.now()), curIdx = fuBulanIdx(todayY), nextIdx = curIdx + 1, prevIdx = curIdx - 1;
     const z = ()=> ({ kt: 0, pk: 0 });
@@ -19306,33 +19338,38 @@ if ("serviceWorker" in navigator) {
   }
   function renderForecast(rowsDasar){
     const f = hitungForecast(rowsDasar);
-    const tot = { kt: f.real.kt + f.sisa.kt, pk: f.real.pk + f.sisa.pk };
+    // v398 -- ANGKA UTAMA = skenario PESIMIS (realisasi + sisa tertimbang keyakinan); optimis (tanpa bobot keyakinan) hanya batas atas rentang
+    const tot = { kt: f.real.kt + f.sisaC.kt, pk: f.real.pk + f.sisaC.pk };
+    const totO = { kt: f.real.kt + f.sisa.kt, pk: f.real.pk + f.sisa.pk };
     const persen = (a, b)=> b > 0 ? Math.min(100, Math.round(a / b * 100)) : 0;
     const hariKe = f.todayY % 100, hariTotal = fuBulanBatas(f.curIdx).end % 100;
-    const unit = (ikon, nama, a, b, ekstra)=>
-      `<div class="ff-unit"><div class="ff-lbl"><span>${ikon} ${nama}</span><span>${persen(a, b)}%</span></div>` +
+    const unit = (ikon, nama, a, b, ekstra, tanpaPersen)=>
+      `<div class="ff-unit"><div class="ff-lbl"><span>${ikon} ${nama}</span><span>${tanpaPersen ? "" : persen(a, b) + "%"}</span></div>` +
       `<div class="ff-bar"><span style="width:${persen(a, b)}%"></span></div>` + ekstra + `</div>`;
     // v456 -- keyakinan = qty tertimbang keyakinan / forecast (realisasi = pasti, jadi keyakinan naik seiring bulan berjalan)
     const kyk = (rendah, tinggi)=>{
       if(!(tinggi > 0)) return `<div class="ff-rows"><span>Keyakinan <b>-</b></span></div>`;
       const p = Math.max(0, Math.min(100, Math.round(rendah / tinggi * 100)));
       const lv = p >= 70 ? ["Tinggi", "var(--text-success, #2e7d32)"] : p >= 45 ? ["Sedang", "var(--text-warning, #a35a00)"] : ["Rendah", "var(--text-danger, #c00000)"];
-      return `<div class="ff-rows"><span>Rentang <b>${fuFmtKP(rendah)} – ${fuFmtKP(tinggi)}</b></span><span>Keyakinan <b style="color:${lv[1]};">${p}% (${lv[0]})</b></span></div>`;
+      return `<div class="ff-rows"><span>Rentang pesimis–optimis <b>${fuFmtKP(rendah)} – ${fuFmtKP(tinggi)}</b></span><span>Keyakinan <b style="color:${lv[1]};">${p}% (${lv[0]})</b></span></div>`;
     };
     const cur = (ikon, nama, k)=> unit(ikon, nama, f.real[k], tot[k],
-      `<div class="ff-rows"><span>Realisasi <b>${fuFmtKP(f.real[k])}</b></span><span>Sisa prediksi <b>${fuFmtKP(f.sisa[k])}</b></span><span>Forecast <b>${fuFmtKP(tot[k])}</b></span></div>` +
-      kyk(f.real[k] + f.sisaC[k], tot[k]));
-    const nxt = (ikon, nama, k)=> unit(ikon, nama, f.depan[k], tot[k] || f.depan[k],
-      `<div class="ff-rows"><span>Forecast <b>${fuFmtKP(f.depan[k])}</b></span><span>vs bulan berjalan <b>${tot[k] > 0 ? (f.depan[k] >= tot[k] ? "+" : "") + Math.round((f.depan[k]-tot[k])/tot[k]*100) + "%" : "-"}</b></span><span>Bulan lalu <b>${fuFmtKP(f.lalu[k])}</b></span></div>` + kyk(f.depanC[k], f.depan[k]));
+      `<div class="ff-rows"><span>Realisasi <b>${fuFmtKP(f.real[k])}</b></span><span>Sisa prediksi <b>${fuFmtKP(f.sisaC[k])}</b></span><span>Forecast pesimis <b>${fuFmtKP(tot[k])}</b></span></div>` +
+      kyk(tot[k], totO[k]));
+    const nxt = (ikon, nama, k)=> unit(ikon, nama, f.depanC[k], Math.max(tot[k], f.depanC[k]),
+      `<div class="ff-rows"><span>Forecast pesimis <b>${fuFmtKP(f.depanC[k])}</b></span><span>vs bulan berjalan <b>${tot[k] > 0 ? (f.depanC[k] >= tot[k] ? "+" : "") + Math.round((f.depanC[k]-tot[k])/tot[k]*100) + "%" : "-"}</b></span><span>Bulan lalu <b>${fuFmtKP(f.lalu[k])}</b></span></div>` + kyk(f.depanC[k], f.depan[k]), true); // v397 -- bulan depan: bar = forecast vs bulan berjalan, tanpa label % (bisa menyesatkan)
     forecastEl.innerHTML =
-      `<div class="ff-title">📈 Forecast Penjualan Qty — Karton &amp; Pack</div>` +
+      fuToggleHead("forecast", `📈 Forecast Penjualan Qty <span style="font-weight:400;color:var(--ink-soft);font-size:12px;">(pesimis)</span>`) +
+      `<div class="fp-summary">${escHtml(fuBulanNama(f.curIdx))}: 📦 <b>${fuFmtKP(tot.kt)}</b> Karton · 🛍️ <b>${fuFmtKP(tot.pk)}</b> Pack<br>${escHtml(fuBulanNama(f.nextIdx))}: 📦 <b>${fuFmtKP(f.depanC.kt)}</b> · 🛍️ <b>${fuFmtKP(f.depanC.pk)}</b></div>` +
+      `<div class="fp-body">` +
       `<div class="ff-grid">` +
         `<div class="ff-card"><h4>Bulan berjalan: ${escHtml(fuBulanNama(f.curIdx))} <span style="font-weight:400;color:var(--ink-soft);">(hari ke-${hariKe}/${hariTotal})</span></h4>` +
           cur("📦", "Karton", "kt") + cur("🛍️", "Pack", "pk") + `</div>` +
         `<div class="ff-card"><h4>Bulan depan: ${escHtml(fuBulanNama(f.nextIdx))}</h4>` +
           nxt("📦", "Karton", "kt") + nxt("🛍️", "Pack", "pk") + `</div>` +
       `</div>` +
-      `<div class="followup-potensi-note">Realisasi = order Lunas bulan ini s/d hari ini. Sisa prediksi = order yang diperkirakan masuk sampai akhir bulan (customer yang sudah lewat jadwal dihitung 1x, dibobot Prob. Aktif; yang sudah order & menunggu lunas dihitung penuh). Bulan depan dibobot Prob. Aktif. Qty per order = rata-rata historis customer. <b>Keyakinan</b> = Prob. Aktif × konsistensi ritme order tiap customer (tinggi/sedang/rendah); <b>Rentang</b> = skenario konservatif (tertimbang keyakinan) sampai optimis (= Forecast). Ikut filter pencarian/CS di atas.</div>`;
+      `<div class="followup-potensi-note">Realisasi = order Lunas bulan ini s/d hari ini. Sisa prediksi = order yang diperkirakan masuk sampai akhir bulan (customer yang sudah lewat jadwal dihitung 1x, dibobot Prob. Aktif; yang sudah order & menunggu lunas dihitung penuh). Bulan depan dibobot Prob. Aktif. Qty per order = rata-rata historis customer. <b>Keyakinan</b> = Prob. Aktif × konsistensi ritme order tiap customer (tinggi/sedang/rendah); <b>Forecast = skenario PESIMIS</b> (tertimbang keyakinan). <b>Rentang</b> = pesimis sampai optimis (tanpa bobot keyakinan). Ikut filter pencarian/CS di atas.</div></div>`;
+    fuTerapkanPanel(forecastEl, "forecast");
   }
 
   // v454 -- POTENSI QTY PENJUALAN (Karton & Pack). Per kelompok customer: potensi = rata-rata qty per order
@@ -19355,7 +19392,9 @@ if ("serviceWorker" in navigator) {
         `<div class="fp-baris"><span>📦 Karton</span><b>${fuFmtKP(d.kt)}</b></div>` +
         `<div class="fp-baris"><span>🛍️ Pack</span><b>${fuFmtKP(d.pk)}</b></div></div>`;
     potensiEl.innerHTML =
-      `<div class="followup-potensi-title">💰 Potensi Qty Penjualan (Karton &amp; Pack)</div>` +
+      fuToggleHead("potensi", "💰 Potensi Qty Penjualan") +
+      `<div class="fp-summary">⏰ Terlewat: 📦 <b>${fuFmtKP(terlewat.kt)}</b> · 🛍️ <b>${fuFmtKP(terlewat.pk)}</b> (${terlewat.n} customer)<br>🟡 Minggu ini: 📦 <b>${fuFmtKP(minggu.kt)}</b> · 🛍️ <b>${fuFmtKP(minggu.pk)}</b> (${minggu.n} customer)</div>` +
+      `<div class="fp-body">` +
       `<div class="followup-potensi-grid">` +
         kotak("⏰ Terlewat 2 Minggu", `${terlewat.n} customer belum di-follow up`, terlewat, "terlewat") +
         kotak("🟠 Follow Up Hari Ini", `${hariIni.n} customer`, hariIni, "hariIni") +
@@ -19363,7 +19402,8 @@ if ("serviceWorker" in navigator) {
         kotak("🎯 Perkiraan " + escHtml(bulanLabel), `${nBlnCust} customer diperkirakan order`, { kt: blnKt, pk: blnPk }, null) +
       `</div>` +
       `<div class="followup-potensi-note">Potensi = rata-rata qty per order tiap customer × 1 order (kolom "Bulan" = × perkiraan jumlah order bulan ini). Ikut filter pencarian/CS di atas. Klik kotak untuk memfilter tabel.` +
-      (adaEstimasi ? ` Riwayat lama yang belum tercatat terpisah dihitung sebagai Karton — jalankan /backfill-customer-order-log di Worker agar Pack terbaca akurat.` : "") + `</div>`;
+      (adaEstimasi ? ` Riwayat lama yang belum tercatat terpisah dihitung sebagai Karton — jalankan /backfill-customer-order-log di Worker agar Pack terbaca akurat.` : "") + `</div></div>`;
+    fuTerapkanPanel(potensiEl, "potensi");
   }
 
   // BARU -- versi KARTU dari tabel Follow Up, khusus layar mobile (≤700px,
