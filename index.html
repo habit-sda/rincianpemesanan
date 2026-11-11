@@ -5579,6 +5579,24 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <input type="time" id="md-logistik-pengingat-time" style="height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
         </div>
       </div>
+      <div class="md-card" id="md-pengiriman-card">
+        <h3>🚚 Konfirmasi Pengiriman</h3>
+        <div class="md-note" style="margin-bottom:12px;">
+          Mengatur tombol di DM "Pesanan sudah di-ACC Finance". <b>Pengingat</b>: kalau tombol konfirmasi belum ditekan setelah beberapa jam, bot mengirim DM pengingat ke Logistik &amp; CS pembuat (maks 2x per pesanan, hanya jam kerja 07.30–17.30 WIB, tidak di hari libur). <b>Konfirmasi otomatis</b>: kalau resi customer masuk ke grup Resi setelah pesanan di-ACC, bot menandai "sudah di ekspedisi" sendiri — hanya untuk ekspedisi Mitra dan hanya kalau tepat satu pesanan customer itu yang sedang menunggu.
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:12px;">
+          <input type="checkbox" id="md-pengiriman-pengingat-toggle" style="width:18px; height:18px;">
+          <span>Aktifkan pengingat konfirmasi pengiriman</span>
+        </label>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <label for="md-pengiriman-pengingat-jam" style="font-size:13.5px; color:var(--ink-soft);">Ingatkan setelah (jam)</label>
+          <input type="number" id="md-pengiriman-pengingat-jam" min="1" max="24" step="1" inputmode="numeric" style="width:90px; height:40px; border:1px solid var(--line); border-radius:9px; padding:0 10px; font-size:14px; background:var(--card);">
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="md-pengiriman-autoresi-toggle" style="width:18px; height:18px;">
+          <span>Konfirmasi otomatis dari resi</span>
+        </label>
+      </div>
       <div class="md-card md-pinform">
         <h3>Ambang cross-check resi vs ongkir</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -6301,7 +6319,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.86.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.88.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6529,6 +6547,12 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div class="confirm-body">
         <label for="md-ekspedisi-add-name" style="font-size:12px;font-weight:700;color:var(--ink-soft);">Nama Ekspedisi</label>
         <input type="text" id="md-ekspedisi-add-name" class="kt-input" placeholder="mis. JNE, J&T, IDTruck" autocomplete="off">
+        <label for="md-ekspedisi-add-kategori" style="display:block;margin-top:10px;font-size:12px;font-weight:700;color:var(--ink-soft);">Kategori Ekspedisi</label>
+        <select id="md-ekspedisi-add-kategori" class="kt-input">
+          <option value="">— Pilih kategori —</option>
+          <option value="mitra">Ekspedisi Mitra</option>
+          <option value="internal">Ekspedisi Internal</option>
+        </select>
         <p class="kt-hint" id="md-ekspedisi-add-err"></p>
       </div>
       <div class="confirm-actionrow">
@@ -6558,7 +6582,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.86.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.88.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Konfirmasi pengiriman, lanjutan</b> — kartu baru di Master Data: <i>Konfirmasi Pengiriman</i>. Pengingat otomatis kalau tombol di DM "Pesanan sudah di-ACC Finance" belum ditekan (jamnya bisa diatur) dan konfirmasi otomatis dari resi (ekspedisi Mitra). Di sisi bot: tombol <i>Salah tekan, batalkan</i> (10 menit), bagian "Belum dikonfirmasi pengiriman" di Rekap Logistik, perintah <code>/statpengiriman</code>, dan ekspedisi berkategori Internal otomatis dilewati pembacaan nominal resi. Butuh Worker v463.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.87.0</div>
+          <ul>
+            <li><b>Kategori ekspedisi: Mitra / Internal</b> — di Master Data &gt; Ekspedisi, tiap ekspedisi sekarang punya pilihan kategori. Semua ekspedisi lama otomatis berkategori <b>Mitra</b>; ubah manual yang berkategori <b>Internal</b>. Saat menambah ekspedisi baru, kategori wajib dipilih. Kategori ini dipakai Worker untuk menentukan tombol di notifikasi "Pesanan sudah di-ACC Finance" (Mitra → <i>Sudah di ekspedisi</i>, Internal → <i>Sudah diterima customer</i>). Butuh Worker v462.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.86.0</div>
           <ul>
             <li><b>Menu Follow Up dibagi jadi 2 tab</b> — tab <b>Follow Up</b> (kartu ringkasan, potensi qty, daftar customer) dan tab <b>Forecast</b> (Forecast Penjualan Qty Karton &amp; Pack). Kotak pencarian dan filter CS tetap berlaku untuk kedua tab; pilihan tab terakhir diingat.</li>
           </ul>
@@ -8052,7 +8088,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -8077,6 +8113,9 @@ function loadSettings(){
     if(typeof s.resiKemarinInfoTime === "string" && s.resiKemarinInfoTime.trim()) SETTINGS.resiKemarinInfoTime = s.resiKemarinInfoTime.trim();
     if(typeof s.logistikPengingatEnabled === "boolean") SETTINGS.logistikPengingatEnabled = s.logistikPengingatEnabled;
     if(typeof s.logistikPengingatTime === "string" && s.logistikPengingatTime.trim()) SETTINGS.logistikPengingatTime = s.logistikPengingatTime.trim();
+    if(typeof s.pengirimanPengingatEnabled === "boolean") SETTINGS.pengirimanPengingatEnabled = s.pengirimanPengingatEnabled;
+    if(typeof s.pengirimanPengingatJam === "number" && s.pengirimanPengingatJam >= 1 && s.pengirimanPengingatJam <= 24) SETTINGS.pengirimanPengingatJam = s.pengirimanPengingatJam;
+    if(typeof s.pengirimanAutoResiEnabled === "boolean") SETTINGS.pengirimanAutoResiEnabled = s.pengirimanAutoResiEnabled;
     if(typeof s.resiTagihanTopicId === "string") SETTINGS.resiTagihanTopicId = s.resiTagihanTopicId.trim();
     if(typeof s.resiAjaTopicId === "string") SETTINGS.resiAjaTopicId = s.resiAjaTopicId.trim();
     if(typeof s.noBuktiTransferReminderEnabled === "boolean") SETTINGS.noBuktiTransferReminderEnabled = s.noBuktiTransferReminderEnabled;
@@ -13795,6 +13834,8 @@ if ("serviceWorker" in navigator) {
     if(typeof e.subsidiKhusus !== "boolean"){ e.subsidiKhusus = isIdtruckLegacy; ch = true; }
     if(typeof e.subsidiPersenOngkir !== "number"){ e.subsidiPersenOngkir = 20; ch = true; }
     if(typeof e.subsidiPersenBatas !== "number"){ e.subsidiPersenBatas = 80; ch = true; }
+    // v2.87.0 -- kategori ekspedisi: data lama otomatis "mitra" (yang internal diubah manual di Master Data > Ekspedisi)
+    if(e.kategori !== "mitra" && e.kategori !== "internal"){ e.kategori = "mitra"; ch = true; }
     return ch;
   }
   function applyProdukDefaults(p){
@@ -14137,6 +14178,35 @@ if ("serviceWorker" in navigator) {
     };
     toggleLogistikPengingat.addEventListener("change", saveLogistikPengingat);
     inputLogistikPengingatTime.addEventListener("change", saveLogistikPengingat);
+  }
+
+  /* ---------- Konfirmasi Pengiriman: pengingat + konfirmasi otomatis dari resi ----------
+     SAMA pola, dibaca WORKER (checkPengirimanTertunda & tryAutoKonfirmasiPengirimanDariResi). */
+  const togglePengirimanPengingat = document.getElementById("md-pengiriman-pengingat-toggle");
+  const inputPengirimanJam = document.getElementById("md-pengiriman-pengingat-jam");
+  if(togglePengirimanPengingat && inputPengirimanJam){
+    togglePengirimanPengingat.checked = SETTINGS.pengirimanPengingatEnabled !== false;
+    inputPengirimanJam.value = String(SETTINGS.pengirimanPengingatJam || 3);
+    const savePengirimanPengingat = async ()=>{
+      let jam = parseInt(inputPengirimanJam.value, 10);
+      if(!(jam >= 1 && jam <= 24)) jam = 3;
+      inputPengirimanJam.value = String(jam);
+      SETTINGS.pengirimanPengingatEnabled = togglePengirimanPengingat.checked;
+      SETTINGS.pengirimanPengingatJam = jam;
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.pengirimanPengingatEnabled ? `Pengingat konfirmasi pengiriman diaktifkan, setelah ${jam} jam.` : "Pengingat konfirmasi pengiriman dimatikan.");
+    };
+    togglePengirimanPengingat.addEventListener("change", savePengirimanPengingat);
+    inputPengirimanJam.addEventListener("change", savePengirimanPengingat);
+  }
+  const togglePengirimanAutoResi = document.getElementById("md-pengiriman-autoresi-toggle");
+  if(togglePengirimanAutoResi){
+    togglePengirimanAutoResi.checked = SETTINGS.pengirimanAutoResiEnabled !== false;
+    togglePengirimanAutoResi.addEventListener("change", async ()=>{
+      SETTINGS.pengirimanAutoResiEnabled = togglePengirimanAutoResi.checked;
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.pengirimanAutoResiEnabled ? "Konfirmasi otomatis dari resi diaktifkan." : "Konfirmasi otomatis dari resi dimatikan.");
+    });
   }
 
   /* ---------- Topik Grup Resi (Tagihan / Resi Aja) ----------
@@ -16754,6 +16824,10 @@ if ("serviceWorker" in navigator) {
           <div class="md-e-namewrap">
             <span class="md-kode-badge" data-copy-kode="${e.kode}" title="Klik untuk salin kode">${e.kode}</span>
             <input type="text" class="md-e-name" data-idx="${i}" value="${e.name}">
+            <select class="md-e-kategori" data-idx="${i}" title="Kategori ekspedisi: Mitra (pihak luar) atau Internal (armada sendiri)" aria-label="Kategori ekspedisi" style="flex:0 0 auto;height:38px;border:1px solid var(--line);border-radius:7px;padding:0 6px;font-size:13px;font-family:inherit;background:var(--card);">
+              <option value="mitra"${e.kategori === "internal" ? "" : " selected"}>Mitra</option>
+              <option value="internal"${e.kategori === "internal" ? " selected" : ""}>Internal</option>
+            </select>
             <button class="md-row-detail md-lockable" data-eksp-detail="${i}" title="Atur rumus: pembulatan berat, minimum charge & subsidi ongkir" aria-label="Rumus ekspedisi">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h5M8 17h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </button>
@@ -16770,6 +16844,13 @@ if ("serviceWorker" in navigator) {
         renderEkspedisiList();
       });
     });
+    list.querySelectorAll(".md-e-kategori").forEach((sel)=>{
+      const i = +sel.dataset.idx;
+      sel.addEventListener("change", ()=>{
+        EKSPEDISI[i].kategori = sel.value === "internal" ? "internal" : "mitra";
+        refreshAfterDataChange();
+      });
+    });
     list.querySelectorAll("[data-eksp-detail]").forEach(btn=>{
       btn.addEventListener("click", ()=> openEkspedisiDetail(+btn.dataset.ekspDetail));
     });
@@ -16783,6 +16864,7 @@ if ("serviceWorker" in navigator) {
     const nameInput = document.getElementById("md-ekspedisi-add-name");
     const err = document.getElementById("md-ekspedisi-add-err");
     nameInput.value = "";
+    document.getElementById("md-ekspedisi-add-kategori").value = "";
     err.textContent = "";
     overlay.hidden = false;
     setTimeout(()=> nameInput.focus(), 50);
@@ -16807,6 +16889,12 @@ if ("serviceWorker" in navigator) {
         nameInput.focus();
         return;
       }
+      const kategori = document.getElementById("md-ekspedisi-add-kategori").value;
+      if(kategori !== "mitra" && kategori !== "internal"){
+        err.textContent = "Pilih kategori ekspedisi: Mitra atau Internal.";
+        err.style.color = "var(--danger-red)";
+        return;
+      }
       const dupe = EKSPEDISI.some(e=> (e.name||"").trim().toLowerCase() === name.toLowerCase());
       if(dupe){
         err.textContent = "Nama ekspedisi ini sudah ada di daftar.";
@@ -16814,7 +16902,7 @@ if ("serviceWorker" in navigator) {
         return;
       }
       const newKode = nextKode("E");
-      EKSPEDISI.push({kode: newKode, name, pembulatanLonggar:false, minBeratKg:0, minBeratCustom:false, subsidiKhusus:false, subsidiPersenOngkir:20, subsidiPersenBatas:80});
+      EKSPEDISI.push({kode: newKode, name, kategori, pembulatanLonggar:false, minBeratKg:0, minBeratCustom:false, subsidiKhusus:false, subsidiPersenOngkir:20, subsidiPersenBatas:80});
       if(ekspedisiSearchInput) ekspedisiSearchInput.value = "";
       renderEkspedisiList();
       close();

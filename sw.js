@@ -4,8 +4,12 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v402";
+const CACHE_VERSION = "v404";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v404 -- (app v2.88.0) Master Data: kartu "Konfirmasi Pengiriman" (pengingat belum dikonfirmasi + jamnya, konfirmasi otomatis dari resi). BUTUH Worker v463.
+   */
+/* v403 -- (app v2.87.0) Master Data > Ekspedisi: kategori Mitra/Internal (data lama otomatis Mitra, kategori wajib dipilih saat tambah ekspedisi baru). BUTUH Worker v462 untuk tombol konfirmasi pengiriman & baris "Pengiriman" di Rekap Invoice.
+   */
 /* v402 -- (app v2.86.0) Menu Follow Up dibagi 2 tab: "Follow Up" & "Forecast" (kartu Forecast Penjualan Qty pindah ke tab sendiri). Murni frontend.
    */
 /* v401 -- (app v2.85.0) Forecast Penjualan Qty (Karton & Pack): angka utama = NILAI HARAPAN (bukan pesimis), rumus dipilih otomatis lewat
