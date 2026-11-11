@@ -6,7 +6,7 @@
    ============================================================ */
 const CACHE_VERSION = "v404";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
-/* v404 -- (app v2.88.0) Master Data: kartu "Konfirmasi Pengiriman" (pengingat belum dikonfirmasi + jamnya, konfirmasi otomatis dari resi). BUTUH Worker v463.
+/* v404 -- (app v2.88.0) Perbaikan lebar dropdown kategori ekspedisi + Master Data: kartu "Konfirmasi Pengiriman" (pengingat belum dikonfirmasi + jamnya, konfirmasi otomatis dari resi). BUTUH Worker v463.
    */
 /* v403 -- (app v2.87.0) Master Data > Ekspedisi: kategori Mitra/Internal (data lama otomatis Mitra, kategori wajib dipilih saat tambah ekspedisi baru). BUTUH Worker v462 untuk tombol konfirmasi pengiriman & baris "Pengiriman" di Rekap Invoice.
    */
