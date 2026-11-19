@@ -4312,15 +4312,13 @@ html[data-theme="dark"] .ut-badge.sebagian{ background:#3a2f12; color:#f3d98a; }
 
   @media (min-width: 1500px) {
 
-    .wrap {
+    /* Konten memenuhi lebar layar (tabel Rekap Pesanan/Follow Up butuh
+       ruang lebar). Batas 1500px HANYA dipertahankan untuk form
+       Penjualan/Custom saat sidebar dibuka penuh, supaya form tidak
+       terlalu renggang di layar sangat lebar. Sidebar mode ikon (burger)
+       selalu memenuhi layar di semua halaman. */
+    body:not(.showing-home):not(.showing-rekap):not(.showing-followup):not(.sidebar-collapsed) .wrap {
       max-width: 1500px;
-    }
-
-    /* Sidebar mode ikon (burger): batas lebar 1500px dilepas supaya
-       konten otomatis memenuhi seluruh layar. Mode sidebar penuh tetap
-       memakai batas 1500px seperti biasa. */
-    body.sidebar-collapsed .wrap {
-      max-width: none;
     }
 
     .grid {
@@ -6526,7 +6524,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.91.1</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.91.2</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6800,7 +6798,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.91.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.91.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Beranda, Rekap Pesanan, dan Follow Up memenuhi layar</b> — batas lebar 1500px dilepas di tiga halaman ini walau menu samping dibuka penuh, jadi tidak ada lagi ruang kosong di kanan pada layar lebar. Form Penjualan/Custom tetap dibatasi 1500px saat menu samping penuh; di mode ikon semua halaman memenuhi layar.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.91.1</div>
           <ul>
             <li><b>Mode ikon memenuhi layar</b> — saat menu samping diciutkan jadi ikon lewat tombol burger (☰), area konten sekarang otomatis melebar sampai tepi kanan layar (sebelumnya berhenti di lebar 1500px sehingga ada ruang kosong di kanan pada layar lebar). Saat menu samping dibuka penuh, tampilannya tidak berubah.</li>
           </ul>

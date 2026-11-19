@@ -4,9 +4,11 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v409";
+const CACHE_VERSION = "v410";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
-/* v409 -- Perbaikan tampilan Master Data > Tampilan: dropdown "Kecepatan gerak" (running text Belum Lunas) diberi lebar tetap supaya teks di sebelahnya tidak terperas. Murni CSS/frontend.
+/* v410 -- (app v2.91.2) Perbaikan tampilan Master Data > Tampilan: dropdown "Kecepatan gerak" (running text Belum Lunas) diberi lebar tetap supaya teks di sebelahnya tidak terperas. Murni CSS/frontend.
+   */
+/* v409 -- (app v2.91.2) Beranda/Rekap Pesanan/Follow Up memenuhi layar walau sidebar penuh (batas 1500px dipertahankan hanya utk form Penjualan/Custom saat sidebar penuh). Murni CSS/frontend.
    */
 /* v408 -- (app v2.91.1) Sidebar mode ikon: konten otomatis memenuhi layar (batas lebar 1500px dilepas saat body.sidebar-collapsed). Murni CSS/frontend.
    */
