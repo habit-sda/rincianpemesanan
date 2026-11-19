@@ -4,8 +4,12 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v406";
+const CACHE_VERSION = "v408";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v408 -- (app v2.91.1) Sidebar mode ikon: konten otomatis memenuhi layar (batas lebar 1500px dilepas saat body.sidebar-collapsed). Murni CSS/frontend.
+   */
+/* v407 -- (app v2.91.0) Beranda desktop: running text pesanan BELUM LUNAS (belum ada pembayaran / bayar sebagian) milik CS yang sedang login + popup daftar; pengaturan nyala/mati & kecepatan di Master Data > Tampilan. Memakai endpoint Worker yang sudah ada (/cs-names, /rekap-pesanan-7hari), tidak butuh Worker baru. Sinkron antar-perangkat butuh Worker menyimpan key settings unpaidTickerEnabled & unpaidTickerSpeed.
+   */
 /* v406 -- (app v2.90.0) Burger menu: sidebar desktop bisa diciutkan jadi strip ikon 64px (tooltip nama menu), konten ikut melebar; pilihan diingat. Murni frontend.
    */
 /* v405 -- (app v2.89.0) Sidebar desktop bisa dibuka/ditutup lewat tombol burger (☰) di header; pilihan diingat (localStorage). Murni frontend, tidak butuh Worker baru.

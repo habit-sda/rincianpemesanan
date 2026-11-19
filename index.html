@@ -2604,6 +2604,23 @@
    angka yang sudah dihitung di tempat lain, tidak dipakai di HP). */
 .habit-sidebar{ display:none; }
 .habit-burger{ display:none; } /* tombol burger sidebar -- cuma muncul di desktop (>=901px) */
+.unpaid-ticker{ display:none; } /* running text "Belum Lunas" -- cuma muncul di Beranda desktop (>=901px) */
+@keyframes ut-scroll{ from{ transform: translateX(0); } to{ transform: translateX(calc(-1 * var(--ut-dist, 0px))); } }
+
+/* Popup daftar pesanan belum lunas */
+.ut-sum{ font-size:13px; color:var(--ink-soft); margin:0 0 10px; }
+.ut-row{ display:flex; justify-content:space-between; align-items:center; gap:14px; padding:10px 0; border-top:1px solid var(--line); }
+.ut-row:first-of-type{ border-top:0; }
+.ut-row-main{ min-width:0; }
+.ut-row-main b{ font-size:14px; word-break:break-word; }
+.ut-row-sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+.ut-row-right{ text-align:right; flex-shrink:0; }
+.ut-badge{ display:inline-block; border-radius:999px; padding:2px 10px; font-size:12px; font-weight:700; white-space:nowrap; }
+.ut-badge.belum{ background:#fdecea; color:#b3261e; }
+.ut-badge.sebagian{ background:#fff3d6; color:#8a5a00; }
+.ut-sisa{ font-size:12.5px; margin-top:3px; color:var(--ink-soft); }
+html[data-theme="dark"] .ut-badge.belum{ background:#3d1f1c; color:#ff9a90; }
+html[data-theme="dark"] .ut-badge.sebagian{ background:#3a2f12; color:#f3d98a; }
 .wiz-summary-card{ display:none; }
 
 @media (min-width: 901px) {
@@ -3300,6 +3317,67 @@
     outline-offset: 2px;
   }
   .habit-burger + div h1{ padding-left: 12px; }
+
+  /* =======================================================
+     RUNNING TEXT "BELUM LUNAS" (Beranda desktop)
+     Strip tipis di atas Beranda: pesanan milik CS yang sedang login
+     yang belum ada pembayaran / baru dibayar sebagian. Bergerak hanya
+     kalau teksnya lebih panjang dari strip; berhenti saat kursor di atas;
+     klik = daftar lengkap. Atur di Master Data > Tampilan.
+     ======================================================= */
+  .unpaid-ticker:not([hidden]){
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-height: 40px;
+    box-sizing: border-box;
+
+    background: #fff8e6;
+    border: 1px solid #f0d9a0;
+    border-radius: 10px;
+    color: #7a4f00;
+    font-size: 13px;
+
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .unpaid-ticker:focus-visible{ outline: 2px solid var(--habit-green); outline-offset: 2px; }
+  .ut-label{
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px;
+    background: #ffefc2;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .ut-label svg{ width: 16px; height: 16px; flex-shrink: 0; }
+  .ut-viewport{
+    flex: 1; min-width: 0;
+    display: flex; align-items: center;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 28px), transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 28px), transparent 100%);
+  }
+  .ut-track{ display: inline-flex; white-space: nowrap; padding-left: 14px; }
+  .ut-seg{ display: inline-block; padding-right: 56px; }
+  .ut-item b{ color: #5c3a00; font-weight: 700; }
+  .ut-sep, .ut-dot{ opacity: .5; margin: 0 6px; }
+  .ut-age{ opacity: .7; }
+  .ut-more{
+    flex-shrink: 0;
+    display: flex; align-items: center;
+    padding: 0 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: underline;
+  }
+  .ut-moving .ut-track{ animation: ut-scroll linear infinite; will-change: transform; }
+  .unpaid-ticker:hover .ut-track{ animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce){ .ut-moving .ut-track{ animation: none; } }
+
+  html[data-theme="dark"] .unpaid-ticker:not([hidden]){ background:#2e2610; border-color:#6b5520; color:#f3d98a; }
+  html[data-theme="dark"] .ut-label{ background:#3a2f12; }
+  html[data-theme="dark"] .ut-item b{ color:#ffe9a8; }
 
   @media (prefers-reduced-motion: reduce){
     .wrap, .habit-sidebar, body.sidebar-collapsed .habit-sidebar{ transition: none; }
@@ -4238,6 +4316,13 @@
       max-width: 1500px;
     }
 
+    /* Sidebar mode ikon (burger): batas lebar 1500px dilepas supaya
+       konten otomatis memenuhi seluruh layar. Mode sidebar penuh tetap
+       memakai batas 1500px seperti biasa. */
+    body.sidebar-collapsed .wrap {
+      max-width: none;
+    }
+
     .grid {
       grid-template-columns:
         minmax(0, 1.75fr)
@@ -4803,6 +4888,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
 
   <!-- ================= HOME SCREEN (khusus mobile) ================= -->
   <div class="home-screen" id="home-screen">
+    <!-- Running text "Belum Lunas" (desktop saja; diisi & ditampilkan oleh JS, tersembunyi kalau tidak ada data / dimatikan di Master Data > Tampilan) -->
+    <div class="unpaid-ticker" id="unpaid-ticker" hidden role="button" tabindex="0" aria-label="Pesanan belum lunas, klik untuk melihat daftar lengkap">
+      <span class="ut-label">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.3" r="1" fill="currentColor"/></svg>
+        <span><b id="ut-count">0</b> belum lunas</span>
+      </span>
+      <div class="ut-viewport" id="ut-viewport"><div class="ut-track" id="ut-track"></div></div>
+      <span class="ut-more">Lihat daftar</span>
+    </div>
     <div class="home-topbar">
       <div class="home-logo">
         <img src="habit-logo.png" alt="">
@@ -5783,6 +5877,32 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
       </div>
       <div class="md-card">
+        <h3>Running text "Belum Lunas" di Beranda</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M12 7.5v5" stroke="var(--primary-green)" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.3" r="1" fill="var(--primary-green)"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Tampilkan running text pesanan belum lunas</div>
+            <div class="md-togglerow-sub">Khusus tampilan desktop. Strip di atas Beranda berisi pelanggan milik CS yang sedang login (sesuai "ID Telegram Saya") yang rincian pemesanannya belum ada pembayaran atau baru dibayar sebagian. Klik strip untuk melihat daftar lengkap. Cakupan hari mengikuti pengaturan "Tampilkan berapa hari terakhir?" di kartu Rekap Pesanan (maks. 90 hari). Nonaktif = strip hilang dan datanya tidak diambil dari server.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-unpaidticker">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+        <div class="md-togglerow" style="border-top:1px solid var(--line); margin-top:12px; padding-top:12px;">
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Kecepatan gerak</div>
+            <div class="md-togglerow-sub">Teks hanya bergerak kalau lebih panjang dari strip, dan berhenti saat kursor di atasnya. "Diam" = teks tidak bergerak (klik strip untuk daftar lengkap).</div>
+          </div>
+          <select id="md-unpaidticker-speed" style="height:40px; border:1px solid var(--line); border-radius:8px; padding:0 10px; font-size:14px; background:var(--card); color:var(--ink);">
+            <option value="0">Diam</option>
+            <option value="30">Lambat</option>
+            <option value="50">Sedang</option>
+            <option value="80">Cepat</option>
+          </select>
+        </div>
+      </div>
+      <div class="md-card">
         <h3>Menu "Follow Up"</h3>
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17 20v-1.6a3.4 3.4 0 0 0-3.4-3.4H8.4A3.4 3.4 0 0 0 5 18.4V20" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/><circle cx="10.7" cy="7.5" r="3" stroke="var(--primary-green)" stroke-width="1.6"/></svg></div>
@@ -6406,7 +6526,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.90.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.91.1</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6660,6 +6780,17 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
   </div>
 
+  <!-- ================= POPUP DAFTAR PESANAN BELUM LUNAS (dibuka dari running text Beranda) ================= -->
+  <div id="unpaid-overlay" class="calc-overlay" hidden>
+    <div class="calc-popup changelog-popup" role="dialog" aria-label="Pesanan belum lunas">
+      <div class="calc-head">
+        <span>Pesanan Belum Lunas</span>
+        <button id="unpaid-close" class="calc-close" aria-label="Tutup daftar pesanan belum lunas">✕</button>
+      </div>
+      <div class="changelog-body" id="unpaid-list"></div>
+    </div>
+  </div>
+
   <!-- ================= POPUP RIWAYAT UPDATE (CHANGELOG) ================= -->
   <div id="changelog-overlay" class="calc-overlay" hidden>
     <div class="calc-popup changelog-popup" role="dialog" aria-label="Riwayat update">
@@ -6669,7 +6800,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.90.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.91.1 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Mode ikon memenuhi layar</b> — saat menu samping diciutkan jadi ikon lewat tombol burger (☰), area konten sekarang otomatis melebar sampai tepi kanan layar (sebelumnya berhenti di lebar 1500px sehingga ada ruang kosong di kanan pada layar lebar). Saat menu samping dibuka penuh, tampilannya tidak berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.91.0</div>
+          <ul>
+            <li><b>Running text "Belum Lunas" di Beranda (desktop)</b> — strip tipis di atas Beranda berisi pelanggan milik CS yang sedang login yang rincian pemesanannya belum ada pembayaran atau baru dibayar sebagian (lengkap dengan sisa kurangnya dan berapa hari lalu). Teks bergerak pelan kalau panjang dan berhenti saat kursor di atasnya; klik strip untuk daftar lengkap. Butuh "ID Telegram Saya" terisi dan terdaftar di Master Nama CS.</li>
+            <li><b>Pengaturan baru</b> — Master Data &rarr; Tampilan: saklar nyala/mati running text dan pilihan kecepatan gerak (Diam / Lambat / Sedang / Cepat).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.90.0</div>
           <ul>
             <li><b>Menu samping bisa diciutkan jadi ikon</b> — tombol burger (☰) di header sekarang mengubah sidebar antara tampilan penuh dan mode ikon saja (strip sempit). Di mode ikon, arahkan kursor ke ikon untuk melihat nama menunya; pindah halaman tetap satu klik dan area kerja jadi lebih lebar. Pilihanmu diingat saat aplikasi dibuka lagi.</li>
           </ul>
@@ -8188,7 +8332,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, unpaidTickerEnabled:true, unpaidTickerSpeed:50, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -8221,6 +8365,9 @@ function loadSettings(){
     if(typeof s.noBuktiTransferReminderEnabled === "boolean") SETTINGS.noBuktiTransferReminderEnabled = s.noBuktiTransferReminderEnabled;
     if(typeof s.rekapPesananEnabled === "boolean") SETTINGS.rekapPesananEnabled = s.rekapPesananEnabled;
     if(typeof s.rekapPesananHari === "number" && s.rekapPesananHari >= 1 && s.rekapPesananHari <= 90) SETTINGS.rekapPesananHari = s.rekapPesananHari;
+    // BARU -- running text "Belum Lunas" di Beranda desktop (nyala/mati + kecepatan px/detik, 0 = diam)
+    if(typeof s.unpaidTickerEnabled === "boolean") SETTINGS.unpaidTickerEnabled = s.unpaidTickerEnabled;
+    if(typeof s.unpaidTickerSpeed === "number" && s.unpaidTickerSpeed >= 0 && s.unpaidTickerSpeed <= 200) SETTINGS.unpaidTickerSpeed = s.unpaidTickerSpeed;
     if(typeof s.followUpEnabled === "boolean") SETTINGS.followUpEnabled = s.followUpEnabled;
     if(typeof s.followUpNotifEnabled === "boolean") SETTINGS.followUpNotifEnabled = s.followUpNotifEnabled;
     if(typeof s.followUpNotifTime === "string" && s.followUpNotifTime.trim()) SETTINGS.followUpNotifTime = s.followUpNotifTime.trim();
@@ -11127,6 +11274,188 @@ async function initHomeGreeting(){
 window.__refreshHomeGreeting = initHomeGreeting;
 initHomeGreeting();
 
+/* ============ Running text "Belum Lunas" (Beranda desktop) ============
+   Menampilkan pesanan milik CS yang sedang login (dicocokkan lewat "ID
+   Telegram Saya" -> Master Nama CS) yang belum ada pembayaran / baru
+   dibayar sebagian. Datanya dari endpoint /rekap-pesanan-7hari yang SAMA
+   dgn Rekap Pesanan (cakupan hari = pengaturan Rekap Pesanan), tanpa
+   endpoint Worker baru. Hemat beban: cuma diambil di layar desktop,
+   cuma saat Beranda terbuka, dan di-cache 3 menit. Gagal/offline = strip
+   tidak tampil (tidak mengganggu apa pun). ============ */
+(function(){
+  const tickerEl = document.getElementById("unpaid-ticker");
+  const trackEl = document.getElementById("ut-track");
+  const viewportEl = document.getElementById("ut-viewport");
+  const countEl = document.getElementById("ut-count");
+  const overlay = document.getElementById("unpaid-overlay");
+  const listEl = document.getElementById("unpaid-list");
+  const btnClose = document.getElementById("unpaid-close");
+  if(!tickerEl || !trackEl || !viewportEl) return;
+
+  const TTL_MS = 3 * 60 * 1000;
+  const CS_TTL_MS = 10 * 60 * 1000;
+  let unpaidRows = [];
+  let lastFetchAt = 0;
+  let loading = false;
+  let csCache = { key: "", names: null, at: 0 };
+
+  const isDesktop = ()=> window.matchMedia("(min-width: 901px)").matches;
+  const isHome = ()=> document.body.classList.contains("showing-home");
+
+  // Nama CS (+ alias) milik akun yang sedang dipakai, huruf kecil.
+  // ID angka -> dicari di Master Nama CS lewat Telegram ID; teks (nama/username
+  // yang diketik manual) -> dipakai apa adanya. Kosong/tak ketemu -> Set kosong.
+  async function resolveMyCsNames(){
+    const sid = getTelegramSenderId().trim();
+    if(!sid) return new Set();
+    if(!/^\d+$/.test(sid)) return new Set([sid.replace(/^@/, "").toLowerCase()]);
+    if(csCache.key === sid && csCache.names && (Date.now() - csCache.at) < CS_TTL_MS) return csCache.names;
+    const res = await fetch(MASTER_DATA_WORKER_URL + "/cs-names", { headers: workerHeaders() });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    const list = Array.isArray(data.csNames) ? data.csNames : [];
+    const names = new Set();
+    list.forEach(r=>{
+      const ids = String(r.telegramId || "").split(/[\s,;]+/).filter(Boolean);
+      if(ids.indexOf(sid) === -1) return;
+      if(r.name) names.add(String(r.name).trim().toLowerCase());
+      (Array.isArray(r.aliases) ? r.aliases : []).forEach(a=>{ if(a) names.add(String(a).trim().toLowerCase()); });
+    });
+    csCache = { key: sid, names, at: Date.now() };
+    return names;
+  }
+
+  // Status pembayaran dari teks status Rekap Pesanan. Selain "belum ada
+  // transfer" & "cicilan" (Lunas, kelebihan, void/hoax, perlu dicek manual,
+  // tidak ditemukan) SENGAJA tidak dihitung, supaya tidak ada alarm palsu.
+  function classify(r){
+    const st = String(r.status || "");
+    if(/void|hoax/i.test(st)) return null;
+    if(/belum ada transfer/i.test(st)) return { type: "belum", sisa: 0 };
+    if(/cicilan/i.test(st)){
+      const m = st.match(/kurang\s+Rp\s*([\d.,]+)/i);
+      return { type: "sebagian", sisa: m ? (parseInt(m[1].replace(/[^\d]/g, ""), 10) || 0) : 0 };
+    }
+    return null;
+  }
+
+  async function load(force){
+    if(loading) return;
+    if(!SETTINGS.unpaidTickerEnabled || !isDesktop() || !MASTER_DATA_WORKER_URL){ render(unpaidRows); return; }
+    if(!force && lastFetchAt && (Date.now() - lastFetchAt) < TTL_MS){ render(unpaidRows); return; }
+    loading = true;
+    try{
+      const names = await resolveMyCsNames();
+      if(!names.size){ unpaidRows = []; lastFetchAt = Date.now(); return; } // akun belum bisa dikenali sbg CS -> tidak tampil
+      const res = await fetch(MASTER_DATA_WORKER_URL + "/rekap-pesanan-7hari", { headers: workerHeaders() });
+      const body = await res.json();
+      if(!res.ok) throw new Error(body.error || ("HTTP " + res.status));
+      const rows = Array.isArray(body.rows) ? body.rows : [];
+      unpaidRows = rows.map(r=>{
+        if(!names.has(String(r.cs || "").trim().toLowerCase())) return null;
+        const c = classify(r);
+        if(!c) return null;
+        return { customer: String(r.customer || "(tanpa nama)"), createdAtMs: r.createdAtMs || 0, type: c.type, sisa: c.sisa };
+      }).filter(Boolean).sort((a, b)=> (a.createdAtMs || 0) - (b.createdAtMs || 0)); // yang paling lama dulu
+      lastFetchAt = Date.now();
+    }catch(e){
+      console.log("Running text belum lunas gagal dimuat:", e); // data lama (kalau ada) tetap dipakai
+    }finally{
+      loading = false;
+      render(unpaidRows);
+    }
+  }
+
+  function ageText(ms){
+    if(!ms) return "";
+    const hari = Math.floor((Date.now() - ms) / 86400000);
+    return hari <= 0 ? "hari ini" : (hari + " hari lalu");
+  }
+  function labelText(it){
+    return it.type === "belum" ? "belum ada pembayaran" : ("bayar sebagian" + (it.sisa ? ", kurang " + rupiah(it.sisa) : ""));
+  }
+  function itemHtml(it){
+    const age = ageText(it.createdAtMs);
+    return `<span class="ut-item"><b>${escHtml(it.customer)}</b><span class="ut-sep">·</span>${escHtml(labelText(it))}${age ? ` <span class="ut-age">(${escHtml(age)})</span>` : ""}</span>`;
+  }
+
+  function render(rows){
+    const show = !!SETTINGS.unpaidTickerEnabled && isDesktop() && rows.length > 0;
+    tickerEl.hidden = !show;
+    if(!show){ trackEl.innerHTML = ""; tickerEl.classList.remove("ut-moving"); return; }
+    countEl.textContent = rows.length;
+    trackEl.innerHTML = '<span class="ut-seg">' + rows.map(itemHtml).join('<span class="ut-dot">•</span>') + "</span>";
+    applySpeed();
+  }
+
+  // Gerak hanya kalau teks lebih panjang dari strip; kecepatan = px/detik
+  // (0 = diam). Segmen diduplikasi supaya putarannya mulus tanpa jeda.
+  function applySpeed(){
+    tickerEl.classList.remove("ut-moving");
+    trackEl.style.animationDuration = "";
+    trackEl.querySelectorAll(".ut-clone").forEach(n=> n.remove());
+    const seg = trackEl.querySelector(".ut-seg");
+    const speed = Number(SETTINGS.unpaidTickerSpeed) || 0;
+    if(!seg || speed <= 0) return;
+    const vpW = viewportEl.getBoundingClientRect().width;
+    const segW = seg.getBoundingClientRect().width;
+    if(!vpW || !segW) return;          // belum terlihat (mis. bukan di Beranda) -> diukur ulang nanti
+    if(segW <= vpW - 20) return;       // muat dalam satu baris -> tidak perlu bergerak
+    const clone = seg.cloneNode(true);
+    clone.classList.add("ut-clone");
+    clone.setAttribute("aria-hidden", "true");
+    trackEl.appendChild(clone);
+    trackEl.style.setProperty("--ut-dist", segW + "px");
+    trackEl.style.animationDuration = (segW / speed) + "s";
+    tickerEl.classList.add("ut-moving");
+  }
+
+  function openList(){
+    if(!overlay || !listEl) return;
+    const belum = unpaidRows.filter(r=> r.type === "belum").length;
+    const sebagian = unpaidRows.length - belum;
+    listEl.innerHTML =
+      `<p class="ut-sum">${belum} belum ada pembayaran &middot; ${sebagian} bayar sebagian &middot; paling lama di atas</p>` +
+      unpaidRows.map(it=>{
+        const tgl = it.createdAtMs ? new Date(it.createdAtMs).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta", day: "2-digit", month: "short" }) : "-";
+        const age = ageText(it.createdAtMs);
+        return `<div class="ut-row"><div class="ut-row-main"><b>${escHtml(it.customer)}</b><div class="ut-row-sub">${escHtml(tgl)}${age ? " &middot; " + escHtml(age) : ""}</div></div>` +
+          `<div class="ut-row-right"><span class="ut-badge ${it.type}">${it.type === "belum" ? "Belum ada pembayaran" : "Bayar sebagian"}</span>` +
+          (it.type === "sebagian" && it.sisa ? `<div class="ut-sisa">kurang ${escHtml(rupiah(it.sisa))}</div>` : "") + `</div></div>`;
+      }).join("");
+    overlay.hidden = false;
+  }
+  function closeList(){ if(overlay) overlay.hidden = true; }
+
+  tickerEl.addEventListener("click", openList);
+  tickerEl.addEventListener("keydown", (e)=>{ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openList(); } });
+  if(btnClose) btnClose.addEventListener("click", closeList);
+  if(overlay){
+    overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeList(); });
+    document.addEventListener("keydown", (e)=>{ if(!overlay.hidden && e.key === "Escape") closeList(); });
+  }
+
+  // Dipakai Master Data (nyala/mati, kecepatan) & tarik pengaturan dari server.
+  window.__refreshUnpaidTicker = function(forceFetch){
+    if(forceFetch) lastFetchAt = 0;
+    load(!!forceFetch);
+  };
+
+  // Muat saat Beranda tampil (awal & tiap kembali ke Beranda), tiap kali tab
+  // kembali terlihat, dan cek berkala (tetap dibatasi TTL 3 menit).
+  let wasHome = isHome();
+  new MutationObserver(()=>{
+    const now = isHome();
+    if(now && !wasHome) load(false);
+    wasHome = now;
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && isHome()) load(false); });
+  setInterval(()=>{ if(!document.hidden && isHome()) load(false); }, 60 * 1000);
+  let rsz = null;
+  window.addEventListener("resize", ()=>{ clearTimeout(rsz); rsz = setTimeout(()=> render(unpaidRows), 200); });
+  setTimeout(()=>{ if(isHome()) load(false); }, 800);
+})();
+
 /* ============ init ============ */
 buildRows("penjualan"); buildRows("custom");
 buildEkspedisi("penjualan"); buildEkspedisi("custom");
@@ -14006,6 +14335,7 @@ if ("serviceWorker" in navigator) {
     syncPenjualanSlice();
     saveMasterData();
     saveSettings();
+    if(window.__refreshUnpaidTicker) window.__refreshUnpaidTicker(false); // BARU -- pengaturan running text bisa berubah dari perangkat lain
     applySettingsToDom();
     // Cadangkan dulu isian baris (termasuk yang baru dipulihkan loadDraft())
     // SEBELUM buildRows() membangun ulang tabel dari nol akibat data produk
@@ -14124,6 +14454,30 @@ if ("serviceWorker" in navigator) {
       SETTINGS.rekapPesananHari = v;
       saveSettings();
       await confirmMasterDataSave(`Rekap Pesanan sekarang menampilkan ${v} hari terakhir.`);
+    });
+  }
+
+  // BARU -- running text "Belum Lunas" (Beranda desktop): nyala/mati + kecepatan
+  const toggleUnpaidTicker = document.getElementById("md-toggle-unpaidticker");
+  const selectUnpaidSpeed = document.getElementById("md-unpaidticker-speed");
+  if(toggleUnpaidTicker){
+    toggleUnpaidTicker.checked = SETTINGS.unpaidTickerEnabled !== false;
+    toggleUnpaidTicker.addEventListener("change", async ()=>{
+      SETTINGS.unpaidTickerEnabled = toggleUnpaidTicker.checked;
+      saveSettings();
+      if(window.__refreshUnpaidTicker) window.__refreshUnpaidTicker(true);
+      await confirmMasterDataSave(SETTINGS.unpaidTickerEnabled ? "Running text pesanan belum lunas diaktifkan." : "Running text pesanan belum lunas dimatikan.");
+    });
+  }
+  if(selectUnpaidSpeed){
+    selectUnpaidSpeed.value = String(Number(SETTINGS.unpaidTickerSpeed) || 0);
+    if(selectUnpaidSpeed.value !== String(Number(SETTINGS.unpaidTickerSpeed) || 0)) selectUnpaidSpeed.value = "50"; // nilai tak dikenal -> Sedang
+    selectUnpaidSpeed.addEventListener("change", async ()=>{
+      SETTINGS.unpaidTickerSpeed = parseInt(selectUnpaidSpeed.value, 10) || 0;
+      saveSettings();
+      if(window.__refreshUnpaidTicker) window.__refreshUnpaidTicker(false);
+      const nama = selectUnpaidSpeed.options[selectUnpaidSpeed.selectedIndex].text;
+      await confirmMasterDataSave("Kecepatan running text: " + nama + ".");
     });
   }
 
