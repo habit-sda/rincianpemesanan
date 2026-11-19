@@ -2603,6 +2603,7 @@
    seperti biasa (kartu Ringkasan ini elemen BARU, murni tampilan ulang
    angka yang sudah dihitung di tempat lain, tidak dipakai di HP). */
 .habit-sidebar{ display:none; }
+.habit-burger{ display:none; } /* tombol burger sidebar -- cuma muncul di desktop (>=901px) */
 .wiz-summary-card{ display:none; }
 
 @media (min-width: 901px) {
@@ -3219,6 +3220,89 @@
     margin: 0 0 0 240px;
 
     padding: 0 32px;
+
+    transition: margin-left .25s ease;
+  }
+
+  /* =======================================================
+     BURGER MENU -- sidebar penuh <-> mode ikon saja
+     Klik tombol burger di header => body.sidebar-collapsed:
+     sidebar mengecil jadi strip ikon 64px (nama menu muncul sbg
+     tooltip saat kursor di atas ikon) & konten melebar.
+     Pilihan diingat di localStorage (habit_sidebar_collapsed).
+     ======================================================= */
+  .habit-sidebar{ transition: width .25s ease, padding .25s ease; }
+  .habit-sidebar-link{ white-space: nowrap; }
+
+  body.sidebar-collapsed .habit-sidebar{
+    width: 64px;
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow-x: hidden;
+  }
+  body.sidebar-collapsed .wrap{ margin-left: 64px; }
+
+  /* logo: cuma gambar, teks "Habit / Halawa Bintang Utama" disembunyikan */
+  body.sidebar-collapsed .habit-sidebar-logo{
+    justify-content: center;
+    padding: 0;
+    margin-bottom: 18px;
+  }
+  body.sidebar-collapsed .habit-sidebar-logo > div{ display: none; }
+
+  /* label grup (Penjualan / Alat Bantu) jadi garis pemisah tipis */
+  body.sidebar-collapsed .habit-sidebar-group-label{
+    height: 1px;
+    margin: 12px 10px;
+    padding: 0;
+    overflow: hidden;
+    font-size: 0;
+    background: var(--habit-border);
+  }
+
+  /* tombol menu: cuma ikon, di tengah (teks disembunyikan lewat font-size:0;
+     ukuran ikon sudah px tetap jadi tidak ikut mengecil) */
+  body.sidebar-collapsed .habit-sidebar-link{
+    justify-content: center;
+    gap: 0;
+    padding: 11px 0;
+    font-size: 0;
+  }
+
+  body.sidebar-collapsed .habit-sidebar-version{ display: none; }
+
+  .habit-burger{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    margin-left: 14px;
+    padding: 0;
+
+    border: 1px solid var(--habit-border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--habit-ink);
+    cursor: pointer;
+
+    transition: background .15s ease, color .15s ease;
+  }
+  .habit-burger svg{ width: 20px; height: 20px; }
+  .habit-burger:hover{
+    background: var(--habit-green-pale);
+    color: var(--habit-green);
+  }
+  .habit-burger:focus-visible{
+    outline: 2px solid var(--habit-green);
+    outline-offset: 2px;
+  }
+  .habit-burger + div h1{ padding-left: 12px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .wrap, .habit-sidebar, body.sidebar-collapsed .habit-sidebar{ transition: none; }
   }
 
 
@@ -4697,6 +4781,9 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
 <div class="wrap">
 
   <header>
+    <button type="button" class="habit-burger" id="habit-burger" aria-label="Ciutkan menu samping" aria-controls="habit-sidebar" aria-expanded="true" title="Ciutkan / perluas menu">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
     <div>
       <h1>Rincian Pemesanan (Rp)</h1>
       <div class="sub">Halawa Bintang Utama</div>
@@ -6319,7 +6406,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.88.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.90.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6582,7 +6669,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.88.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.90.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Menu samping bisa diciutkan jadi ikon</b> — tombol burger (☰) di header sekarang mengubah sidebar antara tampilan penuh dan mode ikon saja (strip sempit). Di mode ikon, arahkan kursor ke ikon untuk melihat nama menunya; pindah halaman tetap satu klik dan area kerja jadi lebih lebar. Pilihanmu diingat saat aplikasi dibuka lagi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.89.0</div>
+          <ul>
+            <li><b>Menu samping bisa dibuka/ditutup</b> — di layar desktop ada tombol burger (☰) di sebelah kiri judul halaman. Klik untuk menyembunyikan sidebar sehingga area kerja melebar penuh, klik lagi untuk memunculkannya. Pilihanmu diingat saat aplikasi dibuka lagi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.88.0</div>
           <ul>
             <li><b>Konfirmasi pengiriman, lanjutan</b> — kartu baru di Master Data: <i>Konfirmasi Pengiriman</i>. Pengingat otomatis kalau tombol di DM "Pesanan sudah di-ACC Finance" belum ditekan (jamnya bisa diatur) dan konfirmasi otomatis dari resi (ekspedisi Mitra). Di sisi bot: tombol <i>Salah tekan, batalkan</i> (10 menit), bagian "Belum dikonfirmasi pengiriman" di Rekap Logistik, perintah <code>/statpengiriman</code>, dan ekspedisi berkategori Internal otomatis dilewati pembacaan nominal resi. Butuh Worker v463.</li>
             <li><b>Perbaikan tampilan</b> — dropdown kategori di Master Data &gt; Ekspedisi tidak lagi melebar sampai menutupi kolom nama ekspedisi.</li>
@@ -17656,6 +17755,38 @@ if ("serviceWorker" in navigator) {
   const sbVersion = byId("sb-app-version");
   const mainVersion = byId("app-current-version");
   if(sbVersion && mainVersion) sbVersion.textContent = mainVersion.textContent;
+
+  /* ---- Burger menu: sidebar penuh <-> mode ikon saja (desktop >=901px).
+     Cuma menyalakan/mematikan kelas body.sidebar-collapsed (CSS yang
+     mengecilkan sidebar & melebarkan konten). Pilihan diingat. ---- */
+  (function(){
+    const KEY = "habit_sidebar_collapsed";
+    const burger = byId("habit-burger");
+    if(!burger) return;
+    function apply(collapsed, save){
+      document.body.classList.toggle("sidebar-collapsed", collapsed);
+      burger.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      burger.setAttribute("aria-label", collapsed ? "Perluas menu samping" : "Ciutkan menu samping");
+      // mode ikon: nama menu ditampilkan sbg tooltip bawaan browser (title)
+      document.querySelectorAll(".habit-sidebar-link").forEach(function(btn){
+        if(collapsed){
+          const t = (btn.textContent || "").replace(/\s+/g, " ").trim();
+          if(t) btn.setAttribute("title", t);
+        } else {
+          btn.removeAttribute("title");
+        }
+      });
+      if(save){ try{ localStorage.setItem(KEY, collapsed ? "1" : "0"); }catch(e){} }
+      // lebar konten berubah -> minta komponen yang ngukur lebar (mis. keranjang Mode Kasir) hitung ulang
+      setTimeout(()=>{ try{ window.dispatchEvent(new Event("resize")); }catch(e){} }, 280);
+    }
+    let saved = false;
+    try{ saved = localStorage.getItem(KEY) === "1"; }catch(e){}
+    if(saved) apply(true, false);
+    burger.addEventListener("click", ()=>{
+      apply(!document.body.classList.contains("sidebar-collapsed"), true);
+    });
+  })();
 
   /* ---- Kartu "Ringkasan Pesanan" desktop — cuma MENAMPILKAN ULANG
      angka yang sudah dihitung oleh calc() di tempat lain (dibaca dari
