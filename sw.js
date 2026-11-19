@@ -4,8 +4,10 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v408";
+const CACHE_VERSION = "v409";
 const CACHE_NAME = "habit-" + CACHE_VERSION;
+/* v409 -- Perbaikan tampilan Master Data > Tampilan: dropdown "Kecepatan gerak" (running text Belum Lunas) diberi lebar tetap supaya teks di sebelahnya tidak terperas. Murni CSS/frontend.
+   */
 /* v408 -- (app v2.91.1) Sidebar mode ikon: konten otomatis memenuhi layar (batas lebar 1500px dilepas saat body.sidebar-collapsed). Murni CSS/frontend.
    */
 /* v407 -- (app v2.91.0) Beranda desktop: running text pesanan BELUM LUNAS (belum ada pembayaran / bayar sebagian) milik CS yang sedang login + popup daftar; pengaturan nyala/mati & kecepatan di Master Data > Tampilan. Memakai endpoint Worker yang sudah ada (/cs-names, /rekap-pesanan-7hari), tidak butuh Worker baru. Sinkron antar-perangkat butuh Worker menyimpan key settings unpaidTickerEnabled & unpaidTickerSpeed.
