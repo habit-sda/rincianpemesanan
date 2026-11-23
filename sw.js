@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v410";
+const CACHE_VERSION = "v411";
+/* v411 -- (app v2.92.0) Kartu baru Master Data > Finance: saklar "Pengingat Invoice Belum Dibuat (DM ke CS)" (setting invoicePengingatEnabled). Butuh Worker v464. */
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* v410 -- (app v2.91.2) Perbaikan tampilan Master Data > Tampilan: dropdown "Kecepatan gerak" (running text Belum Lunas) diberi lebar tetap supaya teks di sebelahnya tidak terperas. Murni CSS/frontend.
    */

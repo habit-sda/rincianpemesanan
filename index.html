@@ -6270,6 +6270,20 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
       </div>
       <div class="md-card">
+        <h3>Pengingat Invoice Belum Dibuat (DM ke CS)</h3>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3h7l4 4v14H7z" stroke="var(--primary-green)" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v4h4M10 12h5M10 16h5" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Ingatkan CS 1 jam sebelum rekap harian</div>
+            <div class="md-togglerow-sub">Aktif: 1 jam sebelum jadwal rekap harian tiap CS, bot kirim DM ke CS pembuat pesanan yang sudah Lunas atau kelebihan bayar (7 hari terakhir) tapi kolom Invoice di Rekap Pesanan masih "Belum". Maksimal 1 DM per CS per hari; tidak dikirim kalau tidak ada yang tertunda, di hari libur, atau untuk pesanan Void/Hoax. Jadwal khusus per-orang ("/aturjadwal") ikut diikuti untuk CS yang ada di Daftar CS. Nonaktif: pengingat tidak dikirim. Butuh Worker v464.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-invoicepengingat">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="md-card">
         <h3>Cocok Otomatis Bukti Transfer (DM Bot)</h3>
         <div class="md-togglerow">
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12a8 8 0 1 1 8 8" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/><path d="M4 12l3-3M4 12l3 3" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -6524,7 +6538,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.91.2</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.92.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6798,7 +6812,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.91.2 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.92.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Pengingat Invoice Belum Dibuat (DM ke CS)</b> — 1 jam sebelum rekap harian, bot mengingatkan CS pembuat pesanan yang sudah Lunas atau kelebihan bayar (7 hari terakhir) tapi kolom Invoice-nya masih "Belum". Saklar ada di Master Data &gt; Finance, di bawah Rekap Invoice Harian. <i>Butuh Worker v464.</i></li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.91.2</div>
           <ul>
             <li><b>Beranda, Rekap Pesanan, dan Follow Up memenuhi layar</b> — batas lebar 1500px dilepas di tiga halaman ini walau menu samping dibuka penuh, jadi tidak ada lagi ruang kosong di kanan pada layar lebar. Form Penjualan/Custom tetap dibatasi 1500px saat menu samping penuh; di mode ikon semua halaman memenuhi layar.</li>
           </ul>
@@ -8336,7 +8356,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, unpaidTickerEnabled:true, unpaidTickerSpeed:50, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, unpaidTickerEnabled:true, unpaidTickerSpeed:50, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, invoicePengingatEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -8364,6 +8384,7 @@ function loadSettings(){
     if(typeof s.pengirimanPengingatEnabled === "boolean") SETTINGS.pengirimanPengingatEnabled = s.pengirimanPengingatEnabled;
     if(typeof s.pengirimanPengingatJam === "number" && s.pengirimanPengingatJam >= 1 && s.pengirimanPengingatJam <= 24) SETTINGS.pengirimanPengingatJam = s.pengirimanPengingatJam;
     if(typeof s.pengirimanAutoResiEnabled === "boolean") SETTINGS.pengirimanAutoResiEnabled = s.pengirimanAutoResiEnabled;
+    if(typeof s.invoicePengingatEnabled === "boolean") SETTINGS.invoicePengingatEnabled = s.invoicePengingatEnabled; // v2.92.0
     if(typeof s.resiTagihanTopicId === "string") SETTINGS.resiTagihanTopicId = s.resiTagihanTopicId.trim();
     if(typeof s.resiAjaTopicId === "string") SETTINGS.resiAjaTopicId = s.resiAjaTopicId.trim();
     if(typeof s.noBuktiTransferReminderEnabled === "boolean") SETTINGS.noBuktiTransferReminderEnabled = s.noBuktiTransferReminderEnabled;
@@ -14585,6 +14606,19 @@ if ("serviceWorker" in navigator) {
       SETTINGS.dailyRecapAutoEnabled = toggleDailyRecap.checked;
       saveSettings();
       await confirmMasterDataSave(SETTINGS.dailyRecapAutoEnabled ? "Rekap invoice harian otomatis diaktifkan." : "Rekap invoice harian otomatis dimatikan (command manual tetap bisa dipakai).");
+    });
+  }
+
+  /* ---------- toggle: Pengingat Invoice Belum Dibuat (Finance) ----------
+     SAMA pola dgn dailyRecapAutoEnabled di atas -- murni disimpan ke
+     settings, DIBACA & dicek oleh WORKER (checkInvoicePengingatCs). */
+  const toggleInvoicePengingat = document.getElementById("md-toggle-invoicepengingat");
+  if(toggleInvoicePengingat){
+    toggleInvoicePengingat.checked = SETTINGS.invoicePengingatEnabled !== false;
+    toggleInvoicePengingat.addEventListener("change", async ()=>{
+      SETTINGS.invoicePengingatEnabled = toggleInvoicePengingat.checked;
+      saveSettings();
+      await confirmMasterDataSave(SETTINGS.invoicePengingatEnabled ? "Pengingat invoice belum dibuat diaktifkan." : "Pengingat invoice belum dibuat dimatikan.");
     });
   }
 
