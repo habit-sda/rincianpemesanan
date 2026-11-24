@@ -4,7 +4,11 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v411";
+const CACHE_VERSION = "v415";
+/* v415 -- Rekap Pesanan: indikator "sudah diterima customer" jadi badge rumah 🏠 (biru); "di ekspedisi" tetap 🚚 hijau. Hanya index.html. */
+/* v414 -- Rekap Pesanan: indikator "Terkirim" (✅ diterima customer / 🚚 di ekspedisi + jam) di kolom Ekspedisi (tabel & kartu HP) + kolom "Pengiriman" di ekspor CSV. Butuh Worker v466. */
+/* v413 -- Follow Up: status "Belum dilapor CS" (butuh Worker v465): kartu "Belum Dilapor CS" (ex "Terlewat 2 Minggu"), badge "⚠️ belum dilapor CS" di tabel/kartu, keterangan di popup detail. Tanpa Worker v465 kartu memakai cadangan jadwalAsli. */
+/* v412 -- Follow Up: kartu "Terlewat 2 Minggu" (& kotak Potensi "Terlewat") dihitung dari jadwal ASLI (jadwalAsli), bukan r.sisa<0 yang sejak v438 tidak pernah negatif. Hanya index.html; Worker tidak berubah. */
 /* v411 -- (app v2.92.0) Kartu baru Master Data > Finance: saklar "Pengingat Invoice Belum Dibuat (DM ke CS)" (setting invoicePengingatEnabled). Butuh Worker v464. */
 const CACHE_NAME = "habit-" + CACHE_VERSION;
 /* v410 -- (app v2.91.2) Perbaikan tampilan Master Data > Tampilan: dropdown "Kecepatan gerak" (running text Belum Lunas) diberi lebar tetap supaya teks di sebelahnya tidak terperas. Murni CSS/frontend.

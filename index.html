@@ -18471,6 +18471,17 @@ if ("serviceWorker" in navigator) {
       if(allRows.length){ renderRekapTable(); } // BARU -- render ulang begitu alias selesai dimuat, tanpa perlu refresh manual
     }catch(e){ console.log("Gagal ambil daftar alias untuk Rekap Pesanan:", e); }
   }
+  // v466 -- indikator "Terkirim" di Rekap Pesanan (r.pengiriman dari Worker v466 = konfirmasi pengiriman Logistik / otomatis dari resi).
+  // "" kalau belum dikonfirmasi (atau Worker masih versi lama -> field tidak ada).
+  function rkBadgePengiriman(r){
+    const p = r && r.pengiriman;
+    if(!p || !p.kind) return "";
+    const diterima = p.kind === "t";
+    const tip = (diterima ? "Sudah diterima customer" : "Sudah diserahkan ke ekspedisi") + " · " + (p.auto ? "otomatis (resi masuk)" : (p.oleh || "-")) + (p.waktu ? " · " + p.waktu : "");
+    // v467 -- "sudah diterima customer" = badge RUMAH (biru), "di ekspedisi" tetap badge truk hijau.
+    const warna = diterima ? "color:#0d47a1;background:#e3f0fd;border:1px solid #90caf9;" : "color:#1b5e20;background:#e6f4ea;border:1px solid #a5d6a7;";
+    return `<div style="margin-top:3px;"><span title="${escHtml(tip)}" style="display:inline-block;font-size:10.5px;font-weight:700;${warna}border-radius:6px;padding:1px 6px;white-space:normal;">${diterima ? "🏠 Sudah diterima customer" : "🚚 Terkirim · di ekspedisi"}${p.jam ? " · " + escHtml(p.jam) : ""}</span></div>`;
+  }
   function rkAliasSubline(customerName){
     const aliases = rkAliasLookup[(customerName || "").trim().toUpperCase()];
     if(!aliases || !aliases.length) return "";
@@ -18820,7 +18831,7 @@ if ("serviceWorker" in navigator) {
       // lebih murah dihitung (tidak perlu serialize seluruh object per
       // baris, cuma beberapa field pendek + join string).
       const signatureBaru = rowsBaru.length + "|" + rowsBaru.map(r=>
-        r.anchorId + ":" + r.lastActivityAtMs + ":" + (r.manualInvoiced?1:0) + ":" + (r.resi?1:0) + ":" + (r.fieldsChanged||[]).join(",")
+        r.anchorId + ":" + r.lastActivityAtMs + ":" + (r.manualInvoiced?1:0) + ":" + (r.resi?1:0) + ":" + (r.pengiriman ? r.pengiriman.kind : "") + ":" + (r.fieldsChanged||[]).join(",")
       ).join(";");
       lastFetchedAt = new Date();
       if(silent && signatureBaru === lastRowsSignature){
@@ -19118,6 +19129,7 @@ if ("serviceWorker" in navigator) {
           <span><b>${r.resi ? (r.resiMethod === "teks" ? "✅ Resi ada (teks)" : "✅ Resi ada") : "❌ Belum resi"}</b></span>
           <span>${escHtml(r.ekspedisi || "-")}${r.kg ? " &middot; " + escHtml(r.kg) + " kg" : ""}</span>
         </div>
+        ${rkBadgePengiriman(r)}
         <div style="display:flex; justify-content:space-between;">${cb("resi")}${cb("ekspedisi", "kg")}</div>
         <div class="rc-card-bottom">
           <button class="md-btn rekap-invoice-btn ${r.manualInvoiced ? "state-sudah" : "state-belum"}" data-anchor="${escHtml(r.anchorId)}" data-state="${r.manualInvoiced ? "sudah" : "belum"}" style="height:auto; padding:6px 12px; font-size:13px; width:100%;">${r.manualInvoiced ? "✓ Sudah di Invoice" : "Belum di Invoice"}</button>
@@ -19264,7 +19276,7 @@ if ("serviceWorker" in navigator) {
         kodeListTampil.map(k=> td(r.items && r.items[k] ? r.items[k] : "-", "text-align:center;")).join("") +
         td(`<div>${r.totalQty || 0}</div>` + (()=>{ const o = orphanItemsInfo(r, kodeList); return o ? `<div title="Produk tanpa Kode Singkat:\n${escHtml(o)}" style="cursor:help;font-size:11px;line-height:1.2;">🏷️</div>` : ""; })() + changeBadge("varian", true), "text-align:center; font-weight:600;") +
         td(escHtml(ringkasStatus(r.status)) + changeBadge("status", false), "white-space:normal; word-break:break-word; max-width:130px;") + td(escHtml(r.kg) + changeBadge("kg", true), "text-align:center; white-space:nowrap;") +
-        td(escHtml(r.ekspedisi) + changeBadge("ekspedisi", false), "white-space:normal; word-break:break-word; max-width:120px;") +
+        td(escHtml(r.ekspedisi) + rkBadgePengiriman(r) + changeBadge("ekspedisi", false), "white-space:normal; word-break:break-word; max-width:120px;") +
         // DIUBAH (permintaan "indikator resi foto vs teks, agar bisa
         // dianalisa mana yang ada bukti foto vs cuma laporan teks") --
         // r.resiMethod ("foto"/"teks"/null) dari server. "foto" (termasuk
@@ -19443,13 +19455,13 @@ if ("serviceWorker" in navigator) {
   document.getElementById("rekap-export-csv-btn").addEventListener("click", ()=>{
     const { rows, kodeList } = terapkanFilter();
     if(!rows.length){ showMsg("Tidak ada data untuk diekspor.", true); return; }
-    const header = ["No","Hari","Tanggal/Jam","CS","Customer", ...kodeList, "Total Qty","Status","KG","Ekspedisi","Ongkir","Resi","Sudah di Invoice"];
+    const header = ["No","Hari","Tanggal/Jam","CS","Customer", ...kodeList, "Total Qty","Status","KG","Ekspedisi","Ongkir","Resi","Sudah di Invoice","Pengiriman"];
     const csvEscape = (v)=> `"${String(v).replace(/"/g,'""')}"`;
     const lines = [header.map(csvEscape).join(",")];
     rows.forEach((r,i)=>{
       const row = [i+1, r.hari, r.tanggalJam, r.cs, r.customer,
         ...kodeList.map(k=> (r.items && r.items[k]) || 0),
-        r.totalQty||0, r.status, r.kg, r.ekspedisi, r.ongkirNum ? rupiah(r.ongkirNum) : "-", r.resi ? "Ya" : "Tidak", r.manualInvoiced ? "Ya" : "Tidak"];
+        r.totalQty||0, r.status, r.kg, r.ekspedisi, r.ongkirNum ? rupiah(r.ongkirNum) : "-", r.resi ? "Ya" : "Tidak", r.manualInvoiced ? "Ya" : "Tidak", r.pengiriman ? (r.pengiriman.kind === "t" ? "Diterima customer" : "Di ekspedisi") + (r.pengiriman.waktu ? " (" + r.pengiriman.waktu + ")" : "") : "Belum"];
       lines.push(row.map(csvEscape).join(","));
     });
     const blob = new Blob(["\uFEFF" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" }); // \uFEFF -- BOM, biar Excel baca huruf non-ASCII (é, dst) dgn benar
@@ -19538,16 +19550,32 @@ if ("serviceWorker" in navigator) {
   let quickFilter = null;
   const QUICK_FILTER_LABEL = {
     jatuh: "🔴 Jatuh Tempo",
-    terlewat: "⏰ Terlewat 2 Minggu Terakhir", // v454
+    terlewat: "⏰ Belum Dilapor CS (jadwal lewat ≤ 2 minggu)", // v454, v465
     hariIni: "🟠 Follow Up Hari Ini",
     minggu: "🟡 Follow Up Minggu Ini",
     belumCukup: "⚪ Belum Cukup Data",
     baru: "🆕 Customer Baru (1x order)"
   };
+  // v465 -- "Belum Dilapor CS" (kartu lama "Terlewat 2 Minggu"): SEBELUMNYA dihitung dari r.sisa<0, padahal sejak v438 penjadwal harian
+  // di Worker selalu menggeser backlog ke hari ini/depan, jadi r.sisa tidak pernah negatif & kartu selalu 0. Sekarang pakai
+  // r.belumLapor dari Worker v465 = jadwal follow up yang SUDAH LEWAT tanpa laporan CS (tombol hasil). Kartu: lewat 1-14 hari.
+  // Kalau Worker masih versi lama (field belumLapor tidak ada sama sekali), pakai cadangan: jadwal ASLI (r.jadwalAsli) lewat 1-14 hari.
+  function fuHariBelumLapor(r){
+    if(!r) return null;
+    if(r.belumLapor !== undefined) return r.belumLapor ? r.belumLapor.hari : null;
+    if(r.sisa===null || r.sisa===undefined || !r.jadwalAsli) return null;
+    const hariIniWIB = new Date(Date.now() + 7*3600e3).toISOString().slice(0,10);
+    const lewat = Math.round((Date.parse(hariIniWIB) - Date.parse(r.jadwalAsli)) / 86400000);
+    return lewat >= 1 ? lewat : null;
+  }
+  function fuTerlewat(r){
+    const h = fuHariBelumLapor(r);
+    return h !== null && h >= 1 && h <= 14;
+  }
   function cocokQuickFilter(r){
     if(!quickFilter) return true;
     if(quickFilter === "jatuh") return r.sisa!==null && r.sisa<0;
-    if(quickFilter === "terlewat") return r.sisa!==null && r.sisa<0 && r.sisa>=-14; // v454 -- jadwal follow up lewat 1-14 hari yang lalu
+    if(quickFilter === "terlewat") return fuTerlewat(r); // v454, v465 -- jadwal ASLI lewat 1-14 hari & belum terlayani (lihat fuTerlewat)
     if(quickFilter === "hariIni") return r.sisa!==null && r.sisa===0;
     if(quickFilter === "minggu") return r.sisa!==null && r.sisa>=0 && r.sisa<=7;
     if(quickFilter === "belumCukup") return r.sisa===null;
@@ -19888,7 +19916,7 @@ if ("serviceWorker" in navigator) {
     // memang dimaksudkan sbg sorotan yg beririsan, bukan kategori eksklusif.
     const hariIni = rowsDasar.filter(r=> r.sisa!==null && r.sisa===0).length;
     const minggu = rowsDasar.filter(r=> r.sisa!==null && r.sisa>=0 && r.sisa<=7).length;
-    const terlewat = rowsDasar.filter(r=> r.sisa!==null && r.sisa<0 && r.sisa>=-14).length; // v454
+    const terlewat = rowsDasar.filter(fuTerlewat).length; // v454, v465
     const belumCukup = rowsDasar.filter(r=> r.sisa===null).length;
     // BARU -- kotak ke-6 "Est. Qty Stok Bulan Ini", pola SAMA dgn
     // stats-grid di RepeatOrder_Calculator.html (total estBln semua
@@ -19905,7 +19933,7 @@ if ("serviceWorker" in navigator) {
     statsGridEl.innerHTML =
       box("total", total, "Total Customer") +
       box("jatuh", jatuh, "🔴 Jatuh Tempo", "var(--danger-red)") +
-      box("terlewat", terlewat, "⏰ Terlewat 2 Minggu", "#b71c1c") + // v454
+      box("terlewat", terlewat, "⏰ Belum Dilapor CS (≤ 2 Mgg)", "#b71c1c") + // v454, v465
       box("hariIni", hariIni, "🟠 Follow Up Hari Ini", "#c46b00") +
       box("minggu", minggu, "🟡 Follow Up Minggu Ini", "#7b6000") +
       box("belumCukup", belumCukup, "⚪ Belum Cukup Data", "#555") +
@@ -20298,7 +20326,7 @@ if ("serviceWorker" in navigator) {
       rowsDasar.forEach(r=>{ if(!filterFn(r)) return; const q = fuQtyPerOrder(r); n++; kt += q.kt; pk += q.pk; });
       return { n, kt, pk };
     };
-    const terlewat = seg(r=> r.sisa!==null && r.sisa<0 && r.sisa>=-14);
+    const terlewat = seg(fuTerlewat); // v465
     const hariIni = seg(r=> r.sisa!==null && r.sisa===0);
     const minggu = seg(r=> r.sisa!==null && r.sisa>=0 && r.sisa<=7);
     let nBlnCust = 0, blnKt = 0, blnPk = 0, bulanLabel = TODAY.toLocaleDateString("id-ID", { month:"long", year:"numeric" });
@@ -20311,10 +20339,10 @@ if ("serviceWorker" in navigator) {
         `<div class="fp-baris"><span>🛍️ Pack</span><b>${fuFmtKP(d.pk)}</b></div></div>`;
     potensiEl.innerHTML =
       fuToggleHead("potensi", "💰 Potensi Qty Penjualan") +
-      `<div class="fp-summary">⏰ Terlewat: 📦 <b>${fuFmtKP(terlewat.kt)}</b> · 🛍️ <b>${fuFmtKP(terlewat.pk)}</b> (${terlewat.n} customer)<br>🟡 Minggu ini: 📦 <b>${fuFmtKP(minggu.kt)}</b> · 🛍️ <b>${fuFmtKP(minggu.pk)}</b> (${minggu.n} customer)</div>` +
+      `<div class="fp-summary">⏰ Belum dilapor CS: 📦 <b>${fuFmtKP(terlewat.kt)}</b> · 🛍️ <b>${fuFmtKP(terlewat.pk)}</b> (${terlewat.n} customer)<br>🟡 Minggu ini: 📦 <b>${fuFmtKP(minggu.kt)}</b> · 🛍️ <b>${fuFmtKP(minggu.pk)}</b> (${minggu.n} customer)</div>` +
       `<div class="fp-body">` +
       `<div class="followup-potensi-grid">` +
-        kotak("⏰ Terlewat 2 Minggu", `${terlewat.n} customer belum di-follow up`, terlewat, "terlewat") +
+        kotak("⏰ Belum Dilapor CS", `${terlewat.n} customer, jadwal lewat ≤ 2 minggu`, terlewat, "terlewat") +
         kotak("🟠 Follow Up Hari Ini", `${hariIni.n} customer`, hariIni, "hariIni") +
         kotak("🟡 Follow Up Minggu Ini", `${minggu.n} customer (0–7 hari)`, minggu, "minggu") +
         kotak("🎯 Perkiraan " + escHtml(bulanLabel), `${nBlnCust} customer diperkirakan order`, { kt: blnKt, pk: blnPk }, null) +
@@ -20334,6 +20362,7 @@ if ("serviceWorker" in navigator) {
   // v438 -- keterangan jadwal: customer baru / follow up ulang / digeser karena batas harian
   function fuLabelJadwal(r){
     const t = [];
+    if(r.belumLapor) t.push(`<span style="background:#fdecea;color:#b71c1c;border-radius:6px;padding:1px 6px;" title="Jadwal follow up ${escHtml(r.belumLapor.tanggal)} (percobaan ke-${r.belumLapor.ke}) sudah lewat tanpa laporan hasil dari CS${r.belumLapor.jumlah > 1 ? " — " + r.belumLapor.jumlah + " percobaan terlewat" : ""}">⚠️ belum dilapor CS · ${r.belumLapor.hari} hr${r.belumLapor.jumlah > 1 ? " (" + r.belumLapor.jumlah + "x)" : ""}</span>`); // v465
     if(r.customerBaru) t.push(`<span style="background:#e3f0fd;color:#1565c0;border-radius:6px;padding:1px 6px;">🆕 Baru${r.riwayat && r.riwayat[0] ? " · qty " + escHtml(String(r.riwayat[0].qty)) : ""}</span>`);
     if(r.percobaan && r.percobaan > 1 && r.percobaanMaks > 1 && r.sisa !== null) t.push(`<span style="background:#fff3e0;color:#a35a00;border-radius:6px;padding:1px 6px;">🔁 ulang ke-${r.percobaan}/${r.percobaanMaks}</span>`);
     if(r.digeser > 0 && r.sisa !== null) t.push(`<span style="background:#f1f1f1;color:#555;border-radius:6px;padding:1px 6px;" title="Jadwal asli ${escHtml(r.jadwalAsli || "")}">⏩ digeser ${r.digeser} hr</span>`);
@@ -20568,7 +20597,7 @@ if ("serviceWorker" in navigator) {
     const stats = `<div class="fuh-stats">
         <div class="fuh-stat"><div class="k">🛒 Terakhir beli</div><div class="v">${r.last ? fmtTgl(r.last) : "-"}</div><div class="s">${escHtml(teksLalu)}${qtyAkhir !== null && qtyAkhir !== undefined ? ` · ${fmtNumID(qtyAkhir)} pcs` : ""}</div></div>
         <div class="fuh-stat"><div class="k">🔁 Ritme order</div><div class="v">${ritme ? "± " + fmtHari(ritme) : "-"}</div><div class="s">${r.jumlahOrder ? `dari ${r.jumlahOrder} order lunas` : ""}</div></div>
-        <div class="fuh-stat"><div class="k">📞 Jadwal follow up</div><div class="v">${r.pred ? fmtTgl(r.pred) : "-"}</div><div class="s" style="${sisaJadwal !== null && sisaJadwal < 0 ? "color:var(--danger-red); font-weight:700;" : ""}">${escHtml(teksJadwal)}</div></div>
+        <div class="fuh-stat"><div class="k">📞 Jadwal follow up</div><div class="v">${r.pred ? fmtTgl(r.pred) : "-"}</div><div class="s" style="${sisaJadwal !== null && sisaJadwal < 0 ? "color:var(--danger-red); font-weight:700;" : ""}">${escHtml(teksJadwal)}${r.belumLapor ? `<br><span style="color:var(--danger-red); font-weight:700;">⚠️ jadwal ${fmtTgl(r.belumLapor.tanggal + "T12:00:00+07:00")} belum dilaporkan CS</span>` : ""}</div></div>
       </div>`;
     const hdr = `<div class="fu-bag-hdr">▌ HASIL FOLLOW UP</div>`;
     if(r.sudahOrder){
