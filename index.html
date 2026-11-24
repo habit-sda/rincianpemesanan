@@ -6624,9 +6624,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
              sama, elemen ini tetap hidden (tidak mengganggu). Klik untuk
              pakai (BUKAN otomatis mengganti ekspedisinya sendiri). -->
         <p id="kt-ekspedisi-suggest" class="kt-hint" hidden style="margin-top:8px;background:#eaf6ee;border:1px solid var(--primary-green);border-radius:8px;padding:8px 10px;color:var(--ink);cursor:pointer;"></p>
-        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
-          <input type="checkbox" id="kt-revisi-check" style="margin-top:2px;">
-          <span>Revisi Pemesanan — rincian pemesanan <b>lama</b> atas nama customer ini (nama sama; huruf besar/kecil &amp; akhiran NEW tidak masalah) <b>diperbarui di tempat</b> dengan rincian ini. Bukti transfer yang sudah di-reply tetap terhubung &amp; status pembayaran dihitung ulang otomatis.</span>
+        <!-- v417 -- keterangan Revisi Pemesanan diringkas: label pendek, penjelasan lengkap hanya muncul saat ikon info (i) diketuk -->
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12.5px;color:var(--ink-soft);">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="kt-revisi-check">
+            <span>Revisi Pemesanan</span>
+          </label>
+          <button type="button" id="kt-revisi-info" aria-label="Keterangan Revisi Pemesanan" aria-expanded="false" style="border:1px solid var(--line);background:transparent;color:var(--ink-soft);border-radius:50%;width:20px;height:20px;padding:0;font-size:12px;line-height:1;cursor:pointer;">i</button>
+        </div>
+        <div id="kt-revisi-info-box" hidden style="margin:6px 0 0 24px;padding:8px 10px;background:var(--bg);border:1px solid var(--line);border-radius:8px;font-size:12px;line-height:1.5;color:var(--ink-soft);">Rincian <b>lama</b> atas nama customer ini <b>diperbarui di tempat</b> dengan rincian ini. Bukti transfer yang sudah di-reply tetap terhubung &amp; status pembayaran dihitung ulang otomatis. Nama dicocokkan tanpa membedakan huruf besar/kecil &amp; akhiran NEW.</div>
+        <!-- v416 -- Piutang: barang dikirim dulu, bayar menyusul. Rincian di grup dapat penanda + Logistik langsung dikabari "siap diproses". -->
+        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;">
+          <input type="checkbox" id="kt-piutang-check" style="margin-top:2px;">
+          <span>💳 Piutang <span style="opacity:.8;">(kirim dulu, bayar menyusul)</span></span>
         </label>
         <div id="kt-revisi-picker" hidden style="margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);"></div>
         <!-- BARU v416 -- daftar deposit menunggu rincian (dicentang CS utk ditempel ke rincian ini) -->
@@ -10117,6 +10127,16 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   const btnCancel = document.getElementById("kt-cancel");
   const btnSend = document.getElementById("kt-send");
   const revisiCheck = document.getElementById("kt-revisi-check");
+  const piutangCheck = document.getElementById("kt-piutang-check"); // v416 -- Piutang
+  // v417 -- ikon (i) buka/tutup keterangan Revisi Pemesanan
+  const revisiInfoBtn = document.getElementById("kt-revisi-info");
+  const revisiInfoBox = document.getElementById("kt-revisi-info-box");
+  if(revisiInfoBtn && revisiInfoBox){
+    revisiInfoBtn.addEventListener("click", ()=>{
+      revisiInfoBox.hidden = !revisiInfoBox.hidden;
+      revisiInfoBtn.setAttribute("aria-expanded", revisiInfoBox.hidden ? "false" : "true");
+    });
+  }
   const revisiPicker = document.getElementById("kt-revisi-picker");
   // BARU -- Dropship
   const dropshipCheck = document.getElementById("kt-dropship-check");
@@ -10915,6 +10935,8 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     hideAliasWarning();
     hideEkspedisiSuggest(); // BARU -- reset dulu, cek ulang di bawah setelah nama ada isinya
     if(revisiCheck) revisiCheck.checked = false;
+    if(piutangCheck) piutangCheck.checked = false; // v416 -- reset tiap popup dibuka
+    if(revisiInfoBox){ revisiInfoBox.hidden = true; if(revisiInfoBtn) revisiInfoBtn.setAttribute("aria-expanded", "false"); } // v417
     resetRevisiPicker();
     // BARU v416 -- deposit menunggu rincian: reset & cek ulang utk nama saat ini
     hideDepositHint(); scheduleDepositCheck();
@@ -11071,6 +11093,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         totalBeratLabel,
         items,
         isRevisi: !!(revisiCheck && revisiCheck.checked),
+        kirimPiutang: !!(piutangCheck && piutangCheck.checked), // v416 -- Piutang: Logistik dikabari sebelum lunas
         depositIds: [...depositPilihan], // v416, v417 -- juga saat Revisi (ditempel setelah revisi tersimpan)
         revisiTargetMessageId: pendingRevisiTargetMessageId,
         kirimId: kirimIdSesi,              // v422 -- anti-kirim-ulang
