@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v417";
+const CACHE_VERSION = "v418";
+/* v418 -- Piutang: kolom jumlah hari jatuh tempo (wajib) di popup Kirim ke grup. Hanya index.html. */
 /* v415 -- Rekap Pesanan: indikator "sudah diterima customer" jadi badge rumah 🏠 (biru); "di ekspedisi" tetap 🚚 hijau. Hanya index.html. */
 /* v414 -- Rekap Pesanan: indikator "Terkirim" (✅ diterima customer / 🚚 di ekspedisi + jam) di kolom Ekspedisi (tabel & kartu HP) + kolom "Pengiriman" di ekspor CSV. Butuh Worker v466. */
 /* v413 -- Follow Up: status "Belum dilapor CS" (butuh Worker v465): kartu "Belum Dilapor CS" (ex "Terlewat 2 Minggu"), badge "⚠️ belum dilapor CS" di tabel/kartu, keterangan di popup detail. Tanpa Worker v465 kartu memakai cadangan jadwalAsli. */
