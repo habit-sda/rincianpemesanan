@@ -6594,7 +6594,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.1</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6893,10 +6893,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.1 <span class="changelog-tag">Sekarang</span></div>
           <ul>
             <li><b>Menu Ekspedisi (desktop): judul "Pilih Ekspedisi"</b> di atas tombol Input Nama / Manual supaya tidak ambigu. Autocomplete nama di kolom Input Nama dibuat lebih andal (muncul di tiap ketikan, data nama dimuat ulang kalau sempat gagal, bisa dipilih dengan panah ↑↓ + Enter).</li>
             <li><b>Konfirmasi saat nama diganti</b> — kalau ekspedisi dipilih dari rekomendasi Input Nama lalu nama di popup Salin &amp; Kirim diganti, tombol Kirim menampilkan dialog "Yakin kirim dengan nama baru?". Pilih Ya = data ekspedisi &amp; ongkir dihapus dari form lalu terkirim; Batal = kembali ke popup. Kalau ekspedisi dipilih manual (atau diubah manual setelahnya), dialog tidak muncul.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.0</div>
+          <ul>
             <li><b>Menu Ekspedisi punya 2 tombol: 🔎 Input Nama &amp; ✍️ Manual</b> (Penjualan Grosir &amp; Custom, juga di Mode Kasir). <b>Manual</b> = form ekspedisi seperti sebelumnya. <b>Input Nama</b> = ketik nama customer, tujuan diambil dari D1 Logistik (riwayat kirim atau <code>(KOTA)</code> di belakang nama, bisa ganti kota manual), lalu muncul daftar ekspedisi lengkap dengan <b>total ongkir</b> masing-masing — sekali ketuk langsung mengisi form. Total dihitung pakai rumus Master Data Rincian (pembulatan berat, minimum charge) dari tarif Logistik, jadi sama dengan angka di nota. Tanda <b>⭐ termurah</b> dan <b>❤️ ekspedisi yang sering dipakai customer itu</b>.</li>
             <li><b>Nama customer tersambung dua arah</b> dengan kolom Nama Customer di popup Salin &amp; Kirim: isi salah satu, yang lain ikut terisi; hapus salah satu, keduanya terhapus. Kolom Input Nama memakai <b>autocomplete yang sama persis</b> dengan popup (muncul mulai 1 huruf, mengenali nama lama/alias), dan nama yang dipilih dari saran tetap dianggap customer lama saat dikirim.</li>
             <li><b>Ganti nama customer di Master Nama otomatis ikut berubah di Logistik</b> (nama lama jadi alias, riwayat kirim &amp; ringkasan customer di Logistik ikut dipindah, tidak ada customer dobel). <i>Butuh Worker Rincian v491 (env baru <code>LOGISTIK_URL</code>) &amp; Worker Logistik v1.5.0.</i></li>

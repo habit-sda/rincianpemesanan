@@ -5,7 +5,7 @@
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
 const CACHE_VERSION = "v420";
-/* v420 -- (app v2.93.0) Menu Ekspedisi desktop: judul "Pilih Ekspedisi"; autocomplete Input Nama lebih andal (+ panah/Enter); dialog "Yakin kirim dengan nama baru?" saat nama diganti padahal ekspedisi dipilih dari rekomendasi (ekspedisi dihapus kalau lanjut). Hanya index.html. */
+/* v420 -- (app v2.93.1) Menu Ekspedisi desktop: judul "Pilih Ekspedisi"; autocomplete Input Nama lebih andal (+ panah/Enter); dialog "Yakin kirim dengan nama baru?" saat nama diganti padahal ekspedisi dipilih dari rekomendasi (ekspedisi dihapus kalau lanjut). Hanya index.html. */
 /* v419 -- (app v2.93.0) Menu Ekspedisi: tombol Input Nama / Manual (rekomendasi ekspedisi + total ongkir dari D1 Logistik, ⭐ termurah, ❤️ sering dipakai), nama customer tersambung dua arah dgn popup Salin & Kirim. Butuh Worker Rincian v491 + Worker Logistik v1.5.0. */
 /* v418 -- Piutang: kolom jumlah hari jatuh tempo (wajib) di popup Kirim ke grup. Hanya index.html. */
 /* v415 -- Rekap Pesanan: indikator "sudah diterima customer" jadi badge rumah 🏠 (biru); "di ekspedisi" tetap 🚚 hijau. Hanya index.html. */
