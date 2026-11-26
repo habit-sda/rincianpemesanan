@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v423";
+const CACHE_VERSION = "v424";
+/* v424 -- (app v2.93.5) Input Nama: teks keterangan di atas daftar ekspedisi riwayat customer dihapus (fungsi tidak berubah). Hanya index.html. */
 /* v423 -- (app v2.93.4) Input Nama: bila kota tidak ketemu, pakai riwayat customer (kota paling sering + ekspedisi biasa, ⭐ termurah di riwayat, estimasi ongkir dari rata-rata Rp/kg). BUTUH Worker Logistik v1.5.1. */
 /* v422 -- (app v2.93.3) Nota desain baru: nama pelanggan tampil di bawah judul "Rincian pemesanan", di atas tanggal. Render server (Worker) perlu menampilkan field customerName juga. */
 /* v421 -- (app v2.93.2) RESET ikut mengosongkan nama customer di menu Ekspedisi > Input Nama. Hanya index.html. */

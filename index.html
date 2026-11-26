@@ -6599,7 +6599,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.4</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.5</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6898,7 +6898,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.4 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.5 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Daftar ekspedisi dari riwayat customer lebih ringkas</b> — teks keterangan di atas daftar dihapus (⭐ termurah &amp; ❤️ paling sering sudah tampil di tiap kartu). Fungsinya tidak berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.4</div>
           <ul>
             <li><b>Kota tidak ketemu? Pakai riwayat customer</b> — menu Ekspedisi &gt; Input Nama kini mencari kota dari riwayat kirim customer itu sendiri. Kalau kota tetap belum ketemu, muncul daftar ekspedisi yang biasa dipakai customer (⭐ termurah di riwayat, ❤️ paling sering) lengkap dengan rata-rata Rp/kg dan estimasi ongkir; sekali ketuk mengisi ekspedisi &amp; Ongkir/Kg. Butuh Worker Logistik v1.5.1.</li>
           </ul>
@@ -12321,9 +12327,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     const list = daftarRiwayat(it.sheet);
     it.listRiw = list;
     if(!list.length) return "";
-    const berat = (window.__ekspBerat || {})[it.sheet] || 0;
-    let h = `<div class="ep-legend">Biasa dipakai customer ini &nbsp;·&nbsp; ⭐ termurah di riwayat &nbsp;·&nbsp; ❤️ paling sering</div>`;
-    h += `<div class="ep-berat">${berat ? "Estimasi dari rata-rata Rp/kg riwayat × berat pesanan " + kgf(berat) + " Kg." : "Isi produk dulu — estimasi ongkir dihitung dari berat pesanan."}</div>`;
+    let h = "";
     h += list.map((r, i)=>{
       const p = r.p, aktif = PICK[it.sheet] && PICK[it.sheet].id === r.key && sel && r.rinci && sel.value === r.rinci.name;
       const meta = [p.pk ? "rata² " + rpf(p.pk) + "/kg" : "", p.ong ? "ongkir rata² " + rpf(p.ong) : "", p.kg ? "rata² " + kgf(p.kg) + " kg" : ""].filter(Boolean).join(" · ");
