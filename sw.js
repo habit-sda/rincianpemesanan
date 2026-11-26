@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v420";
+const CACHE_VERSION = "v421";
+/* v421 -- (app v2.93.2) RESET ikut mengosongkan nama customer di menu Ekspedisi > Input Nama. Hanya index.html. */
 /* v420 -- (app v2.93.1) Menu Ekspedisi desktop: judul "Pilih Ekspedisi"; autocomplete Input Nama lebih andal (+ panah/Enter); dialog "Yakin kirim dengan nama baru?" saat nama diganti padahal ekspedisi dipilih dari rekomendasi (ekspedisi dihapus kalau lanjut). Hanya index.html. */
 /* v419 -- (app v2.93.0) Menu Ekspedisi: tombol Input Nama / Manual (rekomendasi ekspedisi + total ongkir dari D1 Logistik, ⭐ termurah, ❤️ sering dipakai), nama customer tersambung dua arah dgn popup Salin & Kirim. Butuh Worker Rincian v491 + Worker Logistik v1.5.0. */
 /* v418 -- Piutang: kolom jumlah hari jatuh tempo (wajib) di popup Kirim ke grup. Hanya index.html. */

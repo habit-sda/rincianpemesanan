@@ -6594,7 +6594,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.1</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.2</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6893,7 +6893,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.1 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.2 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>RESET sekarang juga mengosongkan nama customer</b> di menu Ekspedisi &gt; Input Nama (beserta kota tujuan &amp; daftar rekomendasi).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.1</div>
           <ul>
             <li><b>Menu Ekspedisi (desktop): judul "Pilih Ekspedisi"</b> di atas tombol Input Nama / Manual supaya tidak ambigu. Autocomplete nama di kolom Input Nama dibuat lebih andal (muncul di tiap ketikan, data nama dimuat ulang kalau sempat gagal, bisa dipilih dengan panah ↑↓ + Enter).</li>
             <li><b>Konfirmasi saat nama diganti</b> — kalau ekspedisi dipilih dari rekomendasi Input Nama lalu nama di popup Salin &amp; Kirim diganti, tombol Kirim menampilkan dialog "Yakin kirim dengan nama baru?". Pilih Ya = data ekspedisi &amp; ongkir dihapus dari form lalu terkirim; Batal = kembali ke popup. Kalau ekspedisi dipilih manual (atau diubah manual setelahnya), dialog tidak muncul.</li>
@@ -12303,6 +12309,15 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
   }
 
   /* ---------- kait ke calc() & wizard ---------- */
+  // dipanggil tombol RESET: kosongkan nama customer, kota tujuan, daftar rekomendasi & penanda pilihan ekspedisi
+  window.__ekspPickReset = function(sheet){
+    PICK[sheet] = null;
+    EP.kotaManual = false; EP.dipilihNama = "";
+    inst.forEach(i=>{ i.showKota = false; i.note = ""; i.linkFor = null; i.kotaList = []; i.sugOpen = false; if(i.kotaInput) i.kotaInput.value = ""; });
+    if(window.__ktNama) window.__ktNama.setDipilih(false);
+    setNama("", null); // kosongkan nama (kolom Input Nama + #kt-customer-name) & hasil rekomendasi
+    renderAll();
+  };
   window.__ekspPickRefresh = function(sheet){
     inst = inst.filter(i=> i.root.isConnected);
     inst.forEach(i=>{ if(i.sheet === sheet && MODE[sheet] === "nama") renderHasil(i); });
@@ -12555,6 +12570,7 @@ calc("penjualan"); calc("custom");
     }
 
     calc(activeTab);
+    if(window.__ekspPickReset){ try{ window.__ekspPickReset(activeTab); }catch(e){ console.log("reset Input Nama gagal:", e); } }
 
     // PERBAIKAN v411 -- tanda visual merah "Kelebihan bayar" (& hijau
     // Rate/Ongkir Manual) dulu TIDAK ikut hilang setelah RESET: nilai
