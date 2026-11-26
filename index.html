@@ -873,6 +873,11 @@
   .pnota2-v3 .v3-title{
     font-size:29px;font-weight:800;color:#00845F;text-align:center;margin:0 0 8px;
   }
+  /* nama pelanggan: di bawah judul, di atas tanggal/jam (hanya dirender kalau nama terisi) */
+  .pnota2-v3 .v3-customer{
+    font-size:21px;font-weight:700;color:#171717;text-align:center;margin:0 0 8px;
+    line-height:1.25;word-break:break-word;
+  }
   .pnota2-v3 .v3-meta{
     display:flex;align-items:center;justify-content:center;gap:9px;
     font-size:16.5px;color:#5b6660;
@@ -6594,7 +6599,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.2</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.4</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6893,7 +6898,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.2 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.4 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Kota tidak ketemu? Pakai riwayat customer</b> — menu Ekspedisi &gt; Input Nama kini mencari kota dari riwayat kirim customer itu sendiri. Kalau kota tetap belum ketemu, muncul daftar ekspedisi yang biasa dipakai customer (⭐ termurah di riwayat, ❤️ paling sering) lengkap dengan rata-rata Rp/kg dan estimasi ongkir; sekali ketuk mengisi ekspedisi &amp; Ongkir/Kg. Butuh Worker Logistik v1.5.1.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.3</div>
+          <ul>
+            <li><b>Nama pelanggan tampil di nota desain baru</b> — tepat di bawah judul "Rincian pemesanan" dan di atas tanggal/jam. Tidak tampil kalau nama belum diisi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.2</div>
           <ul>
             <li><b>RESET sekarang juga mengosongkan nama customer</b> di menu Ekspedisi &gt; Input Nama (beserta kota tujuan &amp; daftar rekomendasi).</li>
           </ul>
@@ -9694,6 +9711,9 @@ function collectNotaV2Data(tab){
 
   const hari = document.getElementById("hariNow").textContent;
   const tgl = document.getElementById("tglNow").textContent;
+  // nama pelanggan (dari kolom Nama Customer popup Salin & Kirim / Input Nama); penanda "NEW" di akhir nama tidak ikut dicetak
+  const ktNamaEl = document.getElementById("kt-customer-name");
+  const customerName = ktNamaEl ? String(ktNamaEl.value || "").replace(/\s*NEW\s*$/i, "").replace(/\s+/g, " ").trim() : "";
   const ekspedisi = document.getElementById(pfx+"-ekspedisi").value || "–";
   const totalberat = document.getElementById(pfx+"-totalberat").textContent;
   const totalqty = document.getElementById(pfx+"-totalqty").textContent;
@@ -9730,7 +9750,7 @@ function collectNotaV2Data(tab){
   const headlineTxt = isKurang ? selisihFmt : grandtotalTxt;
 
   return {
-    cardWidth, nameColWidth, items, hari, tgl, jamTxt,
+    cardWidth, nameColWidth, items, hari, tgl, jamTxt, customerName,
     totalqty, totalberat, ekspedisi, subtotal, ongkir, diskonOngkir,
     grandtotalTxt, headlineTxt, kelebihan, kelebihanFmt, statusLabel, selisihFmt,
     signPrefix, statusColor, statusBg, statusBorder,
@@ -9738,6 +9758,9 @@ function collectNotaV2Data(tab){
   };
 }
 
+function escapeHtmlNota(t){
+  return String(t == null ? "" : t).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
 function buildPrintNotaV2(tab){
   const d = collectNotaV2Data(tab);
 
@@ -9769,6 +9792,7 @@ function buildPrintNotaV2(tab){
       <div class="v3-header">
         <img class="v3-logo" src="${d.logoImg}" alt="">
         <p class="v3-title">Rincian pemesanan</p>
+        ${d.customerName ? `<p class="v3-customer">${escapeHtmlNota(d.customerName)}</p>` : ""}
         <div class="v3-meta">
           <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>${d.hari}, ${d.tgl}</span>
           <span class="v3-meta-divider"></span>
@@ -10880,7 +10904,9 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     const diskonOngkirEl = document.getElementById(pfx + "-diskonongkir");
     const kelebihanSig = kelebihanEl ? kelebihanEl.value : "";
     const diskonOngkirSig = diskonOngkirEl ? (diskonOngkirEl.value !== undefined ? diskonOngkirEl.value : diskonOngkirEl.textContent) : "";
-    return JSON.stringify([tab, getNotaDesignPref(), grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, rowsSig, kelebihanSig, diskonOngkirSig]);
+    const namaSigEl = document.getElementById("kt-customer-name");
+    const namaSig = namaSigEl ? namaSigEl.value.trim() : "";
+    return JSON.stringify([tab, getNotaDesignPref(), grandTotalNum, ratePerKgNum, ekspedisiName, deliveryDate, rowsSig, kelebihanSig, diskonOngkirSig, namaSig]);
   }
 
   /* ---------- Kumpulkan data nota (dipakai bareng oleh kirim final MAUPUN
@@ -11755,7 +11781,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
 (function(){
   "use strict";
   const kt = document.getElementById("kt-customer-name");
-  const EP = { nama:"", dipilihNama:"", tujuan:null, tarif:null, kandidat:[], pakaiCustomer:[], err:"", loading:"", kotaManual:false, seq:0, cache:new Map() };
+  const EP = { nama:"", dipilihNama:"", tujuan:null, tarif:null, kandidat:[], pakaiCustomer:[], pelanggan:null, err:"", loading:"", kotaManual:false, seq:0, cache:new Map() };
   const MODE = { penjualan:"manual", custom:"manual" };
   const PICK = { penjualan:null, custom:null };
   let inst = [];
@@ -11785,7 +11811,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
   async function cariTujuan(){
     const my = ++EP.seq;
     if(EP.nama.trim().length < 3){
-      EP.kandidat = []; EP.err = ""; EP.loading = "";
+      EP.kandidat = []; EP.pakaiCustomer = []; EP.pelanggan = null; EP.err = ""; EP.loading = "";
       if(!EP.kotaManual){ EP.tujuan = null; EP.tarif = null; }
       renderAll(); return;
     }
@@ -11795,6 +11821,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
       if(my !== EP.seq) return;
       EP.kandidat = d.kandidat || [];
       EP.pakaiCustomer = d.pakaiCustomer || [];
+      EP.pelanggan = d.pelanggan || null;
       if(!EP.kotaManual){
         if(d.tujuan){ EP.tujuan = d.tujuan; await muatTarif(d.tujuan.kab, my); }
         else { EP.tujuan = null; EP.tarif = null; }
@@ -11855,7 +11882,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     ktSetSilent(v);
     if(!v.trim()){ // nama dihapus -> hasil rekomendasi ikut kosong
       ++EP.seq; clearTimeout(tmCari);
-      EP.tujuan = null; EP.tarif = null; EP.kandidat = []; EP.pakaiCustomer = []; EP.err = ""; EP.loading = "";
+      EP.tujuan = null; EP.tarif = null; EP.kandidat = []; EP.pakaiCustomer = []; EP.pelanggan = null; EP.err = ""; EP.loading = "";
       renderAll(); return;
     }
     clearTimeout(tmCari);
@@ -12176,6 +12203,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     it.hasilEl.addEventListener("click", (e)=>{
       const card = e.target.closest(".ep-card");
       if(!card) return;
+      if(card.classList.contains("ep-riw")){ const r = (it.listRiw || [])[Number(card.dataset.r)]; if(r) pilihRiwayat(it, r); return; }
       const c = it.list[Number(card.dataset.i)];
       if(!c) return;
       if(!c.rinci){ it.linkFor = c.t; it.note = ""; renderAll(); return; }
@@ -12244,15 +12272,72 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     if(EP.loading) tj = `<span>⏳ ${esc(EP.loading)}</span>`;
     else if(EP.err) tj = `<span class="ep-err">⚠️ ${esc(EP.err)}</span>`;
     else if(EP.tujuan){
-      const sumber = EP.tujuan.sumber === "riwayat" ? "dari riwayat kirim" : EP.tujuan.sumber === "kota-nama" ? "dari (KOTA) di nama" : "dipilih manual";
+      const sumber = EP.tujuan.sumber === "riwayat" ? "dari riwayat kirim" : EP.tujuan.sumber === "riwayat-kota" ? "dari kota yang paling sering di riwayat kirim" : EP.tujuan.sumber === "kota-nama" ? "dari (KOTA) di nama" : "dipilih manual";
       tj = `<span>📍 <b>${esc(labelTujuan())}</b> <small>${sumber}</small></span><button type="button" class="ep-ganti">Ganti kota</button>`;
-    } else if(EP.nama.trim().length >= 3) tj = `<span>Kota tujuan belum ketemu dari nama ini. Cari kota di bawah.</span>`;
+    } else if(EP.nama.trim().length >= 3){
+      const pl = EP.pelanggan, ada = (EP.pakaiCustomer || []).length;
+      tj = `<span>Kota tujuan belum ketemu dari nama ini.${pl && pl.kota ? ` Kota tercatat di riwayat: <b>${esc(pl.kota)}</b> (belum cocok dgn database wilayah).` : ""}${ada ? " Di bawah ini ekspedisi yang biasa dipakai customer ini; cari kota untuk melihat semua ekspedisi beserta total ongkirnya." : " Cari kota di bawah."}</span>`;
+    }
     else tj = `<span class="ep-hint">Ketik nama customer. Tujuan diambil dari riwayat kirim, atau dari (KOTA) di belakang nama.</span>`;
     it.tujuanEl.className = "ep-tujuan" + (EP.tujuan && !EP.err && !EP.loading ? " ok" : "") + (EP.err ? " bad" : "");
     it.tujuanEl.innerHTML = tj;
     renderKota(it);
     renderSug(it);
     renderHasil(it);
+  }
+  /* ---------- cadangan bila kota tidak ketemu: ekspedisi biasa customer + harga rata-rata dari RIWAYATNYA ---------- */
+  function daftarRiwayat(sheet){
+    const src = EP.pakaiCustomer || [];
+    if(!src.length) return [];
+    const berat = (window.__ekspBerat || {})[sheet] || 0, R = daftarRincian();
+    const arr = src.map((p, i)=>{
+      const kunci = new Set([p.eks, p.ekspedisi, p.ekey].map(normNama).filter(Boolean));
+      let rinci = R.find(x=> kunci.has(normNama(x.name))) || null;
+      if(!rinci){ const tok = intiToken(p.eks || p.ekspedisi || ""); const cs = R.filter(x=> sebagianSama(tok, intiToken(x.name))); if(cs.length === 1) rinci = cs[0]; }
+      const kg = berat ? roundWeight(berat, rinci ? rinci.name : "") : null;
+      const total = (p.pk && kg) ? Math.round(p.pk * kg) : null;
+      return { p, rinci, pk: p.pk || null, kg, total, key: "riw:" + normNama(p.ekey || p.eks), sering: i === 0 };
+    });
+    const pks = arr.filter(x=> x.pk).map(x=> x.pk);
+    const minPk = pks.length > 1 ? Math.min(...pks) : null;
+    arr.forEach(x=>{ x.murah = minPk != null && x.pk === minPk; });
+    arr.sort((a, b)=> ((a.pk == null) - (b.pk == null)) || ((a.pk || 0) - (b.pk || 0)) || (b.p.n - a.p.n));
+    return arr;
+  }
+  function pilihRiwayat(it, r){
+    const sheet = it.sheet, pfx = pfxOf(sheet);
+    if(!r.rinci){ it.note = (r.p.eks || r.p.ekspedisi) + " belum ada di Master Data Ekspedisi (Rincian). Tambahkan dulu lewat Master Data → Ekspedisi, atau pakai tombol Manual."; renderAll(); return; }
+    const sel = document.getElementById(pfx + "-ekspedisi"), rateEl = document.getElementById(pfx + "-rate"), manEl = document.getElementById(pfx + "-ongkir-manual");
+    sel.value = r.rinci.name;
+    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    if(r.pk){ rateEl.value = r.pk.toLocaleString("id-ID"); rateEl.dispatchEvent(new Event("input", { bubbles: true })); }
+    PICK[sheet] = { id: r.key, total: r.total };
+    it.note = r.pk ? "Ongkir/Kg diisi dari rata-rata riwayat customer ini (" + rpf(r.pk) + "/kg). Cek lagi dengan tarif terbaru kalau perlu." : "Ekspedisi dipilih. Riwayat customer ini belum punya harga/kg.";
+    syncMirror(sheet);
+    PICK[sheet].nama = EP.nama; PICK[sheet].eksp = sel.value; PICK[sheet].rate = rateEl.value; PICK[sheet].man = manEl.value;
+    renderAll();
+  }
+  function renderRiwayat(it, sel){
+    const list = daftarRiwayat(it.sheet);
+    it.listRiw = list;
+    if(!list.length) return "";
+    const berat = (window.__ekspBerat || {})[it.sheet] || 0;
+    let h = `<div class="ep-legend">Biasa dipakai customer ini &nbsp;·&nbsp; ⭐ termurah di riwayat &nbsp;·&nbsp; ❤️ paling sering</div>`;
+    h += `<div class="ep-berat">${berat ? "Estimasi dari rata-rata Rp/kg riwayat × berat pesanan " + kgf(berat) + " Kg." : "Isi produk dulu — estimasi ongkir dihitung dari berat pesanan."}</div>`;
+    h += list.map((r, i)=>{
+      const p = r.p, aktif = PICK[it.sheet] && PICK[it.sheet].id === r.key && sel && r.rinci && sel.value === r.rinci.name;
+      const meta = [p.pk ? "rata² " + rpf(p.pk) + "/kg" : "", p.ong ? "ongkir rata² " + rpf(p.ong) : "", p.kg ? "rata² " + kgf(p.kg) + " kg" : ""].filter(Boolean).join(" · ");
+      const pakai = "Dipakai " + p.n + "x" + (p.akhir ? " · terakhir " + esc(String(p.akhir).slice(0, 10)) : "");
+      return `<button type="button" class="ep-card ep-riw${aktif ? " on" : ""}${r.rinci ? "" : " off"}" data-r="${i}">
+        <span class="ep-main">
+          <span class="ep-name">${esc(r.rinci ? r.rinci.name : (p.eks || p.ekspedisi))}${r.murah ? '<span class="ep-badge cheap">⭐ Termurah</span>' : ""}${r.sering ? '<span class="ep-badge fav">❤️ Paling sering</span>' : ""}${r.rinci ? "" : '<span class="ep-badge warn">Belum di Master Rincian</span>'}</span>
+          <span class="ep-meta">${esc(meta || "belum ada data harga")}</span>
+          <span class="ep-meta">${pakai}</span>
+        </span>
+        <span class="ep-total">${r.total != null ? rpf(r.total) : "—"}<small>${r.total != null ? "estimasi " + kgf(r.kg) + " kg" : (p.pk ? "belum ada berat" : "")}</small></span>
+      </button>`;
+    }).join("");
+    return h;
   }
   function renderHasil(it){
     if(MODE[it.sheet] !== "nama") return;
@@ -12273,6 +12358,8 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
       const opsi = daftarRincian().filter(e=> !dipakai.has(e.name) && e.name !== "Diambil Sendiri").map(e=> `<option value="${esc(e.name)}">${esc(e.name)}</option>`).join("");
       h += `<div class="ep-note"><b>${esc(it.linkFor.eks)}</b> belum cocok dengan Master Data Ekspedisi (Rincian). Pilih ekspedisi Rincian yang sama — cukup sekali, tersimpan di Logistik.<div class="ep-link"><select class="ep-link-sel"><option value="">— pilih ekspedisi —</option>${opsi}</select><button type="button" class="ep-ganti ep-link-ok">Tautkan</button><button type="button" class="ep-ganti ep-link-batal">Batal</button></div></div>`;
     }
+    it.listRiw = [];
+    if(!EP.tujuan && !EP.loading && !EP.err && EP.nama.trim().length >= 3) h += renderRiwayat(it, sel);
     if(EP.tarif && !EP.loading){
       if(!it.list.length) h += `<div class="ep-empty">Belum ada ekspedisi dengan tarif ke ${esc(labelTujuan())}. Tambahkan tarif di Master Data Logistik, atau pakai tombol Manual.</div>`;
       else {
