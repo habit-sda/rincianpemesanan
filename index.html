@@ -573,6 +573,62 @@
 
   .readout{font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums;}
 
+  /* ============ MENU EKSPEDISI: Input Nama / Manual (v2.93.0) ============ */
+  .ep{margin-bottom:12px;}
+  /* Judul kolom "Pilih Ekspedisi" -- hanya tampil di desktop (>=901px, sama dgn isDesktopWiz) supaya tombol Input Nama / Manual tidak ambigu */
+  .ep-title{display:none;font-size:13px;font-weight:800;color:var(--ink);margin:0 0 6px;}
+  @media (min-width:901px){ .ep-title{display:block;} }
+  .ep-seg{display:flex;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px;}
+  .ep-tab{flex:1;border:0;background:transparent;border-radius:9px;padding:10px 8px;font-size:14px;font-weight:700;color:var(--ink-soft);cursor:pointer;min-height:42px;font-family:inherit;}
+  .ep-tab.on{background:var(--primary-green);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18);}
+  .ep-body{margin-top:10px;}
+  .ep-field{position:relative;margin-bottom:8px;}
+  .ep-field:focus-within{z-index:60;}
+  .ep-suggest .kt-suggest-item:hover, .ep-suggest .kt-suggest-item.ep-aktif{background:rgba(0,132,95,.08);}
+  .ep-suggest .kt-suggest-item:last-child{border-bottom:none;}
+  .ep-field label{display:block;font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:4px;}
+  .ep-input{width:100%;max-width:none;box-sizing:border-box;height:46px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:15px;background:var(--card);color:var(--ink);text-transform:uppercase;font-family:inherit;}
+  .ep-kota-input{text-transform:none;}
+  .ep-input:focus{outline:2px solid var(--primary-green);outline-offset:0;}
+  .ep-suggest{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:220px;overflow-y:auto;}
+  .ep-sug-item{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink);}
+  .ep-sug-item:last-child{border-bottom:none;}
+  .ep-sug-item:hover{background:rgba(0,132,95,.08);}
+  .ep-sug-item span{font-size:12px;color:var(--ink-soft);white-space:nowrap;}
+  .ep-tujuan{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 8px;padding:8px 10px;border-radius:10px;border:1px dashed var(--line);font-size:13px;color:var(--ink);}
+  .ep-tujuan.ok{background:#eaf6ee;border:1px solid var(--primary-green);}
+  .ep-tujuan.bad{border:1px solid var(--danger-red);}
+  .ep-tujuan small{color:var(--ink-soft);margin-left:4px;}
+  .ep-hint{color:var(--ink-soft);font-size:12.5px;}
+  .ep-err{color:var(--danger-red);}
+  .ep-ganti{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+  .ep-sum{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:rgba(0,132,95,.1);font-size:13px;color:var(--ink);}
+  .ep-note{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:#fff6e0;border:1px solid #e0a800;font-size:12.5px;color:#5c3d00;}
+  .ep-empty{padding:12px;border:1px dashed var(--line);border-radius:10px;font-size:13px;color:var(--ink-soft);}
+  .ep-berat{font-size:12px;color:var(--ink-soft);margin:2px 0 8px;}
+  .ep-legend{font-size:12.5px;font-weight:700;color:var(--ink);margin:2px 0 6px;}
+  .ep-card{display:flex;gap:10px;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;padding:12px;margin:0 0 8px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;text-align:left;font-family:inherit;color:var(--ink);}
+  .ep-card:hover{border-color:var(--primary-green);}
+  .ep-card.on{border-color:var(--primary-green);background:#eaf6ee;box-shadow:inset 0 0 0 1px var(--primary-green);}
+  .ep-card.off{opacity:.65;}
+  .ep-main{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .ep-name{font-weight:800;font-size:15px;}
+  .ep-meta{font-size:12px;color:var(--ink-soft);}
+  .ep-link{display:flex;gap:6px;margin-top:8px;align-items:center;}
+  .ep-link select{flex:1;min-width:0;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);padding:0 8px;font-size:13px;font-family:inherit;}
+  .ep-stale{color:#8a5a00;font-weight:700;}
+  .ep-badge{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;margin:0 0 0 6px;vertical-align:middle;white-space:nowrap;}
+  .ep-badge.cheap{background:#fff3c4;color:#6b4e00;border:1px solid #e0b400;}
+  .ep-badge.fav{background:#ffe3e8;color:#a3122f;border:1px solid #f0a0b0;}
+  .ep-badge.warn{background:#fdecea;color:var(--danger-red);}
+  .ep-total{text-align:right;font-weight:800;font-size:17px;white-space:nowrap;}
+  .ep-total small{display:block;font-weight:500;font-size:11px;color:var(--ink-soft);}
+  .ep-host.ep-nama-mode > .ongkir-simple-eksp, .ep-host.ep-nama-mode > .ongkir-simple-grid, .ep-host.ep-nama-mode > .wiz-fieldcard, .ep-host.ep-nama-mode > [id^="ws-manual-"]{display:none;}
+  html[data-theme="dark"] .ep-card.on, html[data-theme="dark"] .ep-tujuan.ok{background:rgba(0,132,95,.16);}
+  html[data-theme="dark"] .ep-badge.cheap{background:rgba(224,180,0,.18);color:#f3d36b;}
+  html[data-theme="dark"] .ep-badge.fav{background:rgba(240,100,130,.18);color:#ff9db1;}
+  html[data-theme="dark"] .ep-note{background:rgba(224,168,0,.14);color:#f3d36b;}
+
   /* ============ COMBOBOX (dropdown produk/ekspedisi dengan pencarian) ============
      Menggantikan tampilan <select> polos dengan kotak ketik + daftar saran
      yang bisa difilter langsung. <select> aslinya tetap ada di DOM (cuma
@@ -6538,7 +6594,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.92.0</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.0</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6837,7 +6893,17 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.92.0 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.0 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Menu Ekspedisi (desktop): judul "Pilih Ekspedisi"</b> di atas tombol Input Nama / Manual supaya tidak ambigu. Autocomplete nama di kolom Input Nama dibuat lebih andal (muncul di tiap ketikan, data nama dimuat ulang kalau sempat gagal, bisa dipilih dengan panah ↑↓ + Enter).</li>
+            <li><b>Konfirmasi saat nama diganti</b> — kalau ekspedisi dipilih dari rekomendasi Input Nama lalu nama di popup Salin &amp; Kirim diganti, tombol Kirim menampilkan dialog "Yakin kirim dengan nama baru?". Pilih Ya = data ekspedisi &amp; ongkir dihapus dari form lalu terkirim; Batal = kembali ke popup. Kalau ekspedisi dipilih manual (atau diubah manual setelahnya), dialog tidak muncul.</li>
+            <li><b>Menu Ekspedisi punya 2 tombol: 🔎 Input Nama &amp; ✍️ Manual</b> (Penjualan Grosir &amp; Custom, juga di Mode Kasir). <b>Manual</b> = form ekspedisi seperti sebelumnya. <b>Input Nama</b> = ketik nama customer, tujuan diambil dari D1 Logistik (riwayat kirim atau <code>(KOTA)</code> di belakang nama, bisa ganti kota manual), lalu muncul daftar ekspedisi lengkap dengan <b>total ongkir</b> masing-masing — sekali ketuk langsung mengisi form. Total dihitung pakai rumus Master Data Rincian (pembulatan berat, minimum charge) dari tarif Logistik, jadi sama dengan angka di nota. Tanda <b>⭐ termurah</b> dan <b>❤️ ekspedisi yang sering dipakai customer itu</b>.</li>
+            <li><b>Nama customer tersambung dua arah</b> dengan kolom Nama Customer di popup Salin &amp; Kirim: isi salah satu, yang lain ikut terisi; hapus salah satu, keduanya terhapus. Kolom Input Nama memakai <b>autocomplete yang sama persis</b> dengan popup (muncul mulai 1 huruf, mengenali nama lama/alias), dan nama yang dipilih dari saran tetap dianggap customer lama saat dikirim.</li>
+            <li><b>Ganti nama customer di Master Nama otomatis ikut berubah di Logistik</b> (nama lama jadi alias, riwayat kirim &amp; ringkasan customer di Logistik ikut dipindah, tidak ada customer dobel). <i>Butuh Worker Rincian v491 (env baru <code>LOGISTIK_URL</code>) &amp; Worker Logistik v1.5.0.</i></li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.92.0</div>
           <ul>
             <li><b>Pengingat Invoice Belum Dibuat (DM ke CS)</b> — 1 jam sebelum rekap harian, bot mengingatkan CS pembuat pesanan yang sudah Lunas atau kelebihan bayar (7 hari terakhir) tapi kolom Invoice-nya masih "Belum". Saklar ada di Master Data &gt; Finance, di bawah Rekap Invoice Harian. <i>Butuh Worker v464.</i></li>
           </ul>
@@ -9222,6 +9288,7 @@ function calc(sheet){
   const rateVal = parseInt((document.getElementById(pfx+"-rate").value||"").replace(/\./g,""), 10) || 0;
 
   const roundedBerat = roundWeight(totalBerat, ekspedisi);
+  (window.__ekspBerat = window.__ekspBerat || {})[sheet] = totalBerat; // v2.93.0 -- dipakai daftar rekomendasi Input Nama
   document.getElementById(pfx+"-totalberat").textContent = roundedBerat + " Kg";
   let ongkir, diskonOngkir, grandTotal;
 
@@ -9295,6 +9362,7 @@ function calc(sheet){
 
   if(sheet==="custom") syncAllDiskonFmt("custom");
   if(window.__renderMobileCards) window.__renderMobileCards(sheet);
+  if(window.__ekspPickRefresh) window.__ekspPickRefresh(sheet); // v2.93.0
 }
 
 /* ============ ekspedisi + region ============ */
@@ -10613,9 +10681,11 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // sebelum tampil (lihat catatan di definisinya).
     checkEkspedisiSuggestion();
   }
-  function renderSuggestions(query){
+  /* v2.93.0 -- pencarian & tampilan saran nama dipisah jadi fungsi sendiri supaya kolom Input Nama (menu Ekspedisi)
+     memakai persis yang sama dgn kolom Nama Customer di popup ini. Perilaku popup TIDAK berubah. */
+  function cariSaranNama(query){
     const q = query.trim().toUpperCase();
-    if(q.length < 1){ hideSuggestions(); return; }
+    if(q.length < 1) return [];
     const seen = new Set();
     const matches = [];
     // PERBAIKAN (permintaan "munculkan nama alias di field ini, tapi CS
@@ -10643,8 +10713,9 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       matches.push({ name: clean, aliases, matchedAlias: matchedAlias ? stripNewTag(matchedAlias) : null });
       if(matches.length >= 6) break;
     }
-    if(!matches.length){ hideSuggestions(); return; }
-    suggestBox.innerHTML = matches.map(m=>{
+    return matches;
+  }
+  function htmlSaranNama(m){
       // BARU -- kalau yang cocok itu ALIAS (bukan nama aktif), tampilkan
       // penanda MENCOLOK (warna beda, bukan abu-abu polos spt "↳ dulu:")
       // supaya CS langsung sadar: "yang saya ketik itu nama LAMA, nama
@@ -10657,7 +10728,11 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
         ? `<div style="font-size:10.5px;color:var(--ink-soft);margin-top:2px;">↳ dulu: ${escHtml(m.aliases.join(", "))}</div>`
         : "";
       return `<div class="kt-suggest-item" style="padding:10px 12px;cursor:pointer;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--line);">${m.name}${aliasFlag}${aliasSub}</div>`;
-    }).join("");
+  }
+  function renderSuggestions(query){
+    const matches = cariSaranNama(query);
+    if(!matches.length){ hideSuggestions(); return; }
+    suggestBox.innerHTML = matches.map(htmlSaranNama).join("");
     suggestBox.hidden = false;
     Array.from(suggestBox.children).forEach((el, i)=>{
       el.addEventListener("mousedown", (e)=>{
@@ -10672,6 +10747,17 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       });
     });
   }
+
+  // v2.93.0 -- dipakai kolom Input Nama di menu Ekspedisi (autocomplete & penanda "dipilih dari rekomendasi" identik dgn popup ini)
+  window.__ktNama = {
+    cari: cariSaranNama,
+    html: htmlSaranNama,
+    setDipilih(v){ pickedFromSuggestion = !!v; },
+    dipilih(){ return pickedFromSuggestion; },
+    muat(){ return loadNameHistory(); },
+    jumlah(){ return customerRecords.length; },
+    segarkan(){ hideSuggestions(); refreshNameWarnings(nameInput.value); },
+  };
 
   /* ---------- BARU -- Saran Ekspedisi berdasarkan riwayat customer ----------
      Begitu nama customer di popup ini cocok dengan customer yang sudah
@@ -11029,6 +11115,28 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
   // = "ketika Lunas" (perilaku LAMA/biasa, tunggu Finance approve). Ikon
   // ✕ / klik di luar kotak = default ke false (paling aman, sama seperti
   // sebelum fitur ini ada -- tidak pernah diam-diam pilih opsi baru).
+  // BARU -- dialog "Kirim dengan nama baru?" (muncul HANYA kalau ekspedisi dipilih dari rekomendasi menu Ekspedisi > Input Nama
+  // atas nama tertentu, lalu nama di popup ini diganti). Promise<boolean>: true = lanjut kirim (ekspedisi dihapus), false = batal.
+  function askNamaBaruEkspedisi(cek){
+    return new Promise((resolve)=>{
+      const overlay = document.createElement("div");
+      overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;";
+      overlay.innerHTML = `
+        <div style="background:var(--card);color:var(--ink);border-radius:14px;padding:18px;max-width:380px;width:100%;" role="dialog" aria-label="Kirim dengan nama baru">
+          <h3 style="margin:0 0 8px;font-size:15px;">Yakin kirim dengan nama baru?</h3>
+          <p style="margin:0 0 8px;font-size:12.5px;line-height:1.5;">Ekspedisi <b>${escHtml(cek.ekspedisi)}</b> dipilih dari rekomendasi atas nama <b>${escHtml(cek.namaLama)}</b>. Sekarang nama diganti menjadi <b>${escHtml(cek.namaBaru)}</b>.</p>
+          <p style="margin:0 0 14px;font-size:12.5px;color:var(--ink-soft);line-height:1.5;">Kalau lanjut, data ekspedisi &amp; ongkir akan <b>dihapus</b> dari form, karena rekomendasinya berlaku untuk nama sebelumnya.</p>
+          <button type="button" data-choice="ya" style="width:100%;padding:10px;border-radius:10px;border:none;background:var(--primary-green);color:#fff;font-weight:700;font-size:13px;margin-bottom:8px;cursor:pointer;">Ya, kirim dengan nama baru</button>
+          <button type="button" data-choice="batal" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;font-size:13px;cursor:pointer;">Batal</button>
+        </div>`;
+      overlay.addEventListener("click", (e)=>{
+        const choice = e.target && e.target.getAttribute && e.target.getAttribute("data-choice");
+        if(choice){ overlay.remove(); resolve(choice === "ya"); }
+        else if(e.target === overlay){ overlay.remove(); resolve(false); } // klik luar kotak = batal (paling aman)
+      });
+      document.body.appendChild(overlay);
+    });
+  }
   function askInventoryTiming(){
     return new Promise((resolve)=>{
       const overlay = document.createElement("div");
@@ -11087,6 +11195,17 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       return;
     }
 
+    // BARU -- nama diganti padahal ekspedisi dipilih dari rekomendasi atas nama lama -> minta konfirmasi dulu.
+    // (Ekspedisi baru benar-benar dihapus nanti, setelah semua validasi di bawah lolos.)
+    let hapusEkspSheet = null;
+    try{
+      const cekEksp = window.__ekspPickCheck ? window.__ekspPickCheck() : null;
+      if(cekEksp){
+        if(!(await askNamaBaruEkspedisi(cekEksp))) return;
+        hapusEkspSheet = cekEksp.sheet;
+      }
+    }catch(e){ console.log("cek ekspedisi vs nama gagal:", e); }
+
     // BARU -- dialog "kirim sebelum/ketika Lunas", CUMA muncul kalau
     // checkbox "Pesan u/ Inventory" dicentang & isinya terisi (kalau
     // tidak, sendInventoryNotifNow tetap false -- 0 perubahan perilaku
@@ -11112,6 +11231,7 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
       if(piutangHari){ piutangHari.focus(); piutangHari.scrollIntoView({ block: "nearest" }); }
       return;
     }
+    if(hapusEkspSheet){ try{ window.__ekspPickClear(hapusEkspSheet); }catch(e){ console.log("hapus ekspedisi gagal:", e); } }
     if(!kirimIdSesi) kirimIdSesi = buatKirimId();
     revisiPicker.hidden = true; // sembunyikan picker (TANPA hapus pendingRevisiTargetMessageId kalau user baru pilih)
     btnSend.disabled = true; btnCancel.disabled = true; isSending = true;
@@ -11602,6 +11722,596 @@ function setupOngkirExclusive(rateId, manualId, sheetName){
 setupOngkirExclusive("pj-rate", "pj-ongkir-manual", "penjualan");
 setupOngkirExclusive("cs-rate", "cs-ongkir-manual", "custom");
 applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-manual","cs-kelebihan","cs-diskonongkir");
+
+/* ============================================================
+   MENU EKSPEDISI: tombol "Input Nama" / "Manual" (v2.93.0)
+   - Manual      = form ekspedisi seperti biasa (tidak diubah sama sekali).
+   - Input Nama  = ketik nama customer -> tujuan (kota) dicari di D1 Logistik
+                   (lewat Worker Rincian: /logistik/tujuan, /logistik/tarif,
+                   /logistik/wilayah) -> daftar ekspedisi + TOTAL ongkir tiap
+                   ekspedisi, sekali ketuk langsung mengisi form.
+   Sumber data yang dianggap paling akurat:
+     * harga/kg, estimasi, minimal kg per tujuan  -> Logistik (tarif per kab/kec)
+     * pembulatan berat, minimum charge, rumus     -> Master Data Rincian
+       (roundWeight + minBeratKg, sama persis dgn calc()), jadi total di daftar
+       = total yang tampil di nota.
+     * nama ekspedisi -> nama di Master Rincian (dicocokkan ke Logistik lewat
+       nama + alias).
+   Nama customer di sini TERHUBUNG DUA ARAH dgn kolom "Nama Customer" di popup
+   Salin & Kirim (#kt-customer-name): isi salah satu -> yang lain ikut terisi,
+   hapus salah satu -> keduanya terhapus.
+   ============================================================ */
+(function(){
+  "use strict";
+  const kt = document.getElementById("kt-customer-name");
+  const EP = { nama:"", dipilihNama:"", tujuan:null, tarif:null, kandidat:[], pakaiCustomer:[], err:"", loading:"", kotaManual:false, seq:0, cache:new Map() };
+  const MODE = { penjualan:"manual", custom:"manual" };
+  const PICK = { penjualan:null, custom:null };
+  let inst = [];
+  let tmCari = null, tmKota = null, seqKota = 0, terakhirMuat = 0;
+
+  const pfxOf = (s)=> s === "penjualan" ? "pj" : "cs";
+  const normNama = (s)=> String(s||"").toUpperCase().replace(/[^A-Z0-9]+/g, "");
+  const esc = (s)=> String(s==null ? "" : s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const rpf = (n)=> "Rp" + Math.round(n).toLocaleString("id-ID");
+  const kgf = (n)=> Number(n).toLocaleString("id-ID", { maximumFractionDigits: 2 });
+
+  /* ---------- panggilan ke Worker (perantara Logistik) ---------- */
+  async function lg(path, params){
+    const res = await fetch(MASTER_DATA_WORKER_URL + path + "?" + new URLSearchParams(params), { headers: workerHeaders() });
+    const d = await res.json().catch(()=> null);
+    if(!res.ok || !d || d.ok === false) throw new Error((d && (d.error || d.message)) || ("Gagal (" + res.status + ")"));
+    return d;
+  }
+  async function muatTarif(kode, my){
+    const c = EP.cache.get(kode);
+    let d;
+    if(c && Date.now() - c.t < 5 * 60e3) d = c.d;
+    else { d = await lg("/logistik/tarif", { kode }); EP.cache.set(kode, { t: Date.now(), d }); }
+    if(my !== EP.seq) return;
+    EP.tarif = d;
+  }
+  async function cariTujuan(){
+    const my = ++EP.seq;
+    if(EP.nama.trim().length < 3){
+      EP.kandidat = []; EP.err = ""; EP.loading = "";
+      if(!EP.kotaManual){ EP.tujuan = null; EP.tarif = null; }
+      renderAll(); return;
+    }
+    EP.loading = "Mencari tujuan di Logistik…"; renderAll();
+    try{
+      const d = await lg("/logistik/tujuan", { nama: EP.nama.trim() });
+      if(my !== EP.seq) return;
+      EP.kandidat = d.kandidat || [];
+      EP.pakaiCustomer = d.pakaiCustomer || [];
+      if(!EP.kotaManual){
+        if(d.tujuan){ EP.tujuan = d.tujuan; await muatTarif(d.tujuan.kab, my); }
+        else { EP.tujuan = null; EP.tarif = null; }
+      }
+      EP.err = "";
+    }catch(e){
+      if(my !== EP.seq) return;
+      EP.err = e.message || String(e); EP.tarif = null;
+    }
+    if(my !== EP.seq) return;
+    EP.loading = "";
+    renderAll();
+  }
+  async function lgPost(path, body){
+    const res = await fetch(MASTER_DATA_WORKER_URL + path, { method: "POST", headers: Object.assign({ "Content-Type": "application/json" }, workerHeaders()), body: JSON.stringify(body) });
+    const d = await res.json().catch(()=> null);
+    if(!res.ok || !d || d.ok === false) throw new Error((d && (d.error || d.message)) || ("Gagal (" + res.status + ")"));
+    return d;
+  }
+  async function tautkan(it, namaRincian){
+    const t = it.linkFor;
+    if(!t || !namaRincian) return;
+    try{
+      await lgPost("/logistik/tautkan", { ekspedisi_id: t.ekspedisi_id, alias: namaRincian });
+      it.linkFor = null; it.note = "";
+      EP.cache.clear();
+      if(EP.tujuan){ const my = ++EP.seq; await muatTarif(EP.tujuan.kab, my); }
+      renderAll();
+      const c = daftar(it.sheet).find(x=> x.t.ekspedisi_id === t.ekspedisi_id);
+      if(c && c.rinci) pilih(it, c);
+    }catch(e){ it.note = "Gagal menautkan: " + (e.message || e); renderAll(); }
+  }
+  async function pilihKota(w){
+    const my = ++EP.seq;
+    EP.kotaManual = true;
+    EP.tujuan = { kab: w.kode, kabNama: w.nama, kota: "", sumber: "manual" };
+    EP.loading = "Memuat tarif…"; EP.err = "";
+    inst.forEach(i=>{ i.showKota = false; if(i.kotaInput) i.kotaInput.value = ""; });
+    renderAll();
+    try{ await muatTarif(w.kode, my); }
+    catch(e){ if(my === EP.seq){ EP.err = e.message || String(e); EP.tarif = null; } }
+    if(my !== EP.seq) return;
+    EP.loading = ""; renderAll();
+  }
+
+  /* ---------- sinkron nama dua arah dgn #kt-customer-name ---------- */
+  const ktDesc = kt ? Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value") : null;
+  function ktSetSilent(v){
+    if(!kt) return;
+    if(ktDesc.get.call(kt) !== v) ktDesc.set.call(kt, v); // tanpa memicu event (autosave draft baru jalan saat popup dibuka)
+  }
+  function setNama(v, src){
+    v = String(v || "").toUpperCase();
+    if(v === EP.nama) return;
+    EP.nama = v; EP.kotaManual = false;
+    if(EP.dipilihNama !== v) EP.dipilihNama = "";
+    inst.forEach(i=>{ if(i.nameInput !== src && i.nameInput.value !== v) i.nameInput.value = v; });
+    ktSetSilent(v);
+    if(!v.trim()){ // nama dihapus -> hasil rekomendasi ikut kosong
+      ++EP.seq; clearTimeout(tmCari);
+      EP.tujuan = null; EP.tarif = null; EP.kandidat = []; EP.pakaiCustomer = []; EP.err = ""; EP.loading = "";
+      renderAll(); return;
+    }
+    clearTimeout(tmCari);
+    tmCari = setTimeout(cariTujuan, 400);
+    renderAll();
+  }
+  if(kt){
+    // nilai #kt-customer-name sering di-set lewat kode (pilih saran, pulihkan draft, kosongkan setelah kirim)
+    // tanpa event "input" -> pasang pengait pada properti value supaya SEMUA perubahan ikut tersinkron.
+    Object.defineProperty(kt, "value", {
+      configurable: true,
+      get(){ return ktDesc.get.call(this); },
+      set(v){ ktDesc.set.call(this, v); try{ setNama(ktDesc.get.call(this), null); }catch(e){} },
+    });
+    // buka popup Salin & Kirim: nama yang sudah terisi dari form langsung dinilai (peringatan mirip, saran ekspedisi, dll)
+    const asli = window.__openKirimTelegramModal;
+    if(typeof asli === "function"){
+      window.__openKirimTelegramModal = function(){
+        // nama yang tadi DIPILIH dari saran di Input Nama harus tetap dianggap "dipilih dari rekomendasi" di popup
+        // (popup mereset penanda itu saat dibuka; tanpa ini customer lama bisa terdaftar ulang sebagai customer baru).
+        const dipilih = !!EP.dipilihNama && EP.dipilihNama === EP.nama;
+        const r = asli.apply(this, arguments);
+        try{
+          if(kt.value.trim()){
+            kt.dispatchEvent(new Event("input", { bubbles: true })); // jalankan semua pengecekan seperti saat diketik
+            if(dipilih && window.__ktNama){
+              window.__ktNama.setDipilih(true); window.__ktNama.segarkan();
+              setTimeout(()=>{ try{ window.__ktNama.segarkan(); }catch(e){} }, 150); // setelah popup memfokuskan kolom nama
+            }
+          }
+        }catch(e){}
+        return r;
+      };
+    }
+    if(kt.value.trim()) EP.nama = kt.value.toUpperCase();
+  }
+
+  /* ---------- perhitungan total (rumus Rincian) ---------- */
+  // Nama ekspedisi di Rincian ("APM Logistics") sering beda dari di Logistik ("APM CARGO"). Urutan pencocokan:
+  //  1) nama/alias persis sama  2) inti nama sama (tanpa kata umum CARGO/EXPRESS/LOGISTIK…) HANYA bila tidak
+  //  ambigu  3) ditautkan sekali oleh pengguna (disimpan sebagai alias di Logistik, jadi berlaku untuk semua).
+  const GENERIK = new Set(["CARGO","EXPRESS","LOGISTICS","LOGISTIK","LOGISTIC","LOG","TRUCKING","TRUCK","TRANS","JASA","EKSPEDISI","PT","CV"]);
+  function inti(s){
+    const t = String(s||"").toUpperCase().replace(/[^A-Z0-9]+/g, " ").split(" ").filter(Boolean);
+    const k = t.filter(x=> !GENERIK.has(x));
+    return (k.length ? k : t).join("");
+  }
+  function intiToken(s){
+    const t = String(s||"").toUpperCase().replace(/[^A-Z0-9]+/g, " ").split(" ").filter(Boolean);
+    const k = t.filter(x=> !GENERIK.has(x));
+    return k.length ? k : t;
+  }
+  // sama persis, atau semua kata inti salah satu termuat di yang lain ("SAJIRA" ⊂ "SAJIRA MAHARDIKA"); minimal 4 huruf agar tidak asal cocok
+  function sebagianSama(a, b){
+    if(!a.length || !b.length) return false;
+    const [kecil, besar] = a.length <= b.length ? [a, b] : [b, a];
+    if(kecil.join("").length < 4 && kecil.join("") !== besar.join("")) return false;
+    return kecil.every(x=> besar.includes(x));
+  }
+  function namaTarif(t){ const a = [t.eks]; String(t.eks_alias || "").split(",").forEach(x=>{ if(x.trim()) a.push(x); }); return a; }
+  function daftarRincian(){ return (typeof EKSPEDISI !== "undefined" ? EKSPEDISI : []).filter(e=> e && e.name); }
+  function cocokkan(rows){
+    const R = daftarRincian(), hasil = new Map(), terpakai = new Set();
+    for(const t of rows){
+      const kunci = new Set(namaTarif(t).map(normNama));
+      const e = R.find(x=> kunci.has(normNama(x.name)));
+      if(e){ hasil.set(t.ekspedisi_id, { rinci: e, fuzzy: false }); terpakai.add(e.name); }
+    }
+    const calon = new Map();
+    for(const t of rows){
+      if(hasil.has(t.ekspedisi_id)) continue;
+      const tokT = namaTarif(t).map(intiToken).filter(a=> a.length);
+      const cs = R.filter(x=> !terpakai.has(x.name) && tokT.some(a=> sebagianSama(a, intiToken(x.name))));
+      if(cs.length === 1) calon.set(t.ekspedisi_id, cs[0]);
+    }
+    const hit = new Map();
+    calon.forEach(e=> hit.set(e.name, (hit.get(e.name) || 0) + 1));
+    calon.forEach((e, id)=>{ if(hit.get(e.name) === 1) hasil.set(id, { rinci: e, fuzzy: true }); });
+    return hasil;
+  }
+  function hitung(sheet, t, berat, m){
+    const rinci = m ? m.rinci : null;
+    const o = { t, rinci, fuzzy: !!(m && m.fuzzy), total: null, rate: null, flat: false, ditagihMin: false, kg: null, perluManual: false, min: 0 };
+    if(!berat) return o;
+    const rounded = roundWeight(berat, rinci ? rinci.name : "");
+    o.kg = rounded;
+    if(!rounded) return o;
+    const minR = (rinci && rinci.minBeratKg > 0 && (sheet === "penjualan" || rinci.minBeratCustom)) ? rinci.minBeratKg : 0;
+    const min = Math.max(minR, Number(t.min_kg) || 0);
+    o.min = min;
+    if(t.jenis === "jenjang" && rounded <= 5 && t.harga_1_5){ o.total = t.harga_1_5; o.flat = true; }
+    else if(t.jenis === "jenjang" && rounded <= 10 && t.harga_6_10){ o.total = t.harga_6_10; o.flat = true; }
+    else if(t.harga_kg){
+      o.rate = t.harga_kg;
+      o.total = Math.round(t.harga_kg * Math.max(rounded, min));
+      o.ditagihMin = rounded < min;
+      const dasarCalc = (minR > 0 && rounded < minR) ? minR : rounded; // yang akan dipakai calc() kalau hanya Ongkir/Kg diisi
+      o.perluManual = Math.round(t.harga_kg * dasarCalc) !== o.total;
+    }
+    return o;
+  }
+  // ❤️ = ekspedisi yang sering dipakai customer ini (>= 2x, atau yang paling sering bila riwayatnya masih sedikit).
+  // Customer belum punya riwayat -> pakai ekspedisi yang paling sering dipakai ke kota tujuan yang sama.
+  function seringDipakai(t, rinci){
+    const kunci = new Set(namaTarif(t).map(normNama));
+    if(rinci) kunci.add(normNama(rinci.name));
+    const pc = EP.pakaiCustomer || [];
+    if(pc.length){
+      const i = pc.findIndex(p=> kunci.has(normNama(p.eks)) || kunci.has(normNama(p.ekspedisi)) || kunci.has(normNama(p.ekey)));
+      if(i === -1) return null;
+      return (pc[i].n >= 2 || i === 0) ? { n: pc[i].n, sumber: "customer" } : null;
+    }
+    return t.favorit ? { n: t.pakai ? t.pakai.n : 0, sumber: "kota" } : null;
+  }
+  function daftar(sheet){
+    const d = EP.tarif;
+    if(!d) return [];
+    const per = new Map();
+    for(const t of (d.tarifKab || [])){
+      const a = per.get(t.ekspedisi_id);
+      if(!a || (t.kec && !a.kec)) per.set(t.ekspedisi_id, t); // tarif khusus kecamatan lebih tepat dari tarif kab/kota
+    }
+    const berat = (window.__ekspBerat || {})[sheet] || 0;
+    const rows = [...per.values()], peta = cocokkan(rows);
+    const arr = rows.map(t=> hitung(sheet, t, berat, peta.get(t.ekspedisi_id) || null));
+    arr.sort((a, b)=> ((a.total == null) - (b.total == null)) || ((a.total || 0) - (b.total || 0)) || ((b.t.favorit ? 1 : 0) - (a.t.favorit ? 1 : 0)));
+    return arr;
+  }
+
+  /* ---------- isi form saat ekspedisi dipilih ---------- */
+  function syncMirror(sheet){
+    const pfx = pfxOf(sheet);
+    const sel = document.getElementById(pfx + "-ekspedisi"), rate = document.getElementById(pfx + "-rate"), man = document.getElementById(pfx + "-ongkir-manual");
+    const we = document.getElementById("ws-eksp-" + sheet), wr = document.getElementById("ws-rate-" + sheet), wm = document.getElementById("ws-manualval-" + sheet);
+    const kosong = (v)=> (v === "0" || v === "") ? "" : v;
+    if(wr && rate) wr.value = kosong(rate.value);
+    if(wm && man) wm.value = kosong(man.value);
+    if(we && sel){ we.value = sel.value; try{ we.dispatchEvent(new Event("change", { bubbles: true })); }catch(e){} }
+  }
+  function pilih(it, c){
+    const sheet = it.sheet, pfx = pfxOf(sheet);
+    if(!c.rinci){
+      it.note = c.t.eks + " belum ada di Master Data Ekspedisi (Rincian). Tambahkan dulu lewat Master Data → Ekspedisi, atau pakai tombol Manual.";
+      renderAll(); return;
+    }
+    const sel = document.getElementById(pfx + "-ekspedisi"), rateEl = document.getElementById(pfx + "-rate"), manEl = document.getElementById(pfx + "-ongkir-manual");
+    sel.value = c.rinci.name;
+    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    if(c.total != null){
+      if(c.flat || c.perluManual || !c.rate){ manEl.value = c.total.toLocaleString("id-ID"); manEl.dispatchEvent(new Event("input", { bubbles: true })); }
+      else { rateEl.value = c.rate.toLocaleString("id-ID"); rateEl.dispatchEvent(new Event("input", { bubbles: true })); }
+    } else if(c.rate && c.t.jenis !== "jenjang"){
+      rateEl.value = c.rate.toLocaleString("id-ID"); rateEl.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    PICK[sheet] = { id: c.t.ekspedisi_id, total: c.total };
+    it.note = c.total == null ? "Ekspedisi dipilih. Isi produk dulu agar ongkir terhitung, lalu ketuk lagi kartunya untuk memperbarui." : "";
+    syncMirror(sheet);
+    // catat "foto" pilihan ini: dipakai tombol Kirim untuk tahu apakah ekspedisi dipilih dari rekomendasi (berdasarkan NAMA tertentu)
+    // atau diubah manual setelahnya.
+    PICK[sheet].nama = EP.nama; PICK[sheet].eksp = sel.value; PICK[sheet].rate = rateEl.value; PICK[sheet].man = manEl.value;
+    renderAll();
+  }
+
+  /* ---------- cek & hapus pilihan ekspedisi saat nama diganti (dipanggil tombol Kirim di popup Salin & Kirim) ---------- */
+  function sheetAktif(){
+    const b = document.querySelector(".tab-btn.active");
+    return b && b.dataset.tab === "custom" ? "custom" : "penjualan";
+  }
+  // Balikan: null = tidak perlu konfirmasi. Objek = ekspedisi dipilih dari rekomendasi atas nama LAMA, tapi nama sekarang sudah beda.
+  window.__ekspPickCheck = function(){
+    const sheet = sheetAktif(), p = PICK[sheet];
+    if(!p || !p.eksp) return null;
+    const pfx = pfxOf(sheet);
+    const sel = document.getElementById(pfx + "-ekspedisi"), rate = document.getElementById(pfx + "-rate"), man = document.getElementById(pfx + "-ongkir-manual");
+    if(!sel || !rate || !man) return null;
+    // ekspedisi / ongkir sudah diubah manual setelah dipilih dari rekomendasi -> anggap pilihan manual, TIDAK perlu dialog
+    if(sel.value !== p.eksp || rate.value !== p.rate || man.value !== p.man){ PICK[sheet] = null; return null; }
+    const baruAsli = String(kt ? kt.value : "").trim().toUpperCase();
+    if(!baruAsli || normNama(baruAsli) === normNama(p.nama)) return null;
+    return { sheet, namaLama: p.nama, namaBaru: baruAsli, ekspedisi: p.eksp };
+  };
+  window.__ekspPickClear = function(sheet){
+    const pfx = pfxOf(sheet);
+    const sel = document.getElementById(pfx + "-ekspedisi"), rate = document.getElementById(pfx + "-rate"), man = document.getElementById(pfx + "-ongkir-manual");
+    if(rate && rate.value){ rate.value = ""; rate.dispatchEvent(new Event("input", { bubbles: true })); }
+    if(man && man.value){ man.value = ""; man.dispatchEvent(new Event("input", { bubbles: true })); }
+    if(sel){ sel.value = ""; sel.dispatchEvent(new Event("change", { bubbles: true })); }
+    syncMirror(sheet);
+    const we = document.getElementById("ws-eksp-" + sheet);
+    if(we && typeof we._comboSync === "function"){ try{ we._comboSync(); }catch(e){} }
+    PICK[sheet] = null;
+    renderAll();
+  };
+
+  /* ---------- tampilan ---------- */
+  const SKELETON = `
+    <div class="ep-title">Pilih Ekspedisi</div>
+    <div class="ep-seg" role="tablist" aria-label="Pilih Ekspedisi">
+      <button type="button" class="ep-tab" data-mode="nama" role="tab">🔎 Input Nama</button>
+      <button type="button" class="ep-tab" data-mode="manual" role="tab">✍️ Manual</button>
+    </div>
+    <div class="ep-body" hidden>
+      <div class="ep-field">
+        <label>Nama customer</label>
+        <input type="text" class="ep-input ep-nama" placeholder="Ketik nama customer, mis. TOKO BERKAH (MADIUN)" autocomplete="off" autocapitalize="characters" spellcheck="false">
+        <div class="ep-suggest ep-nama-suggest" hidden></div>
+      </div>
+      <div class="ep-tujuan"></div>
+      <div class="ep-kota" hidden>
+        <div class="ep-field">
+          <input type="text" class="ep-input ep-kota-input" placeholder="Cari kota / kabupaten / kecamatan tujuan" autocomplete="off" spellcheck="false">
+          <div class="ep-suggest ep-kota-suggest" hidden></div>
+        </div>
+      </div>
+      <div class="ep-sum" hidden></div>
+      <div class="ep-hasil"></div>
+    </div>`;
+
+  function mount(sheet, host){
+    if(!host) return;
+    let parent, before, modeHost;
+    const simple = (host.matches && host.matches(".ongkir-simple")) ? host : host.querySelector(".ongkir-simple");
+    if(simple){ parent = simple; before = simple.firstElementChild; modeHost = simple; }
+    else {
+      const fc = host.querySelector(".wiz-fieldcard");
+      if(!fc) return;
+      parent = host; before = fc; modeHost = host;
+    }
+    if(parent.querySelector(":scope > .ep")) return;
+    const root = document.createElement("div");
+    root.className = "ep";
+    root.dataset.sheet = sheet;
+    root.innerHTML = SKELETON;
+    parent.insertBefore(root, before);
+    modeHost.classList.add("ep-host");
+    const it = {
+      sheet, root, modeHost, showKota: false, linkFor: null, note: "", list: [], sugOpen: false, kotaList: [],
+      tabs: [...root.querySelectorAll(".ep-tab")],
+      body: root.querySelector(".ep-body"),
+      nameInput: root.querySelector(".ep-nama"),
+      sugEl: root.querySelector(".ep-nama-suggest"),
+      tujuanEl: root.querySelector(".ep-tujuan"),
+      kotaWrap: root.querySelector(".ep-kota"),
+      kotaInput: root.querySelector(".ep-kota-input"),
+      kotaSug: root.querySelector(".ep-kota-suggest"),
+      sumEl: root.querySelector(".ep-sum"),
+      hasilEl: root.querySelector(".ep-hasil"),
+    };
+    inst.push(it);
+    wire(it);
+    render(it);
+  }
+
+  function wire(it){
+    it.tabs.forEach(b=> b.addEventListener("click", ()=>{
+      MODE[it.sheet] = b.dataset.mode;
+      renderAll();
+      if(b.dataset.mode === "nama"){
+        muatSaran();
+        setTimeout(()=>{ try{ it.nameInput.focus(); }catch(e){} }, 30);
+        if(EP.nama.trim().length >= 3 && !EP.tarif && !EP.loading) cariTujuan();
+      }
+    }));
+    it.nameInput.addEventListener("input", ()=>{
+      const pos = it.nameInput.selectionStart, v = it.nameInput.value.toUpperCase();
+      if(it.nameInput.value !== v){ it.nameInput.value = v; try{ it.nameInput.setSelectionRange(pos, pos); }catch(e){} }
+      it.sugOpen = true; it.sugIdx = -1;
+      muatSaran(); // pastikan daftar nama sudah dimuat (sama seperti popup Salin & Kirim)
+      if(window.__ktNama) window.__ktNama.setDipilih(false); // diketik manual lagi
+      EP.dipilihNama = "";
+      setNama(v, it.nameInput);
+      render(it); // tampilkan saran SEGERA di tiap ketikan (jangan menunggu pencarian tujuan)
+    });
+    it.nameInput.addEventListener("keydown", (e)=>{
+      const n = (it.sugList || []).length;
+      if(!n || it.sugEl.hidden) return;
+      if(e.key === "ArrowDown" || e.key === "ArrowUp"){
+        e.preventDefault();
+        it.sugIdx = (((it.sugIdx == null ? -1 : it.sugIdx) + (e.key === "ArrowDown" ? 1 : -1)) % n + n) % n;
+        [...it.sugEl.children].forEach((el, i)=> el.classList.toggle("ep-aktif", i === it.sugIdx));
+      } else if(e.key === "Enter" && it.sugIdx >= 0){
+        e.preventDefault();
+        pilihSaran(it, it.sugList[it.sugIdx]);
+      } else if(e.key === "Escape"){ it.sugOpen = false; renderSug(it); }
+    });
+    it.nameInput.addEventListener("focus", ()=>{ it.sugOpen = true; muatSaran(); render(it); });
+    it.nameInput.addEventListener("blur", ()=>{ setTimeout(()=>{ it.sugOpen = false; renderSug(it); }, 120); });
+    it.sugEl.addEventListener("mousedown", (e)=>{
+      const el = e.target.closest(".kt-suggest-item");
+      if(!el) return;
+      e.preventDefault(); // supaya kolom tidak keburu blur
+      pilihSaran(it, (it.sugList || [])[[...it.sugEl.children].indexOf(el)]);
+    });
+    it.kotaInput.addEventListener("input", ()=>{
+      clearTimeout(tmKota);
+      const q = it.kotaInput.value.trim();
+      if(q.length < 3){ it.kotaList = []; renderKota(it); return; }
+      tmKota = setTimeout(async ()=>{
+        const my = ++seqKota;
+        try{
+          const d = await lg("/logistik/wilayah", { q });
+          if(my !== seqKota) return;
+          it.kotaList = d.data || [];
+        }catch(e){ it.kotaList = []; it.note = e.message || String(e); }
+        renderAll();
+      }, 300);
+    });
+    it.kotaSug.addEventListener("mousedown", (e)=>{
+      const el = e.target.closest(".ep-sug-item");
+      if(!el) return;
+      e.preventDefault();
+      const w = it.kotaList.find(x=> String(x.kode) === el.dataset.kode);
+      if(w){ it.kotaList = []; pilihKota(w); }
+    });
+    it.tujuanEl.addEventListener("click", (e)=>{
+      if(e.target.closest(".ep-ganti")){ it.showKota = !it.showKota; render(it); if(it.showKota) setTimeout(()=>{ try{ it.kotaInput.focus(); }catch(x){} }, 30); }
+    });
+    it.hasilEl.addEventListener("click", (e)=>{
+      const card = e.target.closest(".ep-card");
+      if(!card) return;
+      const c = it.list[Number(card.dataset.i)];
+      if(!c) return;
+      if(!c.rinci){ it.linkFor = c.t; it.note = ""; renderAll(); return; }
+      pilih(it, c);
+    });
+    it.hasilEl.addEventListener("click", (e)=>{
+      if(e.target.closest(".ep-link-batal")){ it.linkFor = null; renderAll(); return; }
+      if(e.target.closest(".ep-link-ok")){
+        const sel = it.hasilEl.querySelector(".ep-link-sel");
+        if(sel && sel.value) tautkan(it, sel.value); else { it.note = "Pilih dulu ekspedisi Rincian yang sama."; renderAll(); }
+      }
+    });
+  }
+
+  function pilihSaran(it, pilihan){
+    if(!pilihan) return;
+    it.sugOpen = false; it.sugIdx = -1;
+    setNama(pilihan.name, null);
+    EP.dipilihNama = EP.nama;
+    if(window.__ktNama) window.__ktNama.setDipilih(true); // dipilih dari rekomendasi -> BUKAN customer baru
+    clearTimeout(tmCari);
+    cariTujuan();
+  }
+  // Saran nama = fungsi yang SAMA dgn kolom Nama Customer di popup Salin & Kirim (window.__ktNama): muncul mulai 1 huruf,
+  // cocok ke nama aktif ATAU alias (nama lama ditandai), maks 6, tampilan sama persis.
+  function renderSug(it){
+    const api = window.__ktNama, q = EP.nama.trim();
+    const buka = !!api && MODE[it.sheet] === "nama" && it.sugOpen && q.length >= 1;
+    it.sugList = buka ? api.cari(q) : [];
+    it.sugEl.hidden = !it.sugList.length;
+    it.sugEl.innerHTML = it.sugList.length ? it.sugList.map(api.html).join("") : "";
+  }
+  function muatSaran(){
+    const api = window.__ktNama;
+    if(!api) return;
+    // data nama dimuat ulang tiap 60 detik; kalau masih KOSONG (gagal muat / belum selesai) boleh dicoba lagi (jeda 3 detik)
+    const kosong = !(api.jumlah && api.jumlah() > 0);
+    if(Date.now() - terakhirMuat < (kosong ? 3e3 : 60e3)) return;
+    terakhirMuat = Date.now();
+    Promise.resolve(api.muat()).then(renderAll).catch(()=>{ terakhirMuat = 0; });
+  }
+  function renderKota(it){
+    const perlu = MODE[it.sheet] === "nama" && (it.showKota || (!EP.tujuan && EP.nama.trim().length >= 3 && !EP.loading));
+    it.kotaWrap.hidden = !perlu;
+    const buka = perlu && it.kotaList.length > 0;
+    it.kotaSug.hidden = !buka;
+    if(buka){
+      it.kotaSug.innerHTML = it.kotaList.map(w=> `<div class="ep-sug-item" data-kode="${esc(w.kode)}"><b>${w.tingkat === 3 ? "Kec. " : ""}${esc(w.nama)}</b><span>${esc(w.induk_nama || "")}</span></div>`).join("");
+    }
+  }
+  function labelTujuan(){
+    const w = EP.tarif && EP.tarif.wilayah;
+    if(w) return (w.tingkat === 3 ? "Kec. " + w.nama + ", " + w.kabNama : w.kabNama) + (w.prov ? " · " + w.prov : "");
+    return EP.tujuan ? EP.tujuan.kabNama : "";
+  }
+  function render(it){
+    const nama = MODE[it.sheet] === "nama";
+    it.modeHost.classList.toggle("ep-nama-mode", nama);
+    it.tabs.forEach(b=>{ const on = b.dataset.mode === MODE[it.sheet]; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
+    it.body.hidden = !nama;
+    if(!nama) return;
+    if(it.nameInput.value !== EP.nama && document.activeElement !== it.nameInput) it.nameInput.value = EP.nama;
+
+    // baris tujuan
+    let tj = "";
+    if(EP.loading) tj = `<span>⏳ ${esc(EP.loading)}</span>`;
+    else if(EP.err) tj = `<span class="ep-err">⚠️ ${esc(EP.err)}</span>`;
+    else if(EP.tujuan){
+      const sumber = EP.tujuan.sumber === "riwayat" ? "dari riwayat kirim" : EP.tujuan.sumber === "kota-nama" ? "dari (KOTA) di nama" : "dipilih manual";
+      tj = `<span>📍 <b>${esc(labelTujuan())}</b> <small>${sumber}</small></span><button type="button" class="ep-ganti">Ganti kota</button>`;
+    } else if(EP.nama.trim().length >= 3) tj = `<span>Kota tujuan belum ketemu dari nama ini. Cari kota di bawah.</span>`;
+    else tj = `<span class="ep-hint">Ketik nama customer. Tujuan diambil dari riwayat kirim, atau dari (KOTA) di belakang nama.</span>`;
+    it.tujuanEl.className = "ep-tujuan" + (EP.tujuan && !EP.err && !EP.loading ? " ok" : "") + (EP.err ? " bad" : "");
+    it.tujuanEl.innerHTML = tj;
+    renderKota(it);
+    renderSug(it);
+    renderHasil(it);
+  }
+  function renderHasil(it){
+    if(MODE[it.sheet] !== "nama") return;
+    const pfx = pfxOf(it.sheet);
+    const sel = document.getElementById(pfx + "-ekspedisi");
+    const ongkirTxt = (document.getElementById(pfx + "-ongkir") || {}).textContent || "";
+    if(sel && sel.value && ongkirTxt && ongkirTxt.trim() !== "–"){
+      it.sumEl.hidden = false;
+      it.sumEl.innerHTML = `✅ Terpilih: <b>${esc(sel.value)}</b> · Ongkir <b>${esc(ongkirTxt)}</b>`;
+    } else it.sumEl.hidden = true;
+
+    const berat = (window.__ekspBerat || {})[it.sheet] || 0;
+    it.list = daftar(it.sheet);
+    let h = "";
+    if(it.note) h += `<div class="ep-note">${esc(it.note)}</div>`;
+    if(it.linkFor){
+      const dipakai = new Set(it.list.filter(c=> c.rinci).map(c=> c.rinci.name));
+      const opsi = daftarRincian().filter(e=> !dipakai.has(e.name) && e.name !== "Diambil Sendiri").map(e=> `<option value="${esc(e.name)}">${esc(e.name)}</option>`).join("");
+      h += `<div class="ep-note"><b>${esc(it.linkFor.eks)}</b> belum cocok dengan Master Data Ekspedisi (Rincian). Pilih ekspedisi Rincian yang sama — cukup sekali, tersimpan di Logistik.<div class="ep-link"><select class="ep-link-sel"><option value="">— pilih ekspedisi —</option>${opsi}</select><button type="button" class="ep-ganti ep-link-ok">Tautkan</button><button type="button" class="ep-ganti ep-link-batal">Batal</button></div></div>`;
+    }
+    if(EP.tarif && !EP.loading){
+      if(!it.list.length) h += `<div class="ep-empty">Belum ada ekspedisi dengan tarif ke ${esc(labelTujuan())}. Tambahkan tarif di Master Data Logistik, atau pakai tombol Manual.</div>`;
+      else {
+        h += `<div class="ep-legend">⭐ termurah &nbsp;·&nbsp; ❤️ sering dipakai</div>`;
+        h += `<div class="ep-berat">${berat ? "Berat pesanan " + kgf(berat) + " Kg (dibulatkan sesuai aturan tiap ekspedisi)" : "Isi produk dulu — total ongkir dihitung dari berat pesanan."}</div>`;
+        let cheap = true;
+        h += it.list.map((c, i)=>{
+          const t = c.t, aktif = PICK[it.sheet] && PICK[it.sheet].id === t.ekspedisi_id && sel && c.rinci && sel.value === c.rinci.name;
+          const murah = cheap && c.total != null; if(murah) cheap = false;
+          const est = (t.est_min && t.est_max && t.est_min !== t.est_max) ? t.est_min + "–" + t.est_max + " hari" : (t.est_min || t.est_max) ? (t.est_min || t.est_max) + " hari" : "";
+          const meta = [t.hargaLabel, (c.rinci && (c.fuzzy || normNama(c.rinci.name) !== normNama(t.eks))) ? "di Logistik: " + t.eks : "", c.min ? "min " + kgf(c.min) + " kg" : "", est].filter(Boolean).join(" · ");
+          const sering = seringDipakai(t, c.rinci);
+          const pakai = t.pakai ? `Dipakai ${t.pakai.n}x ke tujuan ini` : "";
+          const usang = aktif && PICK[it.sheet].total !== c.total && c.total != null;
+          return `<button type="button" class="ep-card${aktif ? " on" : ""}${c.rinci ? "" : " off"}" data-i="${i}">
+            <span class="ep-main">
+              <span class="ep-name">${esc(c.rinci ? c.rinci.name : t.eks)}${murah ? '<span class="ep-badge cheap">⭐ Termurah</span>' : ""}${sering ? '<span class="ep-badge fav">❤️ ' + (sering.n ? sering.n + 'x ' : '') + (sering.sumber === "customer" ? 'dipakai customer ini' : 'sering ke kota ini') + '</span>' : ""}${c.rinci ? "" : '<span class="ep-badge warn">Belum di Master Rincian</span>'}</span>
+              <span class="ep-meta">${esc(meta)}</span>
+              ${pakai || t.catatan ? `<span class="ep-meta">${esc([pakai, t.catatan].filter(Boolean).join(" · "))}</span>` : ""}
+              ${usang ? '<span class="ep-meta ep-stale">Berat berubah — ketuk untuk memperbarui ongkir</span>' : ""}
+            </span>
+            <span class="ep-total">${c.total != null ? rpf(c.total) : "—"}<small>${c.total != null ? (c.ditagihMin ? "ditagih min " + kgf(c.min) + " kg" : "untuk " + kgf(c.kg) + " kg") : "belum ada berat"}</small></span>
+          </button>`;
+        }).join("");
+        const tanpa = (EP.tarif.tanpaTarif || []).slice(0, 4);
+        if(tanpa.length) h += `<div class="ep-berat">Pernah dipakai, belum ada tarif: ${tanpa.map(p=> esc(p.ekspedisi) + " (" + p.n + "x)").join(", ")}</div>`;
+      }
+    }
+    it.hasilEl.innerHTML = h;
+  }
+  function renderAll(){
+    inst = inst.filter(i=> i.root.isConnected);
+    inst.forEach(render);
+  }
+
+  /* ---------- kait ke calc() & wizard ---------- */
+  window.__ekspPickRefresh = function(sheet){
+    inst = inst.filter(i=> i.root.isConnected);
+    inst.forEach(i=>{ if(i.sheet === sheet && MODE[sheet] === "nama") renderHasil(i); });
+  };
+  window.__ekspPickMount = function(sheet, host){ try{ mount(sheet, host); }catch(e){ console.log("ekspPick mount gagal:", e); } };
+  ["penjualan", "custom"].forEach(s=>{
+    try{
+      const sel = document.getElementById(pfxOf(s) + "-ekspedisi");
+      const simple = sel && sel.closest(".ongkir-simple");
+      if(simple) mount(s, simple);
+    }catch(e){ console.log("ekspPick init gagal:", e); }
+  });
+})();
+
 
 /* ============ Indikator visual field Ongkir (murni tampilan) ============
    TIDAK menyentuh setupOngkirExclusive() di atas sama sekali — cuma
@@ -14033,6 +14743,7 @@ if ("serviceWorker" in navigator) {
       `;
     }
 
+    if(window.__ekspPickMount) window.__ekspPickMount(sheet, host); // v2.93.0 -- tombol Input Nama / Manual
     const wEksp = document.getElementById("ws-eksp-"+sheet);
     const wRate = document.getElementById("ws-rate-"+sheet);
     const wManualVal = document.getElementById("ws-manualval-"+sheet);
