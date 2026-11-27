@@ -14113,7 +14113,21 @@ if ("serviceWorker" in navigator) {
         btn.disabled = false;
         return;
       }
-      poItems = (data.items || []).map(it=> ({ ...it, aiMatchedProduct: it.matchedProduct })); // simpan snapshot tebakan AI awal, buat dibandingkan kalau CS betulkan manual
+      // v493 -- pengaman qty: kalau AI/Worker mengirim qty kosong atau berupa teks ("20"), pulihkan di sini
+      // (angka teks -> angka; kalau masih kosong & baris cocok produk, ambil angka di akhir teks baris aslinya).
+      const fixQty = (it)=>{
+        let q = it.qty;
+        if(q === undefined || q === null) q = (it.quantity !== undefined ? it.quantity : it.jumlah);
+        if(typeof q === "string"){ const m = q.replace(",", ".").match(/\d+(?:\.\d+)?/); q = m ? parseFloat(m[0]) : NaN; }
+        if(typeof q === "number" && isFinite(q) && q > 0) return q;
+        if(it.matchedProduct){
+          const m = String(it.raw || "").match(/(\d+(?:[.,]\d+)?)\s*(?:dus|ds|krt|karton|kardus|pcs|pack|renceng|renteng|bks|bungkus)?\s*[.!]*\s*$/i);
+          if(m){ const v = parseFloat(m[1].replace(",", ".")); if(isFinite(v) && v > 0) return v; }
+        }
+        return null;
+      };
+      console.log("[parse-order] respons mentah dari Worker:", JSON.stringify(data));
+      poItems = (data.items || []).map(it=> ({ ...it, qty: fixQty(it), aiMatchedProduct: it.matchedProduct })); // simpan snapshot tebakan AI awal, buat dibandingkan kalau CS betulkan manual
       // Simpan tanggal jadwal kirim (kalau AI ketemu) DIAM-DIAM ke state wizard —
       // tidak ada perubahan tampilan apa pun di sini, baru dipakai nanti pas
       // kirim ke grup Telegram (buat pengingat H-1 otomatis lewat bot).
