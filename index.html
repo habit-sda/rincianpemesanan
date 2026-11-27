@@ -2596,6 +2596,8 @@
   .md-nama-alias-label{font-size:10.5px;color:var(--ink-soft);margin-right:2px;}
   .md-alias-chip{display:inline-flex;align-items:center;gap:5px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px 6px 3px 10px;font-size:11.5px;color:var(--ink-soft);}
   .md-alias-chip button{border:none;background:none;color:var(--danger-red);cursor:pointer;font-size:12px;padding:0 2px;line-height:1;}
+  #md-namacustomer-lockwrap.md-locked .md-alias-text{cursor:default;text-decoration:none;}
+  #md-namacustomer-lockwrap.md-locked .md-lockable:disabled{opacity:.35;cursor:not-allowed;}
   .md-alias-text{cursor:text;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--ink-soft);text-underline-offset:2px;}
   .md-alias-edit-input{height:24px;font-size:11.5px;border:1px solid var(--primary-green);border-radius:6px;padding:0 6px;width:130px;text-transform:uppercase;}
   .md-alias-edit-hint{font-size:10px;color:var(--ink-soft);margin-left:6px;white-space:nowrap;}
@@ -6611,7 +6613,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.10</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.11</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6910,7 +6912,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.10 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.11 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Master Nama: semua tombol ubah-data kini wajib lewat Mode Edit</b> — saat Mode Edit belum diaktifkan, tombol ✏️ Edit, 🙈 Sembunyikan, ♻️ Pulihkan, + Tambah / ✕ nama lama, serta tombol 🔄 Sinkronkan / 🙈 Sembunyikan / ✕ Abaikan di kartu saran dinonaktifkan (teks nama lama juga tidak bisa diketuk untuk diedit). Menekan "Simpan &amp; Kunci" otomatis menutup baris yang sedang diedit. Hanya index.html.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.10</div>
           <ul>
             <li><b>Input Nama kini identik 100% dengan popup Salin &amp; Kirim</b> — kolom Nama customer di menu Ekspedisi sekarang juga menampilkan kotak kuning "nama LAMA (alias)" + tombol "Pakai nama baru", dan "kemungkinan sudah terdaftar" + tombol "Pakai nama ini". Isi, aturan muncul, dan tombolnya memakai fungsi yang sama dengan popup (bukan salinan), jadi tidak akan berbeda lagi.</li>
           </ul>
@@ -16241,13 +16249,29 @@ if ("serviceWorker" in navigator) {
         </div>`;
     }
 
+    // BARU -- semua tombol ubah-data di Master Nama (Edit, Sembunyikan,
+    // Pulihkan, + Tambah/✕ alias, tombol di kartu saran) harus lewat
+    // "Mode Edit". Baris/kartu dirender ulang lewat innerHTML sehingga
+    // status terkunci WAJIB disegarkan tiap render.
+    function nsLocked(){
+      const w = document.getElementById("md-namacustomer-lockwrap");
+      return !w || w.classList.contains("md-locked");
+    }
+    function applyNamaLock(){
+      const w = document.getElementById("md-namacustomer-lockwrap");
+      if(!w) return;
+      const locked = nsLocked();
+      w.querySelectorAll("button.md-lockable").forEach(b=>{ b.disabled = locked; });
+    }
+    window.__mdNamaCancelEdit = ()=>{ editingName = null; render(); };
+
     function aliasChipsHtml(c){
       const aliases = Array.isArray(c.aliases) ? c.aliases : [];
       return `
         <div class="md-nama-alias-wrap">
           <span class="md-nama-alias-label">↳ Nama lama:</span>
-          ${aliases.map(a=> `<span class="md-alias-chip"><span class="md-alias-text" data-alias="${escapeHtmlNama(a)}" title="Ketuk untuk edit nama lama ini">${escapeHtmlNama(a)}</span><button type="button" class="md-alias-del" data-alias="${escapeHtmlNama(a)}" title="Hapus alias ini (tidak menyentuh data pesanan)">✕</button></span>`).join("")}
-          <button type="button" class="md-alias-add-btn" title="Tambah nama lama secara manual (tanpa harus nunggu saran otomatis)">+ Tambah</button>
+          ${aliases.map(a=> `<span class="md-alias-chip"><span class="md-alias-text" data-alias="${escapeHtmlNama(a)}" title="Ketuk untuk edit nama lama ini">${escapeHtmlNama(a)}</span><button type="button" class="md-alias-del md-lockable" data-alias="${escapeHtmlNama(a)}" title="Hapus alias ini (tidak menyentuh data pesanan)">✕</button></span>`).join("")}
+          <button type="button" class="md-alias-add-btn md-lockable" title="Tambah nama lama secara manual (tanpa harus nunggu saran otomatis)">+ Tambah</button>
         </div>`;
     }
 
@@ -16300,7 +16324,7 @@ if ("serviceWorker" in navigator) {
                 <div class="fld"><div class="fld-label">Nama CS</div><div class="fld-val cs ${c.cs ? "" : "empty"}">${c.cs ? escapeHtmlNama(c.cs) : "(kosong)"}</div></div>
               </div>
               <div class="md-nama-row-actions">
-                <button type="button" class="edit md-nama-unhide-btn">♻️ Pulihkan</button>
+                <button type="button" class="edit md-nama-unhide-btn md-lockable">♻️ Pulihkan</button>
               </div>
             </div>`;
         }
@@ -16312,13 +16336,14 @@ if ("serviceWorker" in navigator) {
             </div>
             ${aliasChipsHtml(c)}
             <div class="md-nama-row-actions">
-              <button type="button" class="edit md-nama-edit-btn">✏️ Edit</button>
-              <button type="button" class="del md-nama-del-btn">🙈 Sembunyikan</button>
+              <button type="button" class="edit md-nama-edit-btn md-lockable">✏️ Edit</button>
+              <button type="button" class="del md-nama-del-btn md-lockable">🙈 Sembunyikan</button>
             </div>
           </div>`;
       }).join("");
 
       listEl.innerHTML = rowsHtml + paginationHtml(totalPages);
+      applyNamaLock();
     }
 
     /* ---------- Kartu saran ketidaksinkronan ----------
@@ -16398,13 +16423,14 @@ if ("serviceWorker" in navigator) {
             <div class="row">
               <div class="txt">🔎 Nama transaksi <b>"${escapeHtmlNama(s.orderName)}"</b> mirip dengan Master Nama <b>"${escapeHtmlNama(s.masterName)}"</b> tapi tidak 100% sama — apakah customer yang sama? ${badge ? `<br>${badge}${typeof s.score === "number" ? ` (${s.score}%)` : ""}` : ""}</div>
               <div class="btns">
-                <button type="button" class="sync md-nama-sugg-sync">🔄 Sinkronkan</button>
-                <button type="button" class="hide md-nama-sugg-hide">🙈 Sembunyikan</button>
-                <button type="button" class="md-nama-sugg-ignore" style="border:1px solid var(--line);background:var(--card);border-radius:7px;padding:6px 10px;font-size:11.5px;cursor:pointer;color:var(--ink-soft);">✕ Abaikan</button>
+                <button type="button" class="sync md-nama-sugg-sync md-lockable">🔄 Sinkronkan</button>
+                <button type="button" class="hide md-nama-sugg-hide md-lockable">🙈 Sembunyikan</button>
+                <button type="button" class="md-nama-sugg-ignore md-lockable" style="border:1px solid var(--line);background:var(--card);border-radius:7px;padding:6px 10px;font-size:11.5px;cursor:pointer;color:var(--ink-soft);">✕ Abaikan</button>
               </div>
             </div>
           </div>`;
       }).join("");
+      applyNamaLock();
       suggestWrapEl.querySelectorAll(".md-nama-suggest-card").forEach(card=>{
         const idx = Number(card.dataset.idx);
         const s = allSuggestions[idx];
@@ -16848,6 +16874,7 @@ if ("serviceWorker" in navigator) {
       // AKTIF customer lain, endpoint ini otomatis menggabungkan 2 record
       // itu jadi 1 (perilaku bawaan add-alias, sama seperti Sinkronkan).
       if(e.target.classList.contains("md-alias-add-btn")){
+        if(nsLocked()) return;
         const btn = e.target;
         const input = document.createElement("input");
         input.type = "text";
@@ -16886,6 +16913,7 @@ if ("serviceWorker" in navigator) {
       }
 
       if(e.target.classList.contains("md-alias-text")){
+        if(nsLocked()) return; // edit nama lama harus lewat Mode Edit
         const chip = e.target.closest(".md-alias-chip");
         const oldAlias = e.target.dataset.alias;
         if(!chip || !oldAlias) return;
@@ -17982,7 +18010,9 @@ if ("serviceWorker" in navigator) {
   const rumusEditLock = setupSectionEditLock("rumus");
   const keamananEditLock = setupSectionEditLock("keamanan");
   const financeEditLock = setupSectionEditLock("finance");
-  const namacustomerEditLock = setupSectionEditLock("namacustomer");
+  const namacustomerEditLock = setupSectionEditLock("namacustomer", {
+    onExit: ()=>{ if(window.__mdNamaCancelEdit) window.__mdNamaCancelEdit(); }
+  });
 
   /* ---- Mode Edit: daftar produk TERKUNCI (read-only) secara default
      supaya tidak rawan ter-edit tidak sengaja (mis. kepencet pas

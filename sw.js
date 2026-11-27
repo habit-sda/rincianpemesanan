@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v430";
+const CACHE_VERSION = "v431";
+/* v431 -- (app v2.93.11) Master Nama: semua tombol ubah-data (Edit, Sembunyikan, Pulihkan, alias, kartu saran) wajib lewat Mode Edit. Hanya index.html. */
 /* v430 -- (app v2.93.10) Input Nama: kotak peringatan nama lama (alias) & kemungkinan sudah terdaftar identik dgn popup Salin & Kirim. Hanya index.html. */
 /* v429 -- (app v2.93.9) Input Nama: centang hijau di kolom Nama customer & Cari kota/kecamatan saat terisi; baris tujuan pakai ✅. Hanya index.html. */
 /* v428 -- (app v2.93.8) Input Nama: cari kota/kecamatan langsung (tanpa nama customer) -> rekomendasi ekspedisi + total ongkir. Hanya index.html. */
