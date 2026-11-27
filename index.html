@@ -6609,7 +6609,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.7</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.8</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6908,7 +6908,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.7 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.8 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Cari ekspedisi langsung dari kota/kecamatan (tanpa nama customer)</b> — di menu Ekspedisi &gt; Input Nama, kolom "Cari kota / kabupaten / kecamatan tujuan" kini selalu tampil walau nama belum diisi. Pilih kota atau kecamatan, daftar ekspedisi rekomendasi beserta total ongkir (⭐ termurah, min kg) langsung muncul. Pilihan kota dihapus kalau nama customer diketik/diganti, lalu dicari ulang dari nama itu.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.7</div>
           <ul>
             <li><b>Kartu ekspedisi riwayat customer lebih mudah dibaca</b> — Ongkir per Kg dan Minimal kg kini tampil sebagai kotak kecil berlabel (Minimal berwarna kuning supaya menonjol), tanggal terakhir dipakai ditulis "21 Nov 2026". Isi dan hitungannya tidak berubah.</li>
           </ul>
@@ -12089,7 +12095,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     // ekspedisi / ongkir sudah diubah manual setelah dipilih dari rekomendasi -> anggap pilihan manual, TIDAK perlu dialog
     if(sel.value !== p.eksp || rate.value !== p.rate || man.value !== p.man){ PICK[sheet] = null; return null; }
     const baruAsli = String(kt ? kt.value : "").trim().toUpperCase();
-    if(!baruAsli || normNama(baruAsli) === normNama(p.nama)) return null;
+    if(!baruAsli || !normNama(p.nama) || normNama(baruAsli) === normNama(p.nama)) return null; // dipilih lewat cari kota (tanpa nama) -> tidak perlu dialog
     return { sheet, namaLama: p.nama, namaBaru: baruAsli, ekspedisi: p.eksp };
   };
   window.__ekspPickClear = function(sheet){
@@ -12274,7 +12280,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     Promise.resolve(api.muat()).then(renderAll).catch(()=>{ terakhirMuat = 0; });
   }
   function renderKota(it){
-    const perlu = MODE[it.sheet] === "nama" && (it.showKota || (!EP.tujuan && EP.nama.trim().length >= 3 && !EP.loading));
+    const perlu = MODE[it.sheet] === "nama" && (it.showKota || (!EP.tujuan && !EP.loading)); // tanpa nama pun kolom cari kota tampil: cari kota/kecamatan langsung dapat rekomendasi ekspedisi
     it.kotaWrap.hidden = !perlu;
     const buka = perlu && it.kotaList.length > 0;
     it.kotaSug.hidden = !buka;
@@ -12306,7 +12312,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
       const pl = EP.pelanggan, ada = (EP.pakaiCustomer || []).length;
       tj = `<span>Kota tujuan belum ketemu dari nama ini.${pl && pl.kota ? ` Kota tercatat di riwayat: <b>${esc(pl.kota)}</b> (belum cocok dgn database wilayah).` : ""}${ada ? " Di bawah ini ekspedisi yang biasa dipakai customer ini; cari kota untuk melihat semua ekspedisi beserta total ongkirnya." : " Cari kota di bawah."}</span>`;
     }
-    else tj = `<span class="ep-hint">Ketik nama customer. Tujuan diambil dari riwayat kirim, atau dari (KOTA) di belakang nama.</span>`;
+    else tj = `<span class="ep-hint">Ketik nama customer (tujuan diambil dari riwayat kirim, atau dari (KOTA) di belakang nama) — atau langsung cari kota / kecamatan tujuan di bawah untuk melihat ekspedisi rekomendasi.</span>`;
     it.tujuanEl.className = "ep-tujuan" + (EP.tujuan && !EP.err && !EP.loading ? " ok" : "") + (EP.err ? " bad" : "");
     it.tujuanEl.innerHTML = tj;
     renderKota(it);
