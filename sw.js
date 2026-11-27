@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v426";
+const CACHE_VERSION = "v427";
+/* v427 -- (app v2.93.7) Kartu ekspedisi riwayat customer: Ongkir per Kg & Minimal kg jadi kotak berlabel, tanggal terakhir dipakai format "21 Nov 2026". Hanya index.html. */
 /* v426 -- (app v2.93.6) Kartu ekspedisi riwayat customer: info "ongkir Rp… · berat … kg" dihapus dari baris keterangan (tersisa Ongkir per Kg + min kg). Hanya index.html. */
 /* v425 -- (app v2.93.6) Input Nama: kartu ekspedisi dari riwayat customer — label "Ongkir per Kg" (bukan "rata²"), kata "rata-rata" dihapus, ditambah "min X kg" dari kolom Minimal kg tarif di Logistik (ongkir ditagih sesuai minimal). Index.html + Worker Logistik (min_kg di /int/tujuan). */
 /* v424 -- (app v2.93.5) Input Nama: teks keterangan di atas daftar ekspedisi riwayat customer dihapus (fungsi tidak berubah). Hanya index.html. */

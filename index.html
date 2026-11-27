@@ -623,6 +623,16 @@
   .ep-badge.warn{background:#fdecea;color:var(--danger-red);}
   .ep-total{text-align:right;font-weight:800;font-size:17px;white-space:nowrap;}
   .ep-total small{display:block;font-weight:500;font-size:11px;color:var(--ink-soft);}
+  .ep-stats{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px;}
+  .ep-stat{display:flex;flex-direction:column;gap:1px;padding:5px 10px;border-radius:9px;background:rgba(0,0,0,.045);border:1px solid var(--line);min-width:0;}
+  .ep-stat span{font-size:10.5px;font-weight:600;color:var(--ink-soft);line-height:1.2;}
+  .ep-stat b{font-size:14px;font-weight:800;line-height:1.25;white-space:nowrap;}
+  .ep-stat.min{background:#fff3c4;border-color:#e0b400;}
+  .ep-stat.min span{color:#6b4e00;} .ep-stat.min b{color:#4a3500;}
+  .ep-riw-info{font-size:12px;color:var(--ink-soft);}
+  html[data-theme="dark"] .ep-stat{background:rgba(255,255,255,.06);}
+  html[data-theme="dark"] .ep-stat.min{background:rgba(224,180,0,.18);border-color:rgba(224,180,0,.5);}
+  html[data-theme="dark"] .ep-stat.min span{color:#f3d36b;} html[data-theme="dark"] .ep-stat.min b{color:#ffe9a0;}
   .ep-host.ep-nama-mode > .ongkir-simple-eksp, .ep-host.ep-nama-mode > .ongkir-simple-grid, .ep-host.ep-nama-mode > .wiz-fieldcard, .ep-host.ep-nama-mode > [id^="ws-manual-"]{display:none;}
   html[data-theme="dark"] .ep-card.on, html[data-theme="dark"] .ep-tujuan.ok{background:rgba(0,132,95,.16);}
   html[data-theme="dark"] .ep-badge.cheap{background:rgba(224,180,0,.18);color:#f3d36b;}
@@ -6599,7 +6609,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.6</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.7</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6898,7 +6908,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.6 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.7 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Kartu ekspedisi riwayat customer lebih mudah dibaca</b> — Ongkir per Kg dan Minimal kg kini tampil sebagai kotak kecil berlabel (Minimal berwarna kuning supaya menonjol), tanggal terakhir dipakai ditulis "21 Nov 2026". Isi dan hitungannya tidak berubah.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.6</div>
           <ul>
             <li><b>Kartu ekspedisi dari riwayat customer</b> — "rata² Rp/kg" diganti <b>Ongkir per Kg</b>, kata "rata-rata" dihapus dari keterangan kartu &amp; catatan, info ongkir &amp; berat riwayat dihapus dari kartu, dan ditambah <b>min X kg</b> yang diambil dari kolom "Minimal kg" tarif di Logistik. Kalau berat pesanan di bawah minimal, estimasi ongkir ditagih sesuai minimal. Butuh Worker Logistik terbaru (min_kg di /int/tujuan).</li>
           </ul>
@@ -12337,13 +12353,16 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     let h = "";
     h += list.map((r, i)=>{
       const p = r.p, aktif = PICK[it.sheet] && PICK[it.sheet].id === r.key && sel && r.rinci && sel.value === r.rinci.name;
-      const meta = [p.pk ? "Ongkir per Kg " + rpf(p.pk) : "", r.min ? "min " + kgf(r.min) + " kg" : ""].filter(Boolean).join(" · ");
-      const pakai = "Dipakai " + p.n + "x" + (p.akhir ? " · terakhir " + esc(String(p.akhir).slice(0, 10)) : "");
+      const BLN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+      const tgl = p.akhir ? String(p.akhir).slice(0, 10).split("-") : null;
+      const tglTxt = tgl && tgl.length === 3 && BLN[+tgl[1] - 1] ? (+tgl[2]) + " " + BLN[+tgl[1] - 1] + " " + tgl[0] : (p.akhir ? String(p.akhir).slice(0, 10) : "");
+      const stats = (p.pk ? '<span class="ep-stat"><span>Ongkir per Kg</span><b>' + esc(rpf(p.pk)) + '</b></span>' : "") + (r.min ? '<span class="ep-stat min"><span>Minimal</span><b>' + esc(kgf(r.min)) + ' kg</b></span>' : "");
+      const pakai = "Dipakai " + p.n + "x" + (tglTxt ? " · terakhir " + esc(tglTxt) : "");
       return `<button type="button" class="ep-card ep-riw${aktif ? " on" : ""}${r.rinci ? "" : " off"}" data-r="${i}">
         <span class="ep-main">
           <span class="ep-name">${esc(r.rinci ? r.rinci.name : (p.eks || p.ekspedisi))}${r.murah ? '<span class="ep-badge cheap">⭐ Termurah</span>' : ""}${r.sering ? '<span class="ep-badge fav">❤️ Paling sering</span>' : ""}${r.rinci ? "" : '<span class="ep-badge warn">Belum di Master Rincian</span>'}</span>
-          <span class="ep-meta">${esc(meta || "belum ada data harga")}</span>
-          <span class="ep-meta">${pakai}</span>
+          ${stats ? '<span class="ep-stats">' + stats + '</span>' : '<span class="ep-meta">belum ada data harga</span>'}
+          <span class="ep-riw-info">${pakai}</span>
         </span>
         <span class="ep-total">${r.total != null ? rpf(r.total) : "—"}<small>${r.total != null ? (r.ditagihMin ? "ditagih min " + kgf(r.min) + " kg" : "estimasi " + kgf(r.kg) + " kg") : (p.pk ? "belum ada berat" : "")}</small></span>
       </button>`;
