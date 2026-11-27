@@ -6617,7 +6617,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.12</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.13</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6916,7 +6916,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.12 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.13 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Input Nama: ekspedisi yang biasa dipakai customer tetap tampil</b> — sebelumnya daftar ini hanya muncul bila kota tidak ketemu. Kini juga muncul saat tarif Logistik ke kabupaten/kota hanya tercatat per kecamatan (daftar tarif kosong sebelum kecamatan dipilih), lengkap dengan Ongkir per Kg &amp; minimal kg dari riwayat customer.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.12</div>
           <ul>
             <li><b>Input Nama: dialog konfirmasi kecamatan</b> — bila nama customer hanya memuat kota/kabupaten tetapi tarif di Logistik hanya tercatat per kecamatan, muncul dialog "Ongkir ke … terdeteksi untuk Kec. …" (Ya / Bukan / Isi Manual). Tarif kecamatan tidak pernah dianggap berlaku untuk seluruh kabupaten. Jawaban <b>Ya</b> disimpan per customer sehingga pesanan berikutnya langsung memakai tarif kecamatan itu; tombol <b>Ganti kecamatan</b> muncul untuk mengubah atau menghapusnya. Bila tarif kabupaten ada tetapi ada juga tarif kecamatan, kecamatan tampil sebagai pilihan di atas daftar. <i>Butuh Worker Rincian v495 &amp; Worker Logistik v1.6.4.</i></li>
           </ul>
@@ -12608,7 +12614,13 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
       h += `<div class="ep-note"><b>${esc(it.linkFor.eks)}</b> belum cocok dengan Master Data Ekspedisi (Rincian). Pilih ekspedisi Rincian yang sama — cukup sekali, tersimpan di Logistik.<div class="ep-link"><select class="ep-link-sel"><option value="">— pilih ekspedisi —</option>${opsi}</select><button type="button" class="ep-ganti ep-link-ok">Tautkan</button><button type="button" class="ep-ganti ep-link-batal">Batal</button></div></div>`;
     }
     it.listRiw = [];
-    if(!EP.tujuan && !EP.loading && !EP.err && EP.nama.trim().length >= 3) h += renderRiwayat(it, sel);
+    // v2.93.13 -- ekspedisi "biasa dipakai customer" juga tampil saat tarif kab/kota kosong (mis. tarif hanya ada per kecamatan), bukan hanya saat kota tidak ketemu
+    const tarifKosong = !!(EP.tarif && !EP.loading && !it.list.length);
+    if((!EP.tujuan || tarifKosong) && !EP.loading && !EP.err && EP.nama.trim().length >= 3){
+      const riw = renderRiwayat(it, sel);
+      if(riw && tarifKosong) h += `<div class="ep-berat">Ekspedisi yang biasa dipakai customer ini (dari riwayat kirim):</div>`;
+      h += riw;
+    }
     if(EP.tarif && !EP.loading){
       if(!it.list.length){
         if(kecAda().length) h += `<div class="ep-empty">Belum ada tarif untuk seluruh ${esc(labelTujuan())}, tetapi ada <b>tarif khusus kecamatan</b>. Tujuan customer ini di kecamatan mana?${kecChips()}<div class="ep-hint" style="margin-top:8px;">Atau tambahkan tarif di Master Data Logistik, atau pakai tombol Manual.</div></div>`;

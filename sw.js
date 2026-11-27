@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v433";
+const CACHE_VERSION = "v434";
+/* v434 -- (app v2.93.13) Input Nama: ekspedisi yang biasa dipakai customer tetap tampil walau tarif kab/kota hanya ada per kecamatan. Hanya index.html. */
 /* v433 -- (app v2.93.12) Input Nama: dialog konfirmasi kecamatan customer (tarif Logistik per kecamatan), tombol Ganti kecamatan. Butuh Worker Rincian v495 & Logistik v1.6.4. Hanya index.html. */
 /* v431 -- (app v2.93.11) Master Nama: semua tombol ubah-data (Edit, Sembunyikan, Pulihkan, alias, kartu saran) wajib lewat Mode Edit. Hanya index.html. */
 /* v430 -- (app v2.93.10) Input Nama: kotak peringatan nama lama (alias) & kemungkinan sudah terdaftar identik dgn popup Salin & Kirim. Hanya index.html. */
