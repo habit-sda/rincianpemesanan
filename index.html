@@ -589,6 +589,8 @@
   .ep-field label{display:block;font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:4px;}
   .ep-input{width:100%;max-width:none;box-sizing:border-box;height:46px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:15px;background:var(--card);color:var(--ink);text-transform:uppercase;font-family:inherit;}
   .ep-kota-input{text-transform:none;}
+  /* tanda centang hijau + garis hijau kalau kolom nama customer / kota-kecamatan sudah terisi */
+  .ep-nama:not(:placeholder-shown), .ep-kota-input:not(:placeholder-shown){border-color:var(--primary-green);padding-right:40px;background-repeat:no-repeat;background-position:right 12px center;background-size:20px 20px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%2300845F'/%3E%3Cpath d='M7 12.5l3.2 3.2L17 9' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
   .ep-input:focus{outline:2px solid var(--primary-green);outline-offset:0;}
   .ep-suggest{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:220px;overflow-y:auto;}
   .ep-sug-item{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink);}
@@ -6609,7 +6611,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.8</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.9</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6908,7 +6910,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.8 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.9 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Tanda centang di Input Nama</b> — kolom Nama customer dan kolom Cari kota/kecamatan kini diberi garis hijau + centang ✓ di kanan begitu terisi. Setelah kota dipilih, baris tujuan menampilkan ✅ dan nama kotanya.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.8</div>
           <ul>
             <li><b>Cari ekspedisi langsung dari kota/kecamatan (tanpa nama customer)</b> — di menu Ekspedisi &gt; Input Nama, kolom "Cari kota / kabupaten / kecamatan tujuan" kini selalu tampil walau nama belum diisi. Pilih kota atau kecamatan, daftar ekspedisi rekomendasi beserta total ongkir (⭐ termurah, min kg) langsung muncul. Pilihan kota dihapus kalau nama customer diketik/diganti, lalu dicari ulang dari nama itu.</li>
           </ul>
@@ -12307,7 +12315,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     else if(EP.err) tj = `<span class="ep-err">⚠️ ${esc(EP.err)}</span>`;
     else if(EP.tujuan){
       const sumber = EP.tujuan.sumber === "riwayat" ? "dari riwayat kirim" : EP.tujuan.sumber === "riwayat-kota" ? "dari kota yang paling sering di riwayat kirim" : EP.tujuan.sumber === "kota-nama" ? "dari (KOTA) di nama" : "dipilih manual";
-      tj = `<span>📍 <b>${esc(labelTujuan())}</b> <small>${sumber}</small></span><button type="button" class="ep-ganti">Ganti kota</button>`;
+      tj = `<span>✅ <b>${esc(labelTujuan())}</b> <small>${sumber}</small></span><button type="button" class="ep-ganti">Ganti kota</button>`;
     } else if(EP.nama.trim().length >= 3){
       const pl = EP.pelanggan, ada = (EP.pakaiCustomer || []).length;
       tj = `<span>Kota tujuan belum ketemu dari nama ini.${pl && pl.kota ? ` Kota tercatat di riwayat: <b>${esc(pl.kota)}</b> (belum cocok dgn database wilayah).` : ""}${ada ? " Di bawah ini ekspedisi yang biasa dipakai customer ini; cari kota untuk melihat semua ekspedisi beserta total ongkirnya." : " Cari kota di bawah."}</span>`;

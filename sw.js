@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v428";
+const CACHE_VERSION = "v429";
+/* v429 -- (app v2.93.9) Input Nama: centang hijau di kolom Nama customer & Cari kota/kecamatan saat terisi; baris tujuan pakai ✅. Hanya index.html. */
 /* v428 -- (app v2.93.8) Input Nama: cari kota/kecamatan langsung (tanpa nama customer) -> rekomendasi ekspedisi + total ongkir. Hanya index.html. */
 /* v427 -- (app v2.93.7) Kartu ekspedisi riwayat customer: Ongkir per Kg & Minimal kg jadi kotak berlabel, tanggal terakhir dipakai format "21 Nov 2026". Hanya index.html. */
 /* v426 -- (app v2.93.6) Kartu ekspedisi riwayat customer: info "ongkir Rp… · berat … kg" dihapus dari baris keterangan (tersisa Ongkir per Kg + min kg). Hanya index.html. */
