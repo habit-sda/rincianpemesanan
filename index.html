@@ -607,6 +607,10 @@
   .ep-sum{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:rgba(0,132,95,.1);font-size:13px;color:var(--ink);}
   .ep-note{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:#fff6e0;border:1px solid #e0a800;font-size:12.5px;color:#5c3d00;}
   .ep-empty{padding:12px;border:1px dashed var(--line);border-radius:10px;font-size:13px;color:var(--ink-soft);}
+  .ep-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+  .ep-ganti-kec{border:1px solid var(--primary-green);background:var(--card);color:var(--primary-green);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+  .ep-kec-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .ep-kec-chip{border-color:var(--primary-green);color:var(--ink);}
   .ep-berat{font-size:12px;color:var(--ink-soft);margin:2px 0 8px;}
   .ep-legend{font-size:12.5px;font-weight:700;color:var(--ink);margin:2px 0 6px;}
   .ep-card{display:flex;gap:10px;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;padding:12px;margin:0 0 8px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;text-align:left;font-family:inherit;color:var(--ink);}
@@ -6613,7 +6617,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.11</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.12</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6912,7 +6916,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.11 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.12 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Input Nama: dialog konfirmasi kecamatan</b> — bila nama customer hanya memuat kota/kabupaten tetapi tarif di Logistik hanya tercatat per kecamatan, muncul dialog "Ongkir ke … terdeteksi untuk Kec. …" (Ya / Bukan / Isi Manual). Tarif kecamatan tidak pernah dianggap berlaku untuk seluruh kabupaten. Jawaban <b>Ya</b> disimpan per customer sehingga pesanan berikutnya langsung memakai tarif kecamatan itu; tombol <b>Ganti kecamatan</b> muncul untuk mengubah atau menghapusnya. Bila tarif kabupaten ada tetapi ada juga tarif kecamatan, kecamatan tampil sebagai pilihan di atas daftar. <i>Butuh Worker Rincian v495 &amp; Worker Logistik v1.6.4.</i></li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.11</div>
           <ul>
             <li><b>Master Nama: semua tombol ubah-data kini wajib lewat Mode Edit</b> — saat Mode Edit belum diaktifkan, tombol ✏️ Edit, 🙈 Sembunyikan, ♻️ Pulihkan, + Tambah / ✕ nama lama, serta tombol 🔄 Sinkronkan / 🙈 Sembunyikan / ✕ Abaikan di kartu saran dinonaktifkan (teks nama lama juga tidak bisa diketuk untuk diedit). Menekan "Simpan &amp; Kunci" otomatis menutup baris yang sedang diedit. Hanya index.html.</li>
           </ul>
@@ -11853,7 +11863,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
 (function(){
   "use strict";
   const kt = document.getElementById("kt-customer-name");
-  const EP = { nama:"", dipilihNama:"", tujuan:null, tarif:null, kandidat:[], pakaiCustomer:[], pelanggan:null, err:"", loading:"", kotaManual:false, seq:0, cache:new Map() };
+  const EP = { nama:"", dipilihNama:"", tujuan:null, tarif:null, kandidat:[], pakaiCustomer:[], pelanggan:null, err:"", loading:"", kotaManual:false, seq:0, cache:new Map(), kecTolak:"", kecBuka:false };
   const MODE = { penjualan:"manual", custom:"manual" };
   const PICK = { penjualan:null, custom:null };
   let inst = [];
@@ -11895,7 +11905,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
       EP.pakaiCustomer = d.pakaiCustomer || [];
       EP.pelanggan = d.pelanggan || null;
       if(!EP.kotaManual){
-        if(d.tujuan){ EP.tujuan = d.tujuan; await muatTarif(d.tujuan.kab, my); }
+        if(d.tujuan){ EP.tujuan = d.tujuan; await muatTarif(d.tujuan.kec || d.tujuan.kab, my); } // v2.93.12: kecamatan yang sudah dikonfirmasi -> tarif tingkat kecamatan
         else { EP.tujuan = null; EP.tarif = null; }
       }
       EP.err = "";
@@ -11906,6 +11916,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     if(my !== EP.seq) return;
     EP.loading = "";
     renderAll();
+    cekKecamatan(); // v2.93.12
   }
   async function lgPost(path, body){
     const res = await fetch(MASTER_DATA_WORKER_URL + path, { method: "POST", headers: Object.assign({ "Content-Type": "application/json" }, workerHeaders()), body: JSON.stringify(body) });
@@ -11920,7 +11931,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
       await lgPost("/logistik/tautkan", { ekspedisi_id: t.ekspedisi_id, alias: namaRincian });
       it.linkFor = null; it.note = "";
       EP.cache.clear();
-      if(EP.tujuan){ const my = ++EP.seq; await muatTarif(EP.tujuan.kab, my); }
+      if(EP.tujuan){ const my = ++EP.seq; await muatTarif(EP.tujuan.kec || EP.tujuan.kab, my); }
       renderAll();
       const c = daftar(it.sheet).find(x=> x.t.ekspedisi_id === t.ekspedisi_id);
       if(c && c.rinci) pilih(it, c);
@@ -11937,6 +11948,150 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     catch(e){ if(my === EP.seq){ EP.err = e.message || String(e); EP.tarif = null; } }
     if(my !== EP.seq) return;
     EP.loading = ""; renderAll();
+  }
+
+  /* ---------- v2.93.12: KECAMATAN CUSTOMER ----------
+     Nama customer sering hanya memuat kota, sedangkan tarif Logistik bisa sampai kecamatan. Bila tarif ke kab/kota HANYA ada per kecamatan,
+     tarif kecamatan TIDAK dianggap berlaku untuk seluruh kabupaten: kasir diminta mengonfirmasi kecamatannya lewat dialog. Jawaban "Ya"
+     disimpan per customer di Logistik (POST /logistik/kecamatan) sehingga pesanan berikutnya langsung memakai tarif kecamatan itu. */
+  function kecAda(){
+    const d = EP.tarif;
+    return (d && d.wilayah && d.wilayah.tingkat === 2 && Array.isArray(d.kecamatan)) ? d.kecamatan.filter(k=> k && k.kode) : [];
+  }
+  function bisaSimpanKec(){ return !!(EP.tujuan && !EP.kotaManual && EP.tujuan.sumber !== "manual" && EP.nama.trim().length >= 3); }
+  function kecChips(){
+    return '<div class="ep-kec-chips">' + kecAda().map(k=> '<button type="button" class="ep-ganti ep-kec-chip" data-kode="' + esc(k.kode) + '" data-nama="' + esc(k.nama) + '">Kec. ' + esc(k.nama) + ' · ' + esc(k.n) + ' ekspedisi</button>').join("") + '</div>';
+  }
+  function askKecamatan(opsi, kabNama, o){
+    o = o || {};
+    return new Promise((resolve)=>{
+      const satu = opsi.length === 1 && !o.ubah;
+      const sP = "width:100%;padding:10px;border-radius:10px;border:none;background:var(--primary-green);color:#fff;font-weight:700;font-size:13px;margin-bottom:8px;cursor:pointer;font-family:inherit;text-align:left;";
+      const sS = "width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;font-size:13px;margin-bottom:8px;cursor:pointer;font-family:inherit;text-align:left;";
+      const overlay = document.createElement("div");
+      overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;";
+      let judul, isi, tombol = "";
+      if(satu){
+        const k = opsi[0];
+        judul = "Ongkir ke " + esc(kabNama) + " terdeteksi untuk Kec. " + esc(k.nama);
+        isi = "Tarif di Logistik ke " + esc(kabNama) + " hanya tercatat khusus untuk <b>Kec. " + esc(k.nama) + "</b> (" + esc(k.n) + " ekspedisi), bukan untuk seluruh kabupaten. Apakah tujuan customer ini di kecamatan tersebut?";
+        tombol += '<button type="button" data-choice="pilih" data-kode="' + esc(k.kode) + '" data-nama="' + esc(k.nama) + '" style="' + sP + '">Ya, tujuan di Kec. ' + esc(k.nama) + '</button>';
+        tombol += '<button type="button" data-choice="lain" style="' + sS + '">Bukan, cari kota / kecamatan lain</button>';
+      } else {
+        judul = o.ubah ? "Pilih kecamatan tujuan" : "Ongkir ke " + esc(kabNama) + " terdeteksi untuk beberapa kecamatan";
+        isi = o.ubah ? "Tarif khusus kecamatan di " + esc(kabNama) + ". Pilih kecamatan tujuan customer ini." : "Tarif di Logistik ke " + esc(kabNama) + " tercatat khusus per kecamatan, bukan untuk seluruh kabupaten. Tujuan customer ini di kecamatan mana?";
+        opsi.forEach(k=>{
+          const ini = o.saatIni && String(o.saatIni) === String(k.kode);
+          tombol += '<button type="button" data-choice="pilih" data-kode="' + esc(k.kode) + '" data-nama="' + esc(k.nama) + '" style="' + (ini ? sP : sS) + '">' + (ini ? "✓ " : "") + 'Kec. ' + esc(k.nama) + ' · ' + esc(k.n) + ' ekspedisi' + (ini ? " (saat ini)" : "") + '</button>';
+        });
+        tombol += '<button type="button" data-choice="lain" style="' + sS + '">Tujuan di kecamatan / kota lain</button>';
+      }
+      if(o.ubah && o.saatIni) tombol += '<button type="button" data-choice="hapus" style="' + sS + '">Pakai tarif kabupaten saja (hapus pilihan kecamatan)</button>';
+      tombol += '<button type="button" data-choice="manual" style="' + sS + '">Isi Manual</button>';
+      overlay.innerHTML = '<div style="background:var(--card);color:var(--ink);border-radius:14px;padding:18px;max-width:400px;width:100%;max-height:90vh;overflow:auto;" role="dialog" aria-label="Kecamatan tujuan">'
+        + '<h3 style="margin:0 0 8px;font-size:15px;">' + judul + '</h3>'
+        + '<p style="margin:0 0 8px;font-size:12.5px;line-height:1.5;">' + isi + '</p>'
+        + '<p style="margin:0 0 12px;font-size:12px;color:var(--ink-soft);line-height:1.5;">Pilihan disimpan untuk customer ini, jadi pesanan berikutnya langsung memakai tarif kecamatan itu. Bisa diganti lewat tombol Ganti kecamatan.</p>'
+        + tombol + '</div>';
+      const tutup = (hasil)=>{ document.removeEventListener("keydown", onKey, true); overlay.remove(); resolve(hasil); };
+      const onKey = (e)=>{ if(e.key === "Escape"){ e.preventDefault(); tutup({ aksi: "batal" }); } };
+      document.addEventListener("keydown", onKey, true);
+      overlay.addEventListener("click", (e)=>{
+        const b = e.target && e.target.closest ? e.target.closest("button[data-choice]") : null;
+        if(b) tutup({ aksi: b.getAttribute("data-choice"), kode: b.getAttribute("data-kode") || "", nama: b.getAttribute("data-nama") || "" });
+        else if(e.target === overlay) tutup({ aksi: "batal" }); // klik di luar kotak = batal (tidak menyimpan apa pun)
+      });
+      document.body.appendChild(overlay);
+    });
+  }
+  async function setKecamatan(kode, namaKec){
+    const my = ++EP.seq, namaCust = EP.nama.trim();
+    EP.loading = "Memuat tarif kecamatan…"; EP.err = "";
+    inst.forEach(i=>{ i.note = ""; });
+    renderAll();
+    let gagal = "";
+    try{ await lgPost("/logistik/kecamatan", { nama: namaCust, kec: kode }); }
+    catch(e){ gagal = e.message || String(e); }
+    EP.tujuan = Object.assign({}, EP.tujuan, { kec: kode, kecNama: namaKec });
+    try{ await muatTarif(kode, my); }
+    catch(e){ if(my === EP.seq){ EP.err = e.message || String(e); EP.tarif = null; } }
+    if(my !== EP.seq) return;
+    EP.loading = "";
+    if(gagal) inst.forEach(i=>{ i.note = "Kecamatan dipakai untuk pesanan ini, tetapi belum tersimpan di Logistik (" + gagal + "). Akan ditanyakan lagi lain kali."; });
+    renderAll();
+  }
+  async function hapusKecamatan(){
+    const t = EP.tujuan; if(!t) return;
+    const my = ++EP.seq;
+    EP.kecTolak = normNama(EP.nama) + "|" + t.kab; // jangan langsung ditanya lagi
+    EP.loading = "Memuat tarif kabupaten…"; EP.err = "";
+    renderAll();
+    let gagal = "";
+    try{ await lgPost("/logistik/kecamatan", { nama: EP.nama.trim(), kec: "" }); }
+    catch(e){ gagal = e.message || String(e); }
+    EP.tujuan = Object.assign({}, t, { kec: null, kecNama: null });
+    try{ await muatTarif(t.kab, my); }
+    catch(e){ if(my === EP.seq){ EP.err = e.message || String(e); EP.tarif = null; } }
+    if(my !== EP.seq) return;
+    EP.loading = "";
+    inst.forEach(i=>{ i.note = gagal ? "Pilihan kecamatan belum terhapus di Logistik (" + gagal + ")." : ""; });
+    renderAll();
+  }
+  function tanganiKec(r){
+    if(!r || r.aksi === "batal") return;
+    if(r.aksi === "pilih") return setKecamatan(r.kode, r.nama);
+    if(r.aksi === "hapus") return hapusKecamatan();
+    if(r.aksi === "lain"){
+      inst.forEach(i=>{ if(MODE[i.sheet] === "nama") i.showKota = true; });
+      renderAll();
+      const i = inst.find(x=> x.root.isConnected && MODE[x.sheet] === "nama");
+      if(i) setTimeout(()=>{ try{ i.kotaInput.focus(); }catch(e){} }, 30);
+      return;
+    }
+    if(r.aksi === "manual"){ inst.forEach(i=>{ if(MODE[i.sheet] === "nama") MODE[i.sheet] = "manual"; }); renderAll(); }
+  }
+  // Dialog otomatis: customer dikenali sampai kab/kota, tarif kab/kota kosong, tetapi ada tarif khusus kecamatan.
+  function cekKecamatan(){
+    try{
+      if(EP.kecBuka || EP.kotaManual || EP.loading || EP.err || !EP.tujuan || EP.tujuan.kec || !bisaSimpanKec()) return;
+      if(!inst.some(i=> i.root.isConnected && MODE[i.sheet] === "nama")) return;
+      const d = EP.tarif;
+      if(!d || (d.tarifKab || []).length) return;
+      const opsi = kecAda(); if(!opsi.length) return;
+      const kab = EP.tujuan.kab, namaBuka = normNama(EP.nama), kunci = namaBuka + "|" + kab;
+      if(EP.kecTolak === kunci) return;
+      EP.kecBuka = true;
+      askKecamatan(opsi, EP.tujuan.kabNama).then(r=>{
+        EP.kecBuka = false;
+        if(normNama(EP.nama) !== namaBuka || !EP.tujuan || EP.tujuan.kab !== kab) return; // nama sudah diganti selagi dialog terbuka
+        if(!r || r.aksi !== "pilih") EP.kecTolak = kunci; // jangan muncul lagi untuk nama ini (kartu pilihan tetap tampil di bawah)
+        tanganiKec(r);
+      }).catch(()=>{ EP.kecBuka = false; });
+    }catch(e){ EP.kecBuka = false; }
+  }
+  async function ubahKecamatan(){
+    const t = EP.tujuan; if(!t || EP.kecBuka) return;
+    let d;
+    try{
+      const c = EP.cache.get(t.kab);
+      if(c && Date.now() - c.t < 5 * 60e3) d = c.d;
+      else { d = await lg("/logistik/tarif", { kode: t.kab }); EP.cache.set(t.kab, { t: Date.now(), d }); }
+    }catch(e){ inst.forEach(i=>{ i.note = e.message || String(e); }); renderAll(); return; }
+    const opsi = (d.kecamatan || []).filter(k=> k && k.kode);
+    if(!opsi.length){ inst.forEach(i=>{ i.note = "Belum ada tarif khusus kecamatan untuk " + t.kabNama + " di Logistik."; }); renderAll(); return; }
+    EP.kecBuka = true;
+    const r = await askKecamatan(opsi, t.kabNama, { ubah: true, saatIni: t.kec || "" });
+    EP.kecBuka = false;
+    tanganiKec(r);
+  }
+  function wireKec(it){
+    it.tujuanEl.addEventListener("click", (e)=>{ if(e.target.closest(".ep-ganti-kec")) ubahKecamatan(); });
+    it.hasilEl.addEventListener("click", (e)=>{
+      const c = e.target.closest(".ep-kec-chip");
+      if(!c) return;
+      const kode = c.dataset.kode, nama = c.dataset.nama;
+      if(bisaSimpanKec()) setKecamatan(kode, nama); else pilihKota({ kode, nama }); // cari kota manual / tanpa nama: hanya lihat tarif, tidak disimpan
+    });
   }
 
   /* ---------- sinkron nama dua arah dgn #kt-customer-name ---------- */
@@ -12207,6 +12362,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     };
     inst.push(it);
     wire(it);
+    wireKec(it); // v2.93.12
     render(it);
   }
 
@@ -12362,7 +12518,8 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     else if(EP.err) tj = `<span class="ep-err">⚠️ ${esc(EP.err)}</span>`;
     else if(EP.tujuan){
       const sumber = EP.tujuan.sumber === "riwayat" ? "dari riwayat kirim" : EP.tujuan.sumber === "riwayat-kota" ? "dari kota yang paling sering di riwayat kirim" : EP.tujuan.sumber === "kota-nama" ? "dari (KOTA) di nama" : "dipilih manual";
-      tj = `<span>✅ <b>${esc(labelTujuan())}</b> <small>${sumber}</small></span><button type="button" class="ep-ganti">Ganti kota</button>`;
+      const kecOk = !!(EP.tujuan.kec && EP.tujuan.sumber !== "manual" && !EP.kotaManual); // v2.93.12
+      tj = `<span>✅ <b>${esc(labelTujuan())}</b> <small>${sumber}${kecOk ? " · kecamatan dikonfirmasi" : ""}</small></span><span class="ep-btns">${kecOk ? '<button type="button" class="ep-ganti-kec">Ganti kecamatan</button>' : ""}<button type="button" class="ep-ganti">Ganti kota</button></span>`;
     } else if(EP.nama.trim().length >= 3){
       const pl = EP.pelanggan, ada = (EP.pakaiCustomer || []).length;
       tj = `<span>Kota tujuan belum ketemu dari nama ini.${pl && pl.kota ? ` Kota tercatat di riwayat: <b>${esc(pl.kota)}</b> (belum cocok dgn database wilayah).` : ""}${ada ? " Di bawah ini ekspedisi yang biasa dipakai customer ini; cari kota untuk melihat semua ekspedisi beserta total ongkirnya." : " Cari kota di bawah."}</span>`;
@@ -12453,8 +12610,12 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     it.listRiw = [];
     if(!EP.tujuan && !EP.loading && !EP.err && EP.nama.trim().length >= 3) h += renderRiwayat(it, sel);
     if(EP.tarif && !EP.loading){
-      if(!it.list.length) h += `<div class="ep-empty">Belum ada ekspedisi dengan tarif ke ${esc(labelTujuan())}. Tambahkan tarif di Master Data Logistik, atau pakai tombol Manual.</div>`;
+      if(!it.list.length){
+        if(kecAda().length) h += `<div class="ep-empty">Belum ada tarif untuk seluruh ${esc(labelTujuan())}, tetapi ada <b>tarif khusus kecamatan</b>. Tujuan customer ini di kecamatan mana?${kecChips()}<div class="ep-hint" style="margin-top:8px;">Atau tambahkan tarif di Master Data Logistik, atau pakai tombol Manual.</div></div>`;
+        else h += `<div class="ep-empty">Belum ada ekspedisi dengan tarif ke ${esc(labelTujuan())}. Tambahkan tarif di Master Data Logistik, atau pakai tombol Manual.</div>`;
+      }
       else {
+        if(kecAda().length) h += `<div class="ep-berat">Daftar di bawah = tarif untuk seluruh ${esc(labelTujuan())}. Ada juga tarif khusus kecamatan, ketuk kecamatan tujuan bila berlaku:${kecChips()}</div>`;
         h += `<div class="ep-legend">⭐ termurah &nbsp;·&nbsp; ❤️ sering dipakai</div>`;
         h += `<div class="ep-berat">${berat ? "Berat pesanan " + kgf(berat) + " Kg (dibulatkan sesuai aturan tiap ekspedisi)" : "Isi produk dulu — total ongkir dihitung dari berat pesanan."}</div>`;
         let cheap = true;
