@@ -6599,7 +6599,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.5</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.6</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6898,7 +6898,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.5 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.6 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Kartu ekspedisi dari riwayat customer</b> — "rata² Rp/kg" diganti <b>Ongkir per Kg</b>, kata "rata-rata" dihapus dari keterangan kartu &amp; catatan, info ongkir &amp; berat riwayat dihapus dari kartu, dan ditambah <b>min X kg</b> yang diambil dari kolom "Minimal kg" tarif di Logistik. Kalau berat pesanan di bawah minimal, estimasi ongkir ditagih sesuai minimal. Butuh Worker Logistik terbaru (min_kg di /int/tujuan).</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.5</div>
           <ul>
             <li><b>Daftar ekspedisi dari riwayat customer lebih ringkas</b> — teks keterangan di atas daftar dihapus (⭐ termurah &amp; ❤️ paling sering sudah tampil di tiap kartu). Fungsinya tidak berubah.</li>
           </ul>
@@ -12301,8 +12307,9 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
       let rinci = R.find(x=> kunci.has(normNama(x.name))) || null;
       if(!rinci){ const tok = intiToken(p.eks || p.ekspedisi || ""); const cs = R.filter(x=> sebagianSama(tok, intiToken(x.name))); if(cs.length === 1) rinci = cs[0]; }
       const kg = berat ? roundWeight(berat, rinci ? rinci.name : "") : null;
-      const total = (p.pk && kg) ? Math.round(p.pk * kg) : null;
-      return { p, rinci, pk: p.pk || null, kg, total, key: "riw:" + normNama(p.ekey || p.eks), sering: i === 0 };
+      const min = Number(p.min_kg) || 0; // minimal kg dari kolom "Minimal kg" tarif di Logistik
+      const total = (p.pk && kg) ? Math.round(p.pk * Math.max(kg, min)) : null;
+      return { p, rinci, pk: p.pk || null, kg, min, ditagihMin: !!(kg && min && kg < min), total, key: "riw:" + normNama(p.ekey || p.eks), sering: i === 0 };
     });
     const pks = arr.filter(x=> x.pk).map(x=> x.pk);
     const minPk = pks.length > 1 ? Math.min(...pks) : null;
@@ -12318,7 +12325,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     sel.dispatchEvent(new Event("change", { bubbles: true }));
     if(r.pk){ rateEl.value = r.pk.toLocaleString("id-ID"); rateEl.dispatchEvent(new Event("input", { bubbles: true })); }
     PICK[sheet] = { id: r.key, total: r.total };
-    it.note = r.pk ? "Ongkir/Kg diisi dari rata-rata riwayat customer ini (" + rpf(r.pk) + "/kg). Cek lagi dengan tarif terbaru kalau perlu." : "Ekspedisi dipilih. Riwayat customer ini belum punya harga/kg.";
+    it.note = r.pk ? "Ongkir/Kg diisi dari riwayat customer ini (" + rpf(r.pk) + "/kg). Cek lagi dengan tarif terbaru kalau perlu." : "Ekspedisi dipilih. Riwayat customer ini belum punya harga/kg.";
     syncMirror(sheet);
     PICK[sheet].nama = EP.nama; PICK[sheet].eksp = sel.value; PICK[sheet].rate = rateEl.value; PICK[sheet].man = manEl.value;
     renderAll();
@@ -12330,7 +12337,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     let h = "";
     h += list.map((r, i)=>{
       const p = r.p, aktif = PICK[it.sheet] && PICK[it.sheet].id === r.key && sel && r.rinci && sel.value === r.rinci.name;
-      const meta = [p.pk ? "rata² " + rpf(p.pk) + "/kg" : "", p.ong ? "ongkir rata² " + rpf(p.ong) : "", p.kg ? "rata² " + kgf(p.kg) + " kg" : ""].filter(Boolean).join(" · ");
+      const meta = [p.pk ? "Ongkir per Kg " + rpf(p.pk) : "", r.min ? "min " + kgf(r.min) + " kg" : ""].filter(Boolean).join(" · ");
       const pakai = "Dipakai " + p.n + "x" + (p.akhir ? " · terakhir " + esc(String(p.akhir).slice(0, 10)) : "");
       return `<button type="button" class="ep-card ep-riw${aktif ? " on" : ""}${r.rinci ? "" : " off"}" data-r="${i}">
         <span class="ep-main">
@@ -12338,7 +12345,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
           <span class="ep-meta">${esc(meta || "belum ada data harga")}</span>
           <span class="ep-meta">${pakai}</span>
         </span>
-        <span class="ep-total">${r.total != null ? rpf(r.total) : "—"}<small>${r.total != null ? "estimasi " + kgf(r.kg) + " kg" : (p.pk ? "belum ada berat" : "")}</small></span>
+        <span class="ep-total">${r.total != null ? rpf(r.total) : "—"}<small>${r.total != null ? (r.ditagihMin ? "ditagih min " + kgf(r.min) + " kg" : "estimasi " + kgf(r.kg) + " kg") : (p.pk ? "belum ada berat" : "")}</small></span>
       </button>`;
     }).join("");
     return h;
