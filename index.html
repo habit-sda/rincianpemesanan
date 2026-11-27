@@ -6611,7 +6611,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.9</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.10</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6910,7 +6910,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.9 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.10 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Input Nama kini identik 100% dengan popup Salin &amp; Kirim</b> — kolom Nama customer di menu Ekspedisi sekarang juga menampilkan kotak kuning "nama LAMA (alias)" + tombol "Pakai nama baru", dan "kemungkinan sudah terdaftar" + tombol "Pakai nama ini". Isi, aturan muncul, dan tombolnya memakai fungsi yang sama dengan popup (bukan salinan), jadi tidak akan berbeda lagi.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.9</div>
           <ul>
             <li><b>Tanda centang di Input Nama</b> — kolom Nama customer dan kolom Cari kota/kecamatan kini diberi garis hijau + centang ✓ di kanan begitu terisi. Setelah kota dipilih, baris tujuan menampilkan ✅ dan nama kotanya.</li>
           </ul>
@@ -10688,6 +10694,14 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     dupWarningEl.hidden = true;
     dupWarningEl.textContent = "";
   }
+  // v2.93.10 -- isi kotak peringatan "kemungkinan sudah terdaftar" dipisah jadi fungsi sendiri supaya menu Input Nama
+  // memakai PERSIS yang sama (teks, tombol, aturan kapan muncul). Balikan "" = tidak ada peringatan.
+  function dupWarningInner(query){
+    if(pickedFromSuggestion) return "";
+    const matched = findRegisteredNameMatch(query);
+    if(!matched) return "";
+    return `⚠️ Customer ini kemungkinan <b>sudah terdaftar</b> sebagai "${escHtml(matched)}" -- cek dulu sebelum lanjut (cuma peringatan, tidak menghalangi kirim).<br><button type="button" class="kt-warn-use-btn" data-use-name="${escHtml(matched)}" style="margin-top:6px;background:none;border:none;padding:0;color:#8a6d1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:11.5px;">Pakai nama ini</button>`;
+  }
   function checkDuplicateNameWarning(query){
     if(!dupWarningEl) return;
     // PERBAIKAN (permintaan "harusnya tidak seperti itu") -- SEBELUMNYA
@@ -10703,10 +10717,9 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     // otomatis balik false lagi begitu CS mengetik manual (lihat listener
     // "input" di atas), jadi warning tetap muncul normal utk kasus ketik
     // manual seperti biasa.
-    if(pickedFromSuggestion){ hideDuplicateWarning(); return; }
-    const matched = findRegisteredNameMatch(query);
-    if(!matched){ hideDuplicateWarning(); return; }
-    dupWarningEl.innerHTML = `⚠️ Customer ini kemungkinan <b>sudah terdaftar</b> sebagai "${escHtml(matched)}" -- cek dulu sebelum lanjut (cuma peringatan, tidak menghalangi kirim).<br><button type="button" class="kt-warn-use-btn" data-use-name="${escHtml(matched)}" style="margin-top:6px;background:none;border:none;padding:0;color:#8a6d1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:11.5px;">Pakai nama ini</button>`;
+    const inner = dupWarningInner(query);
+    if(!inner){ hideDuplicateWarning(); return; }
+    dupWarningEl.innerHTML = inner;
     dupWarningEl.hidden = false;
   }
 
@@ -10733,12 +10746,18 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     }
     return null;
   }
+  // v2.93.10 -- sama: isi kotak peringatan "nama lama (alias)" jadi fungsi bersama (dipakai juga menu Input Nama).
+  function aliasWarningInner(query){
+    if(pickedFromSuggestion) return "";
+    const rec = findAliasMatch(query);
+    if(!rec || !rec.name) return "";
+    return `⚠️ "${escHtml(query.trim())}" adalah <b>nama lama</b> -- customer ini sekarang terdaftar sebagai "${escHtml(rec.name)}".<br><button type="button" class="kt-warn-use-btn" data-use-name="${escHtml(rec.name)}" style="margin-top:6px;background:none;border:none;padding:0;color:#8a6d1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:11.5px;">Pakai nama baru</button>`;
+  }
   function checkAliasWarning(query){
     if(!aliasWarningEl) return;
-    if(pickedFromSuggestion){ hideAliasWarning(); return; }
-    const rec = findAliasMatch(query);
-    if(!rec || !rec.name){ hideAliasWarning(); return; }
-    aliasWarningEl.innerHTML = `⚠️ "${escHtml(query.trim())}" adalah <b>nama lama</b> -- customer ini sekarang terdaftar sebagai "${escHtml(rec.name)}".<br><button type="button" class="kt-warn-use-btn" data-use-name="${escHtml(rec.name)}" style="margin-top:6px;background:none;border:none;padding:0;color:#8a6d1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:11.5px;">Pakai nama baru</button>`;
+    const inner = aliasWarningInner(query);
+    if(!inner){ hideAliasWarning(); return; }
+    aliasWarningEl.innerHTML = inner;
     aliasWarningEl.hidden = false;
   }
 
@@ -10834,6 +10853,9 @@ document.getElementById("btn-copy").addEventListener("click", async ()=>{
     muat(){ return loadNameHistory(); },
     jumlah(){ return customerRecords.length; },
     segarkan(){ hideSuggestions(); refreshNameWarnings(nameInput.value); },
+    // v2.93.10 -- kotak peringatan identik dgn popup (urutan: mirip -> nama lama), dipakai menu Input Nama
+    peringatan(q){ return [dupWarningInner(q), aliasWarningInner(q)].filter(Boolean); },
+    gayaPeringatan: "margin-top:8px;background:#fff6e0;border:1px solid #e0a800;border-radius:8px;padding:8px 10px;color:var(--ink);",
   };
 
   /* ---------- BARU -- Saran Ekspedisi berdasarkan riwayat customer ----------
@@ -12132,6 +12154,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
         <input type="text" class="ep-input ep-nama" placeholder="Ketik nama customer, mis. TOKO BERKAH (MADIUN)" autocomplete="off" autocapitalize="characters" spellcheck="false">
         <div class="ep-suggest ep-nama-suggest" hidden></div>
       </div>
+      <div class="ep-warn"></div>
       <div class="ep-tujuan"></div>
       <div class="ep-kota" hidden>
         <div class="ep-field">
@@ -12166,6 +12189,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
       body: root.querySelector(".ep-body"),
       nameInput: root.querySelector(".ep-nama"),
       sugEl: root.querySelector(".ep-nama-suggest"),
+      warnEl: root.querySelector(".ep-warn"),
       tujuanEl: root.querySelector(".ep-tujuan"),
       kotaWrap: root.querySelector(".ep-kota"),
       kotaInput: root.querySelector(".ep-kota-input"),
@@ -12212,6 +12236,11 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     });
     it.nameInput.addEventListener("focus", ()=>{ it.sugOpen = true; muatSaran(); render(it); });
     it.nameInput.addEventListener("blur", ()=>{ setTimeout(()=>{ it.sugOpen = false; renderSug(it); }, 120); });
+    it.warnEl.addEventListener("click", (e)=>{ // tombol "Pakai nama ini" / "Pakai nama baru" -> sama dgn di popup
+      const btn = e.target.closest(".kt-warn-use-btn");
+      if(!btn) return;
+      pilihSaran(it, { name: String(btn.dataset.useName || "").toUpperCase() });
+    });
     it.sugEl.addEventListener("mousedown", (e)=>{
       const el = e.target.closest(".kt-suggest-item");
       if(!el) return;
@@ -12266,6 +12295,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     setNama(pilihan.name, null);
     EP.dipilihNama = EP.nama;
     if(window.__ktNama) window.__ktNama.setDipilih(true); // dipilih dari rekomendasi -> BUKAN customer baru
+    renderAll(); // v2.93.10 -- kotak peringatan ikut hilang (nama sudah resmi)
     clearTimeout(tmCari);
     cariTujuan();
   }
@@ -12277,6 +12307,15 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     it.sugList = buka ? api.cari(q) : [];
     it.sugEl.hidden = !it.sugList.length;
     it.sugEl.innerHTML = it.sugList.length ? it.sugList.map(api.html).join("") : "";
+  }
+  // v2.93.10 -- kotak peringatan "kemungkinan sudah terdaftar" & "nama lama (alias)" IDENTIK dgn popup Salin & Kirim
+  // (fungsi & aturan sama: window.__ktNama.peringatan). Disembunyikan selagi dropdown saran terbuka, seperti di popup.
+  function renderWarn(it){
+    const api = window.__ktNama;
+    const q = EP.nama.trim();
+    const sugTerbuka = !it.sugEl.hidden && (it.sugList || []).length > 0;
+    const isi = (api && api.peringatan && MODE[it.sheet] === "nama" && q && !sugTerbuka) ? api.peringatan(q) : [];
+    it.warnEl.innerHTML = isi.map(h=> `<p class="kt-hint" style="${api.gayaPeringatan}">${h}</p>`).join("");
   }
   function muatSaran(){
     const api = window.__ktNama;
@@ -12325,6 +12364,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     it.tujuanEl.innerHTML = tj;
     renderKota(it);
     renderSug(it);
+    renderWarn(it);
     renderHasil(it);
   }
   /* ---------- cadangan bila kota tidak ketemu: ekspedisi biasa customer + harga rata-rata dari RIWAYATNYA ---------- */
