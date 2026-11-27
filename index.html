@@ -6617,7 +6617,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.13</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.14</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -6916,7 +6916,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.13 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.14 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Input Nama: alamat di dalam nama ikut terbaca</b> — kecamatan, kabupaten, atau kota yang ditulis bebas di nama customer kini dikenali otomatis (tidak harus di dalam tanda kurung di belakang nama), termasuk kecamatan: kota induknya terisi dan tarif langsung dimuat tingkat kecamatan. Baris tujuan memberi keterangan "dari alamat di nama"; kecamatan hasil bacaan nama bisa diganti lewat tombol Ganti kecamatan. Butuh Worker Rincian v496 &amp; Logistik v1.7.2.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.13</div>
           <ul>
             <li><b>Input Nama: ekspedisi yang biasa dipakai customer tetap tampil</b> — sebelumnya daftar ini hanya muncul bila kota tidak ketemu. Kini juga muncul saat tarif Logistik ke kabupaten/kota hanya tercatat per kecamatan (daftar tarif kosong sebelum kecamatan dipilih), lengkap dengan Ongkir per Kg &amp; minimal kg dari riwayat customer.</li>
           </ul>
@@ -12018,7 +12024,7 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     let gagal = "";
     try{ await lgPost("/logistik/kecamatan", { nama: namaCust, kec: kode }); }
     catch(e){ gagal = e.message || String(e); }
-    EP.tujuan = Object.assign({}, EP.tujuan, { kec: kode, kecNama: namaKec });
+    EP.tujuan = Object.assign({}, EP.tujuan, { kec: kode, kecNama: namaKec, kecSumber: "konfirmasi" });
     try{ await muatTarif(kode, my); }
     catch(e){ if(my === EP.seq){ EP.err = e.message || String(e); EP.tarif = null; } }
     if(my !== EP.seq) return;
@@ -12523,9 +12529,9 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
     if(EP.loading) tj = `<span>⏳ ${esc(EP.loading)}</span>`;
     else if(EP.err) tj = `<span class="ep-err">⚠️ ${esc(EP.err)}</span>`;
     else if(EP.tujuan){
-      const sumber = EP.tujuan.sumber === "riwayat" ? "dari riwayat kirim" : EP.tujuan.sumber === "riwayat-kota" ? "dari kota yang paling sering di riwayat kirim" : EP.tujuan.sumber === "kota-nama" ? "dari (KOTA) di nama" : "dipilih manual";
+      const sumber = EP.tujuan.sumber === "riwayat" ? "dari riwayat kirim" : EP.tujuan.sumber === "riwayat-kota" ? "dari kota yang paling sering di riwayat kirim" : EP.tujuan.sumber === "kota-nama" ? "dari (KOTA) di nama" : (EP.tujuan.sumber === "teks-nama" || EP.tujuan.sumber === "ai") ? "dari alamat di nama" : "dipilih manual"; // v2.93.14
       const kecOk = !!(EP.tujuan.kec && EP.tujuan.sumber !== "manual" && !EP.kotaManual); // v2.93.12
-      tj = `<span>✅ <b>${esc(labelTujuan())}</b> <small>${sumber}${kecOk ? " · kecamatan dikonfirmasi" : ""}</small></span><span class="ep-btns">${kecOk ? '<button type="button" class="ep-ganti-kec">Ganti kecamatan</button>' : ""}<button type="button" class="ep-ganti">Ganti kota</button></span>`;
+      tj = `<span>✅ <b>${esc(labelTujuan())}</b> <small>${sumber}${kecOk ? (EP.tujuan.kecSumber === "teks" ? " · kecamatan dari nama" : " · kecamatan dikonfirmasi") : ""}</small></span><span class="ep-btns">${kecOk ? '<button type="button" class="ep-ganti-kec">Ganti kecamatan</button>' : ""}<button type="button" class="ep-ganti">Ganti kota</button></span>`;
     } else if(EP.nama.trim().length >= 3){
       const pl = EP.pelanggan, ada = (EP.pakaiCustomer || []).length;
       tj = `<span>Kota tujuan belum ketemu dari nama ini.${pl && pl.kota ? ` Kota tercatat di riwayat: <b>${esc(pl.kota)}</b> (belum cocok dgn database wilayah).` : ""}${ada ? " Di bawah ini ekspedisi yang biasa dipakai customer ini; cari kota untuk melihat semua ekspedisi beserta total ongkirnya." : " Cari kota di bawah."}</span>`;
