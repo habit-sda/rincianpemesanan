@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v439";
+const CACHE_VERSION = "v440";
+/* v440 -- (app v2.93.17) Tombol Bantuan mengambang: notif angka juga di tombol pilihan, panel Bantuan WhatsApp, opsi tampil di HP (sisi & tinggi), tombol Hapus pesan Chat Bot PH. Butuh Worker Rincian v501 & Logistik v1.7.7. Hanya index.html. */
 /* v439 -- (app v2.93.16) Tombol Bantuan mengambang khusus web: menu Bantuan (link Master Data) + chat langsung dgn bot PH (Logistik) di dalam app; sakelar di Master Data > Tampilan. Butuh Worker Rincian v500 & endpoint /int/chat/* di Worker Logistik. Hanya index.html. */
 /* v435 -- (app v2.93.14) Input Nama: alamat (kecamatan/kab/kota) yang ditulis bebas di nama customer ikut terbaca; label sumber tujuan "dari alamat di nama". Butuh Worker Rincian v496 & Logistik v1.7.2. Hanya index.html. */
 /* v434 -- (app v2.93.13) Input Nama: ekspedisi yang biasa dipakai customer tetap tampil walau tarif kab/kota hanya ada per kecamatan. Hanya index.html. */

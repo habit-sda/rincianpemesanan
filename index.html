@@ -6224,14 +6224,42 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2.9-1.2 1.8" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1" fill="var(--primary-green)"/></svg></div>
           <div class="md-togglerow-text">
             <div class="md-togglerow-label">Tombol Bantuan mengambang (web)</div>
-            <div class="md-togglerow-sub">Aktif = tombol bulat di pojok kanan bawah layar web/desktop: pilih Bantuan (link di bawah) atau Chat langsung dengan bot PH (Logistik). Tidak tampil di HP.</div>
+            <div class="md-togglerow-sub">Aktif = tombol bulat di pojok kanan bawah: pilih Bantuan WhatsApp (tulis pesan di panel, diteruskan ke link di bawah) atau Chat langsung dengan bot PH (Logistik). Di HP, tombol hanya tampil kalau opsi "Tampilkan di HP" di bawah ini juga diaktifkan.</div>
           </div>
           <label class="md-switch">
             <input type="checkbox" id="md-toggle-bantuanfab">
             <span class="md-switch-track"><span class="md-switch-knob"></span></span>
           </label>
         </div>
-        <div class="md-note" style="margin-bottom:10px;">Link tujuan tombol "Bantuan" di pojok kanan atas Beranda (mis. link WhatsApp, Telegram, atau halaman FAQ).</div>
+        <div class="md-togglerow">
+          <div class="md-togglerow-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5" stroke="var(--primary-green)" stroke-width="1.6"/><path d="M11 18.5h2" stroke="var(--primary-green)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="md-togglerow-text">
+            <div class="md-togglerow-label">Tampilkan di HP</div>
+            <div class="md-togglerow-sub">Aktif = tombol kecil juga muncul di layar HP. Ramah layar kecil: naik di atas tombol/menu bawah, otomatis bersembunyi saat kolom isian lain dipakai (keyboard), dan chat terbuka sebagai panel di bawah layar.</div>
+          </div>
+          <label class="md-switch">
+            <input type="checkbox" id="md-toggle-bantuanhp">
+            <span class="md-switch-track"><span class="md-switch-knob"></span></span>
+          </label>
+        </div>
+        <div id="md-bantuanhp-opsi" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px;">
+          <div>
+            <label for="md-bantuanhp-posisi" style="font-size:12px;font-weight:700;color:var(--ink-soft);display:block;margin-bottom:4px;">Sisi tombol di HP</label>
+            <select id="md-bantuanhp-posisi" style="width:100%;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 10px;font-size:14px;background:var(--card);color:var(--ink);">
+              <option value="kanan">Kanan bawah</option>
+              <option value="kiri">Kiri bawah</option>
+            </select>
+          </div>
+          <div>
+            <label for="md-bantuanhp-naik" style="font-size:12px;font-weight:700;color:var(--ink-soft);display:block;margin-bottom:4px;">Tinggi dari bawah</label>
+            <select id="md-bantuanhp-naik" style="width:100%;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 10px;font-size:14px;background:var(--card);color:var(--ink);">
+              <option value="16">Rendah (dekat tepi)</option>
+              <option value="84">Sedang (di atas menu bawah)</option>
+              <option value="150">Tinggi</option>
+            </select>
+          </div>
+        </div>
+        <div class="md-note" style="margin-bottom:10px;">Link tujuan tombol "Bantuan" di pojok kanan atas Beranda dan Bantuan WhatsApp di tombol mengambang. Pakai link chat WhatsApp (mis. https://wa.me/628xxxx) agar pesan yang ditulis di panel otomatis terisi di WhatsApp; link lain (grup/Telegram/FAQ) tetap dibuka dan pesan disalin.</div>
         <label>Link Bantuan (URL)</label>
         <input type="text" inputmode="url" id="md-bantuan-link" placeholder="https://...">
         <div class="md-pin-err" id="md-bantuan-err"></div>
@@ -6949,6 +6977,11 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="changelog-item">
           <div class="changelog-ver">v2.93.17 <span class="changelog-tag">Sekarang</span></div>
           <ul>
+            <li><b>Tombol Bantuan mengambang: notifikasi lebih jelas</b> — angka balasan baru kini muncul di tombol utama <i>dan</i> di pilihan yang bersangkutan (beserta keterangan "N balasan baru dari bot"), jadi tidak ambigu asalnya dari Bantuan atau Chat Bot PH.</li>
+            <li><b>Bantuan WhatsApp di dalam panel</b> — tombol Bantuan kini membuka panel chat ("Tulis pesanmu di sini"). Pesan yang ditulis diteruskan ke WhatsApp lewat link Bantuan; jawaban admin datang di WhatsApp (WhatsApp tidak mengizinkan balasan masuk kembali ke panel tanpa layanan API resmi).</li>
+            <li><b>Tombol Bantuan di HP (opsional)</b> — Master Data → Tampilan → Tombol Bantuan: sakelar "Tampilkan di HP", pilihan sisi (kiri/kanan) dan tinggi dari bawah. Tombol bersembunyi otomatis saat kolom isian lain dipakai, dan chat terbuka sebagai panel bawah supaya tidak menutupi menu utama.</li>
+            <li><b>Tombol Hapus pesan di Chat Bot PH</b> — ikon tempat sampah di header chat menghapus semua pesan (di layar dan antrean server). Butuh Worker Rincian v501 &amp; Logistik v1.7.7.</li>
+            <li><b>Nama "AI lokal" diganti "Win AI"</b> di semua jawaban bot (mis. "Pertanyaan diteruskan ke Win AI (data Logistik)"). Butuh Worker Logistik v1.7.7.</li>
             <li><b>Menu Ekspedisi: pilihan Input Nama / Manual lebih jelas</b> — kini berupa dua kartu pilihan (ikon, judul, keterangan singkat, dan tanda centang pada pilihan aktif) sehingga terlihat jelas bisa diketuk. Cara kerjanya tidak berubah. Di layar sempit keterangan diperkecil dan tanda centang disembunyikan.</li>
           </ul>
         </div>
@@ -8608,7 +8641,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", bantuanMengambangEnabled:true, tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, unpaidTickerEnabled:true, unpaidTickerSpeed:50, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, invoicePengingatEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", bantuanMengambangEnabled:true, bantuanHpEnabled:false, bantuanHpPosisi:"kanan", bantuanHpNaik:84, tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, unpaidTickerEnabled:true, unpaidTickerSpeed:50, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, invoicePengingatEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -8618,6 +8651,9 @@ function loadSettings(){
     if(typeof s.autocompleteEkspedisi === "boolean") SETTINGS.autocompleteEkspedisi = s.autocompleteEkspedisi;
     if(typeof s.bantuanLink === "string" && s.bantuanLink.trim()) SETTINGS.bantuanLink = s.bantuanLink.trim();
     if(typeof s.bantuanMengambangEnabled === "boolean") SETTINGS.bantuanMengambangEnabled = s.bantuanMengambangEnabled;
+    if(typeof s.bantuanHpEnabled === "boolean") SETTINGS.bantuanHpEnabled = s.bantuanHpEnabled;
+    if(s.bantuanHpPosisi === "kiri" || s.bantuanHpPosisi === "kanan") SETTINGS.bantuanHpPosisi = s.bantuanHpPosisi;
+    if(typeof s.bantuanHpNaik === "number" && s.bantuanHpNaik >= 0 && s.bantuanHpNaik <= 400) SETTINGS.bantuanHpNaik = s.bantuanHpNaik;
     if(typeof s.tierBatas1 === "number" && s.tierBatas1 > 0) SETTINGS.tierBatas1 = s.tierBatas1;
     if(typeof s.tierBatas2 === "number" && s.tierBatas2 > SETTINGS.tierBatas1) SETTINGS.tierBatas2 = s.tierBatas2;
     if(typeof s.telegramBotEnabled === "boolean") SETTINGS.telegramBotEnabled = s.telegramBotEnabled;
@@ -15811,6 +15847,30 @@ if ("serviceWorker" in navigator) {
     });
   }
 
+  const toggleBantuanHp = document.getElementById("md-toggle-bantuanhp");
+  const selBantuanHpPos = document.getElementById("md-bantuanhp-posisi");
+  const selBantuanHpNaik = document.getElementById("md-bantuanhp-naik");
+  if(toggleBantuanHp && selBantuanHpPos && selBantuanHpNaik){
+    toggleBantuanHp.checked = !!SETTINGS.bantuanHpEnabled;
+    selBantuanHpPos.value = SETTINGS.bantuanHpPosisi === "kiri" ? "kiri" : "kanan";
+    selBantuanHpNaik.value = String([16, 84, 150].includes(Number(SETTINGS.bantuanHpNaik)) ? Number(SETTINGS.bantuanHpNaik) : 84);
+    toggleBantuanHp.addEventListener("change", async ()=>{
+      SETTINGS.bantuanHpEnabled = toggleBantuanHp.checked;
+      saveSettings(); applySettingsToDom();
+      await confirmMasterDataSave(SETTINGS.bantuanHpEnabled ? "Tombol Bantuan ditampilkan di HP." : "Tombol Bantuan disembunyikan di HP.");
+    });
+    selBantuanHpPos.addEventListener("change", async ()=>{
+      SETTINGS.bantuanHpPosisi = selBantuanHpPos.value === "kiri" ? "kiri" : "kanan";
+      saveSettings(); applySettingsToDom();
+      await confirmMasterDataSave("Sisi tombol Bantuan di HP: " + (SETTINGS.bantuanHpPosisi === "kiri" ? "kiri bawah." : "kanan bawah."));
+    });
+    selBantuanHpNaik.addEventListener("change", async ()=>{
+      SETTINGS.bantuanHpNaik = Number(selBantuanHpNaik.value) || 84;
+      saveSettings(); applySettingsToDom();
+      await confirmMasterDataSave("Tinggi tombol Bantuan di HP disimpan.");
+    });
+  }
+
   const toggleStickyFormBtns = document.getElementById("md-toggle-stickyformbtns");
   if(toggleStickyFormBtns){
     toggleStickyFormBtns.checked = SETTINGS.stickyFormButtonsEnabled;
@@ -22377,60 +22437,107 @@ if ("serviceWorker" in navigator) {
   })();
 </script>
 <!-- ============================================================
-     v2.93.16 -- TOMBOL BANTUAN MENGAMBANG (khusus web/desktop >=901px)
-     Klik -> 2 pilihan: (1) link Bantuan dari Master Data > Tampilan,
-     (2) chat langsung dengan bot PH (Logistik) DI DALAM app (bukan buka
-     Telegram). Pesan lewat Worker Rincian (/logistik/chat/*) -> Worker
-     Logistik (/int/chat/*). Aktif/nonaktif: Master Data > Tampilan >
-     "Tombol Bantuan" (SETTINGS.bantuanMengambangEnabled).
+     TOMBOL BANTUAN MENGAMBANG (web + HP)
+     Klik -> 2 pilihan: (1) Bantuan WhatsApp: tulis pesan di panel ini, lalu
+     diteruskan ke WhatsApp (link dari Master Data > Tampilan), (2) chat
+     langsung dengan bot PH (Logistik) DI DALAM app. Notif angka tampil di
+     tombol utama DAN di tombol pilihan yang bersangkutan. Pengaturan:
+     Master Data > Tampilan > Tombol Bantuan (aktif/nonaktif, tampil di HP,
+     posisi & tinggi dari bawah di HP).
      ============================================================ -->
 <style id="fab-bantuan-css">
   #fab-bantuan{ display:none; }
   #fab-bantuan[hidden]{ display:none !important; }
-  @media (min-width:901px){
-    #fab-bantuan:not([hidden]){ display:block; position:fixed; right:22px; bottom:22px; z-index:9000; font-family:inherit; }
-    #fab-bantuan .fab-main{ width:54px; height:54px; border-radius:50%; border:0; cursor:pointer; background:var(--primary-green,#00845f); color:#fff; box-shadow:0 6px 18px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; position:relative; transition:transform .15s; }
-    #fab-bantuan .fab-main:hover{ transform:scale(1.07); }
-    #fab-bantuan .fab-main svg{ width:26px; height:26px; }
-    #fab-bantuan .fab-dot{ position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#d93025; color:#fff; font-size:11px; font-weight:700; line-height:18px; text-align:center; box-sizing:border-box; }
-    #fab-bantuan .fab-dot[hidden]{ display:none; }
-    #fab-bantuan .fab-menu{ position:absolute; right:0; bottom:66px; width:270px; background:var(--card,#fff); color:var(--ink,#1a1a1a); border:1px solid var(--line,#d3d6db); border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.22); padding:8px; }
-    #fab-bantuan .fab-menu[hidden]{ display:none; }
-    #fab-bantuan .fab-item{ display:flex; align-items:center; gap:12px; width:100%; padding:11px 12px; border:0; background:transparent; border-radius:10px; cursor:pointer; text-align:left; color:inherit; text-decoration:none; font:inherit; box-sizing:border-box; }
-    #fab-bantuan .fab-item:hover{ background:rgba(0,132,95,.10); }
-    #fab-bantuan .fab-item-ic{ flex:0 0 36px; height:36px; border-radius:10px; background:rgba(0,132,95,.12); color:var(--primary-green,#00845f); display:flex; align-items:center; justify-content:center; }
-    #fab-bantuan .fab-item-ic svg{ width:20px; height:20px; }
-    #fab-bantuan .fab-item b{ display:block; font-size:14px; }
-    #fab-bantuan .fab-item small{ display:block; font-size:12px; color:var(--ink-soft,#5f6368); margin-top:1px; }
-    #fab-bantuan .fab-chat{ position:absolute; right:0; bottom:66px; width:370px; height:500px; max-height:calc(100vh - 110px); display:flex; flex-direction:column; background:var(--card,#fff); color:var(--ink,#1a1a1a); border:1px solid var(--line,#d3d6db); border-radius:16px; box-shadow:0 12px 36px rgba(0,0,0,.28); overflow:hidden; }
-    #fab-bantuan .fab-chat[hidden]{ display:none; }
-    #fab-bantuan .fab-chat-head{ display:flex; align-items:center; gap:10px; padding:12px 14px; background:var(--primary-green,#00845f); color:#fff; }
-    #fab-bantuan .fab-chat-head b{ font-size:14.5px; display:block; }
-    #fab-bantuan .fab-chat-head small{ font-size:11.5px; opacity:.85; display:block; }
-    #fab-bantuan .fab-chat-head .fab-x{ margin-left:auto; background:transparent; border:0; color:#fff; font-size:22px; line-height:1; cursor:pointer; padding:2px 6px; }
-    #fab-bantuan .fab-chat-body{ flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; background:var(--paper-dark,#f8f9fa); }
-    #fab-bantuan .fab-msg{ max-width:84%; padding:8px 11px; border-radius:12px; font-size:13.5px; line-height:1.4; word-wrap:break-word; overflow-wrap:anywhere; }
-    #fab-bantuan .fab-msg.bot{ align-self:flex-start; background:var(--card,#fff); border:1px solid var(--line,#d3d6db); border-bottom-left-radius:4px; }
-    #fab-bantuan .fab-msg.saya{ align-self:flex-end; background:var(--primary-green,#00845f); color:#fff; border-bottom-right-radius:4px; }
-    #fab-bantuan .fab-msg.sys{ align-self:center; max-width:94%; background:transparent; color:var(--ink-soft,#5f6368); font-size:12px; text-align:center; }
-    #fab-bantuan .fab-msg code{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; background:rgba(127,127,127,.18); padding:1px 4px; border-radius:4px; }
-    #fab-bantuan .fab-time{ display:block; font-size:10.5px; opacity:.65; margin-top:3px; text-align:right; }
-    #fab-bantuan .fab-fail{ color:#ffd6d3; cursor:pointer; text-decoration:underline; }
-    #fab-bantuan .fab-btns{ display:flex; flex-wrap:wrap; gap:6px; margin-top:7px; }
-    #fab-bantuan .fab-btns button{ border:1px solid var(--primary-green,#00845f); color:var(--primary-green,#00845f); background:transparent; border-radius:8px; padding:5px 10px; font-size:12.5px; cursor:pointer; font-family:inherit; }
-    #fab-bantuan .fab-btns button:hover{ background:rgba(0,132,95,.12); }
-    #fab-bantuan .fab-chat-foot{ display:flex; gap:8px; padding:10px; border-top:1px solid var(--line,#d3d6db); background:var(--card,#fff); align-items:flex-end; }
-    #fab-bantuan .fab-chat-foot textarea{ flex:1; resize:none; max-height:90px; min-height:38px; padding:8px 10px; border:1px solid var(--line,#d3d6db); border-radius:10px; font:inherit; font-size:13.5px; background:var(--paper,#fff); color:var(--ink,#1a1a1a); box-sizing:border-box; }
-    #fab-bantuan .fab-chat-foot button{ height:38px; padding:0 14px; border:0; border-radius:10px; background:var(--primary-green,#00845f); color:#fff; font-weight:600; cursor:pointer; font-family:inherit; }
-    #fab-bantuan .fab-chat-foot button:disabled{ opacity:.5; cursor:default; }
+  #fab-bantuan:not([hidden]){ display:block; position:fixed; right:22px; bottom:22px; z-index:9000; font-family:inherit; }
+  #fab-bantuan.fab-kiri:not([hidden]){ right:auto; left:22px; }
+  #fab-bantuan .fab-main{ width:54px; height:54px; border-radius:50%; border:0; cursor:pointer; background:var(--primary-green,#00845f); color:#fff; box-shadow:0 6px 18px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; position:relative; transition:transform .15s; }
+  #fab-bantuan .fab-main:hover{ transform:scale(1.07); }
+  #fab-bantuan .fab-main svg{ width:26px; height:26px; }
+  #fab-bantuan .fab-dot{ position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#d93025; color:#fff; font-size:11px; font-weight:700; line-height:18px; text-align:center; box-sizing:border-box; }
+  #fab-bantuan .fab-dot[hidden]{ display:none; }
+  #fab-bantuan .fab-menu{ position:absolute; right:0; bottom:66px; width:280px; background:var(--card,#fff); color:var(--ink,#1a1a1a); border:1px solid var(--line,#d3d6db); border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.22); padding:8px; }
+  #fab-bantuan.fab-kiri .fab-menu{ right:auto; left:0; }
+  #fab-bantuan .fab-menu[hidden]{ display:none; }
+  #fab-bantuan .fab-item{ display:flex; align-items:center; gap:12px; width:100%; padding:11px 12px; border:0; background:transparent; border-radius:10px; cursor:pointer; text-align:left; color:inherit; text-decoration:none; font:inherit; box-sizing:border-box; }
+  #fab-bantuan .fab-item:hover{ background:rgba(0,132,95,.10); }
+  #fab-bantuan .fab-item-ic{ flex:0 0 36px; height:36px; border-radius:10px; background:rgba(0,132,95,.12); color:var(--primary-green,#00845f); display:flex; align-items:center; justify-content:center; }
+  #fab-bantuan .fab-item-ic svg{ width:20px; height:20px; }
+  #fab-bantuan .fab-item-tx{ flex:1; min-width:0; }
+  #fab-bantuan .fab-item b{ display:block; font-size:14px; }
+  #fab-bantuan .fab-item small{ display:block; font-size:12px; color:var(--ink-soft,#5f6368); margin-top:1px; }
+  #fab-bantuan .fab-item small.fab-baru{ color:#d93025; font-weight:700; }
+  #fab-bantuan .fab-badge{ flex:0 0 auto; min-width:20px; height:20px; padding:0 6px; border-radius:10px; background:#d93025; color:#fff; font-size:11.5px; font-weight:700; line-height:20px; text-align:center; box-sizing:border-box; }
+  #fab-bantuan .fab-badge[hidden]{ display:none; }
+  #fab-bantuan .fab-chat, #fab-bantuan .fab-wa{ position:absolute; right:0; bottom:66px; width:370px; height:500px; max-height:calc(100vh - 110px); display:flex; flex-direction:column; background:var(--card,#fff); color:var(--ink,#1a1a1a); border:1px solid var(--line,#d3d6db); border-radius:16px; box-shadow:0 12px 36px rgba(0,0,0,.28); overflow:hidden; }
+  #fab-bantuan.fab-kiri .fab-chat, #fab-bantuan.fab-kiri .fab-wa{ right:auto; left:0; }
+  #fab-bantuan .fab-chat[hidden], #fab-bantuan .fab-wa[hidden]{ display:none; }
+  #fab-bantuan .fab-chat-head{ display:flex; align-items:center; gap:6px; padding:12px 14px; background:var(--primary-green,#00845f); color:#fff; }
+  #fab-bantuan .fab-chat-head b{ font-size:14.5px; display:block; }
+  #fab-bantuan .fab-chat-head small{ font-size:11.5px; opacity:.85; display:block; }
+  #fab-bantuan .fab-chat-head .fab-hd-sp{ margin-left:auto; }
+  #fab-bantuan .fab-chat-head button{ background:transparent; border:0; color:#fff; cursor:pointer; padding:4px 6px; font-family:inherit; display:flex; align-items:center; justify-content:center; }
+  #fab-bantuan .fab-chat-head .fab-x{ font-size:22px; line-height:1; }
+  #fab-bantuan .fab-chat-head .fab-clear svg{ width:19px; height:19px; }
+  #fab-bantuan .fab-confirm{ display:flex; align-items:center; gap:8px; padding:8px 12px; background:#fdecea; color:#7a1c14; font-size:12.5px; border-bottom:1px solid var(--line,#d3d6db); }
+  #fab-bantuan .fab-confirm[hidden]{ display:none; }
+  #fab-bantuan .fab-confirm span{ flex:1; line-height:1.3; }
+  #fab-bantuan .fab-confirm button{ border:0; border-radius:8px; padding:6px 11px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:inherit; }
+  #fab-bantuan .fab-confirm .fab-yes{ background:#d93025; color:#fff; }
+  #fab-bantuan .fab-confirm .fab-no{ background:rgba(0,0,0,.08); color:inherit; }
+  #fab-bantuan .fab-chat-body{ flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; background:var(--paper-dark,#f8f9fa); }
+  #fab-bantuan .fab-msg{ max-width:84%; padding:8px 11px; border-radius:12px; font-size:13.5px; line-height:1.4; word-wrap:break-word; overflow-wrap:anywhere; }
+  #fab-bantuan .fab-msg.bot{ align-self:flex-start; background:var(--card,#fff); border:1px solid var(--line,#d3d6db); border-bottom-left-radius:4px; }
+  #fab-bantuan .fab-msg.saya{ align-self:flex-end; background:var(--primary-green,#00845f); color:#fff; border-bottom-right-radius:4px; }
+  #fab-bantuan .fab-msg.sys{ align-self:center; max-width:94%; background:transparent; color:var(--ink-soft,#5f6368); font-size:12px; text-align:center; }
+  #fab-bantuan .fab-msg code{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; background:rgba(127,127,127,.18); padding:1px 4px; border-radius:4px; }
+  #fab-bantuan .fab-time{ display:block; font-size:10.5px; opacity:.65; margin-top:3px; text-align:right; }
+  #fab-bantuan .fab-fail{ color:#ffd6d3; cursor:pointer; text-decoration:underline; }
+  #fab-bantuan .fab-btns{ display:flex; flex-wrap:wrap; gap:6px; margin-top:7px; }
+  #fab-bantuan .fab-btns button{ border:1px solid var(--primary-green,#00845f); color:var(--primary-green,#00845f); background:transparent; border-radius:8px; padding:5px 10px; font-size:12.5px; cursor:pointer; font-family:inherit; }
+  #fab-bantuan .fab-btns button:hover{ background:rgba(0,132,95,.12); }
+  #fab-bantuan .fab-chat-foot{ display:flex; gap:8px; padding:10px; border-top:1px solid var(--line,#d3d6db); background:var(--card,#fff); align-items:flex-end; }
+  #fab-bantuan .fab-chat-foot textarea{ flex:1; resize:none; max-height:90px; min-height:38px; padding:8px 10px; border:1px solid var(--line,#d3d6db); border-radius:10px; font:inherit; font-size:13.5px; background:var(--paper,#fff); color:var(--ink,#1a1a1a); box-sizing:border-box; }
+  #fab-bantuan .fab-chat-foot button{ height:38px; padding:0 14px; border:0; border-radius:10px; background:var(--primary-green,#00845f); color:#fff; font-weight:600; cursor:pointer; font-family:inherit; }
+  #fab-bantuan .fab-chat-foot button:disabled{ opacity:.5; cursor:default; }
+
+  /* ---- Tampilan HP / layar kecil: tombol lebih kecil & naik dari bawah supaya
+          tidak menutupi menu utama; panel chat jadi lembar di bawah layar;
+          tombol bersembunyi sementara saat kolom isian lain sedang diketik. ---- */
+  @media (max-width:900px){
+    #fab-bantuan:not([hidden]){ right:14px; bottom:calc(var(--fab-naik,84px) + env(safe-area-inset-bottom,0px)); }
+    #fab-bantuan.fab-kiri:not([hidden]){ right:auto; left:14px; }
+    #fab-bantuan .fab-main{ width:46px; height:46px; opacity:.94; }
+    #fab-bantuan .fab-main svg{ width:22px; height:22px; }
+    #fab-bantuan .fab-menu{ bottom:56px; width:min(280px, calc(100vw - 28px)); }
+    #fab-bantuan .fab-chat, #fab-bantuan .fab-wa{ position:fixed; left:8px; right:8px; bottom:calc(8px + env(safe-area-inset-bottom,0px)); width:auto; height:min(78vh,560px); max-height:calc(100dvh - 16px); z-index:9100; }
+    #fab-bantuan.fab-kiri .fab-chat, #fab-bantuan.fab-kiri .fab-wa{ left:8px; right:8px; }
+    #fab-bantuan.fab-panel-buka .fab-main{ display:none; }
+    #fab-bantuan.fab-sembunyi-ketik{ display:none !important; }
   }
 </style>
 <div id="fab-bantuan" hidden>
+  <div class="fab-wa" id="fab-wa" hidden role="dialog" aria-label="Bantuan WhatsApp">
+    <div class="fab-chat-head">
+      <div><b>Bantuan WhatsApp</b><small>Tulis pesanmu &middot; diteruskan ke WhatsApp</small></div>
+      <span class="fab-hd-sp"></span>
+      <button type="button" class="fab-clear" id="fab-wa-clear" aria-label="Hapus semua pesan" title="Hapus semua pesan"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="fab-x" id="fab-wa-close" aria-label="Tutup">&times;</button>
+    </div>
+    <div class="fab-confirm" id="fab-wa-confirm" hidden><span>Hapus semua pesan di panel ini?</span><button type="button" class="fab-no" id="fab-wa-no">Batal</button><button type="button" class="fab-yes" id="fab-wa-yes">Hapus</button></div>
+    <div class="fab-chat-body" id="fab-wa-body"></div>
+    <div class="fab-chat-foot">
+      <textarea id="fab-wa-input" rows="1" placeholder="Tulis pesanmu di sini… (Enter kirim)"></textarea>
+      <button type="button" id="fab-wa-send">Kirim</button>
+    </div>
+  </div>
   <div class="fab-chat" id="fab-chat" hidden role="dialog" aria-label="Chat bot PH Logistik">
     <div class="fab-chat-head">
       <div><b>Bot PH (Logistik)</b><small>Chat langsung di sini &middot; dibalas bot</small></div>
+      <span class="fab-hd-sp"></span>
+      <button type="button" class="fab-clear" id="fab-chat-clear" aria-label="Hapus semua pesan" title="Hapus semua pesan"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button type="button" class="fab-x" id="fab-chat-close" aria-label="Tutup chat">&times;</button>
     </div>
+    <div class="fab-confirm" id="fab-chat-confirm" hidden><span>Hapus semua pesan di chat Bot PH ini?</span><button type="button" class="fab-no" id="fab-chat-no">Batal</button><button type="button" class="fab-yes" id="fab-chat-yes">Hapus</button></div>
     <div class="fab-chat-body" id="fab-chat-body"></div>
     <div class="fab-chat-foot">
       <textarea id="fab-chat-input" rows="1" placeholder="Ketik pesan… (Enter kirim)"></textarea>
@@ -22438,13 +22545,15 @@ if ("serviceWorker" in navigator) {
     </div>
   </div>
   <div class="fab-menu" id="fab-menu" hidden>
-    <a class="fab-item" id="fab-item-bantuan" href="#" target="_blank" rel="noopener">
+    <button type="button" class="fab-item" id="fab-item-bantuan">
       <span class="fab-item-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2.9-1.2 1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1" fill="currentColor"/></svg></span>
-      <span><b>Bantuan</b><small>Buka link bantuan</small></span>
-    </a>
+      <span class="fab-item-tx"><b>Bantuan WhatsApp</b><small id="fab-sub-wa">Tulis pesan, diteruskan ke WhatsApp</small></span>
+      <span class="fab-badge" id="fab-badge-wa" hidden>0</span>
+    </button>
     <button type="button" class="fab-item" id="fab-item-chat">
       <span class="fab-item-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
-      <span><b>Chat Bot PH (Logistik)</b><small>Tanya langsung, dibalas bot</small></span>
+      <span class="fab-item-tx"><b>Chat Bot PH (Logistik)</b><small id="fab-sub-chat">Tanya langsung, dibalas bot</small></span>
+      <span class="fab-badge" id="fab-badge-chat" hidden>0</span>
     </button>
   </div>
   <button type="button" class="fab-main" id="fab-main" aria-label="Bantuan" aria-expanded="false">
@@ -22456,22 +22565,40 @@ if ("serviceWorker" in navigator) {
 (function(){
   "use strict";
   const $ = id => document.getElementById(id);
-  const fab = $("fab-bantuan"), main = $("fab-main"), menu = $("fab-menu"), chat = $("fab-chat");
+  const fab = $("fab-bantuan"), main = $("fab-main"), menu = $("fab-menu"), chat = $("fab-chat"), wa = $("fab-wa");
   const body = $("fab-chat-body"), input = $("fab-chat-input"), sendBtn = $("fab-chat-send"), dot = $("fab-dot");
+  const waBody = $("fab-wa-body"), waInput = $("fab-wa-input"), waSend = $("fab-wa-send");
   if(!fab || !main) return;
-  const KEY = "habit_chat_ph_v1";
+  const KEY = "habit_chat_ph_v1", KEY_WA = "habit_chat_wa_v1";
   let st = { msgs: [], cursor: "" };
   try{ const r = JSON.parse(localStorage.getItem(KEY) || "null"); if(r && Array.isArray(r.msgs)) st = { msgs: r.msgs.slice(-200), cursor: String(r.cursor || "") }; }catch(e){}
-  let unread = 0, waiting = false, waitUntil = 0, lastSentAt = 0, timer = null, polling = false, lastErrAt = 0;
+  let wst = { msgs: [] };
+  try{ const r = JSON.parse(localStorage.getItem(KEY_WA) || "null"); if(r && Array.isArray(r.msgs)) wst = { msgs: r.msgs.slice(-100) }; }catch(e){}
+  let unreadBot = 0, unreadWa = 0, waiting = false, waitUntil = 0, lastSentAt = 0, timer = null, polling = false, lastErrAt = 0;
 
   const save = () => { try{ localStorage.setItem(KEY, JSON.stringify({ msgs: st.msgs.slice(-200), cursor: st.cursor })); }catch(e){} };
+  const saveWa = () => { try{ localStorage.setItem(KEY_WA, JSON.stringify({ msgs: wst.msgs.slice(-100) })); }catch(e){} };
+  const cfg = () => { try{ return SETTINGS || {}; }catch(e){ return {}; } };
+  const mq = window.matchMedia ? window.matchMedia("(max-width:900px)") : { matches: false };
+  const panelBuka = () => !chat.hidden || !wa.hidden;
+
   function syncVisible(){
-    let on = true;
-    try{ on = SETTINGS.bantuanMengambangEnabled !== false; }catch(e){}
+    const s = cfg(), hp = !!mq.matches;
+    let on = s.bantuanMengambangEnabled !== false;
+    if(on && hp) on = s.bantuanHpEnabled === true;          // di HP: hanya kalau diaktifkan
+    fab.classList.toggle("fab-kiri", hp && s.bantuanHpPosisi === "kiri");
+    const naik = Number(s.bantuanHpNaik); fab.style.setProperty("--fab-naik", (isFinite(naik) && naik >= 0 ? naik : 84) + "px");
     fab.hidden = !on;
-    if(!on){ menu.hidden = true; chat.hidden = true; stopTimer(); }
+    if(!on){ menu.hidden = true; chat.hidden = true; wa.hidden = true; panelClass(); stopTimer(); }
   }
   window.__syncFabBantuan = syncVisible;
+  if(mq.addEventListener) mq.addEventListener("change", syncVisible); else if(mq.addListener) mq.addListener(syncVisible);
+  function panelClass(){ fab.classList.toggle("fab-panel-buka", panelBuka()); }
+
+  // HP: sembunyikan tombol sementara saat kolom isian lain (di luar tombol ini) sedang dipakai/keyboard muncul
+  const FIELD = "input,textarea,select,[contenteditable='true']";
+  document.addEventListener("focusin", e => { if(!mq.matches) return; const t = e.target; if(fab.contains(t)) return; if(t && t.matches && t.matches(FIELD)) fab.classList.add("fab-sembunyi-ketik"); });
+  document.addEventListener("focusout", () => { setTimeout(() => { const a = document.activeElement; if(!(a && a.matches && a.matches(FIELD) && !fab.contains(a))) fab.classList.remove("fab-sembunyi-ketik"); }, 150); });
 
   const jam = iso => { try{ return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }); }catch(e){ return ""; } };
   function fmt(t){ // escape semua, lalu izinkan hanya <b> <i> <code>
@@ -22479,22 +22606,21 @@ if ("serviceWorker" in navigator) {
     s = s.replace(/&lt;(\/?)(b|i|code)&gt;/gi, "<$1$2>").replace(/\n/g, "<br>");
     return s;
   }
-  function render(){
-    body.innerHTML = "";
-    if(!st.msgs.length){
-      const d = document.createElement("div"); d.className = "fab-msg sys";
-      d.textContent = "Halo! Ketik pesan atau perintah (mis. /menu) untuk chat dengan bot PH (Logistik).";
-      body.appendChild(d);
+  // Render gelembung chat -- dipakai bersama oleh panel Bot PH & panel Bantuan WhatsApp
+  function renderInto(el, msgs, o){
+    el.innerHTML = "";
+    if(!msgs.length){
+      const d = document.createElement("div"); d.className = "fab-msg sys"; d.textContent = o.kosong; el.appendChild(d);
     }
-    st.msgs.forEach(m => {
+    msgs.forEach(m => {
       const d = document.createElement("div");
       d.className = "fab-msg " + (m.dari === "saya" ? "saya" : m.dari === "sys" ? "sys" : "bot");
       const tx = document.createElement("div"); tx.innerHTML = fmt(m.teks); d.appendChild(tx);
       if(m.dari !== "sys"){
         const t = document.createElement("span"); t.className = "fab-time";
-        if(m.status === "gagal"){
+        if(m.status === "gagal" && o.retry){
           t.innerHTML = '<span class="fab-fail">Gagal terkirim — ketuk untuk coba lagi</span>';
-          t.firstChild.addEventListener("click", () => retry(m));
+          t.firstChild.addEventListener("click", () => o.retry(m));
         } else t.textContent = (m.status === "mengirim" ? "mengirim… " : "") + jam(m.waktu);
         d.appendChild(t);
       }
@@ -22503,23 +22629,41 @@ if ("serviceWorker" in navigator) {
         m.tombol.flat().forEach(b => {
           if(!b || !b.teks) return;
           const bt = document.createElement("button"); bt.type = "button"; bt.textContent = b.teks;
-          bt.addEventListener("click", () => { if(b.url){ window.open(b.url, "_blank", "noopener"); } else if(b.data){ kirim("", String(b.data), b.teks); } });
+          bt.addEventListener("click", () => { if(b.url){ window.open(b.url, "_blank", "noopener"); } else if(b.data && o.callback){ o.callback(String(b.data), b.teks); } });
           wrap.appendChild(bt);
         });
         d.appendChild(wrap);
       }
-      body.appendChild(d);
+      el.appendChild(d);
     });
-    if(waiting){
-      const d = document.createElement("div"); d.className = "fab-msg sys"; d.textContent = "Bot sedang mengetik…"; body.appendChild(d);
+    if(o.waiting){
+      const d = document.createElement("div"); d.className = "fab-msg sys"; d.textContent = "Bot sedang mengetik…"; el.appendChild(d);
     }
-    body.scrollTop = body.scrollHeight;
+    el.scrollTop = el.scrollHeight;
+  }
+  function render(){
+    renderInto(body, st.msgs, { kosong: "Halo! Ketik pesan atau perintah (mis. /menu) untuk chat dengan bot PH (Logistik).", waiting, retry, callback: (data, label) => kirim("", data, label) });
+  }
+  function renderWa(){
+    renderInto(waBody, wst.msgs, { kosong: "Tulis pesanmu di sini 👇 — pesan akan diteruskan ke WhatsApp admin." });
   }
   function sysNote(t){ // catatan sistem, tidak terus-menerus (maks 1 per 30 dtk)
     if(Date.now() - lastErrAt < 30000) return; lastErrAt = Date.now();
     st.msgs.push({ dari: "sys", teks: t, waktu: new Date().toISOString() }); save(); render();
   }
-  function setUnread(n){ unread = n; dot.hidden = !n; dot.textContent = n > 9 ? "9+" : String(n); }
+  // Notif angka: di tombol utama (total) DAN di tombol pilihan yang bersangkutan
+  function paintNotif(){
+    const total = unreadBot + unreadWa, txt = n => n > 9 ? "9+" : String(n);
+    dot.hidden = !total; dot.textContent = txt(total);
+    const bc = $("fab-badge-chat"), bw = $("fab-badge-wa"), sc = $("fab-sub-chat"), sw = $("fab-sub-wa");
+    bc.hidden = !unreadBot; bc.textContent = txt(unreadBot);
+    bw.hidden = !unreadWa; bw.textContent = txt(unreadWa);
+    sc.textContent = unreadBot ? unreadBot + " balasan baru dari bot" : "Tanya langsung, dibalas bot"; sc.classList.toggle("fab-baru", !!unreadBot);
+    sw.textContent = unreadWa ? unreadWa + " balasan baru" : "Tulis pesan, diteruskan ke WhatsApp"; sw.classList.toggle("fab-baru", !!unreadWa);
+    main.setAttribute("aria-label", total ? "Bantuan — " + total + " balasan baru" : "Bantuan");
+  }
+  function setUnread(n){ unreadBot = n; paintNotif(); }
+  function setUnreadWa(n){ unreadWa = n; paintNotif(); }
 
   const sid = () => { try{ return getTelegramSenderId(); }catch(e){ return ""; } };
   const base = () => { try{ return MASTER_DATA_WORKER_URL; }catch(e){ return ""; } };
@@ -22569,7 +22713,7 @@ if ("serviceWorker" in navigator) {
             st.msgs.push({ dari: "bot", teks: p.teks, tombol: p.tombol || null, waktu: p.waktu || new Date().toISOString(), idServer: p.id });
           });
           waiting = false; save(); render();
-          if(chat.hidden) setUnread(unread + baru.length);
+          if(chat.hidden) setUnread(unreadBot + baru.length);
         } else if(waiting && Date.now() > waitUntil){ waiting = false; render(); }
         if(j.cursor != null && !baru.length){ st.cursor = String(j.cursor); }
       } else if(waiting && Date.now() > waitUntil){
@@ -22591,36 +22735,95 @@ if ("serviceWorker" in navigator) {
   function startTimer(){ stopTimer(); loop(); }
   function stopTimer(){ if(timer){ clearTimeout(timer); timer = null; } }
 
+  /* ---------- Hapus semua pesan chat Bot PH ---------- */
+  async function hapusSemuaBot(){
+    $("fab-chat-confirm").hidden = true;
+    st.msgs = []; waiting = false; save(); setUnread(0); render();   // tampilan & salinan di perangkat ini langsung bersih
+    let gagal = "";
+    try{
+      if(sid() && base()){
+        const res = await fetch(base() + "/logistik/chat/hapus", { method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ senderId: sid() }) });
+        const j = await res.json().catch(() => null);
+        if(!res.ok || !j || j.ok === false) gagal = (j && j.error) || ("HTTP " + res.status);
+      }
+    }catch(e){ gagal = "koneksi bermasalah"; }
+    if(gagal){ st.msgs.push({ dari: "sys", teks: "Pesan di layar ini sudah dihapus, tetapi antrean di server belum bisa dibersihkan (" + gagal + ").", waktu: new Date().toISOString() }); save(); render(); }
+  }
+  /* ---------- Bantuan WhatsApp (panel tulis pesan -> diteruskan ke WhatsApp) ---------- */
+  function waTujuan(teks){
+    let link = ""; try{ link = String(cfg().bantuanLink || "").trim(); }catch(e){}
+    if(!link) return { url: "", mode: "kosong" };
+    try{
+      const u = new URL(link), h = u.hostname.replace(/^www\./, "");
+      if(h === "wa.me" || h === "api.whatsapp.com" || h === "web.whatsapp.com"){
+        if(teks) u.searchParams.set("text", teks); else u.searchParams.delete("text");
+        return { url: u.toString(), mode: "wa", polos: link };
+      }
+    }catch(e){}
+    return { url: link, mode: "salin", polos: link };   // bukan link chat WhatsApp pribadi (mis. grup/Telegram/FAQ): pesan disalin
+  }
+  function waKirim(teks){
+    teks = String(teks || "").trim(); if(!teks) return;
+    const now = new Date().toISOString();
+    wst.msgs.push({ dari: "saya", teks, waktu: now, status: "terkirim" });
+    const r = waTujuan(teks);
+    if(r.mode === "kosong"){
+      wst.msgs.push({ dari: "bot", teks: "Link Bantuan belum diisi. Isi dulu di Master Data → Tampilan → Tombol Bantuan.", waktu: now });
+    } else {
+      if(r.mode === "salin"){ try{ navigator.clipboard && navigator.clipboard.writeText(teks); }catch(e){} }
+      try{ window.open(r.url, "_blank", "noopener"); }catch(e){}
+      wst.msgs.push({ dari: "bot", waktu: now,
+        teks: r.mode === "wa"
+          ? "✅ Pesanmu sudah diteruskan ke <b>WhatsApp</b> admin. Jawaban akan masuk di WhatsApp — lanjutkan percakapan di sana. Kalau jendela WhatsApp tidak terbuka, ketuk tombol di bawah."
+          : "📋 Link bantuan dibuka dan pesanmu sudah <b>disalin</b>. Tempel (paste) di sana untuk mengirim, lalu lanjutkan percakapan di sana.",
+        tombol: [{ teks: "Buka WhatsApp / link lagi", url: r.mode === "wa" ? r.url : r.polos }] });
+    }
+    saveWa(); renderWa();
+  }
+
+  /* ---------- buka / tutup panel ---------- */
   function openChat(){
-    menu.hidden = true; chat.hidden = false; main.setAttribute("aria-expanded", "true");
+    menu.hidden = true; wa.hidden = true; chat.hidden = false; main.setAttribute("aria-expanded", "true"); panelClass();
     setUnread(0); render(); startTimer(); poll();
     setTimeout(() => input.focus(), 50);
   }
-  function closeChat(){ chat.hidden = true; main.setAttribute("aria-expanded", "false"); startTimer(); }
+  function closeChat(){ chat.hidden = true; $("fab-chat-confirm").hidden = true; main.setAttribute("aria-expanded", "false"); panelClass(); startTimer(); }
+  function openWa(){
+    menu.hidden = true; chat.hidden = true; wa.hidden = false; main.setAttribute("aria-expanded", "true"); panelClass();
+    setUnreadWa(0); renderWa(); setTimeout(() => waInput.focus(), 50);
+  }
+  function closeWa(){ wa.hidden = true; $("fab-wa-confirm").hidden = true; main.setAttribute("aria-expanded", "false"); panelClass(); }
+  const tutupMenu = () => { menu.hidden = true; main.setAttribute("aria-expanded", "false"); };
 
   main.addEventListener("click", () => {
     if(!chat.hidden){ closeChat(); return; }
+    if(!wa.hidden){ closeWa(); return; }
     menu.hidden = !menu.hidden;
     main.setAttribute("aria-expanded", String(!menu.hidden));
-    if(!menu.hidden){
-      let url = "";
-      try{ url = SETTINGS.bantuanLink; }catch(e){}
-      $("fab-item-bantuan").href = url || "#";
-    }
   });
-  $("fab-item-bantuan").addEventListener("click", () => { menu.hidden = true; main.setAttribute("aria-expanded", "false"); });
+  $("fab-item-bantuan").addEventListener("click", openWa);
   $("fab-item-chat").addEventListener("click", openChat);
   $("fab-chat-close").addEventListener("click", closeChat);
-  document.addEventListener("click", e => {
-    if(!menu.hidden && !fab.contains(e.target)){ menu.hidden = true; main.setAttribute("aria-expanded", "false"); }
-  });
-  document.addEventListener("keydown", e => { if(e.key === "Escape"){ if(!menu.hidden){ menu.hidden = true; } else if(!chat.hidden){ closeChat(); } } });
+  $("fab-wa-close").addEventListener("click", closeWa);
+  $("fab-chat-clear").addEventListener("click", () => { $("fab-chat-confirm").hidden = !$("fab-chat-confirm").hidden; });
+  $("fab-chat-no").addEventListener("click", () => { $("fab-chat-confirm").hidden = true; });
+  $("fab-chat-yes").addEventListener("click", hapusSemuaBot);
+  $("fab-wa-clear").addEventListener("click", () => { $("fab-wa-confirm").hidden = !$("fab-wa-confirm").hidden; });
+  $("fab-wa-no").addEventListener("click", () => { $("fab-wa-confirm").hidden = true; });
+  $("fab-wa-yes").addEventListener("click", () => { $("fab-wa-confirm").hidden = true; wst.msgs = []; saveWa(); renderWa(); });
+  document.addEventListener("click", e => { if(!menu.hidden && !fab.contains(e.target)) tutupMenu(); });
+  document.addEventListener("keydown", e => { if(e.key === "Escape"){ if(!menu.hidden) tutupMenu(); else if(!chat.hidden) closeChat(); else if(!wa.hidden) closeWa(); } });
   document.addEventListener("visibilitychange", () => { if(!document.hidden) startTimer(); });
   const doSend = () => { const v = input.value; if(!v.trim()) return; input.value = ""; input.style.height = "auto"; kirim(v); };
   sendBtn.addEventListener("click", doSend);
   input.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); doSend(); } });
   input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 90) + "px"; });
+  const doSendWa = () => { const v = waInput.value; if(!v.trim()) return; waInput.value = ""; waInput.style.height = "auto"; waKirim(v); };
+  waSend.addEventListener("click", doSendWa);
+  waInput.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); doSendWa(); } });
+  waInput.addEventListener("input", () => { waInput.style.height = "auto"; waInput.style.height = Math.min(waInput.scrollHeight, 90) + "px"; });
 
+  paintNotif();
   syncVisible();
   setTimeout(syncVisible, 800); // setelah pengaturan dari server selesai ditarik
 })();
