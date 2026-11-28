@@ -5205,7 +5205,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     <!-- BARU -- versi kartu utk layar mobile (≤700px), tabel di atas disembunyikan
          lewat CSS & kartu ini yang ditampilkan gantinya (lihat .rekap-mobile-cards). -->
     <div id="rekap-cards" class="rekap-mobile-cards"></div>
-    <!-- BARU -- pagination (25 baris/halaman) supaya daftar tidak memanjang
+    <!-- BARU -- pagination (100 baris/halaman, sebelumnya 25) supaya daftar tidak memanjang
          tanpa batas ke bawah -- 1 kontainer dipakai bareng utk tabel desktop
          maupun kartu mobile (keduanya toggle display lewat CSS yang sama,
          jadi pagination ini otomatis nempel di bawah versi yang aktif). -->
@@ -6916,7 +6916,19 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.14 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.16 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Rekap Pesanan: 100 baris per halaman</b> (sebelumnya 25) — berlaku di tabel desktop maupun kartu mobile. Tombol "‹ Sebelumnya" / "Selanjutnya ›" baru muncul bila hasil filter lebih dari 100 baris.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.15</div>
+          <ul>
+            <li><b>Follow Up tidak lagi bergantung status pembayaran</b> — customer piutang (barang dikirim dulu, bayar menyusul) dan customer yang pesanannya masih menunggu transfer tetap dijadwalkan Follow Up: bila waktunya tiba, mereka muncul di Hari ini / Jatuh tempo dan ikut DM CS. Status "Sudah order (menunggu lunas)" dihapus; order terbaru apa pun statusnya menjadi dasar jadwal berikutnya. Pesanan Void tidak dihitung. <i>Butuh Worker Rincian v498.</i></li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.14</div>
           <ul>
             <li><b>Input Nama: alamat di dalam nama ikut terbaca</b> — kecamatan, kabupaten, atau kota yang ditulis bebas di nama customer kini dikenali otomatis (tidak harus di dalam tanda kurung di belakang nama), termasuk kecamatan: kota induknya terisi dan tarif langsung dimuat tingkat kecamatan. Baris tujuan memberi keterangan "dari alamat di nama"; kecamatan hasil bacaan nama bisa diganti lewat tombol Ganti kecamatan. Butuh Worker Rincian v496 &amp; Logistik v1.7.2.</li>
           </ul>
@@ -19627,12 +19639,12 @@ if ("serviceWorker" in navigator) {
   const belumInvoiceEl = document.getElementById("rekap-filter-belumInvoice");
   const csSummaryEl = document.getElementById("rekap-cs-summary");
   const hariSummaryEl = document.getElementById("rekap-hari-summary"); // BARU -- ringkasan total qty per hari
-  // BARU -- pagination (25 baris/halaman) supaya list tidak memanjang ke
+  // BARU -- pagination (100 baris/halaman, sebelumnya 25) supaya list tidak memanjang ke
   // bawah tanpa batas. rkPage direset ke 1 tiap kali filter/sort berubah
   // (lihat listener-nya), TAPI TIDAK direset saat auto-refresh diam-diam
   // supaya CS yang sedang di halaman 3 tidak tiba-tiba "dilempar" balik
   // ke halaman 1 tanpa diminta.
-  const RK_PAGE_SIZE = 25;
+  const RK_PAGE_SIZE = 100; // v2.93.16 -- 25 -> 100 baris per halaman
   let rkPage = 1;
   // BARU (perbaikan performa, terutama di HP) -- dipakai renderRekapTable()
   // utk SKIP membangun markup yang toh disembunyikan CSS: kalau layar
@@ -21507,7 +21519,7 @@ if ("serviceWorker" in navigator) {
         `<li><b>Ritme order</b> — jarak hari antar-order tiap customer (rata-rata bergerak, order terbaru lebih berbobot).</li>` +
         `<li><b>Prediksi order</b> — tanggal order terakhir + ritme, diulang berantai sampai akhir bulan depan.</li>` +
         `<li><b>Qty per order</b> — rata-rata Karton dan Pack per order historis customer itu (Pack dihitung dari SEMUA order customer, jadi customer yang jarang order Pack tetap tersumbang sebagian kecil).</li>` +
-        `<li><b>Bulan berjalan</b> = Realisasi (order Lunas s/d hari ini, pasti) + Sisa prediksi sampai akhir bulan. Customer yang jadwalnya sudah lewat tapi belum order dihitung 1x; yang sudah order &amp; menunggu lunas dihitung penuh.</li>` +
+        `<li><b>Bulan berjalan</b> = Realisasi (order tercatat s/d hari ini, apa pun status bayarnya) + Sisa prediksi sampai akhir bulan. Customer yang jadwalnya sudah lewat tapi belum order dihitung 1x; yang sudah order &amp; menunggu lunas dihitung penuh.</li>` +
         `<li><b>Nilai harapan</b> — tiap order prediksi dikali <b>Prob. Aktif</b> (model BG/NBD), yaitu peluang customer itu memang masih aktif. Ini angka paling mungkin terjadi (bukan skenario terburuk).</li>` +
         `<li><b>Customer baru</b> — komponen tambahan dari rata-rata qty order pertama customer baru per hari (180 hari terakhir), karena customer 1x order belum punya ritme.</li>` +
         `<li><b>Kalibrasi otomatis</b> — rasio realisasi ÷ prediksi pada bulan-bulan sebelumnya (hari uji yang sama) dipakai untuk menggeser prediksi bila selama ini cenderung kebesaran/kekecilan.</li>` +
@@ -21695,7 +21707,7 @@ if ("serviceWorker" in navigator) {
     // BAGIAN A -- Parameter & Asumsi
     const rowsA = [
       ["Hari Ini (acuan)", fmtTgl(TODAY.toISOString()), true],
-      ["Jumlah Order Lunas", `${r.jumlahOrder} kali`, false],
+      ["Jumlah Order", `${r.jumlahOrder} kali`, false],
       ["Belum Lunas", `${r.jumlahBelumLunas || 0} kali`, false],
       ["Tanggal Order Pertama", fmtTgl(r.first), false],
       ["Tanggal Order Terakhir", fmtTgl(r.last), false],
@@ -21724,7 +21736,7 @@ if ("serviceWorker" in navigator) {
     // BAGIAN B -- Prediksi 8 order berikutnya
     let tblBHtml;
     if(!p8.length){
-      tblBHtml = `<tr><td colspan="5" style="text-align:center; padding:16px; color:var(--ink-soft);">— Data belum cukup (perlu minimal 2 order Lunas)</td></tr>`;
+      tblBHtml = `<tr><td colspan="5" style="text-align:center; padding:16px; color:var(--ink-soft);">— Data belum cukup (perlu minimal 2 order)</td></tr>`;
     }else{
       tblBHtml = p8.map((p,k)=>{
         const s = p.s;
@@ -21795,7 +21807,7 @@ if ("serviceWorker" in navigator) {
     const teksJadwal = sisaJadwal === null ? "" : (sisaJadwal < 0 ? `terlambat ${fmtHari(-sisaJadwal)}` : (sisaJadwal === 0 ? "hari ini" : `${fmtHari(sisaJadwal)} lagi`));
     const stats = `<div class="fuh-stats">
         <div class="fuh-stat"><div class="k">🛒 Terakhir beli</div><div class="v">${r.last ? fmtTgl(r.last) : "-"}</div><div class="s">${escHtml(teksLalu)}${qtyAkhir !== null && qtyAkhir !== undefined ? ` · ${fmtNumID(qtyAkhir)} pcs` : ""}</div></div>
-        <div class="fuh-stat"><div class="k">🔁 Ritme order</div><div class="v">${ritme ? "± " + fmtHari(ritme) : "-"}</div><div class="s">${r.jumlahOrder ? `dari ${r.jumlahOrder} order lunas` : ""}</div></div>
+        <div class="fuh-stat"><div class="k">🔁 Ritme order</div><div class="v">${ritme ? "± " + fmtHari(ritme) : "-"}</div><div class="s">${r.jumlahOrder ? `dari ${r.jumlahOrder} order` : ""}</div></div>
         <div class="fuh-stat"><div class="k">📞 Jadwal follow up</div><div class="v">${r.pred ? fmtTgl(r.pred) : "-"}</div><div class="s" style="${sisaJadwal !== null && sisaJadwal < 0 ? "color:var(--danger-red); font-weight:700;" : ""}">${escHtml(teksJadwal)}${r.belumLapor ? `<br><span style="color:var(--danger-red); font-weight:700;">⚠️ jadwal ${fmtTgl(r.belumLapor.tanggal + "T12:00:00+07:00")} belum dilaporkan CS</span>` : ""}</div></div>
       </div>`;
     const hdr = `<div class="fu-bag-hdr">▌ HASIL FOLLOW UP</div>`;

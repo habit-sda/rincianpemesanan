@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v435";
+const CACHE_VERSION = "v437";
 /* v435 -- (app v2.93.14) Input Nama: alamat (kecamatan/kab/kota) yang ditulis bebas di nama customer ikut terbaca; label sumber tujuan "dari alamat di nama". Butuh Worker Rincian v496 & Logistik v1.7.2. Hanya index.html. */
 /* v434 -- (app v2.93.13) Input Nama: ekspedisi yang biasa dipakai customer tetap tampil walau tarif kab/kota hanya ada per kecamatan. Hanya index.html. */
 /* v433 -- (app v2.93.12) Input Nama: dialog konfirmasi kecamatan customer (tarif Logistik per kecamatan), tombol Ganti kecamatan. Butuh Worker Rincian v495 & Logistik v1.6.4. Hanya index.html. */
