@@ -578,9 +578,29 @@
   /* Judul kolom "Pilih Ekspedisi" -- hanya tampil di desktop (>=901px, sama dgn isDesktopWiz) supaya tombol Input Nama / Manual tidak ambigu */
   .ep-title{display:none;font-size:13px;font-weight:800;color:var(--ink);margin:0 0 6px;}
   @media (min-width:901px){ .ep-title{display:block;} }
-  .ep-seg{display:flex;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px;}
-  .ep-tab{flex:1;border:0;background:transparent;border-radius:9px;padding:10px 8px;font-size:14px;font-weight:700;color:var(--ink-soft);cursor:pointer;min-height:42px;font-family:inherit;}
-  .ep-tab.on{background:var(--primary-green);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18);}
+  /* v2.93.17 -- pilihan Input Nama / Manual jadi KARTU PILIHAN (ikon + judul + keterangan + bulatan centang) supaya jelas bisa diketuk.
+     Kelas .ep-tab, .on, data-mode & aria-selected TETAP dipakai JS -- hanya tampilan yang berubah. */
+  .ep-seg{display:flex;gap:10px;}
+  .ep-tab{flex:1;display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;min-height:64px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-family:inherit;}
+  .ep-tab.on{border:2px solid var(--primary-green);padding:11px 13px;background:rgba(0,132,95,.10);background:color-mix(in srgb, var(--primary-green) 10%, transparent);}
+  .ep-tab-ic{width:36px;height:36px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--bg);border:1px solid var(--line);}
+  .ep-tab.on .ep-tab-ic{border-color:var(--primary-green);background:var(--card);}
+  .ep-tab-tx{flex:1;min-width:0;}
+  .ep-tab-tt{display:block;font-size:15px;font-weight:800;}
+  .ep-tab.on .ep-tab-tt{color:var(--primary-green);}
+  .ep-tab-cp{display:block;font-size:12px;font-weight:500;color:var(--ink-soft);margin-top:1px;}
+  .ep-tab-rd{width:20px;height:20px;flex:none;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:transparent;}
+  .ep-tab.on .ep-tab-rd{background:var(--primary-green);border-color:var(--primary-green);color:#fff;}
+  html[data-theme="dark"] .ep-tab.on .ep-tab-rd{color:#06281c;}
+  @media (max-width:520px){
+    .ep-seg{gap:8px;}
+    .ep-tab{padding:10px;gap:8px;min-height:58px;}
+    .ep-tab.on{padding:9px;}
+    .ep-tab-ic{width:30px;height:30px;font-size:16px;}
+    .ep-tab-tt{font-size:14px;}
+    .ep-tab-cp{font-size:11px;}
+    .ep-tab-rd{display:none;}
+  }
   .ep-body{margin-top:10px;}
   .ep-field{position:relative;margin-bottom:8px;}
   .ep-field:focus-within{z-index:60;}
@@ -6916,7 +6936,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.16 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.17 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Menu Ekspedisi: pilihan Input Nama / Manual lebih jelas</b> — kini berupa dua kartu pilihan (ikon, judul, keterangan singkat, dan tanda centang pada pilihan aktif) sehingga terlihat jelas bisa diketuk. Cara kerjanya tidak berubah. Di layar sempit keterangan diperkecil dan tanda centang disembunyikan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.16</div>
           <ul>
             <li><b>Rekap Pesanan: 100 baris per halaman</b> (sebelumnya 25) — berlaku di tabel desktop maupun kartu mobile. Tombol "‹ Sebelumnya" / "Selanjutnya ›" baru muncul bila hasil filter lebih dari 100 baris.</li>
           </ul>
@@ -12332,8 +12358,8 @@ applyRibuanTo("pj-rate","pj-ongkir-manual","pj-kelebihan","cs-rate","cs-ongkir-m
   const SKELETON = `
     <div class="ep-title">Pilih Ekspedisi</div>
     <div class="ep-seg" role="tablist" aria-label="Pilih Ekspedisi">
-      <button type="button" class="ep-tab" data-mode="nama" role="tab">🔎 Input Nama</button>
-      <button type="button" class="ep-tab" data-mode="manual" role="tab">✍️ Manual</button>
+      <button type="button" class="ep-tab" data-mode="nama" role="tab"><span class="ep-tab-ic" aria-hidden="true">🔎</span><span class="ep-tab-tx"><span class="ep-tab-tt">Input Nama</span><span class="ep-tab-cp">Cari dari riwayat kirim</span></span><span class="ep-tab-rd" aria-hidden="true">✓</span></button>
+      <button type="button" class="ep-tab" data-mode="manual" role="tab"><span class="ep-tab-ic" aria-hidden="true">✍️</span><span class="ep-tab-tx"><span class="ep-tab-tt">Manual</span><span class="ep-tab-cp">Isi tujuan sendiri</span></span><span class="ep-tab-rd" aria-hidden="true">✓</span></button>
     </div>
     <div class="ep-body" hidden>
       <div class="ep-field">
