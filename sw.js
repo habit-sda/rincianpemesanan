@@ -4,7 +4,8 @@
    Naikkan CACHE_VERSION setiap kali file HTML/CSS/JS utama diubah,
    supaya pengguna otomatis dapat versi terbaru.
    ============================================================ */
-const CACHE_VERSION = "v442";
+const CACHE_VERSION = "v443";
+/* v443 -- (app v2.93.20) Warna latar chat baru "Merah Kuning" untuk Chat Bot PH & Min Ha. Hanya index.html.  */
 /* v442 -- (app v2.93.19) Tombol Bantuan mengambang: Chat Bot Min Ha (@Rp_habit_bot) di dalam app dengan pengaturan sama seperti Chat Bot PH (warna, tulisan, hapus pesan, notifikasi), urutan pilihan bisa digeser (Master Data > Tampilan), ikon tiap pilihan bisa diganti lewat link gambar. Butuh Worker Rincian v504 (rute /minha/chat/*). Hanya index.html.  */
 /* v441 -- (app v2.93.18) Tombol Bantuan mengambang: 7 pilihan warna latar Chat Bot PH (Master Data > Tampilan), ikon tombol bisa diganti link gambar, judul & keterangan tiap pilihan bisa diubah, tampilan lebih ramah & mudah dibaca (huruf/area ketuk lebih besar, pratinjau). Tidak butuh perubahan Worker. Hanya index.html. */
 /* v440 -- (app v2.93.17) Tombol Bantuan mengambang: notif angka juga di tombol pilihan, panel Bantuan WhatsApp, opsi tampil di HP (sisi & tinggi), tombol Hapus pesan Chat Bot PH. Butuh Worker Rincian v501 & Logistik v1.7.7. Hanya index.html. */

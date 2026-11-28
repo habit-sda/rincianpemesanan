@@ -6309,6 +6309,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <button type="button" class="fabset-sw fab-tema-ungu" role="radio" aria-checked="false" data-bot="ph" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
             <button type="button" class="fabset-sw fab-tema-hijau" role="radio" aria-checked="false" data-bot="ph" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
             <button type="button" class="fabset-sw fab-tema-slate" role="radio" aria-checked="false" data-bot="ph" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
+            <button type="button" class="fabset-sw fab-tema-merahkuning" role="radio" aria-checked="false" data-bot="ph" data-tema="merahkuning" aria-label="Warna Merah Kuning"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Kuning</span></button>
         </div>
 
         <div class="fabset-h">3. Warna latar Chat Bot Min Ha</div>
@@ -6321,6 +6322,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
             <button type="button" class="fabset-sw fab-tema-ungu" role="radio" aria-checked="false" data-bot="minha" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
             <button type="button" class="fabset-sw fab-tema-hijau" role="radio" aria-checked="false" data-bot="minha" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
             <button type="button" class="fabset-sw fab-tema-slate" role="radio" aria-checked="false" data-bot="minha" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
+            <button type="button" class="fabset-sw fab-tema-merahkuning" role="radio" aria-checked="false" data-bot="minha" data-tema="merahkuning" aria-label="Warna Merah Kuning"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Kuning</span></button>
         </div>
 
         <div class="fabset-h">4. Ikon tombol chat</div>
@@ -7086,7 +7088,13 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.19 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.20 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Warna latar chat baru: Merah Kuning</b> &mdash; header &amp; gelembung pesan merah, latar kuning krem lembut, dengan garis aksen kuning emas. Tersedia untuk Chat Bot PH dan Chat Bot Min Ha di Master Data &rarr; Tampilan &rarr; Tampilan Tombol Bantuan &amp; Chat, otomatis menyesuaikan mode gelap. Hanya index.html.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.19</div>
           <ul>
             <li><b>Chat Bot Min Ha di tombol Bantuan mengambang</b> &mdash; chat langsung dengan bot Min Ha (@Rp_habit_bot) di dalam app, tanpa membuka Telegram. Perintah, menu, dan tombol dari bot muncul di chat. Foto/berkas dari bot tetap dikirim ke Telegram dan di chat muncul catatan. Butuh Worker Rincian v504.</li>
             <li><b>Pengaturan Chat Bot Min Ha sama seperti Chat Bot PH</b> &mdash; warna latar (7 pilihan, bawaan Hijau), judul &amp; keterangan, hapus pesan, dan notifikasi angka balasan baru.</li>
@@ -8794,12 +8802,12 @@ function loadSettings(){
     if(s.bantuanHpPosisi === "kiri" || s.bantuanHpPosisi === "kanan") SETTINGS.bantuanHpPosisi = s.bantuanHpPosisi;
     if(typeof s.bantuanHpNaik === "number" && s.bantuanHpNaik >= 0 && s.bantuanHpNaik <= 400) SETTINGS.bantuanHpNaik = s.bantuanHpNaik;
     // v2.93.18 -- warna Chat Bot PH, ikon tombol dari link gambar, teks tiap pilihan
-    if(["biru","langit","indigo","teal","ungu","hijau","slate"].includes(s.chatPhTema)) SETTINGS.chatPhTema = s.chatPhTema;
+    if(["biru","langit","indigo","teal","ungu","hijau","slate","merahkuning"].includes(s.chatPhTema)) SETTINGS.chatPhTema = s.chatPhTema;
     if(typeof s.bantuanIkonUrl === "string") SETTINGS.bantuanIkonUrl = s.bantuanIkonUrl.trim().slice(0, 600);
     ["bantuanWaJudul","bantuanWaKet","bantuanChatJudul","bantuanChatKet"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 60); });
     // v2.93.19 -- chat bot Min Ha: urutan pilihan, warna, tulisan, ikon tiap pilihan (link gambar)
     if(typeof s.bantuanUrutan === "string") SETTINGS.bantuanUrutan = fabUrutanBersih(s.bantuanUrutan).join(",");
-    if(["biru","langit","indigo","teal","ungu","hijau","slate"].includes(s.chatMinhaTema)) SETTINGS.chatMinhaTema = s.chatMinhaTema;
+    if(["biru","langit","indigo","teal","ungu","hijau","slate","merahkuning"].includes(s.chatMinhaTema)) SETTINGS.chatMinhaTema = s.chatMinhaTema;
     ["bantuanMinhaJudul","bantuanMinhaKet"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 60); });
     ["bantuanWaIkonUrl","bantuanMinhaIkonUrl","bantuanPhIkonUrl"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 600); });
     if(typeof s.tierBatas1 === "number" && s.tierBatas1 > 0) SETTINGS.tierBatas1 = s.tierBatas1;
@@ -18155,7 +18163,7 @@ if ("serviceWorker" in navigator) {
     const root = document.getElementById("md-fabset");
     if(!root) return;
     const $ = id => document.getElementById(id);
-    const TEMA = { biru:"Biru", langit:"Biru Langit", indigo:"Indigo", teal:"Hijau Tosca", ungu:"Ungu", hijau:"Hijau", slate:"Abu Biru" };
+    const TEMA = { biru:"Biru", langit:"Biru Langit", indigo:"Indigo", teal:"Hijau Tosca", ungu:"Ungu", hijau:"Hijau", slate:"Abu Biru", merahkuning:"Merah Kuning" };
     const BOT = { ph:{ key:"chatPhTema", nama:"Chat Bot PH", awal:"biru" }, minha:{ key:"chatMinhaTema", nama:"Chat Bot Min Ha", awal:"hijau" } };
     const DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", mhJudul:"Chat Bot Min Ha", mhKet:"Tanya soal pesanan, dibalas bot", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
     const KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", mhJudul:"bantuanMinhaJudul", mhKet:"bantuanMinhaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
@@ -22886,6 +22894,15 @@ html[data-theme="dark"] .fab-tema-ungu{ --cp-bg:#1a1427; --cp-link:#c3a4f5; }
 html[data-theme="dark"] .fab-tema-hijau{ --cp-bg:#0e1f18; --cp-link:#3ddc9a; }
 .fab-tema-slate{ --cp-head:#455a64; --cp-bg:#eceff1; --cp-link:#37474f; }
 html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
+/* v2.93.20 -- tema Merah Kuning: header & gelembung pesan merah, latar kuning krem lembut, garis aksen kuning emas.
+   --cp-acc = warna aksen kedua; tema lain otomatis transparan supaya tampilannya tidak berubah. */
+[class*="fab-tema-"]{ --cp-acc:transparent; }
+.fab-tema-merahkuning{ --cp-head:#c62828; --cp-bg:#fff6d9; --cp-link:#b71c1c; --cp-acc:#ffc107; }
+html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5c; }
+#fab-bantuan .fab-chat .fab-chat-head{ border-bottom:3px solid var(--cp-acc,transparent); }
+#fab-bantuan .fab-chat .fab-chat-foot{ border-top:3px solid var(--cp-acc,transparent); }
+.fabset-sw.fab-tema-merahkuning .fabset-sw-chip::after{ background:var(--cp-acc); }
+.fabset-pv-chat .h{ border-bottom:3px solid var(--cp-acc,transparent); }
 
   /* ikon gambar pada tombol utama */
   #fab-bantuan .fab-main img{ display:block; width:100%; height:100%; border-radius:50%; object-fit:cover; }
@@ -23083,7 +23100,7 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
   let unreadWa = 0;
   let ikonSaatIni = null;   // URL ikon gambar tombol utama yang sedang dipasang
   const bots = [];          // chat bot (PH, Min Ha) -- dibuat lewat buatBot()
-  const TEMA_OK = ["biru","langit","indigo","teal","ungu","hijau","slate"];
+  const TEMA_OK = ["biru","langit","indigo","teal","ungu","hijau","slate","merahkuning"];
   const TEKS_DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", mhJudul:"Chat Bot Min Ha", mhKet:"Tanya soal pesanan, dibalas bot", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
   const TEKS_KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", mhJudul:"bantuanMinhaJudul", mhKet:"bantuanMinhaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
   const ITEM = { wa:"fab-item-bantuan", minha:"fab-item-mh", ph:"fab-item-chat" };
