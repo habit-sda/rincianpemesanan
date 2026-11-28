@@ -5921,6 +5921,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
     </div>
 
     <div class="md-section" id="md-sec-hapus">
+      <div class="md-produk-editbar locked" id="md-hapus-editbar">
+        <div class="md-produk-editbar-status" id="md-hapus-editbar-status">
+          <svg id="md-hapus-editbar-icon" viewBox="0 0 24 24" fill="none" width="15" height="15"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span id="md-hapus-editbar-text">Terkunci — aktifkan Mode Edit untuk mengubah</span>
+        </div>
+        <button type="button" class="md-produk-editbtn" id="md-hapus-edit-toggle">✏️ Mode Edit</button>
+        <button type="button" class="md-produk-editbtn primary" id="md-hapus-edit-save" hidden>💾 Simpan &amp; Kunci</button>
+      </div>
+      <div class="md-lockwrap md-locked" id="md-hapus-lockwrap">
       <div class="md-card md-pinform">
         <h3>Hapus data via kode</h3>
         <div class="md-note" style="margin-bottom:12px;">
@@ -5931,14 +5940,15 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <label>Kode data</label>
         <input type="text" id="md-hapus-kode" placeholder="mis. P01 atau E01" style="text-transform:uppercase;max-width:220px;">
         <div class="md-pin-err" id="md-hapus-err"></div>
-        <button class="md-btn primary" id="md-hapus-cari">Cari kode</button>
+        <button class="md-btn primary md-lockable" id="md-hapus-cari">Cari kode</button>
 
         <div class="md-hapus-preview" id="md-hapus-preview" hidden>
           <div class="md-hapus-preview-tipe" id="md-hapus-preview-tipe"></div>
           <div class="md-hapus-preview-nama" id="md-hapus-preview-nama"></div>
-          <button class="md-btn danger" id="md-hapus-confirm">Hapus data ini</button>
+          <button class="md-btn danger md-lockable" id="md-hapus-confirm">Hapus data ini</button>
           <button class="md-btn" id="md-hapus-cancel">Batal</button>
         </div>
+      </div>
       </div>
     </div>
 
@@ -6263,7 +6273,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <label>Link Bantuan (URL)</label>
         <input type="text" inputmode="url" id="md-bantuan-link" placeholder="https://...">
         <div class="md-pin-err" id="md-bantuan-err"></div>
-        <button class="md-btn primary" id="md-bantuan-save">Simpan link Bantuan</button>
+        <button class="md-btn primary md-lockable" id="md-bantuan-save">Simpan link Bantuan</button>
       </div>
       <div class="md-card fabset" id="md-fabset">
         <h3>Tampilan Tombol Bantuan &amp; Chat</h3>
@@ -6302,27 +6312,39 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="fabset-h">2. Warna latar Chat Bot PH</div>
         <div class="fabset-hint">Ketuk satu warna. Berlaku untuk header, gelembung pesan, dan latar chat Bot PH (otomatis menyesuaikan mode gelap).</div>
         <div class="fabset-swatches" id="fabset-sw-ph" role="radiogroup" aria-label="Warna latar Chat Bot PH">
-            <button type="button" class="fabset-sw fab-tema-biru" role="radio" aria-checked="false" data-bot="ph" data-tema="biru" aria-label="Warna Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru</span></button>
-            <button type="button" class="fabset-sw fab-tema-langit" role="radio" aria-checked="false" data-bot="ph" data-tema="langit" aria-label="Warna Biru Langit"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru Langit</span></button>
-            <button type="button" class="fabset-sw fab-tema-indigo" role="radio" aria-checked="false" data-bot="ph" data-tema="indigo" aria-label="Warna Indigo"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Indigo</span></button>
-            <button type="button" class="fabset-sw fab-tema-teal" role="radio" aria-checked="false" data-bot="ph" data-tema="teal" aria-label="Warna Hijau Tosca"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau Tosca</span></button>
-            <button type="button" class="fabset-sw fab-tema-ungu" role="radio" aria-checked="false" data-bot="ph" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
-            <button type="button" class="fabset-sw fab-tema-hijau" role="radio" aria-checked="false" data-bot="ph" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
-            <button type="button" class="fabset-sw fab-tema-slate" role="radio" aria-checked="false" data-bot="ph" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
-            <button type="button" class="fabset-sw fab-tema-merahkuning" role="radio" aria-checked="false" data-bot="ph" data-tema="merahkuning" aria-label="Warna Merah Kuning"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Kuning</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-biru" role="radio" aria-checked="false" data-bot="ph" data-tema="biru" aria-label="Warna Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-langit" role="radio" aria-checked="false" data-bot="ph" data-tema="langit" aria-label="Warna Biru Langit"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru Langit</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-indigo" role="radio" aria-checked="false" data-bot="ph" data-tema="indigo" aria-label="Warna Indigo"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Indigo</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-teal" role="radio" aria-checked="false" data-bot="ph" data-tema="teal" aria-label="Warna Hijau Tosca"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau Tosca</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-ungu" role="radio" aria-checked="false" data-bot="ph" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-hijau" role="radio" aria-checked="false" data-bot="ph" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-slate" role="radio" aria-checked="false" data-bot="ph" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-merah" role="radio" aria-checked="false" data-bot="ph" data-tema="merah" aria-label="Warna Merah"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-merahmarun" role="radio" aria-checked="false" data-bot="ph" data-tema="merahmarun" aria-label="Warna Merah Marun"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Marun</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-merahmuda" role="radio" aria-checked="false" data-bot="ph" data-tema="merahmuda" aria-label="Warna Merah Muda"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Muda</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-kuning" role="radio" aria-checked="false" data-bot="ph" data-tema="kuning" aria-label="Warna Kuning"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Kuning</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-kuningemas" role="radio" aria-checked="false" data-bot="ph" data-tema="kuningemas" aria-label="Warna Kuning Emas"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Kuning Emas</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-oranye" role="radio" aria-checked="false" data-bot="ph" data-tema="oranye" aria-label="Warna Oranye"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Oranye</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-merahkuning" role="radio" aria-checked="false" data-bot="ph" data-tema="merahkuning" aria-label="Warna Merah Kuning"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Kuning</span></button>
         </div>
 
         <div class="fabset-h">3. Warna latar Chat Bot Min Ha</div>
         <div class="fabset-hint">Sama seperti Chat Bot PH, tapi untuk Chat Bot Min Ha. Bawaan: Hijau.</div>
         <div class="fabset-swatches" id="fabset-sw-mh" role="radiogroup" aria-label="Warna latar Chat Bot Min Ha">
-            <button type="button" class="fabset-sw fab-tema-biru" role="radio" aria-checked="false" data-bot="minha" data-tema="biru" aria-label="Warna Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru</span></button>
-            <button type="button" class="fabset-sw fab-tema-langit" role="radio" aria-checked="false" data-bot="minha" data-tema="langit" aria-label="Warna Biru Langit"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru Langit</span></button>
-            <button type="button" class="fabset-sw fab-tema-indigo" role="radio" aria-checked="false" data-bot="minha" data-tema="indigo" aria-label="Warna Indigo"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Indigo</span></button>
-            <button type="button" class="fabset-sw fab-tema-teal" role="radio" aria-checked="false" data-bot="minha" data-tema="teal" aria-label="Warna Hijau Tosca"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau Tosca</span></button>
-            <button type="button" class="fabset-sw fab-tema-ungu" role="radio" aria-checked="false" data-bot="minha" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
-            <button type="button" class="fabset-sw fab-tema-hijau" role="radio" aria-checked="false" data-bot="minha" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
-            <button type="button" class="fabset-sw fab-tema-slate" role="radio" aria-checked="false" data-bot="minha" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
-            <button type="button" class="fabset-sw fab-tema-merahkuning" role="radio" aria-checked="false" data-bot="minha" data-tema="merahkuning" aria-label="Warna Merah Kuning"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Kuning</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-biru" role="radio" aria-checked="false" data-bot="minha" data-tema="biru" aria-label="Warna Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-langit" role="radio" aria-checked="false" data-bot="minha" data-tema="langit" aria-label="Warna Biru Langit"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru Langit</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-indigo" role="radio" aria-checked="false" data-bot="minha" data-tema="indigo" aria-label="Warna Indigo"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Indigo</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-teal" role="radio" aria-checked="false" data-bot="minha" data-tema="teal" aria-label="Warna Hijau Tosca"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau Tosca</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-ungu" role="radio" aria-checked="false" data-bot="minha" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-hijau" role="radio" aria-checked="false" data-bot="minha" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-slate" role="radio" aria-checked="false" data-bot="minha" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-merah" role="radio" aria-checked="false" data-bot="minha" data-tema="merah" aria-label="Warna Merah"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-merahmarun" role="radio" aria-checked="false" data-bot="minha" data-tema="merahmarun" aria-label="Warna Merah Marun"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Marun</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-merahmuda" role="radio" aria-checked="false" data-bot="minha" data-tema="merahmuda" aria-label="Warna Merah Muda"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Muda</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-kuning" role="radio" aria-checked="false" data-bot="minha" data-tema="kuning" aria-label="Warna Kuning"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Kuning</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-kuningemas" role="radio" aria-checked="false" data-bot="minha" data-tema="kuningemas" aria-label="Warna Kuning Emas"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Kuning Emas</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-oranye" role="radio" aria-checked="false" data-bot="minha" data-tema="oranye" aria-label="Warna Oranye"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Oranye</span></button>
+            <button type="button" class="fabset-sw md-lockable fab-tema-merahkuning" role="radio" aria-checked="false" data-bot="minha" data-tema="merahkuning" aria-label="Warna Merah Kuning"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Merah Kuning</span></button>
         </div>
 
         <div class="fabset-h">4. Ikon tombol chat</div>
@@ -6331,8 +6353,8 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <input type="url" inputmode="url" id="fabset-ikon-url" placeholder="https://contoh.com/logo.png" autocomplete="off" maxlength="600">
         <div class="fabset-err" id="fabset-ikon-msg" role="status" aria-live="polite"></div>
         <div class="fabset-actions">
-          <button type="button" class="md-btn primary" id="fabset-ikon-save">Simpan ikon</button>
-          <button type="button" class="md-btn" id="fabset-ikon-reset">Pakai ikon bawaan</button>
+          <button type="button" class="md-btn primary md-lockable" id="fabset-ikon-save">Simpan ikon</button>
+          <button type="button" class="md-btn md-lockable" id="fabset-ikon-reset">Pakai ikon bawaan</button>
         </div>
 
         <div class="fabset-h">5. Ikon tiap pilihan</div>
@@ -6345,8 +6367,8 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <input type="url" inputmode="url" id="fabset-pik-ph" placeholder="https://contoh.com/ph.png" autocomplete="off" maxlength="600">
         <div class="fabset-err" id="fabset-pik-msg" role="status" aria-live="polite"></div>
         <div class="fabset-actions">
-          <button type="button" class="md-btn primary" id="fabset-pik-save">Simpan ikon pilihan</button>
-          <button type="button" class="md-btn" id="fabset-pik-reset">Semua pakai ikon bawaan</button>
+          <button type="button" class="md-btn primary md-lockable" id="fabset-pik-save">Simpan ikon pilihan</button>
+          <button type="button" class="md-btn md-lockable" id="fabset-pik-reset">Semua pakai ikon bawaan</button>
         </div>
 
         <div class="fabset-h">6. Tulisan tiap pilihan</div>
@@ -6374,8 +6396,8 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         </div>
         <div class="fabset-err" id="fabset-teks-msg" role="status" aria-live="polite"></div>
         <div class="fabset-actions">
-          <button type="button" class="md-btn primary" id="fabset-teks-save">Simpan tulisan</button>
-          <button type="button" class="md-btn" id="fabset-teks-reset">Kembalikan tulisan bawaan</button>
+          <button type="button" class="md-btn primary md-lockable" id="fabset-teks-save">Simpan tulisan</button>
+          <button type="button" class="md-btn md-lockable" id="fabset-teks-reset">Kembalikan tulisan bawaan</button>
         </div>
       </div>
       <div class="md-card">
@@ -6433,7 +6455,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <input type="number" inputmode="numeric" id="md-tier-batas2" min="2" style="max-width:140px;">
         <div class="md-note" id="md-tier-preview" style="margin-top:12px;font-weight:700;color:var(--ink);"></div>
         <div class="md-pin-err" id="md-tier-err"></div>
-        <button class="md-btn primary" id="md-tier-save">Simpan batas tier</button>
+        <button class="md-btn primary md-lockable" id="md-tier-save">Simpan batas tier</button>
       </div>
       <div class="md-card md-pinform">
         <h3>Rumus lain yang bisa diatur</h3>
@@ -7090,7 +7112,10 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="changelog-item">
           <div class="changelog-ver">v2.93.20 <span class="changelog-tag">Sekarang</span></div>
           <ul>
-            <li><b>Warna latar chat baru: Merah Kuning</b> &mdash; header &amp; gelembung pesan merah, latar kuning krem lembut, dengan garis aksen kuning emas. Tersedia untuk Chat Bot PH dan Chat Bot Min Ha di Master Data &rarr; Tampilan &rarr; Tampilan Tombol Bantuan &amp; Chat, otomatis menyesuaikan mode gelap. Hanya index.html.</li>
+            <li><b>Warna latar chat baru: Merah dan Kuning</b> &mdash; Merah, Merah Marun, Merah Muda, Kuning, Kuning Emas, Oranye, plus Merah Kuning (gabungan). Tersedia untuk Chat Bot PH dan Chat Bot Min Ha, otomatis menyesuaikan mode gelap. Teks di atas warna kuning dibuat gelap supaya terbaca.</li>
+            <li><b>Chat Bot Min Ha: tampilan dirapikan</b> &mdash; tombol dari bot tersusun per baris seperti di Telegram, link bisa diketuk, tombol pintasan perintah (/menu, /cek, /kirim, resi pending, belum konfirmasi), dan pesan galat yang jelas (mis. Worker belum mendukung chat Min Ha, Kode Akses salah, bot tidak membalas sapaan biasa).</li>
+            <li><b>Tombol bantuan mengambang disembunyikan di layar Review (HP)</b> &mdash; baik di Penjualan (Grosir) maupun Custom, supaya tidak menutupi tombol Unduh/Bagikan/Salin/Kirim. Muncul lagi di langkah lain.</li>
+            <li><b>Master Data: semua pengaturan wajib lewat Mode Edit</b> &mdash; pilihan warna chat, urutan pilihan, tombol simpan link/ikon/teks/batas tier, dan tab Hapus Data kini terkunci sampai Mode Edit dinyalakan. Hanya index.html.</li>
           </ul>
         </div>
         <div class="changelog-item">
@@ -8802,12 +8827,12 @@ function loadSettings(){
     if(s.bantuanHpPosisi === "kiri" || s.bantuanHpPosisi === "kanan") SETTINGS.bantuanHpPosisi = s.bantuanHpPosisi;
     if(typeof s.bantuanHpNaik === "number" && s.bantuanHpNaik >= 0 && s.bantuanHpNaik <= 400) SETTINGS.bantuanHpNaik = s.bantuanHpNaik;
     // v2.93.18 -- warna Chat Bot PH, ikon tombol dari link gambar, teks tiap pilihan
-    if(["biru","langit","indigo","teal","ungu","hijau","slate","merahkuning"].includes(s.chatPhTema)) SETTINGS.chatPhTema = s.chatPhTema;
+    if(["biru","langit","indigo","teal","ungu","hijau","slate","merah","merahmarun","merahmuda","kuning","kuningemas","oranye","merahkuning"].includes(s.chatPhTema)) SETTINGS.chatPhTema = s.chatPhTema;
     if(typeof s.bantuanIkonUrl === "string") SETTINGS.bantuanIkonUrl = s.bantuanIkonUrl.trim().slice(0, 600);
     ["bantuanWaJudul","bantuanWaKet","bantuanChatJudul","bantuanChatKet"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 60); });
     // v2.93.19 -- chat bot Min Ha: urutan pilihan, warna, tulisan, ikon tiap pilihan (link gambar)
     if(typeof s.bantuanUrutan === "string") SETTINGS.bantuanUrutan = fabUrutanBersih(s.bantuanUrutan).join(",");
-    if(["biru","langit","indigo","teal","ungu","hijau","slate","merahkuning"].includes(s.chatMinhaTema)) SETTINGS.chatMinhaTema = s.chatMinhaTema;
+    if(["biru","langit","indigo","teal","ungu","hijau","slate","merah","merahmarun","merahmuda","kuning","kuningemas","oranye","merahkuning"].includes(s.chatMinhaTema)) SETTINGS.chatMinhaTema = s.chatMinhaTema;
     ["bantuanMinhaJudul","bantuanMinhaKet"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 60); });
     ["bantuanWaIkonUrl","bantuanMinhaIkonUrl","bantuanPhIkonUrl"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 600); });
     if(typeof s.tierBatas1 === "number" && s.tierBatas1 > 0) SETTINGS.tierBatas1 = s.tierBatas1;
@@ -18163,7 +18188,7 @@ if ("serviceWorker" in navigator) {
     const root = document.getElementById("md-fabset");
     if(!root) return;
     const $ = id => document.getElementById(id);
-    const TEMA = { biru:"Biru", langit:"Biru Langit", indigo:"Indigo", teal:"Hijau Tosca", ungu:"Ungu", hijau:"Hijau", slate:"Abu Biru", merahkuning:"Merah Kuning" };
+    const TEMA = { biru:"Biru", langit:"Biru Langit", indigo:"Indigo", teal:"Hijau Tosca", ungu:"Ungu", hijau:"Hijau", slate:"Abu Biru", merah:"Merah", merahmarun:"Merah Marun", merahmuda:"Merah Muda", kuning:"Kuning", kuningemas:"Kuning Emas", oranye:"Oranye", merahkuning:"Merah Kuning" };
     const BOT = { ph:{ key:"chatPhTema", nama:"Chat Bot PH", awal:"biru" }, minha:{ key:"chatMinhaTema", nama:"Chat Bot Min Ha", awal:"hijau" } };
     const DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", mhJudul:"Chat Bot Min Ha", mhKet:"Tanya soal pesanan, dibalas bot", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
     const KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", mhJudul:"bantuanMinhaJudul", mhKet:"bantuanMinhaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
@@ -18221,6 +18246,8 @@ if ("serviceWorker" in navigator) {
         muatGambar($(SLOT[k].pv), u);
       });
     }
+    const fabTerkunci = () => { const w = document.getElementById("md-tampilan-lockwrap"); return !w || w.classList.contains("md-locked"); };
+    document.addEventListener("mdlockchange", e => { if(e.detail && e.detail.sectionKey === "tampilan"){ try{ paintUrut(); }catch(err){} } });
     function paintUrut(fokus){
       const urut = urutan(), box = $("fabset-urut"), menuPv = $("fabset-pv-menu");
       box.innerHTML = "";
@@ -18232,7 +18259,7 @@ if ("serviceWorker" in navigator) {
         [[-1, "\u25B2", "Naikkan"], [1, "\u25BC", "Turunkan"]].forEach(([d, ic, aksi]) => {
           const b = document.createElement("button"); b.type = "button"; b.className = "fabset-urut-b"; b.dataset.d = String(d); b.textContent = ic;
           b.setAttribute("aria-label", aksi + " " + judulSaatIni(k));
-          b.disabled = (d < 0 && i === 0) || (d > 0 && i === urut.length - 1);
+          b.disabled = fabTerkunci() || (d < 0 && i === 0) || (d > 0 && i === urut.length - 1);   // terkunci selama Mode Edit Tampilan belum menyala
           b.addEventListener("click", () => geser(k, d));
           row.appendChild(b);
         });
@@ -18262,6 +18289,7 @@ if ("serviceWorker" in navigator) {
 
     /* --- 1. urutan pilihan --- */
     async function geser(k, d){
+      if(fabTerkunci()) return;   // Mode Edit belum dinyalakan
       const u = urutan(), i = u.indexOf(k), j = i + d;
       if(i < 0 || j < 0 || j >= u.length) return;
       [u[i], u[j]] = [u[j], u[i]];
@@ -18538,6 +18566,7 @@ if ("serviceWorker" in navigator) {
     if(keamananEditLock) keamananEditLock.setMode(false);
     if(financeEditLock) financeEditLock.setMode(false);
     if(namacustomerEditLock) namacustomerEditLock.setMode(false);
+    if(hapusEditLock) hapusEditLock.setMode(false);
     renderProdukList();
     renderEkspedisiList();
     resetHapusForm();
@@ -18679,6 +18708,7 @@ if ("serviceWorker" in navigator) {
       btnToggle.hidden = editMode;
       btnSave.hidden = !editMode;
       reapplyMdLock(sectionKey);
+      try{ document.dispatchEvent(new CustomEvent("mdlockchange",{ detail:{ sectionKey, editMode } })); }catch(e){}
     }
     btnToggle.addEventListener("click", ()=>{ setMode(true); if(opts.onEnter) opts.onEnter(); });
     btnSave.addEventListener("click", ()=>{ setMode(false); if(opts.onExit) opts.onExit(); });
@@ -18695,6 +18725,7 @@ if ("serviceWorker" in navigator) {
   const rumusEditLock = setupSectionEditLock("rumus");
   const keamananEditLock = setupSectionEditLock("keamanan");
   const financeEditLock = setupSectionEditLock("finance");
+  const hapusEditLock = setupSectionEditLock("hapus", { onExit: ()=>{ try{ resetHapusForm(); }catch(e){} } });
   const namacustomerEditLock = setupSectionEditLock("namacustomer", {
     onExit: ()=>{ if(window.__mdNamaCancelEdit) window.__mdNamaCancelEdit(); }
   });
@@ -22877,6 +22908,9 @@ if ("serviceWorker" in navigator) {
     #fab-bantuan.fab-kiri .fab-chat, #fab-bantuan.fab-kiri .fab-wa{ left:8px; right:8px; }
     #fab-bantuan.fab-panel-buka .fab-main{ display:none; }
     #fab-bantuan.fab-sembunyi-ketik{ display:none !important; }
+    /* v2.93.20 -- di HP, saat layar "Review" (Penjualan/Grosir atau Custom) sedang terbuka, tombol bantuan mengambang
+       disembunyikan supaya tidak menutupi tombol Unduh/Bagikan/Salin/Kirim. Otomatis muncul lagi di langkah lain. */
+    body:not(.showing-home):not(.showing-rekap):not(.showing-followup):has(.panel.active .wiz-step.active[data-wstep="review"]) #fab-bantuan{ display:none !important; }
   }
 
   /* ===== v2.93.18 -- warna Chat Bot PH (7 pilihan), ikon gambar, keterbacaan lebih baik ===== */
@@ -22894,15 +22928,46 @@ html[data-theme="dark"] .fab-tema-ungu{ --cp-bg:#1a1427; --cp-link:#c3a4f5; }
 html[data-theme="dark"] .fab-tema-hijau{ --cp-bg:#0e1f18; --cp-link:#3ddc9a; }
 .fab-tema-slate{ --cp-head:#455a64; --cp-bg:#eceff1; --cp-link:#37474f; }
 html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
-/* v2.93.20 -- tema Merah Kuning: header & gelembung pesan merah, latar kuning krem lembut, garis aksen kuning emas.
-   --cp-acc = warna aksen kedua; tema lain otomatis transparan supaya tampilannya tidak berubah. */
-[class*="fab-tema-"]{ --cp-acc:transparent; }
+/* v2.93.20 -- tema Merah (Merah, Merah Marun, Merah Muda), Kuning (Kuning, Kuning Emas, Oranye) dan gabungan Merah Kuning.
+   --cp-acc = warna aksen kedua (hanya Merah Kuning yang memakainya, tema lain transparan).
+   --cp-on  = warna teks di atas warna header/gelembung (putih; tema kuning memakai cokelat tua supaya tetap terbaca). */
+[class*="fab-tema-"]{ --cp-acc:transparent; --cp-on:#fff; }
+.fab-tema-merah{ --cp-head:#d32f2f; --cp-bg:#fdecec; --cp-link:#b71c1c; --cp-on:#fff; }
+html[data-theme="dark"] .fab-tema-merah{ --cp-bg:#2a1111; --cp-link:#ff8a80; }
+.fab-tema-merahmarun{ --cp-head:#8b1e2d; --cp-bg:#f8e9eb; --cp-link:#7a1424; --cp-on:#fff; }
+html[data-theme="dark"] .fab-tema-merahmarun{ --cp-bg:#251014; --cp-link:#f0a0aa; }
+.fab-tema-merahmuda{ --cp-head:#d81b60; --cp-bg:#fdeaf1; --cp-link:#ad1457; --cp-on:#fff; }
+html[data-theme="dark"] .fab-tema-merahmuda{ --cp-bg:#2a1220; --cp-link:#ff8fb8; }
+.fab-tema-kuning{ --cp-head:#f4c20d; --cp-bg:#fffbe0; --cp-link:#7a5c00; --cp-on:#3b2a00; }
+html[data-theme="dark"] .fab-tema-kuning{ --cp-bg:#241f08; --cp-link:#ffe066; }
+.fab-tema-kuningemas{ --cp-head:#d99a00; --cp-bg:#fdf3d3; --cp-link:#7a5200; --cp-on:#2b1c00; }
+html[data-theme="dark"] .fab-tema-kuningemas{ --cp-bg:#261c08; --cp-link:#ffcc66; }
+.fab-tema-oranye{ --cp-head:#e65100; --cp-bg:#fff0e1; --cp-link:#bf360c; --cp-on:#fff; }
+html[data-theme="dark"] .fab-tema-oranye{ --cp-bg:#2a1708; --cp-link:#ffab70; }
 .fab-tema-merahkuning{ --cp-head:#c62828; --cp-bg:#fff6d9; --cp-link:#b71c1c; --cp-acc:#ffc107; }
 html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5c; }
 #fab-bantuan .fab-chat .fab-chat-head{ border-bottom:3px solid var(--cp-acc,transparent); }
 #fab-bantuan .fab-chat .fab-chat-foot{ border-top:3px solid var(--cp-acc,transparent); }
+#fab-bantuan .fab-chat .fab-chat-head, #fab-bantuan .fab-chat .fab-chat-head *{ color:var(--cp-on,#fff); }
+#fab-bantuan .fab-chat .fab-msg.saya, #fab-bantuan .fab-chat .fab-chat-foot button{ color:var(--cp-on,#fff); }
+#fab-bantuan .fab-chat .fab-chat-head button:focus-visible{ outline-color:var(--cp-on,#fff); }
 .fabset-sw.fab-tema-merahkuning .fabset-sw-chip::after{ background:var(--cp-acc); }
+.fabset-sw[aria-checked="true"]::after{ color:var(--cp-on,#fff); }
 .fabset-pv-chat .h{ border-bottom:3px solid var(--cp-acc,transparent); }
+.fabset-pv-chat .h, .fabset-pv-chat .m.me{ color:var(--cp-on,#fff); }
+/* v2.93.20 -- perapihan tampilan chat (Min Ha & PH): link bisa diketuk, tombol bot tersusun per baris, pintasan perintah */
+#fab-bantuan .fab-msg a.fab-link{ color:var(--cp-link,#1565c0); text-decoration:underline; overflow-wrap:anywhere; }
+#fab-bantuan .fab-msg.saya a.fab-link{ color:inherit; }
+#fab-bantuan .fab-btns{ flex-direction:column; flex-wrap:nowrap; gap:6px; }
+#fab-bantuan .fab-btnrow{ display:flex; gap:6px; }
+#fab-bantuan .fab-btnrow button{ flex:1 1 0; min-width:0; text-align:center; line-height:1.25; overflow-wrap:anywhere; }
+#fab-bantuan #fab-mh .fab-msg.bot{ max-width:94%; box-shadow:0 1px 2px rgba(0,0,0,.07); }
+#fab-bantuan #fab-mh .fab-msg.saya{ max-width:86%; }
+#fab-bantuan .fab-chips{ display:flex; gap:6px; padding:8px 10px 2px; overflow-x:auto; background:var(--card,#fff); border-top:1px solid var(--line,#d3d6db); scrollbar-width:none; }
+#fab-bantuan .fab-chips::-webkit-scrollbar{ display:none; }
+#fab-bantuan .fab-chips button{ flex:0 0 auto; border:1px solid var(--cp-head,#00845f); background:var(--cp-bg,#e7f5ee); color:var(--cp-link,#00704f); border-radius:999px; padding:6px 12px; font:inherit; font-size:13px; font-weight:600; min-height:34px; cursor:pointer; white-space:nowrap; }
+#fab-bantuan .fab-chips button:hover{ border-color:var(--cp-link,#00704f); }
+#fab-bantuan .fab-chips button:focus-visible{ outline:3px solid var(--cp-head,#00845f); outline-offset:2px; }
 
   /* ikon gambar pada tombol utama */
   #fab-bantuan .fab-main img{ display:block; width:100%; height:100%; border-radius:50%; object-fit:cover; }
@@ -23059,6 +23124,13 @@ html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5
     </div>
     <div class="fab-confirm" id="fab-mh-confirm" hidden><span>Hapus semua pesan di chat Bot Min Ha ini?</span><button type="button" class="fab-no" id="fab-mh-no">Batal</button><button type="button" class="fab-yes" id="fab-mh-yes">Hapus</button></div>
     <div class="fab-chat-body" id="fab-mh-body"></div>
+    <div class="fab-chips" id="fab-mh-chips" role="group" aria-label="Pintasan perintah">
+      <button type="button" data-kirim="/menu">📋 Menu</button>
+      <button type="button" data-kirim="/cek">🔎 Cek</button>
+      <button type="button" data-kirim="/kirim">📤 Kirim</button>
+      <button type="button" data-kirim="/resipending">📦 Resi pending</button>
+      <button type="button" data-kirim="/belum">⏳ Belum konfirmasi</button>
+    </div>
     <div class="fab-chat-foot">
       <textarea id="fab-mh-input" rows="1" placeholder="Ketik pesan atau /menu… (Enter kirim)"></textarea>
       <button type="button" id="fab-mh-send">Kirim</button>
@@ -23100,7 +23172,7 @@ html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5
   let unreadWa = 0;
   let ikonSaatIni = null;   // URL ikon gambar tombol utama yang sedang dipasang
   const bots = [];          // chat bot (PH, Min Ha) -- dibuat lewat buatBot()
-  const TEMA_OK = ["biru","langit","indigo","teal","ungu","hijau","slate","merahkuning"];
+  const TEMA_OK = ["biru","langit","indigo","teal","ungu","hijau","slate","merah","merahmarun","merahmuda","kuning","kuningemas","oranye","merahkuning"];
   const TEKS_DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", mhJudul:"Chat Bot Min Ha", mhKet:"Tanya soal pesanan, dibalas bot", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
   const TEKS_KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", mhJudul:"bantuanMinhaJudul", mhKet:"bantuanMinhaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
   const ITEM = { wa:"fab-item-bantuan", minha:"fab-item-mh", ph:"fab-item-chat" };
@@ -23181,6 +23253,8 @@ html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5
   function fmt(t){ // escape semua, lalu izinkan hanya <b> <i> <code>
     let s = String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     s = s.replace(/&lt;(\/?)(b|i|code)&gt;/gi, "<$1$2>").replace(/\n/g, "<br>");
+    // link http(s) jadi bisa diketuk (teks sudah di-escape di atas; tanda baca di ujung tidak ikut link)
+    s = s.replace(/(https?:\/\/[^\s<"]+)/g, u => { let ekor = ""; const mm = u.match(/[.,;:!?)\]]+$/); if(mm){ ekor = mm[0]; u = u.slice(0, -ekor.length); } return '<a class="fab-link" href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>' + ekor; });
     return s;
   }
   // Render gelembung chat -- dipakai bersama oleh panel Bot PH, Bot Min Ha & panel Bantuan WhatsApp
@@ -23203,22 +23277,27 @@ html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5
       }
       if(m.dari === "bot" && Array.isArray(m.tombol) && m.tombol.length){
         const wrap = document.createElement("div"); wrap.className = "fab-btns";
-        m.tombol.flat().forEach(b => {
-          if(!b || !b.teks) return;
-          const bt = document.createElement("button"); bt.type = "button"; bt.textContent = b.teks;
-          bt.addEventListener("click", () => {
-            if(b.url){ window.open(b.url, "_blank", "noopener"); }
-            else if(b.data && o.callback){ o.callback(String(b.data), b.teks, m.teks); }
-            else if(b.kirim && o.kirimTeks){ o.kirimTeks(String(b.kirim)); }   // tombol keyboard bot: ketuk = kirim teksnya
+        m.tombol.forEach(rowDef => {   // susunan baris tombol dari bot dipertahankan (seperti di Telegram)
+          const arr = (Array.isArray(rowDef) ? rowDef : [rowDef]).filter(b => b && b.teks);
+          if(!arr.length) return;
+          const row = document.createElement("div"); row.className = "fab-btnrow";
+          arr.forEach(b => {
+            const bt = document.createElement("button"); bt.type = "button"; bt.textContent = b.teks;
+            bt.addEventListener("click", () => {
+              if(b.url){ window.open(b.url, "_blank", "noopener"); }
+              else if(b.data && o.callback){ o.callback(String(b.data), b.teks, m.teks); }
+              else if(b.kirim && o.kirimTeks){ o.kirimTeks(String(b.kirim)); }   // tombol keyboard bot: ketuk = kirim teksnya
+            });
+            row.appendChild(bt);
           });
-          wrap.appendChild(bt);
+          wrap.appendChild(row);
         });
         d.appendChild(wrap);
       }
       el.appendChild(d);
     });
     if(o.waiting){
-      const d = document.createElement("div"); d.className = "fab-msg sys"; d.textContent = "Bot sedang mengetik…"; el.appendChild(d);
+      const d = document.createElement("div"); d.className = "fab-msg sys"; d.textContent = (o.nama || "Bot") + " sedang mengetik…"; el.appendChild(d);
     }
     el.scrollTop = el.scrollHeight;
   }
@@ -23254,27 +23333,40 @@ html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5
     const save = () => { try{ localStorage.setItem(o.key, JSON.stringify({ msgs: st.msgs.slice(-200), cursor: st.cursor })); }catch(e){} };
     const setUnread = n => { unread = n; paintNotif(); };
     function render(){
-      renderInto(body, st.msgs, { kosong: o.kosong, waiting, retry, callback: (data, label, asal) => kirim("", data, label, asal), kirimTeks: t => kirim(t) });
+      renderInto(body, st.msgs, { kosong: o.kosong, nama: o.nama, waiting, retry, callback: (data, label, asal) => kirim("", data, label, asal), kirimTeks: t => kirim(t) });
     }
-    function sysNote(t){ // catatan sistem, tidak terus-menerus (maks 1 per 30 dtk)
-      if(Date.now() - lastErrAt < 30000) return; lastErrAt = Date.now();
+    // Pesan galat yang jelas per kode HTTP (sebelumnya cuma "Not found" / "HTTP 404")
+    function pesanGalat(status, j){
+      const asli = j && (j.message || j.error) ? String(j.message || j.error) : "";
+      if(status === 401) return asli || "Kode Akses belum diisi atau salah (menu Kode Akses di footer).";
+      if(status === 404) return "server belum mendukung chat " + (o.nama || "bot") + " (rute tidak ditemukan). Deploy ulang Worker Rincian ke " + (o.minWorker || "versi terbaru") + " atau lebih baru.";
+      if(status === 429) return asli || "terlalu banyak percobaan, coba lagi beberapa menit lagi.";
+      if(status >= 500) return (asli || "server bermasalah") + " (HTTP " + status + ")";
+      return asli || ("HTTP " + status);
+    }
+    function sysNote(t, paksa){ // catatan sistem, tidak terus-menerus (maks 1 per 30 dtk) kecuali dipaksa
+      if(!paksa && Date.now() - lastErrAt < 30000) return; lastErrAt = Date.now();
       st.msgs.push({ dari: "sys", teks: t, waktu: new Date().toISOString() }); save(); render();
     }
     async function kirimKeServer(m){
-      const res = await fetch(base() + o.urlKirim, {
-        method: "POST",
-        headers: workerHeaders({ "Content-Type": "application/json" }),
-        body: JSON.stringify({ senderId: sid(), pesan: m.callback ? "" : m.teks, callback: m.callback || "", idPesan: m.idLokal, asal: m.asal || "" })
-      });
+      if(!base()) throw new Error("alamat Worker belum diisi di app.");
+      let res;
+      try{
+        res = await fetch(base() + o.urlKirim, {
+          method: "POST",
+          headers: workerHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ senderId: sid(), pesan: m.callback ? "" : m.teks, callback: m.callback || "", idPesan: m.idLokal, asal: m.asal || "" })
+        });
+      }catch(err){ throw new Error("tidak bisa terhubung ke server, cek koneksi internet."); }
       const j = await res.json().catch(() => null);
       if(!res.ok || !j || j.ok === false){
-        const e = new Error((j && j.error) || ("HTTP " + res.status)); e.status = res.status; throw e;
+        const e = new Error(pesanGalat(res.status, j)); e.status = res.status; throw e;
       }
     }
     async function kirim(teksPesan, callback, labelTombol, asal){
       teksPesan = String(teksPesan || "").trim();
       if(!teksPesan && !callback) return;
-      if(!sid()){ sysNote("Isi dulu “ID Telegram Saya” (menu Kode Akses di footer) supaya bot tahu ini kamu."); return; }
+      if(!sid()){ sysNote("Isi dulu “ID Telegram Saya” (menu Kode Akses di footer) supaya bot tahu ini kamu.", true); return; }
       const m = { dari: "saya", teks: teksPesan || labelTombol || "", callback: callback || "", asal: String(asal || "").slice(0, 1000), idLokal: "w" + Date.now() + Math.random().toString(36).slice(2, 6), waktu: new Date().toISOString(), status: "mengirim" };
       st.msgs.push(m); save(); render();
       await coba(m);
@@ -23305,11 +23397,11 @@ html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5
             });
             waiting = false; save(); render();
             if(panel.hidden) setUnread(unread + baru.length);
-          } else if(waiting && Date.now() > waitUntil){ waiting = false; render(); }
+          } else if(waiting && Date.now() > waitUntil){ waiting = false; render(); sysNote(o.tanpaBalasan || "Bot belum membalas pesan ini.", true); }
           if(j.cursor != null && !baru.length){ st.cursor = String(j.cursor); }
         } else if(waiting && Date.now() > waitUntil){
           waiting = false; render();
-          sysNote("Bot belum membalas: " + ((j && j.error) || ("HTTP " + res.status)));
+          sysNote("Bot belum membalas: " + pesanGalat(res.status, j));
         }
       }catch(e){ /* jaringan putus: coba lagi di putaran berikut */ }
       polling = false;
@@ -23353,6 +23445,8 @@ html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5
     sendBtn.addEventListener("click", doSend);
     input.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); doSend(); } });
     input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 90) + "px"; });
+    const chips = $(o.pfx + "-chips");   // tombol pintasan perintah (bila ada di panel)
+    if(chips) chips.querySelectorAll("button[data-kirim]").forEach(b => b.addEventListener("click", () => kirim(b.dataset.kirim)));
     $(o.item).addEventListener("click", open);
     const api = { panel, open, close, render, startTimer, stopTimer, unread: () => unread };
     bots.push(api);
@@ -23360,9 +23454,11 @@ html[data-theme="dark"] .fab-tema-merahkuning{ --cp-bg:#241b0a; --cp-link:#ffcf5
   }
   // urutan penting: bots[0] = PH, bots[1] = Min Ha (dipakai paintNotif)
   buatBot({ panel: "fab-chat", pfx: "fab-chat", item: "fab-item-chat", key: "habit_chat_ph_v1", urlKirim: "/logistik/chat/kirim", urlAmbil: "/logistik/chat/ambil", urlHapus: "/logistik/chat/hapus",
+    nama: "Bot PH", minWorker: "v500", tanpaBalasan: "Bot PH belum membalas pesan ini. Coba ketik /menu.",
     kosong: "Halo! Ketik pesan atau perintah (mis. /menu) untuk chat dengan bot PH (Logistik)." });
   buatBot({ panel: "fab-mh", pfx: "fab-mh", item: "fab-item-mh", key: "habit_chat_minha_v1", urlKirim: "/minha/chat/kirim", urlAmbil: "/minha/chat/ambil", urlHapus: "/minha/chat/hapus",
-    kosong: "Halo! Ketik pesan atau perintah (mis. /menu) untuk chat dengan bot Min Ha (Rincian Pemesanan)." });
+    nama: "Min Ha", minWorker: "v504", tanpaBalasan: "Min Ha tidak membalas pesan ini. Bot hanya menanggapi perintah (/menu, /cek, /kirim) atau nama customer; sapaan biasa seperti “halo” tidak dibalas.",
+    kosong: "Halo! Ketik perintah atau nama customer, mis. /menu, /cek, /kirim, atau “budi malang” untuk cek status pembayaran. Sapaan biasa seperti “halo” tidak dibalas bot. Bisa juga ketuk tombol pintasan di bawah." });
 
   /* ---------- Bantuan WhatsApp (panel tulis pesan -> diteruskan ke WhatsApp) ---------- */
   function waTujuan(teksPesan){
