@@ -6265,6 +6265,71 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
         <div class="md-pin-err" id="md-bantuan-err"></div>
         <button class="md-btn primary" id="md-bantuan-save">Simpan link Bantuan</button>
       </div>
+      <div class="md-card fabset" id="md-fabset">
+        <h3>Tampilan Tombol Bantuan &amp; Chat</h3>
+        <div class="fabset-hint">Atur warna Chat Bot PH, ikon tombol, dan tulisan tiap pilihan. Pratinjau di bawah langsung ikut berubah. Pengaturan tersimpan ke server, jadi sama di semua perangkat.</div>
+        <div class="fabset-pv fab-tema-biru" id="fabset-pv">
+          <div class="fabset-pv-col">
+            <div class="fabset-pv-lbl">Pratinjau menu</div>
+            <div class="fabset-pv-menu">
+              <div class="fabset-pv-row wa"><span class="fabset-pv-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2.9-1.2 1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1" fill="currentColor"/></svg></span><span class="fabset-pv-tx"><b id="fabset-pv-wa-t"></b><small id="fabset-pv-wa-k"></small></span></div>
+              <div class="fabset-pv-row chat"><span class="fabset-pv-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><span class="fabset-pv-tx"><b id="fabset-pv-chat-t"></b><small id="fabset-pv-chat-k"></small></span></div>
+            </div>
+            <div class="fabset-pv-fab" id="fabset-pv-fab"><svg id="fabset-pv-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M19 19c0 1.5-1.5 2.5-4 2.5h-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><img id="fabset-pv-img" alt="" hidden referrerpolicy="no-referrer" draggable="false"></div>
+          </div>
+          <div class="fabset-pv-col">
+            <div class="fabset-pv-lbl">Pratinjau Chat Bot PH</div>
+            <div class="fabset-pv-chat">
+              <div class="h" id="fabset-pv-chat-h"></div>
+              <div class="b"><div class="m bot">Halo! Ada yang bisa dibantu?</div><div class="m me">Cek ongkir ke Surabaya</div><div class="m bot">Baik, sebutkan berat barangnya ya.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fabset-h">1. Warna latar Chat Bot PH</div>
+        <div class="fabset-hint">Ketuk satu warna. Berlaku untuk header, gelembung pesan, dan latar chat Bot PH (otomatis menyesuaikan mode gelap).</div>
+        <div class="fabset-swatches" role="radiogroup" aria-label="Warna latar Chat Bot PH">
+            <button type="button" class="fabset-sw fab-tema-biru" role="radio" aria-checked="false" data-tema="biru" aria-label="Warna Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru</span></button>
+            <button type="button" class="fabset-sw fab-tema-langit" role="radio" aria-checked="false" data-tema="langit" aria-label="Warna Biru Langit"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru Langit</span></button>
+            <button type="button" class="fabset-sw fab-tema-indigo" role="radio" aria-checked="false" data-tema="indigo" aria-label="Warna Indigo"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Indigo</span></button>
+            <button type="button" class="fabset-sw fab-tema-teal" role="radio" aria-checked="false" data-tema="teal" aria-label="Warna Hijau Tosca"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau Tosca</span></button>
+            <button type="button" class="fabset-sw fab-tema-ungu" role="radio" aria-checked="false" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
+            <button type="button" class="fabset-sw fab-tema-hijau" role="radio" aria-checked="false" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
+            <button type="button" class="fabset-sw fab-tema-slate" role="radio" aria-checked="false" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
+        </div>
+
+        <div class="fabset-h">2. Ikon tombol chat</div>
+        <div class="fabset-hint">Tempel link gambar (diawali https:// dan bisa dibuka tanpa login, mis. berakhiran .png / .jpg / .webp). Gambar akan ditampilkan bulat. Lebih bagus memakai gambar persegi.</div>
+        <label class="fabset-l" for="fabset-ikon-url">Link gambar</label>
+        <input type="url" inputmode="url" id="fabset-ikon-url" placeholder="https://contoh.com/logo.png" autocomplete="off" maxlength="600">
+        <div class="fabset-err" id="fabset-ikon-msg" role="status" aria-live="polite"></div>
+        <div class="fabset-actions">
+          <button type="button" class="md-btn primary" id="fabset-ikon-save">Simpan ikon</button>
+          <button type="button" class="md-btn" id="fabset-ikon-reset">Pakai ikon bawaan</button>
+        </div>
+
+        <div class="fabset-h">3. Tulisan tiap pilihan</div>
+        <div class="fabset-hint">Ganti judul dan keterangan di bawahnya, mis. &ldquo;Bantuan WhatsApp&rdquo; jadi &ldquo;WhatsApp Petugas&rdquo;. Dikosongkan = memakai tulisan bawaan.</div>
+        <div class="fabset-group">
+          <div class="fabset-group-t">Pilihan 1 &middot; WhatsApp</div>
+          <div class="fabset-grid2">
+            <div><label class="fabset-l" for="fabset-in-wa-t">Judul (maks. 30 huruf)</label><input type="text" id="fabset-in-wa-t" maxlength="30" placeholder="Bantuan WhatsApp" autocomplete="off"></div>
+            <div><label class="fabset-l" for="fabset-in-wa-k">Keterangan (maks. 50 huruf)</label><input type="text" id="fabset-in-wa-k" maxlength="50" placeholder="Tulis pesan, diteruskan ke WhatsApp" autocomplete="off"></div>
+          </div>
+        </div>
+        <div class="fabset-group">
+          <div class="fabset-group-t">Pilihan 2 &middot; Chat Bot PH</div>
+          <div class="fabset-grid2">
+            <div><label class="fabset-l" for="fabset-in-chat-t">Judul (maks. 30 huruf)</label><input type="text" id="fabset-in-chat-t" maxlength="30" placeholder="Chat Bot PH (Logistik)" autocomplete="off"></div>
+            <div><label class="fabset-l" for="fabset-in-chat-k">Keterangan (maks. 50 huruf)</label><input type="text" id="fabset-in-chat-k" maxlength="50" placeholder="Tanya langsung, dibalas bot" autocomplete="off"></div>
+          </div>
+        </div>
+        <div class="fabset-err" id="fabset-teks-msg" role="status" aria-live="polite"></div>
+        <div class="fabset-actions">
+          <button type="button" class="md-btn primary" id="fabset-teks-save">Simpan tulisan</button>
+          <button type="button" class="md-btn" id="fabset-teks-reset">Kembalikan tulisan bawaan</button>
+        </div>
+      </div>
       <div class="md-card">
         <h3>Bot Telegram</h3>
         <div class="md-togglerow">
@@ -6975,7 +7040,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.17 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.18 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Warna latar Chat Bot PH bisa dipilih</b> &mdash; 7 warna seirama (Biru, Biru Langit, Indigo, Hijau Tosca, Ungu, Hijau, Abu Biru) di Master Data &rarr; Tampilan &rarr; Tampilan Tombol Bantuan &amp; Chat. Bawaan: Biru. Mengubah header, gelembung pesan, dan latar chat; otomatis menyesuaikan mode gelap.</li>
+            <li><b>Ikon tombol chat bisa diganti gambar</b> &mdash; tempel link gambar (https). Dicek dulu sebelum disimpan; kalau gambar gagal dimuat, otomatis kembali ke ikon bawaan.</li>
+            <li><b>Tulisan tiap pilihan bisa diubah</b> &mdash; judul dan keterangan di bawahnya (mis. &ldquo;Bantuan WhatsApp&rdquo; jadi &ldquo;WhatsApp Petugas&rdquo;). Judul yang sama dipakai di header panel.</li>
+            <li><b>Tampilan lebih ramah &amp; mudah dibaca</b> &mdash; menu dan huruf chat lebih besar, jarak lebih lega, kontras lebih jelas, area ketuk lebih luas, fokus keyboard terlihat, kolom ketik di HP 16px (tidak zoom sendiri), plus pratinjau langsung di Master Data. Hanya index.html.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.17</div>
           <ul>
             <li><b>Tombol Bantuan mengambang: notifikasi lebih jelas</b> — angka balasan baru kini muncul di tombol utama <i>dan</i> di pilihan yang bersangkutan (beserta keterangan "N balasan baru dari bot"), jadi tidak ambigu asalnya dari Bantuan atau Chat Bot PH.</li>
             <li><b>Bantuan WhatsApp di dalam panel</b> — tombol Bantuan kini membuka panel chat ("Tulis pesanmu di sini"). Pesan yang ditulis diteruskan ke WhatsApp lewat link Bantuan; jawaban admin datang di WhatsApp (WhatsApp tidak mengizinkan balasan masuk kembali ke panel tanpa layanan API resmi).</li>
@@ -8641,7 +8715,7 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", bantuanMengambangEnabled:true, bantuanHpEnabled:false, bantuanHpPosisi:"kanan", bantuanHpNaik:84, tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, unpaidTickerEnabled:true, unpaidTickerSpeed:50, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, invoicePengingatEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", bantuanMengambangEnabled:true, bantuanHpEnabled:false, bantuanHpPosisi:"kanan", bantuanHpNaik:84, chatPhTema:"biru", bantuanIkonUrl:"", bantuanWaJudul:"", bantuanWaKet:"", bantuanChatJudul:"", bantuanChatKet:"", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, unpaidTickerEnabled:true, unpaidTickerSpeed:50, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, invoicePengingatEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -8654,6 +8728,10 @@ function loadSettings(){
     if(typeof s.bantuanHpEnabled === "boolean") SETTINGS.bantuanHpEnabled = s.bantuanHpEnabled;
     if(s.bantuanHpPosisi === "kiri" || s.bantuanHpPosisi === "kanan") SETTINGS.bantuanHpPosisi = s.bantuanHpPosisi;
     if(typeof s.bantuanHpNaik === "number" && s.bantuanHpNaik >= 0 && s.bantuanHpNaik <= 400) SETTINGS.bantuanHpNaik = s.bantuanHpNaik;
+    // v2.93.18 -- warna Chat Bot PH, ikon tombol dari link gambar, teks tiap pilihan
+    if(["biru","langit","indigo","teal","ungu","hijau","slate"].includes(s.chatPhTema)) SETTINGS.chatPhTema = s.chatPhTema;
+    if(typeof s.bantuanIkonUrl === "string") SETTINGS.bantuanIkonUrl = s.bantuanIkonUrl.trim().slice(0, 600);
+    ["bantuanWaJudul","bantuanWaKet","bantuanChatJudul","bantuanChatKet"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 60); });
     if(typeof s.tierBatas1 === "number" && s.tierBatas1 > 0) SETTINGS.tierBatas1 = s.tierBatas1;
     if(typeof s.tierBatas2 === "number" && s.tierBatas2 > SETTINGS.tierBatas1) SETTINGS.tierBatas2 = s.tierBatas2;
     if(typeof s.telegramBotEnabled === "boolean") SETTINGS.telegramBotEnabled = s.telegramBotEnabled;
@@ -8716,6 +8794,7 @@ function applySettingsToDom(){
   const helpBtn = document.getElementById("home-help-btn");
   if(helpBtn) helpBtn.href = SETTINGS.bantuanLink;
   if(window.__syncFabBantuan) window.__syncFabBantuan(); // v2.93.16 -- tombol Bantuan mengambang (web)
+  if(window.__fabsetRefresh) window.__fabsetRefresh();    // v2.93.18 -- pratinjau di Master Data ikut diperbarui
   document.body.classList.toggle("sticky-form-btns-off", !SETTINGS.stickyFormButtonsEnabled);
   document.body.classList.toggle("custom-blue-theme", !!SETTINGS.customBlueThemeEnabled);
   // BARU -- toggle menu sidebar "Rekap Pesanan" (habit-rekap-hidden, beda
@@ -18001,6 +18080,117 @@ if ("serviceWorker" in navigator) {
     await confirmMasterDataSave("Link Bantuan disimpan.");
   });
 
+  /* ---------- Tampilan Tombol Bantuan & Chat: warna Chat Bot PH, ikon gambar, tulisan pilihan (v2.93.18) ---------- */
+  (function(){
+    const root = document.getElementById("md-fabset");
+    if(!root) return;
+    const $ = id => document.getElementById(id);
+    const TEMA = { biru:"Biru", langit:"Biru Langit", indigo:"Indigo", teal:"Hijau Tosca", ungu:"Ungu", hijau:"Hijau", slate:"Abu Biru" };
+    const DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
+    const KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
+    const IN = { waJudul:$("fabset-in-wa-t"), waKet:$("fabset-in-wa-k"), chatJudul:$("fabset-in-chat-t"), chatKet:$("fabset-in-chat-k") };
+    const PV = { waJudul:$("fabset-pv-wa-t"), waKet:$("fabset-pv-wa-k"), chatJudul:$("fabset-pv-chat-t"), chatKet:$("fabset-pv-chat-k") };
+    const swatches = Array.from(root.querySelectorAll(".fabset-sw"));
+    const clean = v => String(v == null ? "" : v).replace(/\s+/g, " ").trim();
+    const maks = k => k.endsWith("Ket") ? 50 : 30;
+    const amanUrl = v => { v = clean(v); return (v.length <= 600 && /^https:\/\/[^\s"'<>]+$/i.test(v)) ? v : ""; };
+    const tema = () => TEMA[SETTINGS.chatPhTema] ? SETTINGS.chatPhTema : "biru";
+    const nilai = k => clean(IN[k].value).slice(0, maks(k));
+    const pesan = (el, t, ok) => { el.textContent = t; el.classList.toggle("fabset-ok", !!ok); };
+
+    function paintTema(){
+      const t = tema(), pv = $("fabset-pv");
+      Object.keys(TEMA).forEach(x => pv.classList.toggle("fab-tema-" + x, x === t));
+      swatches.forEach(b => { const on = b.dataset.tema === t; b.setAttribute("aria-checked", on ? "true" : "false"); b.tabIndex = on ? 0 : -1; });
+    }
+    function paintTeks(){
+      Object.keys(PV).forEach(k => { PV[k].textContent = nilai(k) || DEF[k]; });
+      $("fabset-pv-chat-h").textContent = nilai("chatJudul") || DEF.chatJudul;
+    }
+    let pvIkon = null;
+    function paintIkon(u){
+      if(u === pvIkon) return; pvIkon = u;
+      const fab = $("fabset-pv-fab"), im = $("fabset-pv-img"), sv = $("fabset-pv-svg");
+      if(!u){ im.hidden = true; im.removeAttribute("src"); sv.style.display = ""; fab.classList.remove("gambar"); return; }
+      im.onload = () => { if(pvIkon === u){ im.hidden = false; sv.style.display = "none"; fab.classList.add("gambar"); } };
+      im.onerror = () => { if(pvIkon === u){ im.hidden = true; sv.style.display = ""; fab.classList.remove("gambar"); } };
+      im.src = u;
+    }
+    function render(isiKolom){
+      paintTema();
+      if(isiKolom){
+        Object.keys(IN).forEach(k => { IN[k].value = clean(SETTINGS[KEY[k]]).slice(0, maks(k)); });
+        $("fabset-ikon-url").value = amanUrl(SETTINGS.bantuanIkonUrl);
+      }
+      paintTeks();
+      paintIkon(amanUrl(SETTINGS.bantuanIkonUrl));
+    }
+    // dipanggil applySettingsToDom (mis. setelah pengaturan server ditarik) -- jangan timpa kolom yang sedang diketik
+    window.__fabsetRefresh = function(){ const a = document.activeElement; render(!(a && root.contains(a))); };
+
+    /* --- 1. warna --- */
+    async function pilihTema(t){
+      if(!TEMA[t] || t === tema()) return;
+      SETTINGS.chatPhTema = t; saveSettings(); applySettingsToDom(); render(false);
+      await confirmMasterDataSave("Warna Chat Bot PH: " + TEMA[t] + ".");
+    }
+    swatches.forEach((b, i) => {
+      b.addEventListener("click", () => pilihTema(b.dataset.tema));
+      b.addEventListener("keydown", e => {
+        let d = 0;
+        if(e.key === "ArrowRight" || e.key === "ArrowDown") d = 1; else if(e.key === "ArrowLeft" || e.key === "ArrowUp") d = -1; else return;
+        e.preventDefault();
+        const n = swatches[(i + d + swatches.length) % swatches.length];
+        n.focus(); pilihTema(n.dataset.tema);
+      });
+    });
+
+    /* --- 2. ikon dari link gambar --- */
+    function cobaGambar(u){
+      return new Promise(res => {
+        let tm = null, selesai = false;
+        const fin = r => { if(selesai) return; selesai = true; clearTimeout(tm); res(r); };
+        const im = new Image(); im.referrerPolicy = "no-referrer";
+        im.onload = () => fin(true); im.onerror = () => fin(false);
+        tm = setTimeout(() => fin(false), 10000);
+        im.src = u;
+      });
+    }
+    $("fabset-ikon-save").addEventListener("click", async () => {
+      const m = $("fabset-ikon-msg"), raw = clean($("fabset-ikon-url").value);
+      if(!raw){ pesan(m, "Isi link gambar dulu, atau tekan “Pakai ikon bawaan”."); return; }
+      const u = amanUrl(raw);
+      if(!u){ pesan(m, "Link harus diawali https:// dan tidak boleh ada spasi."); return; }
+      pesan(m, "Memeriksa gambar…", true);
+      if(!(await cobaGambar(u))){ pesan(m, "Gambar tidak bisa dimuat. Pastikan link langsung ke file gambar (.png / .jpg / .webp) dan bisa dibuka tanpa login."); return; }
+      SETTINGS.bantuanIkonUrl = u; saveSettings(); applySettingsToDom(); render(false);
+      pesan(m, "✓ Tersimpan — ikon tombol sudah diganti.", true);
+      await confirmMasterDataSave("Ikon tombol Bantuan diganti.");
+    });
+    $("fabset-ikon-reset").addEventListener("click", async () => {
+      SETTINGS.bantuanIkonUrl = ""; $("fabset-ikon-url").value = ""; saveSettings(); applySettingsToDom(); render(false);
+      pesan($("fabset-ikon-msg"), "✓ Kembali memakai ikon bawaan.", true);
+      await confirmMasterDataSave("Ikon tombol Bantuan dikembalikan ke bawaan.");
+    });
+
+    /* --- 3. tulisan tiap pilihan --- */
+    Object.keys(IN).forEach(k => IN[k].addEventListener("input", paintTeks));
+    $("fabset-teks-save").addEventListener("click", async () => {
+      Object.keys(IN).forEach(k => { const v = nilai(k); SETTINGS[KEY[k]] = (v === DEF[k]) ? "" : v; });
+      saveSettings(); applySettingsToDom(); render(true);
+      pesan($("fabset-teks-msg"), "✓ Tersimpan — tulisan pilihan sudah diganti.", true);
+      await confirmMasterDataSave("Tulisan pilihan tombol Bantuan disimpan.");
+    });
+    $("fabset-teks-reset").addEventListener("click", async () => {
+      Object.keys(KEY).forEach(k => { SETTINGS[KEY[k]] = ""; });
+      saveSettings(); applySettingsToDom(); render(true);
+      pesan($("fabset-teks-msg"), "✓ Kembali memakai tulisan bawaan.", true);
+      await confirmMasterDataSave("Tulisan pilihan dikembalikan ke bawaan.");
+    });
+
+    render(true);
+  })();
+
   /* ---------- batas tier diskon Grosir (Rumus) ---------- */
   const tierBatas1Input = document.getElementById("md-tier-batas1");
   const tierBatas2Input = document.getElementById("md-tier-batas2");
@@ -22514,11 +22704,116 @@ if ("serviceWorker" in navigator) {
     #fab-bantuan.fab-panel-buka .fab-main{ display:none; }
     #fab-bantuan.fab-sembunyi-ketik{ display:none !important; }
   }
+
+  /* ===== v2.93.18 -- warna Chat Bot PH (7 pilihan), ikon gambar, keterbacaan lebih baik ===== */
+.fab-tema-biru{ --cp-head:#1976d2; --cp-bg:#eaf3fc; --cp-link:#1565c0; }
+html[data-theme="dark"] .fab-tema-biru{ --cp-bg:#0f1b29; --cp-link:#6ab5ff; }
+.fab-tema-langit{ --cp-head:#0277bd; --cp-bg:#e5f4fb; --cp-link:#01579b; }
+html[data-theme="dark"] .fab-tema-langit{ --cp-bg:#0c1d28; --cp-link:#5cc3f5; }
+.fab-tema-indigo{ --cp-head:#3f51b5; --cp-bg:#eceefa; --cp-link:#303f9f; }
+html[data-theme="dark"] .fab-tema-indigo{ --cp-bg:#14172b; --cp-link:#9fa8f0; }
+.fab-tema-teal{ --cp-head:#00796b; --cp-bg:#e2f3f0; --cp-link:#00695c; }
+html[data-theme="dark"] .fab-tema-teal{ --cp-bg:#0d1f1d; --cp-link:#4fd1c0; }
+.fab-tema-ungu{ --cp-head:#7b4fc4; --cp-bg:#f1ebfa; --cp-link:#6a3fb3; }
+html[data-theme="dark"] .fab-tema-ungu{ --cp-bg:#1a1427; --cp-link:#c3a4f5; }
+.fab-tema-hijau{ --cp-head:#00845f; --cp-bg:#e7f5ee; --cp-link:#00704f; }
+html[data-theme="dark"] .fab-tema-hijau{ --cp-bg:#0e1f18; --cp-link:#3ddc9a; }
+.fab-tema-slate{ --cp-head:#455a64; --cp-bg:#eceff1; --cp-link:#37474f; }
+html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
+
+  /* ikon gambar pada tombol utama */
+  #fab-bantuan .fab-main img{ display:block; width:100%; height:100%; border-radius:50%; object-fit:cover; }
+  #fab-bantuan .fab-main img[hidden]{ display:none; }
+  #fab-bantuan .fab-main.fab-ikon-gambar{ background:#fff; box-shadow:0 6px 18px rgba(0,0,0,.28), 0 0 0 2px #fff; }
+  /* fokus keyboard yang jelas */
+  #fab-bantuan .fab-main:focus-visible, #fab-bantuan .fab-item:focus-visible, #fab-bantuan .fab-chat-head button:focus-visible,
+  #fab-bantuan .fab-chat-foot button:focus-visible, #fab-bantuan .fab-btns button:focus-visible{ outline:3px solid var(--cp-head,#1976d2); outline-offset:2px; }
+  #fab-bantuan .fab-chat-head button:focus-visible{ outline-color:#fff; outline-offset:0; }
+  /* menu pilihan: lebih besar, lega, mudah diketuk */
+  #fab-bantuan .fab-menu{ width:min(320px, calc(100vw - 28px)); padding:8px; border-radius:16px; }
+  #fab-bantuan .fab-item{ gap:14px; padding:12px; min-height:64px; border-radius:12px; }
+  #fab-bantuan .fab-item + .fab-item{ margin-top:2px; }
+  #fab-bantuan .fab-item-ic{ flex:0 0 44px; height:44px; border-radius:12px; }
+  #fab-bantuan .fab-item-ic svg{ width:24px; height:24px; }
+  #fab-bantuan .fab-item b{ font-size:15px; line-height:1.3; overflow-wrap:anywhere; }
+  #fab-bantuan .fab-item small{ font-size:13px; line-height:1.4; margin-top:2px; overflow-wrap:anywhere; }
+  #fab-bantuan #fab-item-chat .fab-item-ic{ background:var(--cp-bg,#eaf3fc); color:var(--cp-link,#1565c0); }
+  #fab-bantuan #fab-item-chat:hover{ background:var(--cp-bg,#eaf3fc); }
+  /* panel chat: huruf lebih besar, jarak lega, kontras jelas */
+  #fab-bantuan .fab-chat-head{ padding:14px 16px; }
+  #fab-bantuan .fab-chat-head b{ font-size:15.5px; line-height:1.3; overflow-wrap:anywhere; }
+  #fab-bantuan .fab-chat-head small{ font-size:12.5px; opacity:.95; margin-top:2px; }
+  #fab-bantuan .fab-chat .fab-chat-head{ background:var(--cp-head,#1976d2); }
+  #fab-bantuan .fab-chat .fab-chat-body{ background:var(--cp-bg,#eaf3fc); }
+  #fab-bantuan .fab-chat-body{ padding:14px; gap:10px; }
+  #fab-bantuan .fab-msg{ font-size:14.5px; line-height:1.5; padding:9px 13px; max-width:88%; }
+  #fab-bantuan .fab-msg.sys{ font-size:12.5px; }
+  #fab-bantuan .fab-chat .fab-msg.saya{ background:var(--cp-head,#1976d2); }
+  #fab-bantuan .fab-chat .fab-btns button{ border-color:var(--cp-head,#1976d2); color:var(--cp-link,#1565c0); background:var(--card,#fff); font-size:13.5px; padding:7px 12px; min-height:36px; }
+  #fab-bantuan .fab-chat .fab-btns button:hover{ background:var(--cp-bg,#eaf3fc); }
+  #fab-bantuan .fab-chat .fab-chat-foot button{ background:var(--cp-head,#1976d2); }
+  #fab-bantuan .fab-chat-foot textarea{ font-size:14.5px; min-height:42px; }
+  #fab-bantuan .fab-chat-foot textarea:focus-visible{ outline:2px solid var(--cp-head,#1976d2); outline-offset:0; }
+  #fab-bantuan .fab-chat-foot button{ height:42px; min-width:68px; font-size:14px; }
+  @media (max-width:900px){
+    #fab-bantuan .fab-chat-foot textarea{ font-size:16px; }   /* 16px: cegah layar HP otomatis zoom saat mengetik */
+  }
+
+  /* ---- Master Data > Tampilan > "Tampilan Tombol Bantuan & Chat" ---- */
+  .fabset .fabset-h{ font-size:15px; font-weight:700; margin:24px 0 4px; color:var(--ink); }
+  .fabset .fabset-hint{ font-size:13px; color:var(--ink-soft); line-height:1.5; margin-bottom:10px; }
+  .fabset label.fabset-l{ display:block; font-size:13px; font-weight:600; color:var(--ink); margin:12px 0 5px; }
+  .fabset input[type=text], .fabset input[type=url]{ width:100%; max-width:none; height:46px; border:1px solid var(--line); border-radius:10px; padding:0 12px; font-size:16px; font-family:inherit; background:var(--card); color:var(--ink); }
+  .fabset input::placeholder{ color:var(--ink-soft); opacity:.75; }
+  .fabset input:focus-visible{ outline:2px solid var(--primary-green); outline-offset:1px; }
+  .fabset-err{ font-size:13px; line-height:1.4; color:var(--danger-red); min-height:18px; margin-top:8px; }
+  .fabset-err.fabset-ok{ color:var(--primary-green); }
+  .fabset-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .fabset-actions .md-btn{ margin:0; height:44px; font-size:14px; }
+  .fabset-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:0 14px; }
+  .fabset-group{ border:1px solid var(--line); border-radius:12px; padding:2px 14px 14px; margin-top:10px; background:var(--card); }
+  .fabset-group-t{ font-size:13px; font-weight:700; color:var(--ink-soft); margin-top:12px; }
+  .fabset-swatches{ display:grid; grid-template-columns:repeat(auto-fill, minmax(112px, 1fr)); gap:12px; margin-top:6px; }
+  .fabset-sw{ position:relative; display:flex; flex-direction:column; gap:8px; padding:8px; border:2px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); cursor:pointer; font:inherit; text-align:left; }
+  .fabset-sw:hover{ border-color:var(--cp-head); }
+  .fabset-sw:focus-visible{ outline:3px solid var(--cp-head); outline-offset:2px; }
+  .fabset-sw[aria-checked="true"]{ border-color:var(--cp-head); box-shadow:0 0 0 1px var(--cp-head); }
+  .fabset-sw[aria-checked="true"]::after{ content:"\2713"; position:absolute; top:-9px; right:-9px; width:24px; height:24px; border-radius:50%; background:var(--cp-head); color:#fff; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .fabset-sw-chip{ position:relative; display:block; height:44px; border-radius:8px; background:var(--cp-bg); border:1px solid rgba(127,127,127,.25); overflow:hidden; }
+  .fabset-sw-chip::before{ content:""; position:absolute; left:0; right:0; top:0; height:12px; background:var(--cp-head); }
+  .fabset-sw-chip::after{ content:""; position:absolute; right:6px; bottom:6px; width:54%; height:14px; border-radius:7px; background:var(--cp-head); }
+  .fabset-sw-name{ font-size:13.5px; font-weight:600; line-height:1.2; }
+  .fabset-pv{ display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start; padding:14px; border:1px solid var(--line); border-radius:14px; background:var(--paper-dark); }
+  .fabset-pv-col{ flex:1 1 250px; min-width:0; }
+  .fabset-pv-lbl{ font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:8px; }
+  .fabset-pv-menu{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:6px; box-shadow:0 4px 14px rgba(0,0,0,.10); }
+  .fabset-pv-row{ display:flex; gap:12px; align-items:center; padding:10px; border-radius:10px; }
+  .fabset-pv-ic{ flex:0 0 40px; height:40px; border-radius:11px; background:rgba(0,132,95,.12); color:var(--primary-green); display:flex; align-items:center; justify-content:center; }
+  .fabset-pv-ic svg{ width:22px; height:22px; }
+  .fabset-pv-row.chat .fabset-pv-ic{ background:var(--cp-bg); color:var(--cp-link); }
+  .fabset-pv-tx{ min-width:0; flex:1; }
+  .fabset-pv-tx b{ display:block; font-size:14.5px; line-height:1.3; overflow-wrap:anywhere; }
+  .fabset-pv-tx small{ display:block; font-size:12.5px; color:var(--ink-soft); line-height:1.4; margin-top:1px; overflow-wrap:anywhere; }
+  .fabset-pv-fab{ width:52px; height:52px; border-radius:50%; background:var(--primary-green); color:#fff; display:flex; align-items:center; justify-content:center; margin:12px 4px 0 auto; box-shadow:0 5px 14px rgba(0,0,0,.25); overflow:hidden; }
+  .fabset-pv-fab svg{ width:24px; height:24px; }
+  .fabset-pv-fab img{ display:block; width:100%; height:100%; object-fit:cover; }
+  .fabset-pv-fab img[hidden]{ display:none; }
+  .fabset-pv-fab.gambar{ background:#fff; }
+  .fabset-pv-chat{ border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--cp-bg); }
+  .fabset-pv-chat .h{ background:var(--cp-head); color:#fff; padding:12px 14px; font-size:14.5px; font-weight:700; line-height:1.3; overflow-wrap:anywhere; }
+  .fabset-pv-chat .b{ padding:12px; display:flex; flex-direction:column; gap:8px; }
+  .fabset-pv-chat .m{ max-width:88%; padding:8px 12px; border-radius:12px; font-size:13.5px; line-height:1.45; }
+  .fabset-pv-chat .m.bot{ align-self:flex-start; background:var(--card); border:1px solid var(--line); color:var(--ink); border-bottom-left-radius:4px; }
+  .fabset-pv-chat .m.me{ align-self:flex-end; background:var(--cp-head); color:#fff; border-bottom-right-radius:4px; }
+  @media (max-width:640px){
+    .fabset-grid2{ grid-template-columns:1fr; }
+    .fabset-swatches{ grid-template-columns:repeat(2, 1fr); }
+  }
 </style>
-<div id="fab-bantuan" hidden>
+<div id="fab-bantuan" hidden class="fab-tema-biru">
   <div class="fab-wa" id="fab-wa" hidden role="dialog" aria-label="Bantuan WhatsApp">
     <div class="fab-chat-head">
-      <div><b>Bantuan WhatsApp</b><small>Tulis pesanmu &middot; diteruskan ke WhatsApp</small></div>
+      <div><b id="fab-hd-wa">Bantuan WhatsApp</b><small>Tulis pesanmu &middot; diteruskan ke WhatsApp</small></div>
       <span class="fab-hd-sp"></span>
       <button type="button" class="fab-clear" id="fab-wa-clear" aria-label="Hapus semua pesan" title="Hapus semua pesan"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button type="button" class="fab-x" id="fab-wa-close" aria-label="Tutup">&times;</button>
@@ -22532,7 +22827,7 @@ if ("serviceWorker" in navigator) {
   </div>
   <div class="fab-chat" id="fab-chat" hidden role="dialog" aria-label="Chat bot PH Logistik">
     <div class="fab-chat-head">
-      <div><b>Bot PH (Logistik)</b><small>Chat langsung di sini &middot; dibalas bot</small></div>
+      <div><b id="fab-hd-chat">Chat Bot PH (Logistik)</b><small>Chat langsung di sini &middot; dibalas bot</small></div>
       <span class="fab-hd-sp"></span>
       <button type="button" class="fab-clear" id="fab-chat-clear" aria-label="Hapus semua pesan" title="Hapus semua pesan"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button type="button" class="fab-x" id="fab-chat-close" aria-label="Tutup chat">&times;</button>
@@ -22547,18 +22842,18 @@ if ("serviceWorker" in navigator) {
   <div class="fab-menu" id="fab-menu" hidden>
     <button type="button" class="fab-item" id="fab-item-bantuan">
       <span class="fab-item-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2.9-1.2 1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1" fill="currentColor"/></svg></span>
-      <span class="fab-item-tx"><b>Bantuan WhatsApp</b><small id="fab-sub-wa">Tulis pesan, diteruskan ke WhatsApp</small></span>
+      <span class="fab-item-tx"><b id="fab-t-wa">Bantuan WhatsApp</b><small id="fab-sub-wa">Tulis pesan, diteruskan ke WhatsApp</small></span>
       <span class="fab-badge" id="fab-badge-wa" hidden>0</span>
     </button>
     <button type="button" class="fab-item" id="fab-item-chat">
       <span class="fab-item-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
-      <span class="fab-item-tx"><b>Chat Bot PH (Logistik)</b><small id="fab-sub-chat">Tanya langsung, dibalas bot</small></span>
+      <span class="fab-item-tx"><b id="fab-t-chat">Chat Bot PH (Logistik)</b><small id="fab-sub-chat">Tanya langsung, dibalas bot</small></span>
       <span class="fab-badge" id="fab-badge-chat" hidden>0</span>
     </button>
   </div>
   <button type="button" class="fab-main" id="fab-main" aria-label="Bantuan" aria-expanded="false">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M19 19c0 1.5-1.5 2.5-4 2.5h-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    <span class="fab-dot" id="fab-dot" hidden>0</span>
+    <svg id="fab-ikon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M19 19c0 1.5-1.5 2.5-4 2.5h-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <img id="fab-ikon-img" alt="" hidden decoding="async" referrerpolicy="no-referrer" draggable="false"><span class="fab-dot" id="fab-dot" hidden>0</span>
   </button>
 </div>
 <script>
@@ -22568,6 +22863,7 @@ if ("serviceWorker" in navigator) {
   const fab = $("fab-bantuan"), main = $("fab-main"), menu = $("fab-menu"), chat = $("fab-chat"), wa = $("fab-wa");
   const body = $("fab-chat-body"), input = $("fab-chat-input"), sendBtn = $("fab-chat-send"), dot = $("fab-dot");
   const waBody = $("fab-wa-body"), waInput = $("fab-wa-input"), waSend = $("fab-wa-send");
+  const fabImg = $("fab-ikon-img"), fabSvg = $("fab-ikon-svg");
   if(!fab || !main) return;
   const KEY = "habit_chat_ph_v1", KEY_WA = "habit_chat_wa_v1";
   let st = { msgs: [], cursor: "" };
@@ -22575,6 +22871,10 @@ if ("serviceWorker" in navigator) {
   let wst = { msgs: [] };
   try{ const r = JSON.parse(localStorage.getItem(KEY_WA) || "null"); if(r && Array.isArray(r.msgs)) wst = { msgs: r.msgs.slice(-100) }; }catch(e){}
   let unreadBot = 0, unreadWa = 0, waiting = false, waitUntil = 0, lastSentAt = 0, timer = null, polling = false, lastErrAt = 0;
+  let ikonSaatIni = null;   // v2.93.18 -- URL ikon gambar yang sedang dipasang
+  const TEMA_OK = ["biru","langit","indigo","teal","ungu","hijau","slate"];
+  const TEKS_DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
+  const TEKS_KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
 
   const save = () => { try{ localStorage.setItem(KEY, JSON.stringify({ msgs: st.msgs.slice(-200), cursor: st.cursor })); }catch(e){} };
   const saveWa = () => { try{ localStorage.setItem(KEY_WA, JSON.stringify({ msgs: wst.msgs.slice(-100) })); }catch(e){} };
@@ -22588,8 +22888,34 @@ if ("serviceWorker" in navigator) {
     if(on && hp) on = s.bantuanHpEnabled === true;          // di HP: hanya kalau diaktifkan
     fab.classList.toggle("fab-kiri", hp && s.bantuanHpPosisi === "kiri");
     const naik = Number(s.bantuanHpNaik); fab.style.setProperty("--fab-naik", (isFinite(naik) && naik >= 0 ? naik : 84) + "px");
+    terapkanTema(); terapkanIkon(); terapkanTeks();
     fab.hidden = !on;
     if(!on){ menu.hidden = true; chat.hidden = true; wa.hidden = true; panelClass(); stopTimer(); }
+  }
+  /* v2.93.18 -- warna Chat Bot PH, ikon dari link gambar, tulisan tiap pilihan (semua dari Master Data > Tampilan) */
+  function terapkanTema(){
+    let t = ""; try{ t = String(cfg().chatPhTema || ""); }catch(e){}
+    if(TEMA_OK.indexOf(t) < 0) t = "biru";
+    TEMA_OK.forEach(x => fab.classList.toggle("fab-tema-" + x, x === t));
+  }
+  function ikonAman(v){ v = String(v == null ? "" : v).trim(); return (v.length <= 600 && /^https:\/\/[^\s"'<>]+$/i.test(v)) ? v : ""; }
+  function terapkanIkon(){
+    let u = ""; try{ u = ikonAman(cfg().bantuanIkonUrl); }catch(e){}
+    if(u === ikonSaatIni) return; ikonSaatIni = u;
+    if(!u){ fabImg.hidden = true; fabImg.removeAttribute("src"); fabSvg.style.display = ""; main.classList.remove("fab-ikon-gambar"); return; }
+    fabImg.onload = () => { if(ikonSaatIni === u){ fabImg.hidden = false; fabSvg.style.display = "none"; main.classList.add("fab-ikon-gambar"); } };
+    fabImg.onerror = () => { if(ikonSaatIni === u){ fabImg.hidden = true; fabSvg.style.display = ""; main.classList.remove("fab-ikon-gambar"); } };   // gambar gagal dimuat -> ikon bawaan
+    fabImg.src = u;
+  }
+  function teks(k){
+    let v = ""; try{ v = String(cfg()[TEKS_KEY[k]] || "").replace(/\s+/g, " ").trim().slice(0, 60); }catch(e){}
+    return v || TEKS_DEF[k];
+  }
+  function terapkanTeks(){
+    $("fab-t-wa").textContent = teks("waJudul"); $("fab-t-chat").textContent = teks("chatJudul");
+    $("fab-hd-wa").textContent = teks("waJudul"); $("fab-hd-chat").textContent = teks("chatJudul");
+    wa.setAttribute("aria-label", teks("waJudul")); chat.setAttribute("aria-label", teks("chatJudul"));
+    paintNotif();
   }
   window.__syncFabBantuan = syncVisible;
   if(mq.addEventListener) mq.addEventListener("change", syncVisible); else if(mq.addListener) mq.addListener(syncVisible);
@@ -22658,8 +22984,8 @@ if ("serviceWorker" in navigator) {
     const bc = $("fab-badge-chat"), bw = $("fab-badge-wa"), sc = $("fab-sub-chat"), sw = $("fab-sub-wa");
     bc.hidden = !unreadBot; bc.textContent = txt(unreadBot);
     bw.hidden = !unreadWa; bw.textContent = txt(unreadWa);
-    sc.textContent = unreadBot ? unreadBot + " balasan baru dari bot" : "Tanya langsung, dibalas bot"; sc.classList.toggle("fab-baru", !!unreadBot);
-    sw.textContent = unreadWa ? unreadWa + " balasan baru" : "Tulis pesan, diteruskan ke WhatsApp"; sw.classList.toggle("fab-baru", !!unreadWa);
+    sc.textContent = unreadBot ? unreadBot + " balasan baru dari bot" : teks("chatKet"); sc.classList.toggle("fab-baru", !!unreadBot);
+    sw.textContent = unreadWa ? unreadWa + " balasan baru" : teks("waKet"); sw.classList.toggle("fab-baru", !!unreadWa);
     main.setAttribute("aria-label", total ? "Bantuan — " + total + " balasan baru" : "Bantuan");
   }
   function setUnread(n){ unreadBot = n; paintNotif(); }
