@@ -6267,38 +6267,63 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="md-card fabset" id="md-fabset">
         <h3>Tampilan Tombol Bantuan &amp; Chat</h3>
-        <div class="fabset-hint">Atur warna Chat Bot PH, ikon tombol, dan tulisan tiap pilihan. Pratinjau di bawah langsung ikut berubah. Pengaturan tersimpan ke server, jadi sama di semua perangkat.</div>
-        <div class="fabset-pv fab-tema-biru" id="fabset-pv">
+        <div class="fabset-hint">Atur urutan pilihan, warna Chat Bot PH dan Min Ha, ikon tombol &amp; tiap pilihan, dan tulisan tiap pilihan. Pratinjau di bawah langsung ikut berubah. Pengaturan tersimpan ke server, jadi sama di semua perangkat.</div>
+        <div class="fabset-pv" id="fabset-pv">
           <div class="fabset-pv-col">
             <div class="fabset-pv-lbl">Pratinjau menu</div>
-            <div class="fabset-pv-menu">
-              <div class="fabset-pv-row wa"><span class="fabset-pv-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2.9-1.2 1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1" fill="currentColor"/></svg></span><span class="fabset-pv-tx"><b id="fabset-pv-wa-t"></b><small id="fabset-pv-wa-k"></small></span></div>
-              <div class="fabset-pv-row chat"><span class="fabset-pv-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><span class="fabset-pv-tx"><b id="fabset-pv-chat-t"></b><small id="fabset-pv-chat-k"></small></span></div>
+            <div class="fabset-pv-menu" id="fabset-pv-menu">
+              <div class="fabset-pv-row wa" id="fabset-pv-row-wa"><span class="fabset-pv-ic" id="fabset-pv-ic-wa"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2.9-1.2 1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1" fill="currentColor"/></svg><img alt="" hidden referrerpolicy="no-referrer" draggable="false"></span><span class="fabset-pv-tx"><b id="fabset-pv-wa-t"></b><small id="fabset-pv-wa-k"></small></span></div>
+              <div class="fabset-pv-row mh" id="fabset-pv-row-minha"><span class="fabset-pv-ic" id="fabset-pv-ic-minha"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M9 8h6M9 12h6M9 16h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><img alt="" hidden referrerpolicy="no-referrer" draggable="false"></span><span class="fabset-pv-tx"><b id="fabset-pv-mh-t"></b><small id="fabset-pv-mh-k"></small></span></div>
+              <div class="fabset-pv-row chat" id="fabset-pv-row-ph"><span class="fabset-pv-ic" id="fabset-pv-ic-ph"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><img alt="" hidden referrerpolicy="no-referrer" draggable="false"></span><span class="fabset-pv-tx"><b id="fabset-pv-chat-t"></b><small id="fabset-pv-chat-k"></small></span></div>
             </div>
             <div class="fabset-pv-fab" id="fabset-pv-fab"><svg id="fabset-pv-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="13" width="4" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M19 19c0 1.5-1.5 2.5-4 2.5h-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><img id="fabset-pv-img" alt="" hidden referrerpolicy="no-referrer" draggable="false"></div>
           </div>
           <div class="fabset-pv-col">
             <div class="fabset-pv-lbl">Pratinjau Chat Bot PH</div>
-            <div class="fabset-pv-chat">
+            <div class="fabset-pv-chat" id="fabset-pv-phchat">
               <div class="h" id="fabset-pv-chat-h"></div>
               <div class="b"><div class="m bot">Halo! Ada yang bisa dibantu?</div><div class="m me">Cek ongkir ke Surabaya</div><div class="m bot">Baik, sebutkan berat barangnya ya.</div></div>
             </div>
           </div>
+          <div class="fabset-pv-col">
+            <div class="fabset-pv-lbl">Pratinjau Chat Bot Min Ha</div>
+            <div class="fabset-pv-chat" id="fabset-pv-mhchat">
+              <div class="h" id="fabset-pv-mh-h"></div>
+              <div class="b"><div class="m bot">Halo! Ada yang bisa dibantu?</div><div class="m me">/menu</div><div class="m bot">Pilih menu di bawah ini.</div></div>
+            </div>
+          </div>
         </div>
 
-        <div class="fabset-h">1. Warna latar Chat Bot PH</div>
+        <div class="fabset-h">1. Urutan pilihan</div>
+        <div class="fabset-hint">Geser pilihan dengan tombol &uarr; &darr;. Urutan paling atas tampil paling atas di menu tombol Bantuan. Contoh: Bantuan, Min Ha, PH bisa diganti jadi Bantuan, PH, Min Ha.</div>
+        <div class="fabset-urut" id="fabset-urut" role="list"></div>
+        <div class="fabset-err" id="fabset-urut-msg" role="status" aria-live="polite"></div>
+
+        <div class="fabset-h">2. Warna latar Chat Bot PH</div>
         <div class="fabset-hint">Ketuk satu warna. Berlaku untuk header, gelembung pesan, dan latar chat Bot PH (otomatis menyesuaikan mode gelap).</div>
-        <div class="fabset-swatches" role="radiogroup" aria-label="Warna latar Chat Bot PH">
-            <button type="button" class="fabset-sw fab-tema-biru" role="radio" aria-checked="false" data-tema="biru" aria-label="Warna Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru</span></button>
-            <button type="button" class="fabset-sw fab-tema-langit" role="radio" aria-checked="false" data-tema="langit" aria-label="Warna Biru Langit"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru Langit</span></button>
-            <button type="button" class="fabset-sw fab-tema-indigo" role="radio" aria-checked="false" data-tema="indigo" aria-label="Warna Indigo"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Indigo</span></button>
-            <button type="button" class="fabset-sw fab-tema-teal" role="radio" aria-checked="false" data-tema="teal" aria-label="Warna Hijau Tosca"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau Tosca</span></button>
-            <button type="button" class="fabset-sw fab-tema-ungu" role="radio" aria-checked="false" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
-            <button type="button" class="fabset-sw fab-tema-hijau" role="radio" aria-checked="false" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
-            <button type="button" class="fabset-sw fab-tema-slate" role="radio" aria-checked="false" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
+        <div class="fabset-swatches" id="fabset-sw-ph" role="radiogroup" aria-label="Warna latar Chat Bot PH">
+            <button type="button" class="fabset-sw fab-tema-biru" role="radio" aria-checked="false" data-bot="ph" data-tema="biru" aria-label="Warna Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru</span></button>
+            <button type="button" class="fabset-sw fab-tema-langit" role="radio" aria-checked="false" data-bot="ph" data-tema="langit" aria-label="Warna Biru Langit"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru Langit</span></button>
+            <button type="button" class="fabset-sw fab-tema-indigo" role="radio" aria-checked="false" data-bot="ph" data-tema="indigo" aria-label="Warna Indigo"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Indigo</span></button>
+            <button type="button" class="fabset-sw fab-tema-teal" role="radio" aria-checked="false" data-bot="ph" data-tema="teal" aria-label="Warna Hijau Tosca"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau Tosca</span></button>
+            <button type="button" class="fabset-sw fab-tema-ungu" role="radio" aria-checked="false" data-bot="ph" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
+            <button type="button" class="fabset-sw fab-tema-hijau" role="radio" aria-checked="false" data-bot="ph" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
+            <button type="button" class="fabset-sw fab-tema-slate" role="radio" aria-checked="false" data-bot="ph" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
         </div>
 
-        <div class="fabset-h">2. Ikon tombol chat</div>
+        <div class="fabset-h">3. Warna latar Chat Bot Min Ha</div>
+        <div class="fabset-hint">Sama seperti Chat Bot PH, tapi untuk Chat Bot Min Ha. Bawaan: Hijau.</div>
+        <div class="fabset-swatches" id="fabset-sw-mh" role="radiogroup" aria-label="Warna latar Chat Bot Min Ha">
+            <button type="button" class="fabset-sw fab-tema-biru" role="radio" aria-checked="false" data-bot="minha" data-tema="biru" aria-label="Warna Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru</span></button>
+            <button type="button" class="fabset-sw fab-tema-langit" role="radio" aria-checked="false" data-bot="minha" data-tema="langit" aria-label="Warna Biru Langit"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Biru Langit</span></button>
+            <button type="button" class="fabset-sw fab-tema-indigo" role="radio" aria-checked="false" data-bot="minha" data-tema="indigo" aria-label="Warna Indigo"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Indigo</span></button>
+            <button type="button" class="fabset-sw fab-tema-teal" role="radio" aria-checked="false" data-bot="minha" data-tema="teal" aria-label="Warna Hijau Tosca"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau Tosca</span></button>
+            <button type="button" class="fabset-sw fab-tema-ungu" role="radio" aria-checked="false" data-bot="minha" data-tema="ungu" aria-label="Warna Ungu"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Ungu</span></button>
+            <button type="button" class="fabset-sw fab-tema-hijau" role="radio" aria-checked="false" data-bot="minha" data-tema="hijau" aria-label="Warna Hijau"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Hijau</span></button>
+            <button type="button" class="fabset-sw fab-tema-slate" role="radio" aria-checked="false" data-bot="minha" data-tema="slate" aria-label="Warna Abu Biru"><span class="fabset-sw-chip"></span><span class="fabset-sw-name">Abu Biru</span></button>
+        </div>
+
+        <div class="fabset-h">4. Ikon tombol chat</div>
         <div class="fabset-hint">Tempel link gambar (diawali https:// dan bisa dibuka tanpa login, mis. berakhiran .png / .jpg / .webp). Gambar akan ditampilkan bulat. Lebih bagus memakai gambar persegi.</div>
         <label class="fabset-l" for="fabset-ikon-url">Link gambar</label>
         <input type="url" inputmode="url" id="fabset-ikon-url" placeholder="https://contoh.com/logo.png" autocomplete="off" maxlength="600">
@@ -6308,17 +6333,38 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
           <button type="button" class="md-btn" id="fabset-ikon-reset">Pakai ikon bawaan</button>
         </div>
 
-        <div class="fabset-h">3. Tulisan tiap pilihan</div>
+        <div class="fabset-h">5. Ikon tiap pilihan</div>
+        <div class="fabset-hint">Ganti ikon kotak di samping tiap pilihan di menu, lewat link gambar (https://). Kolom dikosongkan = memakai ikon bawaan.</div>
+        <label class="fabset-l" for="fabset-pik-wa">Ikon Bantuan WhatsApp</label>
+        <input type="url" inputmode="url" id="fabset-pik-wa" placeholder="https://contoh.com/wa.png" autocomplete="off" maxlength="600">
+        <label class="fabset-l" for="fabset-pik-mh">Ikon Chat Bot Min Ha</label>
+        <input type="url" inputmode="url" id="fabset-pik-mh" placeholder="https://contoh.com/minha.png" autocomplete="off" maxlength="600">
+        <label class="fabset-l" for="fabset-pik-ph">Ikon Chat Bot PH</label>
+        <input type="url" inputmode="url" id="fabset-pik-ph" placeholder="https://contoh.com/ph.png" autocomplete="off" maxlength="600">
+        <div class="fabset-err" id="fabset-pik-msg" role="status" aria-live="polite"></div>
+        <div class="fabset-actions">
+          <button type="button" class="md-btn primary" id="fabset-pik-save">Simpan ikon pilihan</button>
+          <button type="button" class="md-btn" id="fabset-pik-reset">Semua pakai ikon bawaan</button>
+        </div>
+
+        <div class="fabset-h">6. Tulisan tiap pilihan</div>
         <div class="fabset-hint">Ganti judul dan keterangan di bawahnya, mis. &ldquo;Bantuan WhatsApp&rdquo; jadi &ldquo;WhatsApp Petugas&rdquo;. Dikosongkan = memakai tulisan bawaan.</div>
         <div class="fabset-group">
-          <div class="fabset-group-t">Pilihan 1 &middot; WhatsApp</div>
+          <div class="fabset-group-t">Bantuan WhatsApp</div>
           <div class="fabset-grid2">
             <div><label class="fabset-l" for="fabset-in-wa-t">Judul (maks. 30 huruf)</label><input type="text" id="fabset-in-wa-t" maxlength="30" placeholder="Bantuan WhatsApp" autocomplete="off"></div>
             <div><label class="fabset-l" for="fabset-in-wa-k">Keterangan (maks. 50 huruf)</label><input type="text" id="fabset-in-wa-k" maxlength="50" placeholder="Tulis pesan, diteruskan ke WhatsApp" autocomplete="off"></div>
           </div>
         </div>
         <div class="fabset-group">
-          <div class="fabset-group-t">Pilihan 2 &middot; Chat Bot PH</div>
+          <div class="fabset-group-t">Chat Bot Min Ha</div>
+          <div class="fabset-grid2">
+            <div><label class="fabset-l" for="fabset-in-mh-t">Judul (maks. 30 huruf)</label><input type="text" id="fabset-in-mh-t" maxlength="30" placeholder="Chat Bot Min Ha" autocomplete="off"></div>
+            <div><label class="fabset-l" for="fabset-in-mh-k">Keterangan (maks. 50 huruf)</label><input type="text" id="fabset-in-mh-k" maxlength="50" placeholder="Tanya soal pesanan, dibalas bot" autocomplete="off"></div>
+          </div>
+        </div>
+        <div class="fabset-group">
+          <div class="fabset-group-t">Chat Bot PH</div>
           <div class="fabset-grid2">
             <div><label class="fabset-l" for="fabset-in-chat-t">Judul (maks. 30 huruf)</label><input type="text" id="fabset-in-chat-t" maxlength="30" placeholder="Chat Bot PH (Logistik)" autocomplete="off"></div>
             <div><label class="fabset-l" for="fabset-in-chat-k">Keterangan (maks. 50 huruf)</label><input type="text" id="fabset-in-chat-k" maxlength="50" placeholder="Tanya langsung, dibalas bot" autocomplete="off"></div>
@@ -6741,7 +6787,7 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       <div id="berlaku" style="margin-top:6px;"></div>
     </div>
     <div style="margin-top:8px;opacity:.6;">
-      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.16</span>
+      <span id="md-secret-tap" style="cursor:default;">Habit</span> &nbsp;·&nbsp; versi <span id="app-current-version">2.93.19</span>
       <span class="footer-changelog-wrap footer-changelog-dup">&nbsp;·&nbsp; <button id="btn-changelog" class="changelog-link">Riwayat Update</button></span>
       <span class="footer-changelog-wrap">&nbsp;·&nbsp; <button type="button" id="btn-check-update" class="changelog-link">Cek Pembaruan</button></span>
       <span class="footer-changelog-wrap telegram-bot-ui">&nbsp;·&nbsp; <button type="button" id="home-link-tgid" class="changelog-link">ID Telegram Saya</button></span>
@@ -7040,7 +7086,16 @@ html[data-theme="dark"] .wiz-reset-proxy:hover{
       </div>
       <div class="changelog-body">
         <div class="changelog-item">
-          <div class="changelog-ver">v2.93.18 <span class="changelog-tag">Sekarang</span></div>
+          <div class="changelog-ver">v2.93.19 <span class="changelog-tag">Sekarang</span></div>
+          <ul>
+            <li><b>Chat Bot Min Ha di tombol Bantuan mengambang</b> &mdash; chat langsung dengan bot Min Ha (@Rp_habit_bot) di dalam app, tanpa membuka Telegram. Perintah, menu, dan tombol dari bot muncul di chat. Foto/berkas dari bot tetap dikirim ke Telegram dan di chat muncul catatan. Butuh Worker Rincian v504.</li>
+            <li><b>Pengaturan Chat Bot Min Ha sama seperti Chat Bot PH</b> &mdash; warna latar (7 pilihan, bawaan Hijau), judul &amp; keterangan, hapus pesan, dan notifikasi angka balasan baru.</li>
+            <li><b>Urutan pilihan bisa digeser</b> &mdash; Master Data &rarr; Tampilan &rarr; Tampilan Tombol Bantuan &amp; Chat &rarr; Urutan pilihan (tombol &uarr; &darr;), mis. Bantuan, Min Ha, PH jadi Bantuan, PH, Min Ha. Tersimpan ke server.</li>
+            <li><b>Ikon tiap pilihan bisa diganti lewat link gambar</b> &mdash; Bantuan WhatsApp, Chat Bot Min Ha, dan Chat Bot PH masing-masing punya kolom link (https). Dicek dulu sebelum disimpan; kalau gambar gagal dimuat otomatis kembali ke ikon bawaan.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v2.93.18</div>
           <ul>
             <li><b>Warna latar Chat Bot PH bisa dipilih</b> &mdash; 7 warna seirama (Biru, Biru Langit, Indigo, Hijau Tosca, Ungu, Hijau, Abu Biru) di Master Data &rarr; Tampilan &rarr; Tampilan Tombol Bantuan &amp; Chat. Bawaan: Biru. Mengubah header, gelembung pesan, dan latar chat; otomatis menyesuaikan mode gelap.</li>
             <li><b>Ikon tombol chat bisa diganti gambar</b> &mdash; tempel link gambar (https). Dicek dulu sebelum disimpan; kalau gambar gagal dimuat, otomatis kembali ke ikon bawaan.</li>
@@ -8715,7 +8770,17 @@ let TELEGRAM_SENDER_AUTO_DETECTED = false;
 })();
 
 const SETTINGS_KEY = "notaHalawa_settings";
-const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", bantuanMengambangEnabled:true, bantuanHpEnabled:false, bantuanHpPosisi:"kanan", bantuanHpNaik:84, chatPhTema:"biru", bantuanIkonUrl:"", bantuanWaJudul:"", bantuanWaKet:"", bantuanChatJudul:"", bantuanChatKet:"", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, unpaidTickerEnabled:true, unpaidTickerSpeed:50, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, invoicePengingatEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
+const SETTINGS = {autocompleteProduk:true, autocompleteEkspedisi:true, bantuanLink:"https://t.me/+RtDvshvsHr1jijhm", bantuanMengambangEnabled:true, bantuanHpEnabled:false, bantuanHpPosisi:"kanan", bantuanHpNaik:84, chatPhTema:"biru", bantuanIkonUrl:"", bantuanWaJudul:"", bantuanWaKet:"", bantuanChatJudul:"", bantuanChatKet:"", bantuanUrutan:"wa,minha,ph", chatMinhaTema:"hijau", bantuanMinhaJudul:"", bantuanMinhaKet:"", bantuanWaIkonUrl:"", bantuanMinhaIkonUrl:"", bantuanPhIkonUrl:"", tierBatas1:14, tierBatas2:50, telegramBotEnabled:true, pasteOrderEnabled:true, dmAutoMatchEnabled:true, stickerButtonsEnabled:true, stickerReactionsEnabled:{konfirmasi:true,hoax:true,deposit:true,void:true}, stickerCollapsedLabelStyle:"text", stickyFormButtonsEnabled:true, unpaidTickerEnabled:true, unpaidTickerSpeed:50, customBlueThemeEnabled:true, darkModeFeatureEnabled:true, footerInfoEnabled:true, financeList:[], logistikList:[], resiCrossCheckThresholdPercent:15, resiCrossCheckReactionEnabled:true, autoRepostNoCaptionEnabled:true, showTransferNominalCaptionEnabled:false, resiNoNameReminderEnabled:true, dailyRecapAutoEnabled:true, resiKemarinInfoEnabled:true, resiKemarinInfoTime:"08:45", logistikPengingatEnabled:true, logistikPengingatTime:"08:45", noBuktiTransferReminderEnabled:true, noBuktiTransferReminderTime:"08:45", accFinanceLogistikNotifEnabled:true, pengirimanPengingatEnabled:true, pengirimanPengingatJam:3, pengirimanAutoResiEnabled:true, invoicePengingatEnabled:true, rekapPesananEnabled:false, rekapPesananHari:7, followUpEnabled:false, followUpNotifEnabled:false, followUpNotifTime:"08:00", followUpBatasHarian:7, csList:[], resiTagihanTopicId:"", resiAjaTopicId:"", renderNotaViaBrowserless:false};
+/* v2.93.19 -- urutan pilihan di tombol Bantuan mengambang: "wa" (Bantuan WhatsApp), "minha" (Chat Bot Min Ha), "ph" (Chat Bot PH).
+   Selalu mengembalikan ketiganya, tanpa ganda; yang tidak dikenal dibuang, yang hilang ditaruh di belakang. */
+function fabUrutanBersih(v){
+  const semua = ["wa","minha","ph"];
+  const dari = Array.isArray(v) ? v : String(v == null ? "" : v).split(",");
+  const hasil = [];
+  dari.forEach(x=>{ x = String(x).trim().toLowerCase(); if(semua.includes(x) && !hasil.includes(x)) hasil.push(x); });
+  semua.forEach(x=>{ if(!hasil.includes(x)) hasil.push(x); });
+  return hasil;
+}
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -8732,6 +8797,11 @@ function loadSettings(){
     if(["biru","langit","indigo","teal","ungu","hijau","slate"].includes(s.chatPhTema)) SETTINGS.chatPhTema = s.chatPhTema;
     if(typeof s.bantuanIkonUrl === "string") SETTINGS.bantuanIkonUrl = s.bantuanIkonUrl.trim().slice(0, 600);
     ["bantuanWaJudul","bantuanWaKet","bantuanChatJudul","bantuanChatKet"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 60); });
+    // v2.93.19 -- chat bot Min Ha: urutan pilihan, warna, tulisan, ikon tiap pilihan (link gambar)
+    if(typeof s.bantuanUrutan === "string") SETTINGS.bantuanUrutan = fabUrutanBersih(s.bantuanUrutan).join(",");
+    if(["biru","langit","indigo","teal","ungu","hijau","slate"].includes(s.chatMinhaTema)) SETTINGS.chatMinhaTema = s.chatMinhaTema;
+    ["bantuanMinhaJudul","bantuanMinhaKet"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 60); });
+    ["bantuanWaIkonUrl","bantuanMinhaIkonUrl","bantuanPhIkonUrl"].forEach(k=>{ if(typeof s[k] === "string") SETTINGS[k] = s[k].trim().slice(0, 600); });
     if(typeof s.tierBatas1 === "number" && s.tierBatas1 > 0) SETTINGS.tierBatas1 = s.tierBatas1;
     if(typeof s.tierBatas2 === "number" && s.tierBatas2 > SETTINGS.tierBatas1) SETTINGS.tierBatas2 = s.tierBatas2;
     if(typeof s.telegramBotEnabled === "boolean") SETTINGS.telegramBotEnabled = s.telegramBotEnabled;
@@ -18080,32 +18150,51 @@ if ("serviceWorker" in navigator) {
     await confirmMasterDataSave("Link Bantuan disimpan.");
   });
 
-  /* ---------- Tampilan Tombol Bantuan & Chat: warna Chat Bot PH, ikon gambar, tulisan pilihan (v2.93.18) ---------- */
+  /* ---------- Tampilan Tombol Bantuan & Chat: urutan, warna PH & Min Ha, ikon, tulisan pilihan (v2.93.19) ---------- */
   (function(){
     const root = document.getElementById("md-fabset");
     if(!root) return;
     const $ = id => document.getElementById(id);
     const TEMA = { biru:"Biru", langit:"Biru Langit", indigo:"Indigo", teal:"Hijau Tosca", ungu:"Ungu", hijau:"Hijau", slate:"Abu Biru" };
-    const DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
-    const KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
-    const IN = { waJudul:$("fabset-in-wa-t"), waKet:$("fabset-in-wa-k"), chatJudul:$("fabset-in-chat-t"), chatKet:$("fabset-in-chat-k") };
-    const PV = { waJudul:$("fabset-pv-wa-t"), waKet:$("fabset-pv-wa-k"), chatJudul:$("fabset-pv-chat-t"), chatKet:$("fabset-pv-chat-k") };
+    const BOT = { ph:{ key:"chatPhTema", nama:"Chat Bot PH", awal:"biru" }, minha:{ key:"chatMinhaTema", nama:"Chat Bot Min Ha", awal:"hijau" } };
+    const DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", mhJudul:"Chat Bot Min Ha", mhKet:"Tanya soal pesanan, dibalas bot", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
+    const KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", mhJudul:"bantuanMinhaJudul", mhKet:"bantuanMinhaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
+    const IN = { waJudul:$("fabset-in-wa-t"), waKet:$("fabset-in-wa-k"), mhJudul:$("fabset-in-mh-t"), mhKet:$("fabset-in-mh-k"), chatJudul:$("fabset-in-chat-t"), chatKet:$("fabset-in-chat-k") };
+    const PV = { waJudul:$("fabset-pv-wa-t"), waKet:$("fabset-pv-wa-k"), mhJudul:$("fabset-pv-mh-t"), mhKet:$("fabset-pv-mh-k"), chatJudul:$("fabset-pv-chat-t"), chatKet:$("fabset-pv-chat-k") };
+    const TJ = { wa:"waJudul", minha:"mhJudul", ph:"chatJudul" };   // judul tiap pilihan
+    const SLOT = {
+      wa:    { url:"bantuanWaIkonUrl",    inp:"fabset-pik-wa", pv:"fabset-pv-ic-wa",    nama:"Bantuan WhatsApp" },
+      minha: { url:"bantuanMinhaIkonUrl", inp:"fabset-pik-mh", pv:"fabset-pv-ic-minha", nama:"Chat Bot Min Ha" },
+      ph:    { url:"bantuanPhIkonUrl",    inp:"fabset-pik-ph", pv:"fabset-pv-ic-ph",    nama:"Chat Bot PH" }
+    };
     const swatches = Array.from(root.querySelectorAll(".fabset-sw"));
     const clean = v => String(v == null ? "" : v).replace(/\s+/g, " ").trim();
     const maks = k => k.endsWith("Ket") ? 50 : 30;
     const amanUrl = v => { v = clean(v); return (v.length <= 600 && /^https:\/\/[^\s"'<>]+$/i.test(v)) ? v : ""; };
-    const tema = () => TEMA[SETTINGS.chatPhTema] ? SETTINGS.chatPhTema : "biru";
+    const temaBot = b => TEMA[SETTINGS[BOT[b].key]] ? SETTINGS[BOT[b].key] : BOT[b].awal;
     const nilai = k => clean(IN[k].value).slice(0, maks(k));
     const pesan = (el, t, ok) => { el.textContent = t; el.classList.toggle("fabset-ok", !!ok); };
+    const setTema = (el, t) => { if(el) Object.keys(TEMA).forEach(x => el.classList.toggle("fab-tema-" + x, x === t)); };
+    const urutan = () => fabUrutanBersih(SETTINGS.bantuanUrutan);
+    const judulSaatIni = k => clean(SETTINGS[KEY[TJ[k]]]).slice(0, 30) || DEF[TJ[k]];
 
     function paintTema(){
-      const t = tema(), pv = $("fabset-pv");
-      Object.keys(TEMA).forEach(x => pv.classList.toggle("fab-tema-" + x, x === t));
-      swatches.forEach(b => { const on = b.dataset.tema === t; b.setAttribute("aria-checked", on ? "true" : "false"); b.tabIndex = on ? 0 : -1; });
+      const tp = temaBot("ph"), tm = temaBot("minha");
+      setTema($("fabset-pv-row-ph"), tp); setTema($("fabset-pv-phchat"), tp);
+      setTema($("fabset-pv-row-minha"), tm); setTema($("fabset-pv-mhchat"), tm);
+      swatches.forEach(b => { const on = b.dataset.tema === temaBot(b.dataset.bot); b.setAttribute("aria-checked", on ? "true" : "false"); b.tabIndex = on ? 0 : -1; });
     }
     function paintTeks(){
       Object.keys(PV).forEach(k => { PV[k].textContent = nilai(k) || DEF[k]; });
       $("fabset-pv-chat-h").textContent = nilai("chatJudul") || DEF.chatJudul;
+      $("fabset-pv-mh-h").textContent = nilai("mhJudul") || DEF.mhJudul;
+    }
+    function muatGambar(box, u){   // pasang gambar ke kotak ikon; gagal dimuat = ikon bawaan
+      const im = box.querySelector("img"), sv = box.querySelector("svg");
+      if(!u){ im.hidden = true; im.removeAttribute("src"); if(sv) sv.style.display = ""; box.classList.remove("gambar"); return; }
+      im.onload = () => { im.hidden = false; if(sv) sv.style.display = "none"; box.classList.add("gambar"); };
+      im.onerror = () => { im.hidden = true; if(sv) sv.style.display = ""; box.classList.remove("gambar"); };
+      im.src = u;
     }
     let pvIkon = null;
     function paintIkon(u){
@@ -18116,36 +18205,85 @@ if ("serviceWorker" in navigator) {
       im.onerror = () => { if(pvIkon === u){ im.hidden = true; sv.style.display = ""; fab.classList.remove("gambar"); } };
       im.src = u;
     }
-    function render(isiKolom){
+    const pvPik = {};
+    function paintPik(){
+      Object.keys(SLOT).forEach(k => {
+        const u = amanUrl(SETTINGS[SLOT[k].url]);
+        if(pvPik[k] === u) return; pvPik[k] = u;
+        muatGambar($(SLOT[k].pv), u);
+      });
+    }
+    function paintUrut(fokus){
+      const urut = urutan(), box = $("fabset-urut"), menuPv = $("fabset-pv-menu");
+      box.innerHTML = "";
+      urut.forEach((k, i) => {
+        const row = document.createElement("div"); row.className = "fabset-urut-row"; row.setAttribute("role", "listitem"); row.dataset.k = k;
+        const n = document.createElement("span"); n.className = "fabset-urut-n"; n.textContent = String(i + 1);
+        const t = document.createElement("span"); t.className = "fabset-urut-t"; t.textContent = judulSaatIni(k);
+        row.appendChild(n); row.appendChild(t);
+        [[-1, "\u25B2", "Naikkan"], [1, "\u25BC", "Turunkan"]].forEach(([d, ic, aksi]) => {
+          const b = document.createElement("button"); b.type = "button"; b.className = "fabset-urut-b"; b.dataset.d = String(d); b.textContent = ic;
+          b.setAttribute("aria-label", aksi + " " + judulSaatIni(k));
+          b.disabled = (d < 0 && i === 0) || (d > 0 && i === urut.length - 1);
+          b.addEventListener("click", () => geser(k, d));
+          row.appendChild(b);
+        });
+        box.appendChild(row);
+      });
+      urut.forEach(k => { const r = $("fabset-pv-row-" + k); if(r) menuPv.appendChild(r); });   // pratinjau menu ikut berurutan
+      if(fokus){
+        const row = box.querySelector('[data-k="' + fokus.k + '"]');
+        const b = row && (row.querySelector('[data-d="' + fokus.d + '"]:not(:disabled)') || row.querySelector(".fabset-urut-b:not(:disabled)"));
+        if(b) b.focus();
+      }
+    }
+    function render(isiKolom, fokus){
       paintTema();
       if(isiKolom){
         Object.keys(IN).forEach(k => { IN[k].value = clean(SETTINGS[KEY[k]]).slice(0, maks(k)); });
         $("fabset-ikon-url").value = amanUrl(SETTINGS.bantuanIkonUrl);
+        Object.keys(SLOT).forEach(k => { $(SLOT[k].inp).value = amanUrl(SETTINGS[SLOT[k].url]); });
       }
       paintTeks();
       paintIkon(amanUrl(SETTINGS.bantuanIkonUrl));
+      paintPik();
+      paintUrut(fokus);
     }
     // dipanggil applySettingsToDom (mis. setelah pengaturan server ditarik) -- jangan timpa kolom yang sedang diketik
     window.__fabsetRefresh = function(){ const a = document.activeElement; render(!(a && root.contains(a))); };
 
-    /* --- 1. warna --- */
-    async function pilihTema(t){
-      if(!TEMA[t] || t === tema()) return;
-      SETTINGS.chatPhTema = t; saveSettings(); applySettingsToDom(); render(false);
-      await confirmMasterDataSave("Warna Chat Bot PH: " + TEMA[t] + ".");
+    /* --- 1. urutan pilihan --- */
+    async function geser(k, d){
+      const u = urutan(), i = u.indexOf(k), j = i + d;
+      if(i < 0 || j < 0 || j >= u.length) return;
+      [u[i], u[j]] = [u[j], u[i]];
+      SETTINGS.bantuanUrutan = u.join(",");
+      saveSettings(); applySettingsToDom(); render(false, { k, d });
+      pesan($("fabset-urut-msg"), "✓ Urutan sekarang: " + u.map(judulSaatIni).join(" → "), true);
+      await confirmMasterDataSave("Urutan pilihan tombol Bantuan disimpan.");
     }
-    swatches.forEach((b, i) => {
-      b.addEventListener("click", () => pilihTema(b.dataset.tema));
-      b.addEventListener("keydown", e => {
-        let d = 0;
-        if(e.key === "ArrowRight" || e.key === "ArrowDown") d = 1; else if(e.key === "ArrowLeft" || e.key === "ArrowUp") d = -1; else return;
-        e.preventDefault();
-        const n = swatches[(i + d + swatches.length) % swatches.length];
-        n.focus(); pilihTema(n.dataset.tema);
+
+    /* --- 2 & 3. warna Chat Bot PH dan Min Ha --- */
+    async function pilihTema(bot, t){
+      if(!TEMA[t] || !BOT[bot] || t === temaBot(bot)) return;
+      SETTINGS[BOT[bot].key] = t; saveSettings(); applySettingsToDom(); render(false);
+      await confirmMasterDataSave("Warna " + BOT[bot].nama + ": " + TEMA[t] + ".");
+    }
+    ["fabset-sw-ph", "fabset-sw-mh"].forEach(gid => {
+      const grup = Array.from($(gid).querySelectorAll(".fabset-sw"));
+      grup.forEach((b, i) => {
+        b.addEventListener("click", () => pilihTema(b.dataset.bot, b.dataset.tema));
+        b.addEventListener("keydown", e => {
+          let d = 0;
+          if(e.key === "ArrowRight" || e.key === "ArrowDown") d = 1; else if(e.key === "ArrowLeft" || e.key === "ArrowUp") d = -1; else return;
+          e.preventDefault();
+          const n = grup[(i + d + grup.length) % grup.length];
+          n.focus(); pilihTema(n.dataset.bot, n.dataset.tema);
+        });
       });
     });
 
-    /* --- 2. ikon dari link gambar --- */
+    /* --- 4. ikon tombol utama dari link gambar --- */
     function cobaGambar(u){
       return new Promise(res => {
         let tm = null, selesai = false;
@@ -18173,7 +18311,35 @@ if ("serviceWorker" in navigator) {
       await confirmMasterDataSave("Ikon tombol Bantuan dikembalikan ke bawaan.");
     });
 
-    /* --- 3. tulisan tiap pilihan --- */
+    /* --- 5. ikon tiap pilihan dari link gambar --- */
+    $("fabset-pik-save").addEventListener("click", async () => {
+      const m = $("fabset-pik-msg"), baru = {};
+      for(const k of Object.keys(SLOT)){
+        const raw = clean($(SLOT[k].inp).value);
+        if(!raw){ baru[k] = ""; continue; }
+        const u = amanUrl(raw);
+        if(!u){ pesan(m, "Link ikon “" + SLOT[k].nama + "” harus diawali https:// dan tidak boleh ada spasi."); return; }
+        baru[k] = u;
+      }
+      pesan(m, "Memeriksa gambar…", true);
+      for(const k of Object.keys(baru)){
+        if(baru[k] && baru[k] !== amanUrl(SETTINGS[SLOT[k].url]) && !(await cobaGambar(baru[k]))){
+          pesan(m, "Gambar untuk “" + SLOT[k].nama + "” tidak bisa dimuat. Pastikan link langsung ke file gambar (.png / .jpg / .webp) dan bisa dibuka tanpa login."); return;
+        }
+      }
+      Object.keys(SLOT).forEach(k => { SETTINGS[SLOT[k].url] = baru[k]; });
+      saveSettings(); applySettingsToDom(); render(true);
+      pesan(m, "✓ Tersimpan — ikon pilihan sudah diganti (kolom kosong = ikon bawaan).", true);
+      await confirmMasterDataSave("Ikon tiap pilihan tombol Bantuan disimpan.");
+    });
+    $("fabset-pik-reset").addEventListener("click", async () => {
+      Object.keys(SLOT).forEach(k => { SETTINGS[SLOT[k].url] = ""; });
+      saveSettings(); applySettingsToDom(); render(true);
+      pesan($("fabset-pik-msg"), "✓ Semua pilihan kembali memakai ikon bawaan.", true);
+      await confirmMasterDataSave("Ikon tiap pilihan dikembalikan ke bawaan.");
+    });
+
+    /* --- 6. tulisan tiap pilihan --- */
     Object.keys(IN).forEach(k => IN[k].addEventListener("input", paintTeks));
     $("fabset-teks-save").addEventListener("click", async () => {
       Object.keys(IN).forEach(k => { const v = nilai(k); SETTINGS[KEY[k]] = (v === DEF[k]) ? "" : v; });
@@ -22630,7 +22796,7 @@ if ("serviceWorker" in navigator) {
      TOMBOL BANTUAN MENGAMBANG (web + HP)
      Klik -> 2 pilihan: (1) Bantuan WhatsApp: tulis pesan di panel ini, lalu
      diteruskan ke WhatsApp (link dari Master Data > Tampilan), (2) chat
-     langsung dengan bot PH (Logistik) DI DALAM app. Notif angka tampil di
+     langsung dengan bot PH (Logistik) atau bot Min Ha (Rincian Pemesanan) DI DALAM app. Notif angka tampil di
      tombol utama DAN di tombol pilihan yang bersangkutan. Pengaturan:
      Master Data > Tampilan > Tombol Bantuan (aktif/nonaktif, tampil di HP,
      posisi & tinggi dari bawah di HP).
@@ -22809,6 +22975,34 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
     .fabset-grid2{ grid-template-columns:1fr; }
     .fabset-swatches{ grid-template-columns:repeat(2, 1fr); }
   }
+
+  /* ===== v2.93.19 -- Chat Bot Min Ha, ikon tiap pilihan, urutan pilihan ===== */
+  #fab-bantuan .fab-item-ic{ position:relative; overflow:hidden; }
+  #fab-bantuan .fab-item-ic img{ display:block; width:100%; height:100%; object-fit:cover; }
+  #fab-bantuan .fab-item-ic img[hidden]{ display:none; }
+  #fab-bantuan #fab-item-mh .fab-item-ic{ background:var(--cp-bg,#e7f5ee); color:var(--cp-link,#00704f); }
+  #fab-bantuan #fab-item-mh:hover{ background:var(--cp-bg,#e7f5ee); }
+  #fab-bantuan .fab-item .fab-item-ic.fab-ikon-gambar, #fab-bantuan #fab-item-chat .fab-item-ic.fab-ikon-gambar, #fab-bantuan #fab-item-mh .fab-item-ic.fab-ikon-gambar{ background:#fff; }
+  #fab-bantuan #fab-mh .fab-msg.saya{ background:var(--cp-head,#00845f); }
+  #fab-bantuan #fab-mh .fab-btns button{ border-color:var(--cp-head,#00845f); color:var(--cp-link,#00704f); background:var(--card,#fff); font-size:13.5px; padding:7px 12px; min-height:36px; }
+  #fab-bantuan #fab-mh .fab-btns button:hover{ background:var(--cp-bg,#e7f5ee); }
+  #fab-bantuan #fab-mh .fab-chat-head{ background:var(--cp-head,#00845f); }
+  #fab-bantuan #fab-mh .fab-chat-body{ background:var(--cp-bg,#e7f5ee); }
+  #fab-bantuan #fab-mh .fab-chat-foot button{ background:var(--cp-head,#00845f); }
+  #fab-bantuan #fab-mh .fab-chat-foot textarea:focus-visible{ outline:2px solid var(--cp-head,#00845f); outline-offset:0; }
+  .fabset-pv-row.mh .fabset-pv-ic{ background:var(--cp-bg); color:var(--cp-link); }
+  .fabset-pv-ic{ position:relative; overflow:hidden; }
+  .fabset-pv-ic img{ display:block; width:100%; height:100%; object-fit:cover; }
+  .fabset-pv-ic img[hidden]{ display:none; }
+  .fabset-pv-row .fabset-pv-ic.gambar{ background:#fff; }
+  .fabset-urut{ display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+  .fabset-urut-row{ display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--line); border-radius:12px; background:var(--card); }
+  .fabset-urut-n{ flex:0 0 26px; height:26px; border-radius:50%; background:var(--primary-green); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .fabset-urut-t{ flex:1; min-width:0; font-size:14.5px; font-weight:600; color:var(--ink); overflow-wrap:anywhere; }
+  .fabset-urut-b{ flex:0 0 44px; height:44px; border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink); font-size:16px; cursor:pointer; font-family:inherit; }
+  .fabset-urut-b:hover:not(:disabled){ border-color:var(--primary-green); }
+  .fabset-urut-b:disabled{ opacity:.35; cursor:default; }
+  .fabset-urut-b:focus-visible{ outline:3px solid var(--primary-green); outline-offset:2px; }
 </style>
 <div id="fab-bantuan" hidden class="fab-tema-biru">
   <div class="fab-wa" id="fab-wa" hidden role="dialog" aria-label="Bantuan WhatsApp">
@@ -22839,14 +23033,33 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
       <button type="button" id="fab-chat-send">Kirim</button>
     </div>
   </div>
+  <div class="fab-chat fab-tema-hijau" id="fab-mh" hidden role="dialog" aria-label="Chat bot Min Ha">
+    <div class="fab-chat-head">
+      <div><b id="fab-hd-mh">Chat Bot Min Ha</b><small>Chat langsung di sini &middot; dibalas bot</small></div>
+      <span class="fab-hd-sp"></span>
+      <button type="button" class="fab-clear" id="fab-mh-clear" aria-label="Hapus semua pesan" title="Hapus semua pesan"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="fab-x" id="fab-mh-close" aria-label="Tutup chat">&times;</button>
+    </div>
+    <div class="fab-confirm" id="fab-mh-confirm" hidden><span>Hapus semua pesan di chat Bot Min Ha ini?</span><button type="button" class="fab-no" id="fab-mh-no">Batal</button><button type="button" class="fab-yes" id="fab-mh-yes">Hapus</button></div>
+    <div class="fab-chat-body" id="fab-mh-body"></div>
+    <div class="fab-chat-foot">
+      <textarea id="fab-mh-input" rows="1" placeholder="Ketik pesan atau /menu… (Enter kirim)"></textarea>
+      <button type="button" id="fab-mh-send">Kirim</button>
+    </div>
+  </div>
   <div class="fab-menu" id="fab-menu" hidden>
     <button type="button" class="fab-item" id="fab-item-bantuan">
-      <span class="fab-item-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2.9-1.2 1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1" fill="currentColor"/></svg></span>
+      <span class="fab-item-ic" id="fab-ic-wa"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2.9-1.2 1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1" fill="currentColor"/></svg><img alt="" hidden decoding="async" referrerpolicy="no-referrer" draggable="false"></span>
       <span class="fab-item-tx"><b id="fab-t-wa">Bantuan WhatsApp</b><small id="fab-sub-wa">Tulis pesan, diteruskan ke WhatsApp</small></span>
       <span class="fab-badge" id="fab-badge-wa" hidden>0</span>
     </button>
+    <button type="button" class="fab-item fab-tema-hijau" id="fab-item-mh">
+      <span class="fab-item-ic" id="fab-ic-mh"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M9 8h6M9 12h6M9 16h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><img alt="" hidden decoding="async" referrerpolicy="no-referrer" draggable="false"></span>
+      <span class="fab-item-tx"><b id="fab-t-mh">Chat Bot Min Ha</b><small id="fab-sub-mh">Tanya soal pesanan, dibalas bot</small></span>
+      <span class="fab-badge" id="fab-badge-mh" hidden>0</span>
+    </button>
     <button type="button" class="fab-item" id="fab-item-chat">
-      <span class="fab-item-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+      <span class="fab-item-ic" id="fab-ic-ph"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><img alt="" hidden decoding="async" referrerpolicy="no-referrer" draggable="false"></span>
       <span class="fab-item-tx"><b id="fab-t-chat">Chat Bot PH (Logistik)</b><small id="fab-sub-chat">Tanya langsung, dibalas bot</small></span>
       <span class="fab-badge" id="fab-badge-chat" hidden>0</span>
     </button>
@@ -22860,27 +23073,27 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
 (function(){
   "use strict";
   const $ = id => document.getElementById(id);
-  const fab = $("fab-bantuan"), main = $("fab-main"), menu = $("fab-menu"), chat = $("fab-chat"), wa = $("fab-wa");
-  const body = $("fab-chat-body"), input = $("fab-chat-input"), sendBtn = $("fab-chat-send"), dot = $("fab-dot");
-  const waBody = $("fab-wa-body"), waInput = $("fab-wa-input"), waSend = $("fab-wa-send");
+  const fab = $("fab-bantuan"), main = $("fab-main"), menu = $("fab-menu"), wa = $("fab-wa"), mhPanel = $("fab-mh");
+  const waBody = $("fab-wa-body"), waInput = $("fab-wa-input"), waSend = $("fab-wa-send"), dot = $("fab-dot");
   const fabImg = $("fab-ikon-img"), fabSvg = $("fab-ikon-svg");
   if(!fab || !main) return;
-  const KEY = "habit_chat_ph_v1", KEY_WA = "habit_chat_wa_v1";
-  let st = { msgs: [], cursor: "" };
-  try{ const r = JSON.parse(localStorage.getItem(KEY) || "null"); if(r && Array.isArray(r.msgs)) st = { msgs: r.msgs.slice(-200), cursor: String(r.cursor || "") }; }catch(e){}
+  const KEY_WA = "habit_chat_wa_v1";
   let wst = { msgs: [] };
   try{ const r = JSON.parse(localStorage.getItem(KEY_WA) || "null"); if(r && Array.isArray(r.msgs)) wst = { msgs: r.msgs.slice(-100) }; }catch(e){}
-  let unreadBot = 0, unreadWa = 0, waiting = false, waitUntil = 0, lastSentAt = 0, timer = null, polling = false, lastErrAt = 0;
-  let ikonSaatIni = null;   // v2.93.18 -- URL ikon gambar yang sedang dipasang
+  let unreadWa = 0;
+  let ikonSaatIni = null;   // URL ikon gambar tombol utama yang sedang dipasang
+  const bots = [];          // chat bot (PH, Min Ha) -- dibuat lewat buatBot()
   const TEMA_OK = ["biru","langit","indigo","teal","ungu","hijau","slate"];
-  const TEKS_DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
-  const TEKS_KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
+  const TEKS_DEF = { waJudul:"Bantuan WhatsApp", waKet:"Tulis pesan, diteruskan ke WhatsApp", mhJudul:"Chat Bot Min Ha", mhKet:"Tanya soal pesanan, dibalas bot", chatJudul:"Chat Bot PH (Logistik)", chatKet:"Tanya langsung, dibalas bot" };
+  const TEKS_KEY = { waJudul:"bantuanWaJudul", waKet:"bantuanWaKet", mhJudul:"bantuanMinhaJudul", mhKet:"bantuanMinhaKet", chatJudul:"bantuanChatJudul", chatKet:"bantuanChatKet" };
+  const ITEM = { wa:"fab-item-bantuan", minha:"fab-item-mh", ph:"fab-item-chat" };
+  const IKON_KEY = { wa:"bantuanWaIkonUrl", minha:"bantuanMinhaIkonUrl", ph:"bantuanPhIkonUrl" };
+  const IKON_BOX = { wa:"fab-ic-wa", minha:"fab-ic-mh", ph:"fab-ic-ph" };
 
-  const save = () => { try{ localStorage.setItem(KEY, JSON.stringify({ msgs: st.msgs.slice(-200), cursor: st.cursor })); }catch(e){} };
   const saveWa = () => { try{ localStorage.setItem(KEY_WA, JSON.stringify({ msgs: wst.msgs.slice(-100) })); }catch(e){} };
   const cfg = () => { try{ return SETTINGS || {}; }catch(e){ return {}; } };
   const mq = window.matchMedia ? window.matchMedia("(max-width:900px)") : { matches: false };
-  const panelBuka = () => !chat.hidden || !wa.hidden;
+  const panelBuka = () => !wa.hidden || bots.some(b => !b.panel.hidden);
 
   function syncVisible(){
     const s = cfg(), hp = !!mq.matches;
@@ -22888,15 +23101,17 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
     if(on && hp) on = s.bantuanHpEnabled === true;          // di HP: hanya kalau diaktifkan
     fab.classList.toggle("fab-kiri", hp && s.bantuanHpPosisi === "kiri");
     const naik = Number(s.bantuanHpNaik); fab.style.setProperty("--fab-naik", (isFinite(naik) && naik >= 0 ? naik : 84) + "px");
-    terapkanTema(); terapkanIkon(); terapkanTeks();
+    terapkanTema(); terapkanIkon(); terapkanIkonPilihan(); terapkanUrutan(); terapkanTeks();
     fab.hidden = !on;
-    if(!on){ menu.hidden = true; chat.hidden = true; wa.hidden = true; panelClass(); stopTimer(); }
+    if(!on){ menu.hidden = true; wa.hidden = true; bots.forEach(b => { b.panel.hidden = true; b.stopTimer(); }); panelClass(); }
   }
-  /* v2.93.18 -- warna Chat Bot PH, ikon dari link gambar, tulisan tiap pilihan (semua dari Master Data > Tampilan) */
+  /* warna Chat Bot PH (di tombol induk) dan Chat Bot Min Ha (di panel & pilihannya sendiri), ikon gambar, urutan, tulisan -- semua dari Master Data > Tampilan */
+  function setTema(el, t){ TEMA_OK.forEach(x => el.classList.toggle("fab-tema-" + x, x === t)); }
   function terapkanTema(){
-    let t = ""; try{ t = String(cfg().chatPhTema || ""); }catch(e){}
+    let t = "", m = ""; try{ t = String(cfg().chatPhTema || ""); m = String(cfg().chatMinhaTema || ""); }catch(e){}
     if(TEMA_OK.indexOf(t) < 0) t = "biru";
-    TEMA_OK.forEach(x => fab.classList.toggle("fab-tema-" + x, x === t));
+    if(TEMA_OK.indexOf(m) < 0) m = "hijau";
+    setTema(fab, t); setTema(mhPanel, m); setTema($("fab-item-mh"), m);
   }
   function ikonAman(v){ v = String(v == null ? "" : v).trim(); return (v.length <= 600 && /^https:\/\/[^\s"'<>]+$/i.test(v)) ? v : ""; }
   function terapkanIkon(){
@@ -22907,14 +23122,33 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
     fabImg.onerror = () => { if(ikonSaatIni === u){ fabImg.hidden = true; fabSvg.style.display = ""; main.classList.remove("fab-ikon-gambar"); } };   // gambar gagal dimuat -> ikon bawaan
     fabImg.src = u;
   }
+  const ikonPil = {};
+  function terapkanIkonPilihan(){
+    Object.keys(IKON_KEY).forEach(k => {
+      let u = ""; try{ u = ikonAman(cfg()[IKON_KEY[k]]); }catch(e){}
+      if(ikonPil[k] === u) return; ikonPil[k] = u;
+      const box = $(IKON_BOX[k]), im = box.querySelector("img"), sv = box.querySelector("svg");
+      if(!u){ im.hidden = true; im.removeAttribute("src"); if(sv) sv.style.display = ""; box.classList.remove("fab-ikon-gambar"); return; }
+      im.onload = () => { if(ikonPil[k] === u){ im.hidden = false; if(sv) sv.style.display = "none"; box.classList.add("fab-ikon-gambar"); } };
+      im.onerror = () => { if(ikonPil[k] === u){ im.hidden = true; if(sv) sv.style.display = ""; box.classList.remove("fab-ikon-gambar"); } };   // gagal dimuat -> ikon bawaan
+      im.src = u;
+    });
+  }
+  let urutanSaatIni = "";
+  function terapkanUrutan(){
+    let v = ["wa","minha","ph"];
+    try{ if(typeof fabUrutanBersih === "function") v = fabUrutanBersih(cfg().bantuanUrutan); }catch(e){}
+    const k = v.join(","); if(k === urutanSaatIni) return; urutanSaatIni = k;
+    v.forEach(x => menu.appendChild($(ITEM[x])));
+  }
   function teks(k){
     let v = ""; try{ v = String(cfg()[TEKS_KEY[k]] || "").replace(/\s+/g, " ").trim().slice(0, 60); }catch(e){}
     return v || TEKS_DEF[k];
   }
   function terapkanTeks(){
-    $("fab-t-wa").textContent = teks("waJudul"); $("fab-t-chat").textContent = teks("chatJudul");
-    $("fab-hd-wa").textContent = teks("waJudul"); $("fab-hd-chat").textContent = teks("chatJudul");
-    wa.setAttribute("aria-label", teks("waJudul")); chat.setAttribute("aria-label", teks("chatJudul"));
+    $("fab-t-wa").textContent = teks("waJudul"); $("fab-t-mh").textContent = teks("mhJudul"); $("fab-t-chat").textContent = teks("chatJudul");
+    $("fab-hd-wa").textContent = teks("waJudul"); $("fab-hd-mh").textContent = teks("mhJudul"); $("fab-hd-chat").textContent = teks("chatJudul");
+    wa.setAttribute("aria-label", teks("waJudul")); mhPanel.setAttribute("aria-label", teks("mhJudul")); $("fab-chat").setAttribute("aria-label", teks("chatJudul"));
     paintNotif();
   }
   window.__syncFabBantuan = syncVisible;
@@ -22932,7 +23166,7 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
     s = s.replace(/&lt;(\/?)(b|i|code)&gt;/gi, "<$1$2>").replace(/\n/g, "<br>");
     return s;
   }
-  // Render gelembung chat -- dipakai bersama oleh panel Bot PH & panel Bantuan WhatsApp
+  // Render gelembung chat -- dipakai bersama oleh panel Bot PH, Bot Min Ha & panel Bantuan WhatsApp
   function renderInto(el, msgs, o){
     el.innerHTML = "";
     if(!msgs.length){
@@ -22955,7 +23189,11 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
         m.tombol.flat().forEach(b => {
           if(!b || !b.teks) return;
           const bt = document.createElement("button"); bt.type = "button"; bt.textContent = b.teks;
-          bt.addEventListener("click", () => { if(b.url){ window.open(b.url, "_blank", "noopener"); } else if(b.data && o.callback){ o.callback(String(b.data), b.teks); } });
+          bt.addEventListener("click", () => {
+            if(b.url){ window.open(b.url, "_blank", "noopener"); }
+            else if(b.data && o.callback){ o.callback(String(b.data), b.teks, m.teks); }
+            else if(b.kirim && o.kirimTeks){ o.kirimTeks(String(b.kirim)); }   // tombol keyboard bot: ketuk = kirim teksnya
+          });
           wrap.appendChild(bt);
         });
         d.appendChild(wrap);
@@ -22967,136 +23205,170 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
     }
     el.scrollTop = el.scrollHeight;
   }
-  function render(){
-    renderInto(body, st.msgs, { kosong: "Halo! Ketik pesan atau perintah (mis. /menu) untuk chat dengan bot PH (Logistik).", waiting, retry, callback: (data, label) => kirim("", data, label) });
-  }
   function renderWa(){
     renderInto(waBody, wst.msgs, { kosong: "Tulis pesanmu di sini 👇 — pesan akan diteruskan ke WhatsApp admin." });
   }
-  function sysNote(t){ // catatan sistem, tidak terus-menerus (maks 1 per 30 dtk)
-    if(Date.now() - lastErrAt < 30000) return; lastErrAt = Date.now();
-    st.msgs.push({ dari: "sys", teks: t, waktu: new Date().toISOString() }); save(); render();
-  }
   // Notif angka: di tombol utama (total) DAN di tombol pilihan yang bersangkutan
   function paintNotif(){
-    const total = unreadBot + unreadWa, txt = n => n > 9 ? "9+" : String(n);
+    const ph = bots[0], mh = bots[1];
+    const uPh = ph ? ph.unread() : 0, uMh = mh ? mh.unread() : 0;
+    const total = uPh + uMh + unreadWa, txt = n => n > 9 ? "9+" : String(n);
     dot.hidden = !total; dot.textContent = txt(total);
-    const bc = $("fab-badge-chat"), bw = $("fab-badge-wa"), sc = $("fab-sub-chat"), sw = $("fab-sub-wa");
-    bc.hidden = !unreadBot; bc.textContent = txt(unreadBot);
-    bw.hidden = !unreadWa; bw.textContent = txt(unreadWa);
-    sc.textContent = unreadBot ? unreadBot + " balasan baru dari bot" : teks("chatKet"); sc.classList.toggle("fab-baru", !!unreadBot);
-    sw.textContent = unreadWa ? unreadWa + " balasan baru" : teks("waKet"); sw.classList.toggle("fab-baru", !!unreadWa);
+    const set = (badge, sub, n, kata, def) => {
+      $(badge).hidden = !n; $(badge).textContent = txt(n);
+      $(sub).textContent = n ? n + kata : def; $(sub).classList.toggle("fab-baru", !!n);
+    };
+    set("fab-badge-chat", "fab-sub-chat", uPh, " balasan baru dari bot", teks("chatKet"));
+    set("fab-badge-mh", "fab-sub-mh", uMh, " balasan baru dari bot", teks("mhKet"));
+    set("fab-badge-wa", "fab-sub-wa", unreadWa, " balasan baru", teks("waKet"));
     main.setAttribute("aria-label", total ? "Bantuan — " + total + " balasan baru" : "Bantuan");
   }
-  function setUnread(n){ unreadBot = n; paintNotif(); }
   function setUnreadWa(n){ unreadWa = n; paintNotif(); }
 
   const sid = () => { try{ return getTelegramSenderId(); }catch(e){ return ""; } };
   const base = () => { try{ return MASTER_DATA_WORKER_URL; }catch(e){ return ""; } };
 
-  async function kirimKeServer(m){
-    const res = await fetch(base() + "/logistik/chat/kirim", {
-      method: "POST",
-      headers: workerHeaders({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ senderId: sid(), pesan: m.callback ? "" : m.teks, callback: m.callback || "", idPesan: m.idLokal })
-    });
-    const j = await res.json().catch(() => null);
-    if(!res.ok || !j || j.ok === false){
-      const e = new Error((j && j.error) || ("HTTP " + res.status)); e.status = res.status; throw e;
+  /* ---------- Chat bot (dipakai bersama: Bot PH -> Logistik, Bot Min Ha -> Worker Rincian) ---------- */
+  function buatBot(o){
+    const panel = $(o.panel), body = $(o.pfx + "-body"), input = $(o.pfx + "-input"), sendBtn = $(o.pfx + "-send"), konfirm = $(o.pfx + "-confirm");
+    let st = { msgs: [], cursor: "" };
+    try{ const r = JSON.parse(localStorage.getItem(o.key) || "null"); if(r && Array.isArray(r.msgs)) st = { msgs: r.msgs.slice(-200), cursor: String(r.cursor || "") }; }catch(e){}
+    let unread = 0, waiting = false, waitUntil = 0, lastSentAt = 0, timer = null, polling = false, lastErrAt = 0;
+    const save = () => { try{ localStorage.setItem(o.key, JSON.stringify({ msgs: st.msgs.slice(-200), cursor: st.cursor })); }catch(e){} };
+    const setUnread = n => { unread = n; paintNotif(); };
+    function render(){
+      renderInto(body, st.msgs, { kosong: o.kosong, waiting, retry, callback: (data, label, asal) => kirim("", data, label, asal), kirimTeks: t => kirim(t) });
     }
-  }
-  async function kirim(teks, callback, labelTombol){
-    teks = String(teks || "").trim();
-    if(!teks && !callback) return;
-    if(!sid()){ sysNote("Isi dulu “ID Telegram Saya” (menu Kode Akses di footer) supaya bot tahu ini kamu."); return; }
-    const m = { dari: "saya", teks: teks || labelTombol || "", callback: callback || "", idLokal: "w" + Date.now() + Math.random().toString(36).slice(2, 6), waktu: new Date().toISOString(), status: "mengirim" };
-    st.msgs.push(m); save(); render();
-    await coba(m);
-  }
-  async function coba(m){
-    try{
-      await kirimKeServer(m);
-      m.status = "terkirim"; lastSentAt = Date.now(); waiting = true; waitUntil = Date.now() + 30000;
-      save(); render(); startTimer(); poll();
-    }catch(e){
-      m.status = "gagal"; save(); render();
-      sysNote("Pesan belum terkirim: " + (e && e.message ? e.message : "koneksi bermasalah"));
+    function sysNote(t){ // catatan sistem, tidak terus-menerus (maks 1 per 30 dtk)
+      if(Date.now() - lastErrAt < 30000) return; lastErrAt = Date.now();
+      st.msgs.push({ dari: "sys", teks: t, waktu: new Date().toISOString() }); save(); render();
     }
-  }
-  function retry(m){ m.status = "mengirim"; render(); coba(m); }
-
-  async function poll(){
-    if(polling || !sid() || !base() || document.hidden) return;
-    polling = true;
-    try{
-      const res = await fetch(base() + "/logistik/chat/ambil?senderId=" + encodeURIComponent(sid()) + "&setelah=" + encodeURIComponent(st.cursor), { headers: workerHeaders() });
+    async function kirimKeServer(m){
+      const res = await fetch(base() + o.urlKirim, {
+        method: "POST",
+        headers: workerHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ senderId: sid(), pesan: m.callback ? "" : m.teks, callback: m.callback || "", idPesan: m.idLokal, asal: m.asal || "" })
+      });
       const j = await res.json().catch(() => null);
-      if(res.ok && j && j.ok !== false){
-        const baru = (Array.isArray(j.pesan) ? j.pesan : []).filter(p => p && p.teks != null);
-        if(baru.length){
-          baru.forEach(p => {
-            if(p.id != null) st.cursor = String(p.id);
-            st.msgs.push({ dari: "bot", teks: p.teks, tombol: p.tombol || null, waktu: p.waktu || new Date().toISOString(), idServer: p.id });
-          });
-          waiting = false; save(); render();
-          if(chat.hidden) setUnread(unreadBot + baru.length);
-        } else if(waiting && Date.now() > waitUntil){ waiting = false; render(); }
-        if(j.cursor != null && !baru.length){ st.cursor = String(j.cursor); }
-      } else if(waiting && Date.now() > waitUntil){
-        waiting = false; render();
-        sysNote("Bot belum membalas: " + ((j && j.error) || ("HTTP " + res.status)));
+      if(!res.ok || !j || j.ok === false){
+        const e = new Error((j && j.error) || ("HTTP " + res.status)); e.status = res.status; throw e;
       }
-    }catch(e){ /* jaringan putus: coba lagi di putaran berikut */ }
-    polling = false;
-  }
-  function interval(){
-    if(!chat.hidden) return waiting ? 1800 : 5000;
-    return (Date.now() - lastSentAt < 600000) ? 15000 : 0; // tertutup: hanya cek bila baru saja chat
-  }
-  function loop(){
-    const iv = interval();
-    if(!iv){ timer = null; return; }
-    timer = setTimeout(async () => { await poll(); loop(); }, iv);
-  }
-  function startTimer(){ stopTimer(); loop(); }
-  function stopTimer(){ if(timer){ clearTimeout(timer); timer = null; } }
-
-  /* ---------- Hapus semua pesan chat Bot PH ---------- */
-  async function hapusSemuaBot(){
-    $("fab-chat-confirm").hidden = true;
-    st.msgs = []; waiting = false; save(); setUnread(0); render();   // tampilan & salinan di perangkat ini langsung bersih
-    let gagal = "";
-    try{
-      if(sid() && base()){
-        const res = await fetch(base() + "/logistik/chat/hapus", { method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ senderId: sid() }) });
+    }
+    async function kirim(teksPesan, callback, labelTombol, asal){
+      teksPesan = String(teksPesan || "").trim();
+      if(!teksPesan && !callback) return;
+      if(!sid()){ sysNote("Isi dulu “ID Telegram Saya” (menu Kode Akses di footer) supaya bot tahu ini kamu."); return; }
+      const m = { dari: "saya", teks: teksPesan || labelTombol || "", callback: callback || "", asal: String(asal || "").slice(0, 1000), idLokal: "w" + Date.now() + Math.random().toString(36).slice(2, 6), waktu: new Date().toISOString(), status: "mengirim" };
+      st.msgs.push(m); save(); render();
+      await coba(m);
+    }
+    async function coba(m){
+      try{
+        await kirimKeServer(m);
+        m.status = "terkirim"; lastSentAt = Date.now(); waiting = true; waitUntil = Date.now() + 30000;
+        save(); render(); startTimer(); poll();
+      }catch(e){
+        m.status = "gagal"; save(); render();
+        sysNote("Pesan belum terkirim: " + (e && e.message ? e.message : "koneksi bermasalah"));
+      }
+    }
+    function retry(m){ m.status = "mengirim"; render(); coba(m); }
+    async function poll(){
+      if(polling || !sid() || !base() || document.hidden) return;
+      polling = true;
+      try{
+        const res = await fetch(base() + o.urlAmbil + "?senderId=" + encodeURIComponent(sid()) + "&setelah=" + encodeURIComponent(st.cursor), { headers: workerHeaders() });
         const j = await res.json().catch(() => null);
-        if(!res.ok || !j || j.ok === false) gagal = (j && j.error) || ("HTTP " + res.status);
-      }
-    }catch(e){ gagal = "koneksi bermasalah"; }
-    if(gagal){ st.msgs.push({ dari: "sys", teks: "Pesan di layar ini sudah dihapus, tetapi antrean di server belum bisa dibersihkan (" + gagal + ").", waktu: new Date().toISOString() }); save(); render(); }
+        if(res.ok && j && j.ok !== false){
+          const baru = (Array.isArray(j.pesan) ? j.pesan : []).filter(p => p && p.teks != null);
+          if(baru.length){
+            baru.forEach(p => {
+              if(p.id != null) st.cursor = String(p.id);
+              st.msgs.push({ dari: "bot", teks: p.teks, tombol: p.tombol || null, waktu: p.waktu || new Date().toISOString(), idServer: p.id });
+            });
+            waiting = false; save(); render();
+            if(panel.hidden) setUnread(unread + baru.length);
+          } else if(waiting && Date.now() > waitUntil){ waiting = false; render(); }
+          if(j.cursor != null && !baru.length){ st.cursor = String(j.cursor); }
+        } else if(waiting && Date.now() > waitUntil){
+          waiting = false; render();
+          sysNote("Bot belum membalas: " + ((j && j.error) || ("HTTP " + res.status)));
+        }
+      }catch(e){ /* jaringan putus: coba lagi di putaran berikut */ }
+      polling = false;
+    }
+    function interval(){
+      if(!panel.hidden) return waiting ? 1800 : 5000;
+      return (Date.now() - lastSentAt < 600000) ? 15000 : 0; // tertutup: hanya cek bila baru saja chat
+    }
+    function loop(){
+      const iv = interval();
+      if(!iv){ timer = null; return; }
+      timer = setTimeout(async () => { await poll(); loop(); }, iv);
+    }
+    function stopTimer(){ if(timer){ clearTimeout(timer); timer = null; } }
+    function startTimer(){ stopTimer(); loop(); }
+    async function hapusSemua(){
+      konfirm.hidden = true;
+      st.msgs = []; waiting = false; save(); setUnread(0); render();   // tampilan & salinan di perangkat ini langsung bersih
+      let gagal = "";
+      try{
+        if(sid() && base()){
+          const res = await fetch(base() + o.urlHapus, { method: "POST", headers: workerHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ senderId: sid() }) });
+          const j = await res.json().catch(() => null);
+          if(!res.ok || !j || j.ok === false) gagal = (j && j.error) || ("HTTP " + res.status);
+        }
+      }catch(e){ gagal = "koneksi bermasalah"; }
+      if(gagal){ st.msgs.push({ dari: "sys", teks: "Pesan di layar ini sudah dihapus, tetapi antrean di server belum bisa dibersihkan (" + gagal + ").", waktu: new Date().toISOString() }); save(); render(); }
+    }
+    function open(){
+      tutupLain(api);
+      menu.hidden = true; panel.hidden = false; main.setAttribute("aria-expanded", "true"); panelClass();
+      setUnread(0); render(); startTimer(); poll();
+      setTimeout(() => input.focus(), 50);
+    }
+    function close(){ panel.hidden = true; konfirm.hidden = true; main.setAttribute("aria-expanded", "false"); panelClass(); startTimer(); }
+    $(o.pfx + "-close").addEventListener("click", close);
+    $(o.pfx + "-clear").addEventListener("click", () => { konfirm.hidden = !konfirm.hidden; });
+    $(o.pfx + "-no").addEventListener("click", () => { konfirm.hidden = true; });
+    $(o.pfx + "-yes").addEventListener("click", hapusSemua);
+    const doSend = () => { const v = input.value; if(!v.trim()) return; input.value = ""; input.style.height = "auto"; kirim(v); };
+    sendBtn.addEventListener("click", doSend);
+    input.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); doSend(); } });
+    input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 90) + "px"; });
+    $(o.item).addEventListener("click", open);
+    const api = { panel, open, close, render, startTimer, stopTimer, unread: () => unread };
+    bots.push(api);
+    return api;
   }
+  // urutan penting: bots[0] = PH, bots[1] = Min Ha (dipakai paintNotif)
+  buatBot({ panel: "fab-chat", pfx: "fab-chat", item: "fab-item-chat", key: "habit_chat_ph_v1", urlKirim: "/logistik/chat/kirim", urlAmbil: "/logistik/chat/ambil", urlHapus: "/logistik/chat/hapus",
+    kosong: "Halo! Ketik pesan atau perintah (mis. /menu) untuk chat dengan bot PH (Logistik)." });
+  buatBot({ panel: "fab-mh", pfx: "fab-mh", item: "fab-item-mh", key: "habit_chat_minha_v1", urlKirim: "/minha/chat/kirim", urlAmbil: "/minha/chat/ambil", urlHapus: "/minha/chat/hapus",
+    kosong: "Halo! Ketik pesan atau perintah (mis. /menu) untuk chat dengan bot Min Ha (Rincian Pemesanan)." });
+
   /* ---------- Bantuan WhatsApp (panel tulis pesan -> diteruskan ke WhatsApp) ---------- */
-  function waTujuan(teks){
+  function waTujuan(teksPesan){
     let link = ""; try{ link = String(cfg().bantuanLink || "").trim(); }catch(e){}
     if(!link) return { url: "", mode: "kosong" };
     try{
       const u = new URL(link), h = u.hostname.replace(/^www\./, "");
       if(h === "wa.me" || h === "api.whatsapp.com" || h === "web.whatsapp.com"){
-        if(teks) u.searchParams.set("text", teks); else u.searchParams.delete("text");
+        if(teksPesan) u.searchParams.set("text", teksPesan); else u.searchParams.delete("text");
         return { url: u.toString(), mode: "wa", polos: link };
       }
     }catch(e){}
     return { url: link, mode: "salin", polos: link };   // bukan link chat WhatsApp pribadi (mis. grup/Telegram/FAQ): pesan disalin
   }
-  function waKirim(teks){
-    teks = String(teks || "").trim(); if(!teks) return;
+  function waKirim(teksPesan){
+    teksPesan = String(teksPesan || "").trim(); if(!teksPesan) return;
     const now = new Date().toISOString();
-    wst.msgs.push({ dari: "saya", teks, waktu: now, status: "terkirim" });
-    const r = waTujuan(teks);
+    wst.msgs.push({ dari: "saya", teks: teksPesan, waktu: now, status: "terkirim" });
+    const r = waTujuan(teksPesan);
     if(r.mode === "kosong"){
       wst.msgs.push({ dari: "bot", teks: "Link Bantuan belum diisi. Isi dulu di Master Data → Tampilan → Tombol Bantuan.", waktu: now });
     } else {
-      if(r.mode === "salin"){ try{ navigator.clipboard && navigator.clipboard.writeText(teks); }catch(e){} }
+      if(r.mode === "salin"){ try{ navigator.clipboard && navigator.clipboard.writeText(teksPesan); }catch(e){} }
       try{ window.open(r.url, "_blank", "noopener"); }catch(e){}
       wst.msgs.push({ dari: "bot", waktu: now,
         teks: r.mode === "wa"
@@ -23108,42 +23380,37 @@ html[data-theme="dark"] .fab-tema-slate{ --cp-bg:#161b1e; --cp-link:#a9bcc6; }
   }
 
   /* ---------- buka / tutup panel ---------- */
-  function openChat(){
-    menu.hidden = true; wa.hidden = true; chat.hidden = false; main.setAttribute("aria-expanded", "true"); panelClass();
-    setUnread(0); render(); startTimer(); poll();
-    setTimeout(() => input.focus(), 50);
+  function tutupLain(kecuali){
+    bots.forEach(b => { if(b !== kecuali && !b.panel.hidden) b.close(); });
+    if(kecuali !== "wa" && !wa.hidden) closeWa();
   }
-  function closeChat(){ chat.hidden = true; $("fab-chat-confirm").hidden = true; main.setAttribute("aria-expanded", "false"); panelClass(); startTimer(); }
   function openWa(){
-    menu.hidden = true; chat.hidden = true; wa.hidden = false; main.setAttribute("aria-expanded", "true"); panelClass();
+    tutupLain("wa");
+    menu.hidden = true; wa.hidden = false; main.setAttribute("aria-expanded", "true"); panelClass();
     setUnreadWa(0); renderWa(); setTimeout(() => waInput.focus(), 50);
   }
   function closeWa(){ wa.hidden = true; $("fab-wa-confirm").hidden = true; main.setAttribute("aria-expanded", "false"); panelClass(); }
   const tutupMenu = () => { menu.hidden = true; main.setAttribute("aria-expanded", "false"); };
+  function tutupPanelTerbuka(){
+    const b = bots.find(x => !x.panel.hidden);
+    if(b){ b.close(); return true; }
+    if(!wa.hidden){ closeWa(); return true; }
+    return false;
+  }
 
   main.addEventListener("click", () => {
-    if(!chat.hidden){ closeChat(); return; }
-    if(!wa.hidden){ closeWa(); return; }
+    if(tutupPanelTerbuka()) return;
     menu.hidden = !menu.hidden;
     main.setAttribute("aria-expanded", String(!menu.hidden));
   });
   $("fab-item-bantuan").addEventListener("click", openWa);
-  $("fab-item-chat").addEventListener("click", openChat);
-  $("fab-chat-close").addEventListener("click", closeChat);
   $("fab-wa-close").addEventListener("click", closeWa);
-  $("fab-chat-clear").addEventListener("click", () => { $("fab-chat-confirm").hidden = !$("fab-chat-confirm").hidden; });
-  $("fab-chat-no").addEventListener("click", () => { $("fab-chat-confirm").hidden = true; });
-  $("fab-chat-yes").addEventListener("click", hapusSemuaBot);
   $("fab-wa-clear").addEventListener("click", () => { $("fab-wa-confirm").hidden = !$("fab-wa-confirm").hidden; });
   $("fab-wa-no").addEventListener("click", () => { $("fab-wa-confirm").hidden = true; });
   $("fab-wa-yes").addEventListener("click", () => { $("fab-wa-confirm").hidden = true; wst.msgs = []; saveWa(); renderWa(); });
   document.addEventListener("click", e => { if(!menu.hidden && !fab.contains(e.target)) tutupMenu(); });
-  document.addEventListener("keydown", e => { if(e.key === "Escape"){ if(!menu.hidden) tutupMenu(); else if(!chat.hidden) closeChat(); else if(!wa.hidden) closeWa(); } });
-  document.addEventListener("visibilitychange", () => { if(!document.hidden) startTimer(); });
-  const doSend = () => { const v = input.value; if(!v.trim()) return; input.value = ""; input.style.height = "auto"; kirim(v); };
-  sendBtn.addEventListener("click", doSend);
-  input.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); doSend(); } });
-  input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 90) + "px"; });
+  document.addEventListener("keydown", e => { if(e.key === "Escape"){ if(!menu.hidden) tutupMenu(); else tutupPanelTerbuka(); } });
+  document.addEventListener("visibilitychange", () => { if(!document.hidden) bots.forEach(b => b.startTimer()); });
   const doSendWa = () => { const v = waInput.value; if(!v.trim()) return; waInput.value = ""; waInput.style.height = "auto"; waKirim(v); };
   waSend.addEventListener("click", doSendWa);
   waInput.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); doSendWa(); } });
